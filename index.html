@@ -230,14 +230,19 @@
                         <p class="price">${item.price}</p>
                     </div>`;
 
-                card.querySelector('model-viewer').addEventListener('click', () => openModal(src, item.name));
+                card.querySelector('model-viewer').addEventListener('pointerdown', e => { _dragStartX = e.clientX; _dragStartY = e.clientY; });
+card.querySelector('model-viewer').addEventListener('pointerup', e => {
+    const dx = Math.abs(e.clientX - _dragStartX);
+    const dy = Math.abs(e.clientY - _dragStartY);
+    if (dx < 5 && dy < 5) openModal(src, item.name);
+});
                 card.querySelector('.ar-btn').addEventListener('click', e => { e.stopPropagation(); openAR(i); });
                 card.querySelector('.item-details').addEventListener('click', () => openAR(i));
 
                 list.appendChild(card);
             });
         }
-
+let _dragStartX = 0, _dragStartY = 0;
         buildMenu();
     </script>
 </body>
