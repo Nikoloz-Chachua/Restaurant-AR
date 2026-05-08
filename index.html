@@ -9,10 +9,6 @@
     <style>
         :root { --t: 0.45s ease; }
 
-        /* ══════════════════════════════════════════════
-           NIGHT — warm amber glow, deep rich greens
-           like the restaurant at evening
-        ══════════════════════════════════════════════ */
         [data-theme="night"] {
             --bg:          #0e1a0e;
             --bg2:         #162416;
@@ -32,13 +28,9 @@
             --header-sub:  #7aaa50;
         }
 
-        /* ══════════════════════════════════════════════
-           DAY — vivid tropical explosion, warm whites,
-           bright greens, golden sunlight
-        ══════════════════════════════════════════════ */
         [data-theme="day"] {
             --bg:          #e8f5e0;
-            --bg2:         #d4eeC8;
+            --bg2:         #d4eec8;
             --card:        #ffffff;
             --card2:       #f0fae8;
             --border:      rgba(80,160,40,0.25);
@@ -49,13 +41,12 @@
             --accent:      #d4900a;
             --accent2:     #f0b020;
             --accent-text: #ffffff;
-            --thumb-bg:    #ffffff;
+            --thumb-bg:    #3a3a3a;
             --modal-bg:    radial-gradient(ellipse at center, #c8e8b0 0%, #a0cc88 80%);
             --vine:        #5aaa30;
             --header-sub:  #4a8a20;
         }
 
-        /* ── BASE ─────────────────────────────────── */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
@@ -75,7 +66,6 @@
             overflow-x: hidden;
         }
 
-        /* ── VINE DECORATION TOP ──────────────────── */
         .vine-bar {
             width: 100%;
             max-width: 500px;
@@ -89,7 +79,6 @@
             line-height: 1;
         }
 
-        /* ── HEADER ───────────────────────────────── */
         .header {
             width: 100%;
             max-width: 450px;
@@ -114,9 +103,7 @@
 
         [data-theme="day"] .header h1 {
             color: var(--accent);
-            text-shadow:
-                0 0 40px rgba(212,144,10,0.3),
-                0 2px 4px rgba(0,0,0,0.15);
+            text-shadow: 0 0 40px rgba(212,144,10,0.3), 0 2px 4px rgba(0,0,0,0.15);
         }
 
         .tagline {
@@ -129,7 +116,6 @@
             transition: color var(--t);
         }
 
-        /* ── TOGGLE ───────────────────────────────── */
         #theme-toggle {
             position: fixed;
             top: 14px;
@@ -154,7 +140,6 @@
         #theme-toggle:active { transform: scale(0.93); }
         #toggle-icon { font-size: 15px; }
 
-        /* ── MENU LIST ────────────────────────────── */
         .menu-list {
             width: 100%;
             max-width: 450px;
@@ -165,7 +150,6 @@
             z-index: 1;
         }
 
-        /* ── CARD ─────────────────────────────────── */
         .menu-item {
             background: var(--card);
             border: 1px solid var(--border);
@@ -175,17 +159,10 @@
             gap: 13px;
             align-items: center;
             box-shadow: var(--glow);
-            transition:
-                background var(--t), border-color var(--t),
-                box-shadow 0.2s, transform 0.2s;
-            cursor: pointer;
+            transition: background var(--t), border-color var(--t), box-shadow 0.2s, transform 0.2s;
         }
-        .menu-item:active {
-            transform: scale(0.985);
-            box-shadow: var(--glow-hover);
-        }
+        .menu-item:active { transform: scale(0.985); }
 
-        /* ── THUMBNAIL ────────────────────────────── */
         .thumb-wrap {
             width: 108px;
             height: 108px;
@@ -203,7 +180,6 @@
             display: block;
         }
 
-        /* ── ITEM DETAILS ─────────────────────────── */
         .item-details { flex: 1; user-select: none; }
 
         .item-header {
@@ -316,7 +292,30 @@
             transition: color var(--t);
         }
 
-        /* ── VINE BOTTOM ──────────────────────────── */
+        /* ── MODAL NAV ARROWS ─────────────────────── */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.45);
+            color: var(--text);
+            font-size: 1.5rem;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s, transform 0.2s;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-arrow:active { background: rgba(0,0,0,0.7); transform: translateY(-50%) scale(0.93); }
+        .left-arrow  { left: 10px; }
+        .right-arrow { right: 10px; }
+
         .vine-bottom {
             width: 100%;
             max-width: 500px;
@@ -338,7 +337,6 @@
         <span id="toggle-label">Day</span>
     </button>
 
-    <!-- Decorative vine top -->
     <div class="vine-bar">🌿 🦜 🌺 🌿 🌴 🌺 🦜 🌿</div>
 
     <div class="header">
@@ -348,11 +346,14 @@
 
     <div class="menu-list" id="menu-list"></div>
 
-    <!-- Decorative vine bottom -->
     <div class="vine-bottom">🌿 🌺 🌴 🌺 🌿</div>
 
     <!-- Fullscreen modal -->
     <div id="modal">
+        <!-- Nav arrows inside modal -->
+        <button class="nav-arrow left-arrow"  id="modal-prev">❮</button>
+        <button class="nav-arrow right-arrow" id="modal-next">❯</button>
+
         <div class="modal-bar">
             <div id="modal-title"></div>
             <button class="close-btn" id="close-btn">✕ Close</button>
@@ -377,28 +378,51 @@
 
         function applyTheme(theme) {
             html.setAttribute('data-theme', theme);
-            if (theme === 'night') {
-                toggleIcon.textContent  = '☀️';
-                toggleLabel.textContent = 'Day';
-            } else {
-                toggleIcon.textContent  = '🌙';
-                toggleLabel.textContent = 'Night';
-            }
+            toggleIcon.textContent  = theme === 'night' ? '☀️' : '🌙';
+            toggleLabel.textContent = theme === 'night' ? 'Day' : 'Night';
             localStorage.setItem('bl-theme', theme);
         }
-
         applyTheme(localStorage.getItem('bl-theme') || 'night');
         toggleBtn.addEventListener('click', () => {
             applyTheme(html.getAttribute('data-theme') === 'night' ? 'day' : 'night');
         });
 
-        // ── MODAL ──────────────────────────────────
+        // ── MODAL STATE ────────────────────────────
         const modal       = document.getElementById('modal');
         const modalViewer = document.getElementById('modal-viewer');
         const modalTitle  = document.getElementById('modal-title');
 
+        let menuItems  = [];   // filled after buildMenu
+        let modalIndex = 0;
+
         document.getElementById('close-btn').addEventListener('click', closeModal);
         modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+        document.getElementById('modal-prev').addEventListener('click', e => {
+            e.stopPropagation();
+            modalIndex = (modalIndex - 1 + menuItems.length) % menuItems.length;
+            updateModal();
+        });
+        document.getElementById('modal-next').addEventListener('click', e => {
+            e.stopPropagation();
+            modalIndex = (modalIndex + 1) % menuItems.length;
+            updateModal();
+        });
+
+        function updateModal() {
+            const item = menuItems[modalIndex];
+            if (!item) return;
+            modalViewer.src        = item.model || 'food.glb';
+            modalTitle.textContent = item.name;
+        }
+
+        function openModal(index) {
+            modalIndex = index;
+            updateModal();
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+            document.body.style.overflow = 'hidden';
+        }
 
         function closeModal() {
             modal.classList.remove('active');
@@ -406,19 +430,41 @@
             document.body.style.overflow = '';
         }
 
-        function openModal(src, name) {
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('active'), 10);
-            modalViewer.src = src;
-            modalTitle.textContent = name;
-            document.body.style.overflow = 'hidden';
-        }
-
         // ── AR ROUTING ─────────────────────────────
+        // Tries WebXR first, then advanced-ar.html,
+        // falls back to fullscreen modal if AR not supported
         async function openAR(idx) {
-            let ok = false;
-            try { ok = !!(navigator.xr && await navigator.xr.isSessionSupported('immersive-ar')); } catch {}
-            location.href = ok ? `ar-webxr.html?item=${idx}` : `advanced-ar.html?item=${idx}`;
+            let arSupported = false;
+            try {
+                arSupported = !!(navigator.xr && await navigator.xr.isSessionSupported('immersive-ar'));
+            } catch {}
+
+            if (arSupported) {
+                location.href = `ar-webxr.html?item=${idx}`;
+            } else {
+                // Try advanced-ar (model-viewer based AR)
+                // If that fails it redirects back — so open modal as safe fallback
+                const item = menuItems[idx];
+                if (!item) return;
+
+                // Quick check: does model-viewer AR work on this device?
+                // scene-viewer requires ARCore, quick-look requires iOS
+                const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+                              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                const hasCamera = navigator.mediaDevices &&
+                                  (await navigator.mediaDevices.enumerateDevices().catch(() => []))
+                                  .some(d => d.kind === 'videoinput');
+
+                if (isIOS || arSupported) {
+                    location.href = `advanced-ar.html?item=${idx}`;
+                } else if (hasCamera) {
+                    // Marker AR fallback
+                    location.href = `mind-ar-fallback.html`;
+                } else {
+                    // No AR at all — open fullscreen 3D viewer
+                    openModal(idx);
+                }
+            }
         }
 
         // ── BUILD MENU ─────────────────────────────
@@ -438,6 +484,8 @@
                     { name: 'Galius',    description: 'Charcoal-grilled chicken thighs with roasted garlic, lemon & wild herbs',    price: '$16.99', model: 'Druidi.glb' },
                 ];
             }
+
+            menuItems = items; // store for modal navigation
 
             const list = document.getElementById('menu-list');
             items.forEach((item, i) => {
@@ -464,11 +512,12 @@
                         <p class="price">${item.price}</p>
                     </div>`;
 
+                // Tap thumbnail = open modal, drag = just rotate
                 const mv = card.querySelector('model-viewer');
                 mv.addEventListener('pointerdown', e => { _dragStartX = e.clientX; _dragStartY = e.clientY; });
                 mv.addEventListener('pointerup', e => {
                     if (Math.abs(e.clientX - _dragStartX) < 5 && Math.abs(e.clientY - _dragStartY) < 5)
-                        openModal(src, item.name);
+                        openModal(i);
                 });
 
                 card.querySelector('.ar-btn').addEventListener('click', e => { e.stopPropagation(); openAR(i); });
