@@ -44,11 +44,11 @@
             font-size: 15px; padding: 12px 22px;
             border-radius: 24px; white-space: nowrap;
         }
-        #item-label {
+       #item-label {
             display: none; position: absolute;
-            top: 24px; left: 50%; transform: translateX(-50%);
+            bottom: 110px; left: 50%; transform: translateX(-50%);
             background: rgba(0,0,0,0.65); color: white;
-            font-size: 14px; padding: 8px 18px;
+            font-size: 13px; padding: 8px 18px;
             border-radius: 20px; white-space: nowrap;
         }
         #swipe-hint {
@@ -63,6 +63,14 @@
             border: 1px solid rgba(255,255,255,0.25);
             padding: 8px 16px; border-radius: 20px;
             font-size: 13px; cursor: pointer;
+        }
+        #ar-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            display: none;
+            /* Lock to portrait regardless of device rotation */
+            transform-origin: top left;
         }
     </style>
 </head>
@@ -134,13 +142,13 @@
         let N    = 0;
         const mod = i => ((i % N) + N) % N;
 
-        const CFG = {
-            farLeft:  { x: -0.35, z: -0.12, s: 0.20, opacity: 0    },
-            left:     { x: -0.14, z: -0.08, s: 0.20, opacity: 0.65 },
-            center:   { x:  0,    z:  0,    s: 0.25, opacity: 1.0  },
-            right:    { x:  0.14, z: -0.08, s: 0.20, opacity: 0.65 },
-            farRight: { x:  0.35, z: -0.12, s: 0.20, opacity: 0    },
-        };
+      const CFG = {
+    farLeft:  { x: -0.45, z: -0.25, s: 0.10, opacity: 0    },
+    left:     { x: -0.22, z: -0.18, s: 0.12, opacity: 0.55 },
+    center:   { x:  0,    z:  0,    s: 0.25, opacity: 1.0  },
+    right:    { x:  0.22, z: -0.18, s: 0.12, opacity: 0.55 },
+    farRight: { x:  0.45, z: -0.25, s: 0.10, opacity: 0    },
+};
 
         const INIT_ROLES       = ['left', 'center', 'right', 'farRight'];
         let slotOf             = { left: 0, center: 1, right: 2, hidden: 3 };
@@ -526,6 +534,9 @@
             await renderer.xr.setSession(xrSession);
             preAR.style.display   = 'none';
             overlay.style.display = 'block';
+            preAR.style.display   = 'none';
+            overlay.style.display = 'block';
+            lockOverlayOrientation();
         });
 
         document.getElementById('btn-exit').addEventListener('click', () => xrSession?.end());
@@ -543,6 +554,24 @@
         }, { passive: true });
 
         init();
+
+        // Lock overlay orientation
+        function lockOverlayOrientation() {
+            const overlay = document.getElementById('ar-overlay');
+            const angle = window.screen?.orientation?.angle || window.orientation || 0;
+            if (angle === 90 || angle === -90) {
+                overlay.style.transform = `rotate(${-angle}deg) translateX(${angle === 90 ? '-100%' : '0'}) translateY(${angle === -90 ? '-100%' : '0'})`;
+                overlay.style.width  = window.screen.height + 'px';
+                overlay.style.height = window.screen.width  + 'px';
+            } else {
+                overlay.style.transform = '';
+                overlay.style.width  = '';
+                overlay.style.height = '';
+            }
+        }
+        window.addEventListener('orientationchange', lockOverlayOrientation);
+        window.addEventListener('resize', lockOverlayOrientation);
+        
     </script>
 </body>
 </html>
