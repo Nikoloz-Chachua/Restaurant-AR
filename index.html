@@ -1,128 +1,277 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="night">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D AR Menu</title>
+    <title>Burger Lions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
-        :root {
-            --bg:     #1a1a1a;
-            --card:   #2a2a2a;
-            --text:   #ffffff;
-            --dim:    #b0b0b0;
-            --accent: #ffcc00;
+        :root { --t: 0.45s ease; }
+
+        /* ══════════════════════════════════════════════
+           NIGHT — warm amber glow, deep rich greens
+           like the restaurant at evening
+        ══════════════════════════════════════════════ */
+        [data-theme="night"] {
+            --bg:          #0e1a0e;
+            --bg2:         #162416;
+            --card:        #172217;
+            --card2:       #1e2e1e;
+            --border:      rgba(230,170,40,0.18);
+            --glow:        0 4px 28px rgba(230,170,40,0.10), 0 1px 4px rgba(0,0,0,0.7);
+            --glow-hover:  0 8px 36px rgba(230,170,40,0.22), 0 2px 8px rgba(0,0,0,0.8);
+            --text:        #f0e8d0;
+            --dim:         #8a9a78;
+            --accent:      #e8aa28;
+            --accent2:     #f0c040;
+            --accent-text: #0e1a00;
+            --thumb-bg:    #1a2a1a;
+            --modal-bg:    radial-gradient(ellipse at center, #1a2e1a 0%, #080f08 80%);
+            --vine:        #2a4a20;
+            --header-sub:  #7aaa50;
         }
-        * { box-sizing: border-box; }
+
+        /* ══════════════════════════════════════════════
+           DAY — vivid tropical explosion, warm whites,
+           bright greens, golden sunlight
+        ══════════════════════════════════════════════ */
+        [data-theme="day"] {
+            --bg:          #e8f5e0;
+            --bg2:         #d4eeC8;
+            --card:        #ffffff;
+            --card2:       #f0fae8;
+            --border:      rgba(80,160,40,0.25);
+            --glow:        0 4px 24px rgba(80,160,40,0.12), 0 1px 6px rgba(0,0,0,0.08);
+            --glow-hover:  0 8px 36px rgba(80,160,40,0.22), 0 2px 10px rgba(0,0,0,0.12);
+            --text:        #1a2e0a;
+            --dim:         #4a7030;
+            --accent:      #d4900a;
+            --accent2:     #f0b020;
+            --accent-text: #ffffff;
+            --thumb-bg:    #e0f2d4;
+            --modal-bg:    radial-gradient(ellipse at center, #c8e8b0 0%, #a0cc88 80%);
+            --vine:        #5aaa30;
+            --header-sub:  #4a8a20;
+        }
+
+        /* ── BASE ─────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            background: var(--bg);
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(ellipse at 15% 0%, var(--bg2) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 100%, var(--bg2) 0%, transparent 55%);
+            background-attachment: fixed;
             color: var(--text);
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 20px;
+            font-family: 'Nunito', sans-serif;
+            min-height: 100vh;
+            padding: 0 16px 48px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: background-color var(--t), color var(--t);
+            overflow-x: hidden;
         }
-        h1 {
-            font-weight: 300;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+
+        /* ── VINE DECORATION TOP ──────────────────── */
+        .vine-bar {
+            width: 100%;
+            max-width: 500px;
             text-align: center;
-            margin-bottom: 30px;
+            font-size: 22px;
+            letter-spacing: 4px;
+            color: var(--vine);
+            padding: 10px 0 0;
+            transition: color var(--t);
+            user-select: none;
+            line-height: 1;
         }
+
+        /* ── HEADER ───────────────────────────────── */
+        .header {
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            padding: 4px 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.8rem, 10vw, 3.8rem);
+            letter-spacing: 8px;
+            color: var(--accent2);
+            line-height: 1;
+            text-shadow:
+                0 0 60px rgba(230,170,40,0.5),
+                0 0 20px rgba(230,170,40,0.3),
+                0 2px 6px rgba(0,0,0,0.5);
+            transition: color var(--t), text-shadow var(--t);
+        }
+
+        [data-theme="day"] .header h1 {
+            color: var(--accent);
+            text-shadow:
+                0 0 40px rgba(212,144,10,0.3),
+                0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        .tagline {
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--header-sub);
+            margin-top: 2px;
+            font-weight: 700;
+            transition: color var(--t);
+        }
+
+        /* ── TOGGLE ───────────────────────────────── */
+        #theme-toggle {
+            position: fixed;
+            top: 14px;
+            right: 14px;
+            z-index: 1000;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 8px 14px;
+            cursor: pointer;
+            box-shadow: var(--glow);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text);
+            font-family: 'Nunito', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            transition: all var(--t);
+        }
+        #theme-toggle:active { transform: scale(0.93); }
+        #toggle-icon { font-size: 15px; }
+
+        /* ── MENU LIST ────────────────────────────── */
         .menu-list {
             width: 100%;
             max-width: 450px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            padding-bottom: 24px;
+            gap: 14px;
+            position: relative;
+            z-index: 1;
         }
+
+        /* ── CARD ─────────────────────────────────── */
         .menu-item {
             background: var(--card);
-            border-radius: 20px;
+            border: 1px solid var(--border);
+            border-radius: 22px;
             display: flex;
-            padding: 15px;
-            gap: 15px;
+            padding: 13px;
+            gap: 13px;
             align-items: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-        .thumb-wrap {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            flex-shrink: 0;
+            box-shadow: var(--glow);
+            transition:
+                background var(--t), border-color var(--t),
+                box-shadow 0.2s, transform 0.2s;
             cursor: pointer;
+        }
+        .menu-item:active {
+            transform: scale(0.985);
+            box-shadow: var(--glow-hover);
+        }
+
+        /* ── THUMBNAIL ────────────────────────────── */
+        .thumb-wrap {
+            width: 108px;
+            height: 108px;
+            flex-shrink: 0;
             border-radius: 15px;
             overflow: hidden;
-            transition: transform 0.2s;
+            background: var(--thumb-bg);
+            border: 1px solid var(--border);
+            transition: background var(--t), border-color var(--t);
         }
-        .thumb-wrap:hover { transform: scale(1.03); }
         .thumb-wrap model-viewer {
             width: 100%;
             height: 100%;
-            background: #ffffff;
+            background: transparent;
             display: block;
         }
-        .item-details {
-            flex: 1;
-            cursor: pointer;
-            user-select: none;
-        }
+
+        /* ── ITEM DETAILS ─────────────────────────── */
+        .item-details { flex: 1; user-select: none; }
+
         .item-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 5px;
         }
+
         .item-name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin: 0;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.45rem;
+            letter-spacing: 2px;
             color: var(--accent);
-        }
-        .ar-btn {
-            background: var(--accent);
-            color: black;
-            border: none;
-            border-radius: 10px;
-            padding: 8px 12px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: transform 0.2s;
-            flex-shrink: 0;
-        }
-        .ar-btn:hover { transform: scale(1.05); }
-        .ingredients {
-            font-size: 0.85rem;
-            color: var(--dim);
-            margin: 0 0 10px;
-            line-height: 1.3;
-        }
-        .price {
-            font-size: 1rem;
-            font-weight: 700;
-            margin: 0;
+            line-height: 1.1;
+            transition: color var(--t);
         }
 
-        /* Fullscreen modal */
+        .ar-btn {
+            background: var(--accent);
+            color: var(--accent-text);
+            border: none;
+            border-radius: 10px;
+            padding: 7px 10px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            font-family: 'Nunito', sans-serif;
+            letter-spacing: 0.8px;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            text-transform: uppercase;
+            transition: transform 0.15s, background var(--t), color var(--t);
+        }
+        .ar-btn:active { transform: scale(0.93); }
+
+        .ingredients {
+            font-size: 0.8rem;
+            color: var(--dim);
+            margin-bottom: 7px;
+            line-height: 1.45;
+            transition: color var(--t);
+        }
+
+        .price {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.15rem;
+            letter-spacing: 1px;
+            color: var(--accent2);
+            transition: color var(--t);
+        }
+
+        /* ── MODAL ────────────────────────────────── */
         #modal {
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle at center, #333 0%, #000 70%);
+            background: var(--modal-bg);
             z-index: 9999;
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             opacity: 0;
-            transition: opacity 0.25s;
+            transition: opacity 0.25s, background var(--t);
         }
         #modal.active { opacity: 1; }
+
         .modal-bar {
             width: 95%;
             display: flex;
@@ -130,45 +279,120 @@
             align-items: center;
             margin-bottom: 10px;
         }
-        #modal-title { font-size: 1.4rem; font-weight: 700; }
-        .close-btn {
-            background: #333;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 10px 14px;
-            cursor: pointer;
-            font-size: 1rem;
+
+        #modal-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.2rem;
+            letter-spacing: 5px;
+            color: var(--accent2);
+            text-shadow: 0 0 30px rgba(230,170,40,0.4);
+            transition: color var(--t);
         }
+
+        .close-btn {
+            background: var(--card2);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            transition: background var(--t), color var(--t);
+        }
+
         #modal-viewer {
             width: 95vw;
-            height: 80vh;
+            height: 75vh;
             background: transparent;
         }
-        .tip { margin-top: 10px; color: #999; font-size: 0.9rem; }
+
+        .tip {
+            margin-top: 10px;
+            color: var(--dim);
+            font-size: 0.82rem;
+            letter-spacing: 1px;
+            transition: color var(--t);
+        }
+
+        /* ── VINE BOTTOM ──────────────────────────── */
+        .vine-bottom {
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            font-size: 20px;
+            letter-spacing: 3px;
+            color: var(--vine);
+            padding: 20px 0 0;
+            transition: color var(--t);
+            user-select: none;
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body>
-    <h1>Our Menu</h1>
+
+    <button id="theme-toggle" aria-label="Toggle theme">
+        <span id="toggle-icon">☀️</span>
+        <span id="toggle-label">Day</span>
+    </button>
+
+    <!-- Decorative vine top -->
+    <div class="vine-bar">🌿 🦜 🌺 🌿 🌴 🌺 🦜 🌿</div>
+
+    <div class="header">
+        <h1>Burger Lions</h1>
+        <div class="tagline">🦁 &nbsp; Taste the Wild &nbsp; 🦁</div>
+    </div>
+
     <div class="menu-list" id="menu-list"></div>
 
+    <!-- Decorative vine bottom -->
+    <div class="vine-bottom">🌿 🌺 🌴 🌺 🌿</div>
+
+    <!-- Fullscreen modal -->
     <div id="modal">
         <div class="modal-bar">
             <div id="modal-title"></div>
-            <button class="close-btn" id="close-btn">&#x2715; Close</button>
+            <button class="close-btn" id="close-btn">✕ Close</button>
         </div>
         <model-viewer id="modal-viewer"
-    camera-controls
-    auto-rotate
-    auto-rotate-delay="999999"
-    shadow-intensity="1"
-    min-camera-orbit="auto 0deg auto"
-    max-camera-orbit="auto 90deg auto">
+            camera-controls
+            auto-rotate
+            auto-rotate-delay="999999"
+            shadow-intensity="1"
+            min-camera-orbit="auto 0deg auto"
+            max-camera-orbit="auto 90deg auto">
         </model-viewer>
         <p class="tip">Drag to rotate</p>
     </div>
 
     <script>
+        // ── THEME ──────────────────────────────────
+        const html        = document.documentElement;
+        const toggleBtn   = document.getElementById('theme-toggle');
+        const toggleIcon  = document.getElementById('toggle-icon');
+        const toggleLabel = document.getElementById('toggle-label');
+
+        function applyTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            if (theme === 'night') {
+                toggleIcon.textContent  = '☀️';
+                toggleLabel.textContent = 'Day';
+            } else {
+                toggleIcon.textContent  = '🌙';
+                toggleLabel.textContent = 'Night';
+            }
+            localStorage.setItem('bl-theme', theme);
+        }
+
+        applyTheme(localStorage.getItem('bl-theme') || 'night');
+        toggleBtn.addEventListener('click', () => {
+            applyTheme(html.getAttribute('data-theme') === 'night' ? 'day' : 'night');
+        });
+
+        // ── MODAL ──────────────────────────────────
         const modal       = document.getElementById('modal');
         const modalViewer = document.getElementById('modal-viewer');
         const modalTitle  = document.getElementById('modal-title');
@@ -190,11 +414,15 @@
             document.body.style.overflow = 'hidden';
         }
 
+        // ── AR ROUTING ─────────────────────────────
         async function openAR(idx) {
             let ok = false;
             try { ok = !!(navigator.xr && await navigator.xr.isSessionSupported('immersive-ar')); } catch {}
             location.href = ok ? `ar-webxr.html?item=${idx}` : `advanced-ar.html?item=${idx}`;
         }
+
+        // ── BUILD MENU ─────────────────────────────
+        let _dragStartX = 0, _dragStartY = 0;
 
         async function buildMenu() {
             let items;
@@ -214,12 +442,18 @@
             const list = document.getElementById('menu-list');
             items.forEach((item, i) => {
                 const src = item.model || 'food.glb';
-
                 const card = document.createElement('div');
                 card.className = 'menu-item';
                 card.innerHTML = `
                     <div class="thumb-wrap">
-                        <<model-viewer src="${src}" camera-controls auto-rotate auto-rotate-delay="999999" shadow-intensity="1" min-camera-orbit="auto 0deg auto" max-camera-orbit="auto 90deg auto"></model-viewer>>
+                        <model-viewer src="${src}"
+                            camera-controls
+                            auto-rotate
+                            auto-rotate-delay="999999"
+                            shadow-intensity="1"
+                            min-camera-orbit="auto 0deg auto"
+                            max-camera-orbit="auto 90deg auto">
+                        </model-viewer>
                     </div>
                     <div class="item-details">
                         <div class="item-header">
@@ -230,19 +464,20 @@
                         <p class="price">${item.price}</p>
                     </div>`;
 
-                card.querySelector('model-viewer').addEventListener('pointerdown', e => { _dragStartX = e.clientX; _dragStartY = e.clientY; });
-card.querySelector('model-viewer').addEventListener('pointerup', e => {
-    const dx = Math.abs(e.clientX - _dragStartX);
-    const dy = Math.abs(e.clientY - _dragStartY);
-    if (dx < 5 && dy < 5) openModal(src, item.name);
-});
+                const mv = card.querySelector('model-viewer');
+                mv.addEventListener('pointerdown', e => { _dragStartX = e.clientX; _dragStartY = e.clientY; });
+                mv.addEventListener('pointerup', e => {
+                    if (Math.abs(e.clientX - _dragStartX) < 5 && Math.abs(e.clientY - _dragStartY) < 5)
+                        openModal(src, item.name);
+                });
+
                 card.querySelector('.ar-btn').addEventListener('click', e => { e.stopPropagation(); openAR(i); });
                 card.querySelector('.item-details').addEventListener('click', () => openAR(i));
 
                 list.appendChild(card);
             });
         }
-let _dragStartX = 0, _dragStartY = 0;
+
         buildMenu();
     </script>
 </body>
