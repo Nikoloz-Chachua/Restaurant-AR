@@ -229,23 +229,32 @@
         }
         #modal.active { opacity: 1; }
 
-        .modal-bar {
-            width: 95%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
         #modal-title {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 2.2rem;
-            letter-spacing: 5px;
+            font-size: clamp(1.8rem, 6vw, 2.6rem);
+            letter-spacing: 4px;
             color: var(--accent);
+            text-align: center;
+            width: 100%;
+            padding: 0 80px;
+            line-height: 1.2;
+            transition: color var(--t);
+        }
+
+        #modal-price {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(1.4rem, 5vw, 2rem);
+            letter-spacing: 3px;
+            color: var(--accent);
+            text-align: center;
+            margin-top: 6px;
             transition: color var(--t);
         }
 
         .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
             background: var(--card2);
             color: var(--text);
             border: 1px solid var(--border);
@@ -260,12 +269,13 @@
 
         #modal-viewer {
             width: 95vw;
-            height: 75vh;
+            height: 68vh;
             background: transparent;
+            margin-top: 8px;
         }
 
         .tip {
-            margin-top: 10px;
+            margin-top: 4px;
             color: var(--dim);
             font-size: 0.82rem;
             letter-spacing: 1px;
@@ -390,16 +400,15 @@
     <div id="modal">
         <button class="nav-arrow left-arrow"  id="modal-prev">&#10094;</button>
         <button class="nav-arrow right-arrow" id="modal-next">&#10095;</button>
-        <div class="modal-bar">
-            <div id="modal-title"></div>
-            <button class="close-btn" id="close-btn">Close</button>
-        </div>
+        <button class="close-btn" id="close-btn">Close</button>
+        <div id="modal-title"></div>
         <model-viewer id="modal-viewer"
             camera-controls
             shadow-intensity="1"
             min-camera-orbit="auto 0deg auto"
             max-camera-orbit="auto 90deg auto">
         </model-viewer>
+        <div id="modal-price"></div>
         <p class="tip" id="modal-tip">Drag to rotate</p>
     </div>
 
@@ -893,6 +902,7 @@
         const modal       = document.getElementById('modal');
         const modalViewer = document.getElementById('modal-viewer');
         const modalTitle  = document.getElementById('modal-title');
+        const modalPrice  = document.getElementById('modal-price');
         let menuItems  = [];
         let modalItems = [];
         let modalIndex = 0;
@@ -915,6 +925,7 @@
             if (!item) return;
             modalViewer.src        = item.model || 'food.glb';
             modalTitle.textContent = t(item, 'name');
+            modalPrice.textContent = item.price;
         }
 
         function openModal(localIdx, catItems) {
