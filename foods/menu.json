@@ -1,229 +1,111 @@
 [
   {
-    "name": "Druidi",       "name_ka": "დრუიდი",
-    "category": "Burgers",  "category_ka": "ბურგერები",
-    "description": "Ancient grain patty, roasted herbs, olive oil & spiced lamb",
-    "description_ka": "ძველი მარცვლეულის კოტლეტი შებრაწული მწვანილებით, ზეთისხილის ზეთითა და სანელებლებიანი ბატკნის ხორცით",
-    "price": "$18.99", "model": "Druidi.glb"
+    "name": "Jalapeno Burger",       "name_ka": "ჰალაპენიუ ბურგერი",
+    "category": "Burgers",           "category_ka": "ბურგერები",
+    "description": "300g beef, 4 layers cheddar cheese, 2 layers bacon, caramelized jalapeno with bacon, special sauce, burger bun, onion marinated in Saperavi, iceberg lettuce, pickles.",
+    "description_ka": "ხორცი 300 გრ, ყველი ჩედარი 4 ფენა, ბეკონი 2 ფენა, კარამელიზირებული ჰალაპენიო ბეკონით, სპეც სოუსი, ბურგერის ფუნთუშა, საფერავში დამარინადებული ხახვი, აისბერგი, მჟავე კიტრი.",
+    "price": "27.5 ₾", "model": "Druidi.glb"
   },
   {
-    "name": "Asteroidi",    "name_ka": "ასტეროიდი",
-    "category": "Burgers",  "category_ka": "ბურგერები",
-    "description": "Crispy smash patty, spiced chickpea & tahini drizzle",
-    "description_ka": "ხრაშუნა კოტლეტი სანელებლებიანი ბლის შიგთავსით და ტაჰინის სოუსით",
-    "price": "$12.99", "model": "food.glb"
+    "name": "5 Cheese Burger",        "name_ka": "5 ყველის ბურგერი",
+    "category": "Burgers",            "category_ka": "ბურგერები",
+    "description": "300g beef, 4 layers cheddar cheese, mozzarella, parmesan, emmental, cheese sauce, pickles, iceberg lettuce, burger bun, special sauce.",
+    "description_ka": "საქონლის ხორცი 300გრ, ყველი ჩედარი 4 ფენა, მოცარელა, პარმეზანი, ემენტალი, ყველის სოუსი, მჟავე კიტრი, აისბერგი, ბურგერის ფუნთუშა, სპეც სოუსი.",
+    "price": "29.5 ₾", "model": "food.glb"
   },
   {
-    "name": "Iulius",       "name_ka": "იულიუსი",
-    "category": "Burgers",  "category_ka": "ბურგერები",
-    "description": "Slow-braised veal burger with saffron aioli & gremolata",
-    "description_ka": "ნელა გახარშული ხბოს ბურგერი შაფრანის ემულსიითა და გრემოლატათი",
-    "price": "$24.99", "model": "Druidi.glb"
+    "name": "White Lion",             "name_ka": "თეთრი ლომი",
+    "category": "Burgers",            "category_ka": "ბურგერები",
+    "description": "300g meat, emmental cheese, melted cheese with bacon, camembert, onion marinated in Saperavi, iceberg lettuce, burger bun.",
+    "description_ka": "ხორცი 300 გრ, ემენტალის ყველი, მდნარი ყველი ბეკონით, კამემბერი, საფერავში დამარინადებული ხახვი, აისბერგი, ბურგერის ფუნთუშა.",
+    "price": "27 ₾", "model": "Druidi.glb"
   },
   {
-    "name": "Maximus",      "name_ka": "მაქსიმუსი",
-    "category": "Burgers",  "category_ka": "ბურგერები",
-    "description": "Double smash patty, aged cheddar & caramelized onions",
-    "description_ka": "ორმაგი კოტლეტი, ძველებური ჩედარი და კარამელიზებული ხახვი",
-    "price": "$16.99", "model": "food.glb"
+    "name": "Zeus",                   "name_ka": "ზევსი",
+    "category": "Burgers",            "category_ka": "ბურგერები",
+    "description": "300g beef, bacon, cheddar cheese, parmesan, mimolete, cheese sauce, special sauce, pickles, iceberg lettuce, burger bun.",
+    "description_ka": "საქონლის ხორცი 300გრ, ბეკონი, ჩედარი, პარმეზანი, მიმოლეტე, ყველის სოუსი, სპეც სოუსი, მჟავე კიტრი, აისბერგი, ბურგერის ფუნთუშა.",
+    "price": "31.8 ₾", "model": "food.glb"
   },
   {
-    "name": "Brutus",       "name_ka": "ბრუტუსი",
-    "category": "Burgers",  "category_ka": "ბურგერები",
-    "description": "Crispy fried chicken thigh with hot honey & pickles",
-    "description_ka": "ხრაშუნა შემწვარი წიწილა ცხელი თაფლითა და მარინადებული ბოსტნეულით",
-    "price": "$15.99", "model": "Druidi.glb"
+    "name": "Everest",                "name_ka": "ევერესტი",
+    "category": "Burgers",            "category_ka": "ბურგერები",
+    "description": "450g beef, cheddar cheese, parmesan, barbecue sauce, jalapeno, bacon, cheese sauce, special sauce, pickles and iceberg.",
+    "description_ka": "450 გრ საქონლის ხორცი, ჩედარი, პარმეზანი, ბარბექიუ სოუსი, ჰალაპენიო, ბეკონი, ყველის სოუსი, სპეც სოუსი, მჟავე კიტრი და აისბერგი.",
+    "price": "33 ₾", "model": "Druidi.glb"
   },
   {
-    "name": "Cassius",      "name_ka": "კასიუსი",
-    "category": "Burgers",  "category_ka": "ბურგერები",
-    "description": "Black bean & roasted pepper patty with chipotle mayo",
-    "description_ka": "შავი ლობიოსა და შებრაწული წიწაკის კოტლეტი ჩიპოტლეს მაიონეზით",
-    "price": "$13.99", "model": "food.glb"
+    "name": "Asterix",                "name_ka": "ასტერიქსი",
+    "category": "Burgers",            "category_ka": "ბურგერები",
+    "description": "450g beef, 4 layers cheddar cheese, 3 layers bacon, special sauce, pickles, iceberg lettuce, burger bun.",
+    "description_ka": "ხორცი 450 გრ, ყველი ჩედარი 4 ფენა, ბეკონი 3 ფენა, სპეც სოუსი, მჟავე კიტრი, აისბერგი, ბურგერის ფუნთუშა.",
+    "price": "29.8 ₾", "model": "food.glb"
   },
   {
-    "name": "Galius",       "name_ka": "გალიუსი",
-    "category": "Burgers",  "category_ka": "ბურგერები",
-    "description": "Charcoal-grilled chicken with roasted garlic & wild herbs",
-    "description_ka": "ნახშირზე შემწვარი წიწილა შებრაწული ნიორითა და ველური მწვანილებით",
-    "price": "$16.99", "model": "Druidi.glb"
+    "name": "Druid",                  "name_ka": "დრუიდი",
+    "category": "Burgers",            "category_ka": "ბურგერები",
+    "description": "600g beef, 5 layers cheddar cheese, 4 layers bacon, special sauce, pickles, iceberg lettuce, burger bun.",
+    "description_ka": "ხორცი 600 გრ, ყველი ჩედარი 5 ფენა, ბეკონი 4 ფენა, სპეც სოუსი, მჟავე კიტრი, აისბერგი, ბურგერის ფუნთუშა.",
+    "price": "32.8 ₾", "model": "Druidi.glb"
   },
   {
-    "name": "Pompeii",      "name_ka": "პომპეი",
-    "category": "Burgers",  "category_ka": "ბურგერები",
-    "description": "Wood-fired bun, San Marzano tomato & buffalo mozzarella",
-    "description_ka": "შეშის ღუმელში გამომცხვარი ბურგერი სან-მარძანოს პომიდვრით და კამეჩის მოცარელათი",
-    "price": "$14.99", "model": "food.glb"
-  },
-
-  {
-    "name": "Vulcanus",     "name_ka": "ვულკანუსი",
-    "category": "Sides",    "category_ka": "გარნირები",
-    "description": "Volcano-spiced crispy fries with smoked paprika salt",
-    "description_ka": "მწვავე სანელებლებიანი ხრაშუნა კარტოფილი შებოლილი პაპრიკის მარილით",
-    "price": "$6.99", "model": "Druidi.glb"
+    "name": "Julius",                 "name_ka": "იულიუსი",
+    "category": "Burgers",            "category_ka": "ბურგერები",
+    "description": "750g beef, 6 layers cheddar cheese, 5 layers bacon, special sauce, pickles, iceberg lettuce, burger bun.",
+    "description_ka": "ხორცი 750 გრ, ყველი ჩედარი 6 ფენა, ბეკონი 5 ფენა, სპეც სოუსი, მჟავე კიტრი, აისბერგი, ბურგერის ფუნთუშა.",
+    "price": "38.8 ₾", "model": "food.glb"
   },
   {
-    "name": "Neptuni",      "name_ka": "ნეპტუნი",
-    "category": "Sides",    "category_ka": "გარნირები",
-    "description": "Golden calamari rings with lemon-herb dipping sauce",
-    "description_ka": "ოქროსფერი კალამარის რგოლები ლიმონ-მწვანილის სოუსით",
-    "price": "$9.99", "model": "food.glb"
+    "name": "Asteroid",               "name_ka": "ასტეროიდი",
+    "category": "Burgers",            "category_ka": "ბურგერები",
+    "description": "900g beef, cheddar cheese, parmesan, mimolete, bacon, barbecue sauce, cheese sauce, special sauce, pickles and iceberg.",
+    "description_ka": "საქონლის ხორცი 900 გრ, ჩედარი, პარმეზანი, მიმოლეტე, ბეკონი, ბარბექიუ სოუსი, ყველის სოუსი, სპეც სოუსი, მჟავე კიტრი და აისბერგი.",
+    "price": "44.8 ₾", "model": "Druidi.glb"
   },
   {
-    "name": "Cerberus",     "name_ka": "კერბეროსი",
-    "category": "Sides",    "category_ka": "გარნირები",
-    "description": "Three-cheese loaded potato tots with pickled jalapeño",
-    "description_ka": "სამი სახის ყველით გაჯერებული კარტოფილის ბურთულები მარინადებული ჰალაპენიოთი",
-    "price": "$8.99", "model": "Druidi.glb"
-  },
-  {
-    "name": "Mercuri",      "name_ka": "მერკური",
-    "category": "Sides",    "category_ka": "გარნირები",
-    "description": "Truffle parmesan wedges with fresh rosemary",
-    "description_ka": "ტრიუფელ-პარმეზანის ლურსმნები ახალი როზმარინით",
-    "price": "$8.49", "model": "food.glb"
-  },
-  {
-    "name": "Venusi",       "name_ka": "ვენუსი",
-    "category": "Sides",    "category_ka": "გარნირები",
-    "description": "Sweet potato fries with maple & sriracha dipping sauce",
-    "description_ka": "ტკბილი კარტოფილის ფრი კლენის სიროფისა და სრირაჩას სოუსით",
-    "price": "$7.49", "model": "Druidi.glb"
-  },
-  {
-    "name": "Saturni",      "name_ka": "სატურნი",
-    "category": "Sides",    "category_ka": "გარნირები",
-    "description": "Crispy onion rings with smoky chipotle mayo",
-    "description_ka": "ხრაშუნა ხახვის რგოლები შებოლილი ჩიპოტლეს მაიონეზით",
-    "price": "$6.49", "model": "food.glb"
-  },
-  {
-    "name": "Lupus",        "name_ka": "ლუპუსი",
-    "category": "Sides",    "category_ka": "გარნირები",
-    "description": "Garlic herb bread with melted butter & fresh parsley",
-    "description_ka": "ნიორ-მწვანილის პური გამდნარი კარაქითა და ახალი პეტრუშკით",
-    "price": "$5.49", "model": "Druidi.glb"
-  },
-  {
-    "name": "Aquila",       "name_ka": "აქვილა",
-    "category": "Sides",    "category_ka": "გარნირები",
-    "description": "Fresh mixed greens with lemon vinaigrette & seeds",
-    "description_ka": "ახალი მწვანილების სალათი ლიმონის ვინეგრეტით და თესლებით",
-    "price": "$5.99", "model": "food.glb"
+    "name": "Black Lion",             "name_ka": "შავი ლომი",
+    "category": "Burgers",            "category_ka": "ბურგერები",
+    "description": "450g beef, 12 layers bacon, cheddar cheese, parmesan, mozzarella, special sauce, cucumber, iceberg and burger bun.",
+    "description_ka": "450გრ საქონლის ხორცი, ბეკონი 12 ფენა, ჩედარი, პარმეზანი, მოცარელა, სპეც სოუსი, კიტრი, აისბერგი და ბურგერის ფუნთუშა.",
+    "price": "36.8 ₾", "model": "food.glb"
   },
 
   {
-    "name": "Aurora",       "name_ka": "აურორა",
-    "category": "Drinks",   "category_ka": "სასმელები",
-    "description": "Passion fruit & mango lemonade with mint",
-    "description_ka": "მარაკუიასა და მანგოს ლიმონათი პიტნით",
-    "price": "$5.99", "model": "Druidi.glb"
-  },
-  {
-    "name": "Solaris",      "name_ka": "სოლარისი",
-    "category": "Drinks",   "category_ka": "სასმელები",
-    "description": "Freshly pressed orange & ginger juice",
-    "description_ka": "ახლად გამოწურული ფორთოხლისა და კოჭლის წვენი",
-    "price": "$4.99", "model": "food.glb"
-  },
-  {
-    "name": "Glacius",      "name_ka": "გლაციუსი",
-    "category": "Drinks",   "category_ka": "სასმელები",
-    "description": "Blueberry mint smoothie with coconut milk",
-    "description_ka": "მოცვისა და პიტნის სმუზი კოკოსის რძით",
-    "price": "$6.49", "model": "Druidi.glb"
-  },
-  {
-    "name": "Ignis",        "name_ka": "იგნისი",
-    "category": "Drinks",   "category_ka": "სასმელები",
-    "description": "Warm spiced apple cider with cinnamon & clove",
-    "description_ka": "თბილი სანელებლებიანი ვაშლის სიდრი დარიჩინითა და მიხაკით",
-    "price": "$4.49", "model": "food.glb"
-  },
-  {
-    "name": "Fulgur",       "name_ka": "ფულგური",
-    "category": "Drinks",   "category_ka": "სასმელები",
-    "description": "Sparkling watermelon & basil refresher",
-    "description_ka": "გაზიანი საზამთრო-ბაზილიკოს სასმელი",
-    "price": "$5.49", "model": "Druidi.glb"
-  },
-  {
-    "name": "Caelum",       "name_ka": "კაელუმი",
-    "category": "Drinks",   "category_ka": "სასმელები",
-    "description": "Classic vanilla cola float with whipped cream",
-    "description_ka": "კლასიკური ვანილის კოლა ნაღებითა და ნაყინით",
-    "price": "$5.49", "model": "food.glb"
-  },
-  {
-    "name": "Nimbus",       "name_ka": "ნიმბუსი",
-    "category": "Drinks",   "category_ka": "სასმელები",
-    "description": "Peach iced tea with wildflower honey",
-    "description_ka": "ატმის გაცივებული ჩაი ველის ყვავილების თაფლით",
-    "price": "$4.49", "model": "Druidi.glb"
-  },
-  {
-    "name": "Zephyr",       "name_ka": "ზეფირი",
-    "category": "Drinks",   "category_ka": "სასმელები",
-    "description": "Cucumber mint agua fresca with lime",
-    "description_ka": "კიტრი-პიტნის გამაგრილებელი სასმელი ლაიმით",
-    "price": "$4.49", "model": "food.glb"
+    "name": "Lion Sauce Extra",       "name_ka": "ლომების სოუსი ექსტრა",
+    "category": "Sides",              "category_ka": "გარნირი | სოუსები",
+    "description": "Fries, cheese sauce, jalapeno, beef, bacon, onion, parmesan, cheddar and iceberg.",
+    "description_ka": "ფრი, ყველის სოუსი, ჰალაპენიო, საქონლის ხორცი, ბეკონი, ხახვი, პარმეზანი, ჩედარი და აისბერგი.",
+    "price": "23.8 ₾", "model": "Druidi.glb"
   },
 
   {
-    "name": "Olympus",      "name_ka": "ოლიმპოსი",
-    "category": "Desserts", "category_ka": "დესერტები",
-    "description": "Honey walnut baklava with rose water syrup",
-    "description_ka": "თაფლ-კაკლის ბაკლავა ვარდის წყლის სიროფით",
-    "price": "$7.99", "model": "Druidi.glb"
+    "name": "Coca Cola",              "name_ka": "კოკა კოლა",
+    "category": "Drinks",             "category_ka": "სასმელები",
+    "description": "Coca-Cola 0.33L",
+    "description_ka": "კოკა-კოლა 0.33ლ",
+    "price": "3.5 ₾", "model": "food.glb"
   },
   {
-    "name": "Erebus",       "name_ka": "ერებუსი",
-    "category": "Desserts", "category_ka": "დესერტები",
-    "description": "Dark chocolate lava cake with vanilla ice cream",
-    "description_ka": "შავი შოკოლადის ლავა ქეიქი ვანილის ნაყინით",
-    "price": "$8.99", "model": "food.glb"
+    "name": "Kombucha",               "name_ka": "კომბუჩა",
+    "category": "Drinks",             "category_ka": "სასმელები",
+    "description": "Fermented sparkling kombucha drink with beneficial bacteria.",
+    "description_ka": "ფერმენტირებული შუშხუნა კომბუჩა სასარგებლო ბაქტერიებით.",
+    "price": "8 ₾", "model": "Druidi.glb"
   },
+
   {
-    "name": "Elysium",      "name_ka": "ელიზიუმი",
-    "category": "Desserts", "category_ka": "დესერტები",
-    "description": "Vanilla bean panna cotta with mixed berry coulis",
-    "description_ka": "ვანილის პანა-კოტა კენკრის კულისით",
-    "price": "$7.49", "model": "Druidi.glb"
+    "name": "Tiramisu",               "name_ka": "ტირამისუ",
+    "category": "Desserts",           "category_ka": "ტკბილეული",
+    "description": "Classic tiramisu dessert.",
+    "description_ka": "კლასიკური ტირამისუ.",
+    "price": "10 ₾", "model": "food.glb"
   },
+
   {
-    "name": "Tartarus",     "name_ka": "ტარტარუსი",
-    "category": "Desserts", "category_ka": "დესერტები",
-    "description": "Salted caramel brownie with whipped cream",
-    "description_ka": "დამარილებული კარამელის ბრაუნი ნაღებით",
-    "price": "$6.99", "model": "food.glb"
-  },
-  {
-    "name": "Empyreum",     "name_ka": "ემპირეუმი",
-    "category": "Desserts", "category_ka": "დესერტები",
-    "description": "Mixed berry cheesecake with graham cracker crust",
-    "description_ka": "კენკრის ჩიზქეიქი გრეჰამის ნამცხვრის ქერქით",
-    "price": "$8.49", "model": "Druidi.glb"
-  },
-  {
-    "name": "Arcadia",      "name_ka": "არკადია",
-    "category": "Desserts", "category_ka": "დესერტები",
-    "description": "Apple cinnamon crumble with warm custard sauce",
-    "description_ka": "ვაშლ-დარიჩინის კრამბლი თბილი კასტარდის სოუსით",
-    "price": "$7.49", "model": "food.glb"
-  },
-  {
-    "name": "Chaos",        "name_ka": "ქაოსი",
-    "category": "Desserts", "category_ka": "დესერტები",
-    "description": "Classic tiramisu with espresso & mascarpone",
-    "description_ka": "კლასიკური ტირამიზუ ესპრესოთი და მასკარპონეთი",
-    "price": "$7.99", "model": "Druidi.glb"
-  },
-  {
-    "name": "Cosmos",       "name_ka": "კოსმოსი",
-    "category": "Desserts", "category_ka": "დესერტები",
-    "description": "Pistachio & rose gelato with candied pistachios",
-    "description_ka": "ფისტა-ვარდის ჯელატო შაქარში გახვეული ფისტებით",
-    "price": "$6.99", "model": "food.glb"
+    "name": "Espresso",               "name_ka": "ესპრესო",
+    "category": "Coffee",             "category_ka": "ყავა",
+    "description": "Classic espresso coffee.",
+    "description_ka": "კლასიკური ესპრესო.",
+    "price": "5.5 ₾", "model": "Druidi.glb"
   }
 ]

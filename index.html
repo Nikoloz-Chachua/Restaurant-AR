@@ -150,17 +150,19 @@
             justify-content: space-between;
             align-items: flex-start;
             gap: 8px;
+            flex-wrap: wrap;
             margin-bottom: 5px;
         }
 
         .item-name {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.45rem;
-            letter-spacing: 2px;
+            font-size: 1.15rem;
+            letter-spacing: 1px;
             color: var(--accent);
-            line-height: 1.1;
+            line-height: 1.2;
             transition: color var(--t);
             overflow-wrap: break-word;
+            word-break: keep-all;
             min-width: 0;
         }
 
@@ -1081,11 +1083,11 @@
 
         async function buildMenu() {
             const fallback = [
-                { name: 'Druidi',    name_ka: 'დრუიდი',    category: 'Burgers', category_ka: 'ბურგერები', description: 'Ancient grain patty, roasted herbs, olive oil & spiced lamb',              description_ka: 'ძველი მარცვლეულის კოტლეტი შებრაწული მწვანილებით, ზეთისხილის ზეთითა და სანელებლებიანი ბატკნის ხორცით', price: '$18.99', model: 'Druidi.glb' },
-                { name: 'Asteroidi', name_ka: 'ასტეროიდი', category: 'Burgers', category_ka: 'ბურგერები', description: 'Crispy smash patty, spiced chickpea & tahini drizzle',                     description_ka: 'ხრაშუნა კოტლეტი სანელებლებიანი ბლის შიგთავსით და ტაჰინის სოუსით',                                          price: '$12.99', model: 'food.glb'   },
-                { name: 'Iulius',    name_ka: 'იულიუსი',   category: 'Sides',   category_ka: 'გარნირები',  description: 'Slow-braised veal burger with saffron aioli & gremolata',                  description_ka: 'ნელა გახარშული ხბოს ბურგერი შაფრანის ემულსიითა და გრემოლატათი',                                         price: '$24.99', model: 'Druidi.glb' },
-                { name: 'Pompeii',   name_ka: 'პომპეი',    category: 'Drinks',  category_ka: 'სასმელები',  description: 'Wood-fired bun, San Marzano tomato & buffalo mozzarella',                  description_ka: 'შეშის ღუმელში გამომცხვარი ბურგერი სან-მარძანოს პომიდვრით და კამეჩის მოცარელათი',                    price: '$14.99', model: 'food.glb'   },
-                { name: 'Galius',    name_ka: 'გალიუსი',   category: 'Desserts', category_ka: 'დესერტები', description: 'Charcoal-grilled chicken with roasted garlic & wild herbs',                 description_ka: 'ნახშირზე შემწვარი წიწილა შებრაწული ნიორითა და ველური მწვანილებით',                                      price: '$16.99', model: 'Druidi.glb' },
+                { name: 'Jalapeno Burger', name_ka: 'ჰალაპენიუ ბურგერი', category: 'Burgers', category_ka: 'ბურგერები', description: '300g beef, 4 layers cheddar cheese, 2 layers bacon, caramelized jalapeno with bacon, special sauce, burger bun.', description_ka: 'ხორცი 300 გრ, ყველი ჩედარი 4 ფენა, ბეკონი 2 ფენა, კარამელიზირებული ჰალაპენიო ბეკონით, სპეც სოუსი.', price: '27.5 ₾', model: 'Druidi.glb' },
+                { name: 'Druid',           name_ka: 'დრუიდი',             category: 'Burgers', category_ka: 'ბურგერები', description: '600g beef, 5 layers cheddar cheese, 4 layers bacon, special sauce, pickles, iceberg lettuce, burger bun.',         description_ka: 'ხორცი 600 გრ, ყველი ჩედარი 5 ფენა, ბეკონი 4 ფენა, სპეც სოუსი, მჟავე კიტრი, აისბერგი.',               price: '32.8 ₾', model: 'Druidi.glb' },
+                { name: 'Lion Sauce Extra',name_ka: 'ლომების სოუსი ექსტრა', category: 'Sides', category_ka: 'გარნირი | სოუსები', description: 'Fries, cheese sauce, jalapeno, beef, bacon, onion, parmesan, cheddar and iceberg.',                         description_ka: 'ფრი, ყველის სოუსი, ჰალაპენიო, საქონლის ხორცი, ბეკონი, ხახვი, პარმეზანი, ჩედარი და აისბერგი.',       price: '23.8 ₾', model: 'Druidi.glb' },
+                { name: 'Coca Cola',       name_ka: 'კოკა კოლა',          category: 'Drinks',  category_ka: 'სასმელები',  description: 'Coca-Cola 0.33L',                                                                                                 description_ka: 'კოკა-კოლა 0.33ლ',                                                                                        price: '3.5 ₾',  model: 'food.glb'   },
+                { name: 'Tiramisu',        name_ka: 'ტირამისუ',            category: 'Desserts',category_ka: 'ტკბილეული', description: 'Classic tiramisu dessert.',                                                                                       description_ka: 'კლასიკური ტირამისუ.',                                                                                    price: '10 ₾',   model: 'food.glb'   },
             ];
 
             // Read cached AR cap synchronously so first render uses correct label if known
