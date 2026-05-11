@@ -369,10 +369,9 @@
             font-size: 12px;
             white-space: nowrap;
         }
-        #xr-exit, #xr-carousel-toggle {
+        #xr-exit, #xr-carousel-toggle, #xr-label-toggle {
             pointer-events: all;
             position: absolute;
-            top: 18px;
             background: rgba(0,0,0,0.65);
             color: #ccc;
             border: 1px solid rgba(255,255,255,0.2);
@@ -382,8 +381,9 @@
             font-size: 13px;
             cursor: pointer;
         }
-        #xr-exit             { right: 18px; }
-        #xr-carousel-toggle  { left: 18px; display: none; }
+        #xr-exit             { top: 18px; right: 18px; }
+        #xr-carousel-toggle  { top: 18px; left: 18px; display: none; }
+        #xr-label-toggle     { top: 58px; left: 18px; display: none; }
     </style>
 </head>
 <body>
@@ -423,6 +423,7 @@
         <div id="xr-move-hint">Drag to move &middot; Twist two fingers to rotate</div>
         <button id="xr-exit">Exit AR</button>
         <button id="xr-carousel-toggle"></button>
+        <button id="xr-label-toggle"></button>
     </div>
 
     <!-- WebXR — Three.js loaded lazily on first AR tap, not on page load -->
@@ -446,6 +447,7 @@
         const modelGLTFs = {};
         let loader;
         let labelMesh = null, labelCanvas = null, labelCtx = null, labelTexture = null;
+        let labelMode = localStorage.getItem('bl-xr-label') || 'float';
 
         const CFG = {
             farLeft:  { x: -0.35, z: -0.12, s: 0.20, opacity: 0    },
@@ -552,6 +554,19 @@
             labelMesh.position.set(0, 0.28, 0.06);
             labelMesh.visible = false;
             carouselRoot.add(labelMesh);
+        }
+
+        function updateLabelTransform() {
+            if (!labelMesh) return;
+            if (labelMode === 'surface') {
+                labelMesh.position.set(0, 0.004, 0.22);
+                labelMesh.rotation.set(-Math.PI / 2, 0, 0);
+            } else {
+                labelMesh.position.set(0, 0.28, 0.06);
+                labelMesh.rotation.set(0, 0, 0);
+            }
+            const btn = document.getElementById('xr-label-toggle');
+            if (btn) btn.textContent = labelMode === 'float' ? 'ON TABLE' : 'FLOATING';
         }
 
         // ── Models ────────────────────────────────────────────────────
@@ -699,7 +714,8 @@
             document.getElementById('xr-nav-row').style.display          = 'flex';
             document.getElementById('xr-move-hint').style.display        = 'block';
             document.getElementById('xr-carousel-toggle').style.display  = 'block';
-            if (labelMesh) { drawLabel(MENU[currentCenterMenu]); labelMesh.visible = true; }
+            if (labelMesh) { drawLabel(MENU[currentCenterMenu]); updateLabelTransform(); labelMesh.visible = true; }
+            document.getElementById('xr-label-toggle').style.display = 'block';
         }
 
         // ── One-time init — deferred until first AR tap ───────────────
@@ -812,6 +828,7 @@
                 document.getElementById('xr-nav-row').style.display         = 'none';
                 document.getElementById('xr-move-hint').style.display       = 'none';
                 document.getElementById('xr-carousel-toggle').style.display = 'none';
+                document.getElementById('xr-label-toggle').style.display    = 'none';
                 activeTouches.clear();
                 slotOf = { left: 0, center: 1, right: 2, hidden: 3 };
                 hiddenSide = 'farRight'; isAnimating = false;
@@ -830,19 +847,25 @@
                         } else { reticle.visible = false; }
                     }
                 }
-                if (labelMesh && labelMesh.visible) labelMesh.quaternion.copy(camera.quaternion);
+                if (labelMesh && labelMesh.visible && labelMode === 'float') labelMesh.quaternion.copy(camera.quaternion);
                 renderer.render(scene, camera);
             });
 
             document.getElementById('xr-exit').addEventListener('click', () => xrSession?.end());
             document.getElementById('xr-prev').addEventListener('click', goPrev);
             document.getElementById('xr-next').addEventListener('click', goNext);
+            document.getElementById('xr-label-toggle').addEventListener('click', () => {
+                labelMode = labelMode === 'float' ? 'surface' : 'float';
+                localStorage.setItem('bl-xr-label', labelMode);
+                updateLabelTransform();
+            });
 
             function updateXRToggleBtn() {
                 document.getElementById('xr-carousel-toggle').textContent =
                     _xrSingleItem ? 'CAROUSEL' : 'SINGLE';
             }
             updateXRToggleBtn();
+            updateLabelTransform();
 
             document.getElementById('xr-carousel-toggle').addEventListener('click', () => {
                 _xrSingleItem = !_xrSingleItem;
