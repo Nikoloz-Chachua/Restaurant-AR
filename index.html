@@ -445,6 +445,7 @@
         const meshObjs   = [null, null, null, null];
         const modelGLTFs = {};
         let loader;
+        let labelMesh = null, labelCanvas = null, labelCtx = null, labelTexture = null;
 
         const CFG = {
             farLeft:  { x: -0.35, z: -0.12, s: 0.20, opacity: 0    },
@@ -463,6 +464,95 @@
         const DEAD_ZONE     = 3;
         const MAX_DELTA     = 40;
         const activeTouches = new Map();
+
+        // ── AR label (museum card) ────────────────────────────────────
+        function _rrPath(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.arcTo(x + w, y,     x + w, y + r,     r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+            ctx.lineTo(x + r, y + h);
+            ctx.arcTo(x,     y + h, x,         y + h - r, r);
+            ctx.lineTo(x, y + r);
+            ctx.arcTo(x,     y,     x + r,     y,         r);
+            ctx.closePath();
+        }
+
+        function _wrapText(ctx, text, x, y, maxW, lh, maxLines) {
+            const words = text.split(' ');
+            let line = '', count = 0;
+            for (const word of words) {
+                const test = line ? line + ' ' + word : word;
+                if (ctx.measureText(test).width > maxW && line) {
+                    ctx.fillText(line, x, y + count * lh);
+                    if (++count >= maxLines) return;
+                    line = word;
+                } else { line = test; }
+            }
+            if (line) ctx.fillText(line, x, y + count * lh);
+        }
+
+        function drawLabel(item) {
+            if (!labelCtx) return;
+            const ctx = labelCtx;
+            const W = labelCanvas.width, H = labelCanvas.height;
+            const lang = window.__lang || 'en';
+            const name = (lang === 'ka' && item.name_ka)        ? item.name_ka        : item.name;
+            const desc = (lang === 'ka' && item.description_ka) ? item.description_ka : item.description;
+
+            ctx.clearRect(0, 0, W, H);
+
+            // Background
+            ctx.fillStyle = 'rgba(8, 8, 8, 0.92)';
+            _rrPath(ctx, 6, 6, W - 12, H - 12, 20);
+            ctx.fill();
+
+            // Golden border
+            ctx.strokeStyle = 'rgba(240, 192, 64, 0.7)';
+            ctx.lineWidth = 3;
+            _rrPath(ctx, 6, 6, W - 12, H - 12, 20);
+            ctx.stroke();
+
+            // Name
+            ctx.fillStyle = '#f0c040';
+            ctx.font = 'bold 44px Arial, sans-serif';
+            ctx.fillText(name, 28, 52, W - 56);
+
+            // Thin divider under name
+            ctx.strokeStyle = 'rgba(240, 192, 64, 0.30)';
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(28, 66); ctx.lineTo(W - 28, 66); ctx.stroke();
+
+            // Description
+            ctx.fillStyle = '#c0c0c0';
+            ctx.font = '22px Arial, sans-serif';
+            _wrapText(ctx, desc, 28, 88, W - 56, 28, 3);
+
+            // Price at bottom
+            ctx.fillStyle = '#f0c040';
+            ctx.font = 'bold 36px Arial, sans-serif';
+            ctx.fillText(item.price, 28, H - 20);
+
+            if (labelTexture) labelTexture.needsUpdate = true;
+        }
+
+        function createLabelMesh() {
+            const W = 512, H = 210;
+            labelCanvas = document.createElement('canvas');
+            labelCanvas.width = W; labelCanvas.height = H;
+            labelCtx = labelCanvas.getContext('2d');
+            labelTexture = new THREE.CanvasTexture(labelCanvas);
+            const mat = new THREE.MeshBasicMaterial({
+                map: labelTexture, transparent: true, depthWrite: false, side: THREE.DoubleSide
+            });
+            const planeW = 0.30, planeH = planeW * H / W;
+            labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), mat);
+            labelMesh.position.set(0, 0.28, 0.06);
+            labelMesh.visible = false;
+            carouselRoot.add(labelMesh);
+        }
 
         // ── Models ────────────────────────────────────────────────────
         function preloadModels() {
@@ -571,6 +661,7 @@
                 slotOf = { left: cIdx, center: rIdx, right: hIdx, hidden: lIdx };
                 hiddenSide = 'farLeft'; currentCenterMenu = mod(currentCenterMenu + 1);
                 isAnimating = false;
+                if (labelMesh && labelMesh.visible) drawLabel(MENU[currentCenterMenu]);
             }, DUR + 10);
         }
 
@@ -591,6 +682,7 @@
                 slotOf = { left: hIdx, center: lIdx, right: cIdx, hidden: rIdx };
                 hiddenSide = 'farRight'; currentCenterMenu = mod(currentCenterMenu - 1);
                 isAnimating = false;
+                if (labelMesh && labelMesh.visible) drawLabel(MENU[currentCenterMenu]);
             }, DUR + 10);
         }
 
@@ -607,6 +699,7 @@
             document.getElementById('xr-nav-row').style.display          = 'flex';
             document.getElementById('xr-move-hint').style.display        = 'block';
             document.getElementById('xr-carousel-toggle').style.display  = 'block';
+            if (labelMesh) { drawLabel(MENU[currentCenterMenu]); labelMesh.visible = true; }
         }
 
         // ── One-time init — deferred until first AR tap ───────────────
@@ -658,6 +751,7 @@
             slotGroups = Array.from({ length: 4 }, () => {
                 const g = new THREE.Group(); carouselRoot.add(g); return g;
             });
+            createLabelMesh();
 
             gestureLayer = document.getElementById('xr-gesture-layer');
             xrOverlay    = document.getElementById('xr-overlay');
@@ -710,6 +804,7 @@
                 hitTestSource = null; placed = false;
                 xrSession = null; xrStarting = false;
                 carouselRoot.visible = false; reticle.visible = false;
+                if (labelMesh) labelMesh.visible = false;
                 xrCanvas.style.display       = 'none';
                 xrOverlay.style.display      = 'none';
                 gestureLayer.style.display   = 'none';
@@ -735,6 +830,7 @@
                         } else { reticle.visible = false; }
                     }
                 }
+                if (labelMesh && labelMesh.visible) labelMesh.quaternion.copy(camera.quaternion);
                 renderer.render(scene, camera);
             });
 
