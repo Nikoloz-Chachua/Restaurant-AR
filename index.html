@@ -356,11 +356,10 @@
             font-size: 12px;
             white-space: nowrap;
         }
-        #xr-exit {
+        #xr-exit, #xr-carousel-toggle {
             pointer-events: all;
             position: absolute;
             top: 18px;
-            right: 18px;
             background: rgba(0,0,0,0.65);
             color: #ccc;
             border: 1px solid rgba(255,255,255,0.2);
@@ -370,6 +369,8 @@
             font-size: 13px;
             cursor: pointer;
         }
+        #xr-exit             { right: 18px; }
+        #xr-carousel-toggle  { left: 18px; display: none; }
     </style>
 </head>
 <body>
@@ -409,6 +410,7 @@
         </div>
         <div id="xr-move-hint">Drag to move &middot; Twist two fingers to rotate</div>
         <button id="xr-exit">Exit AR</button>
+        <button id="xr-carousel-toggle"></button>
     </div>
 
     <!-- WebXR — Three.js loaded lazily on first AR tap, not on page load -->
@@ -420,6 +422,7 @@
         let gestureLayer, xrOverlay;
         let hitTestSource = null, xrSession = null, xrStarting = false;
         let placed = false, isAnimating = false;
+        let _xrSingleItem = (localStorage.getItem('bl-xr-view') || 'single') === 'single';
 
         let MENU = [], N = 0;
         const mod = i => ((i % N) + N) % N;
@@ -438,6 +441,9 @@
             right:    { x:  0.14, z: -0.08, s: 0.20, opacity: 0.65 },
             farRight: { x:  0.35, z: -0.12, s: 0.20, opacity: 0    },
         };
+        // Returns target opacity for a role based on current view mode
+        const _roleOp = role => _xrSingleItem ? (role === 'center' ? 1.0 : 0) : CFG[role].opacity;
+
         const INIT_ROLES    = ['left', 'center', 'right', 'farRight'];
         const DUR           = 350;
         const MOVE_SCALE    = 0.0015;
@@ -480,7 +486,7 @@
             const c = currentCenterMenu;
             menuOf = [mod(c - 1), c, mod(c + 1), mod(c + 2)];
             for (let i = 0; i < 4; i++) setSlotModel(i, menuOf[i]);
-            const opacities = [CFG.left.opacity, CFG.center.opacity, CFG.right.opacity, 0];
+            const opacities = [_roleOp('left'), _roleOp('center'), _roleOp('right'), 0];
             INIT_ROLES.forEach((role, i) => {
                 slotGroups[i].position.x = CFG[role].x;
                 slotGroups[i].position.z = CFG[role].z;
@@ -545,10 +551,10 @@
             setSlotModel(hIdx, menuOf[hIdx]); setOpacity(hIdx, 0);
             animSlot(lIdx, 'farLeft', DUR); animSlot(cIdx, 'left',  DUR);
             animSlot(rIdx, 'center',  DUR); animSlot(hIdx, 'right', DUR);
-            animOpacity(lIdx, CFG.left.opacity,   0,                  DUR);
-            animOpacity(cIdx, CFG.center.opacity, CFG.left.opacity,   DUR);
-            animOpacity(rIdx, CFG.right.opacity,  CFG.center.opacity, DUR);
-            animOpacity(hIdx, 0,                  CFG.right.opacity,  DUR);
+            animOpacity(lIdx, _roleOp('left'),    0,                DUR);
+            animOpacity(cIdx, _roleOp('center'),  _roleOp('left'),  DUR);
+            animOpacity(rIdx, _roleOp('right'),   _roleOp('center'), DUR);
+            animOpacity(hIdx, 0,                  _roleOp('right'), DUR);
             setTimeout(() => {
                 slotOf = { left: cIdx, center: rIdx, right: hIdx, hidden: lIdx };
                 hiddenSide = 'farLeft'; currentCenterMenu = mod(currentCenterMenu + 1);
@@ -565,10 +571,10 @@
             setSlotModel(hIdx, menuOf[hIdx]); setOpacity(hIdx, 0);
             animSlot(rIdx, 'farRight', DUR); animSlot(cIdx, 'right', DUR);
             animSlot(lIdx, 'center',   DUR); animSlot(hIdx, 'left',  DUR);
-            animOpacity(rIdx, CFG.right.opacity,  0,                   DUR);
-            animOpacity(cIdx, CFG.center.opacity, CFG.right.opacity,   DUR);
-            animOpacity(lIdx, CFG.left.opacity,   CFG.center.opacity,  DUR);
-            animOpacity(hIdx, 0,                  CFG.left.opacity,    DUR);
+            animOpacity(rIdx, _roleOp('right'),   0,                 DUR);
+            animOpacity(cIdx, _roleOp('center'),  _roleOp('right'),  DUR);
+            animOpacity(lIdx, _roleOp('left'),    _roleOp('center'), DUR);
+            animOpacity(hIdx, 0,                  _roleOp('left'),   DUR);
             setTimeout(() => {
                 slotOf = { left: hIdx, center: lIdx, right: cIdx, hidden: rIdx };
                 hiddenSide = 'farRight'; currentCenterMenu = mod(currentCenterMenu - 1);
@@ -585,9 +591,10 @@
             reticle.visible      = false;
             placed               = true;
             gestureLayer.style.display = 'block';
-            document.getElementById('xr-place-hint').style.display = 'none';
-            document.getElementById('xr-nav-row').style.display    = 'flex';
-            document.getElementById('xr-move-hint').style.display  = 'block';
+            document.getElementById('xr-place-hint').style.display      = 'none';
+            document.getElementById('xr-nav-row').style.display          = 'flex';
+            document.getElementById('xr-move-hint').style.display        = 'block';
+            document.getElementById('xr-carousel-toggle').style.display  = 'block';
         }
 
         // ── One-time init — deferred until first AR tap ───────────────
@@ -694,9 +701,10 @@
                 xrCanvas.style.display       = 'none';
                 xrOverlay.style.display      = 'none';
                 gestureLayer.style.display   = 'none';
-                document.getElementById('xr-place-hint').style.display = 'block';
-                document.getElementById('xr-nav-row').style.display    = 'none';
-                document.getElementById('xr-move-hint').style.display  = 'none';
+                document.getElementById('xr-place-hint').style.display     = 'block';
+                document.getElementById('xr-nav-row').style.display         = 'none';
+                document.getElementById('xr-move-hint').style.display       = 'none';
+                document.getElementById('xr-carousel-toggle').style.display = 'none';
                 activeTouches.clear();
                 slotOf = { left: 0, center: 1, right: 2, hidden: 3 };
                 hiddenSide = 'farRight'; isAnimating = false;
@@ -721,6 +729,23 @@
             document.getElementById('xr-exit').addEventListener('click', () => xrSession?.end());
             document.getElementById('xr-prev').addEventListener('click', goPrev);
             document.getElementById('xr-next').addEventListener('click', goNext);
+
+            function updateXRToggleBtn() {
+                document.getElementById('xr-carousel-toggle').textContent =
+                    _xrSingleItem ? 'CAROUSEL' : 'SINGLE';
+            }
+            updateXRToggleBtn();
+
+            document.getElementById('xr-carousel-toggle').addEventListener('click', () => {
+                _xrSingleItem = !_xrSingleItem;
+                localStorage.setItem('bl-xr-view', _xrSingleItem ? 'single' : 'multi');
+                updateXRToggleBtn();
+                const { left: lIdx, right: rIdx } = slotOf;
+                const from = _xrSingleItem ? CFG.left.opacity : 0;
+                const to   = _xrSingleItem ? 0 : CFG.left.opacity;
+                animOpacity(lIdx, from, to, DUR);
+                animOpacity(rIdx, from, to, DUR);
+            });
         }
 
         // ── Public API ────────────────────────────────────────────────
