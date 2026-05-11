@@ -133,7 +133,6 @@
             overflow: hidden;
             background: var(--thumb-bg);
             border: 1px solid var(--border);
-            cursor: pointer;
             transition: background var(--t), border-color var(--t);
         }
         .thumb-wrap model-viewer {
@@ -141,6 +140,7 @@
             height: 100%;
             background: transparent;
             display: block;
+            touch-action: pan-y;
         }
 
         .item-details { flex: 1; min-width: 0; user-select: none; }
@@ -1106,8 +1106,11 @@
                         <div class="thumb-wrap">
                             <model-viewer
                                 data-src="${item.model || 'food.glb'}"
+                                camera-controls
                                 shadow-intensity="0"
-                                interaction-prompt="none">
+                                interaction-prompt="none"
+                                min-camera-orbit="auto 0deg auto"
+                                max-camera-orbit="auto 90deg auto">
                             </model-viewer>
                         </div>
                         <div class="item-details">

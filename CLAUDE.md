@@ -24,13 +24,15 @@ npm run dev      # Serve static files at http://localhost:3000
 | Device | AR capability | Result |
 |---|---|---|
 | Android Chrome + ARCore | `webxr` detected | Three.js WebXR carousel — tap surface to place, swipe to cycle items |
-| iOS Safari | `arkit` detected | Redirect to `advanced-ar.html?item=N` (Quick Look) |
-| Android without WebXR | `none` + mobile UA | Redirect to `advanced-ar.html?item=N` (Scene Viewer) |
-| Desktop | `none` + not mobile | In-page 3D modal (no AR) |
+| iOS Safari | `arkit` detected | Quick Look fires directly via a hidden pre-loaded `model-viewer` in index.html (`activateAR()`) — no page redirect |
+| Android without WebXR | `none` | In-page 3D modal — button reads "VIEW IN 3D" |
+| Desktop | `none` | In-page 3D modal — button reads "VIEW IN 3D" |
 
 AR capability is cached in `localStorage` key `bl-ar-cap`. Theme and language are stored under `bl-theme` / `bl-lang`.
 
-**`advanced-ar.html`** — model-viewer-based AR page. Primary experience for iOS (Quick Look) and fallback for Android without WebXR (Scene Viewer). Accepts `?item=N` (global menu index) from index.html. No in-AR overlays — the AR scene shows only the 3D model. Supports EN/KA language and Day/Night theme, both synced to the same localStorage keys as index.html.
+On iOS, both model files (`food.glb`, `Druidi.glb`) are pre-loaded into hidden launcher `model-viewer` elements on page load so `activateAR()` can fire synchronously from the tap gesture without losing the gesture context.
+
+**`advanced-ar.html`** — standalone model-viewer AR page accessible at `?item=N` (global menu index). Not linked from `index.html`'s AR routing — it is an independent page. Has prev/next navigation through all 32 items, `ar-modes="webxr scene-viewer quick-look"`, and syncs EN/KA language and Day/Night theme via the same localStorage keys as index.html.
 
 ### Data
 
@@ -48,5 +50,5 @@ Both files are in the project root. AR sessions show no name/price labels — cl
 - Three.js is loaded **lazily** on first AR tap (not on page load) to avoid blocking the menu.
 - Thumbnails are loaded **staggered** (150 ms apart) via IntersectionObserver to prevent competing WebGL context inits.
 - The WebXR carousel in index.html is **category-scoped** — only items in the same category as the tapped item appear in the carousel.
-- `advanced-ar.html` navigates through **all 32 items** (simple prev/next), not category-scoped.
-- AR labels (name, price) are intentionally absent from both AR flows — AR is for immersive 3D viewing only.
+- `advanced-ar.html` navigates through **all 32 items** (simple prev/next), not category-scoped. It is not used by `index.html`'s AR routing — access it directly via URL if needed.
+- AR labels (name, price) are intentionally absent from all AR flows — AR is for immersive 3D viewing only.
