@@ -8,6 +8,14 @@
     <meta property="og:title" content="Burger Lions — AR Menu">
     <meta property="og:description" content="Browse our menu and place dishes on your table in Augmented Reality.">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.155.0/examples/jsm/"
+      }
+    }
+    </script>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
         :root { --t: 0.22s ease; }
@@ -100,6 +108,28 @@
         #theme-toggle { right: 14px; }
         #lang-toggle  { left: 14px; }
         #theme-toggle:active, #lang-toggle:active { opacity: 0.65; }
+
+        #ar-mode-toggle {
+            position: fixed;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: var(--card);
+            border: 1px solid var(--accent);
+            border-radius: 50px;
+            padding: 8px 16px;
+            cursor: pointer;
+            color: var(--accent);
+            font-family: 'Nunito', sans-serif;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: none;
+            transition: background var(--t), color var(--t), border-color var(--t);
+        }
+        #ar-mode-toggle:active { opacity: 0.65; }
 
         .menu-list {
             width: 100%;
@@ -376,6 +406,7 @@
 
     <button id="theme-toggle" aria-label="Toggle theme">Day</button>
     <button id="lang-toggle" aria-label="Toggle language">KA</button>
+    <button id="ar-mode-toggle" aria-label="Toggle AR mode"></button>
 
     <div class="header">
         <h1>Burger Lions</h1>
@@ -598,8 +629,8 @@
             _setupDone = true;
 
             const [threeNS, loaderMod] = await Promise.all([
-                import('https://esm.sh/three@0.155.0'),
-                import('https://esm.sh/three@0.155.0/examples/jsm/loaders/GLTFLoader')
+                import('three'),
+                import('three/addons/loaders/GLTFLoader.js')
             ]);
             THREE      = threeNS;
             GLTFLoader = loaderMod.GLTFLoader;
@@ -725,6 +756,7 @@
 
         // ── Public API ────────────────────────────────────────────────
         window.XR = {
+            async preload() { await _setup(); },
             async start(itemIndex, items) {
                 if (xrStarting || xrSession) return;
                 xrStarting = true;
@@ -769,32 +801,36 @@
     <script>
         const UI = {
             en: {
-                tagline:   'Taste the Wild',
-                viewAR:    'VIEW ON TABLE',
-                view3D:    'VIEW IN 3D',
-                loading:   'Loading...',
-                close:     'Close',
-                tip:       'Drag to rotate',
-                placeHint: 'Point at a flat surface, then tap to place',
-                moveHint:  'Drag to move · Twist two fingers to rotate',
-                exitAR:    'Exit AR',
-                langBtn:   'KA',
-                themeDay:  'Day',
-                themeNight:'Night',
+                tagline:        'Taste the Wild',
+                viewAR:         'VIEW ON TABLE',
+                view3D:         'VIEW IN 3D',
+                loading:        'Loading...',
+                close:          'Close',
+                tip:            'Drag to rotate',
+                placeHint:      'Point at a flat surface, then tap to place',
+                moveHint:       'Drag to move · Twist two fingers to rotate',
+                exitAR:         'Exit AR',
+                langBtn:        'KA',
+                themeDay:       'Day',
+                themeNight:     'Night',
+                arModeCarousel: 'CAROUSEL',
+                arModeQuick:    'QUICK AR',
             },
             ka: {
-                tagline:   'გემო ველისა',
-                viewAR:    'ᲛᲐᲒᲘᲓᲐᲖᲔ ᲜᲐᲮᲕᲐ',
-                view3D:    '3D-ში ᲜᲐᲮᲕᲐ',
-                loading:   'იტვირთება...',
-                close:     'დახურვა',
-                tip:       'სანახავად გადაათრიე',
-                placeHint: 'მიანიშნე ბრტყელ ზედაპირზე, შემდეგ შეეხე',
-                moveHint:  'გადასაადგილებლად გადაათრიე · ორი თითით შეტრიალება',
-                exitAR:    'AR-ის დახურვა',
-                langBtn:   'EN',
-                themeDay:  'Day',
-                themeNight:'Night',
+                tagline:        'გემო ველისა',
+                viewAR:         'ᲛᲐᲒᲘᲓᲐᲖᲔ ᲜᲐᲮᲕᲐ',
+                view3D:         '3D-ში ᲜᲐᲮᲕᲐ',
+                loading:        'იტვირთება...',
+                close:          'დახურვა',
+                tip:            'სანახავად გადაათრიე',
+                placeHint:      'მიანიშნე ბრტყელ ზედაპირზე, შემდეგ შეეხე',
+                moveHint:       'გადასაადგილებლად გადაათრიე · ორი თითით შეტრიალება',
+                exitAR:         'AR-ის დახურვა',
+                langBtn:        'EN',
+                themeDay:       'Day',
+                themeNight:     'Night',
+                arModeCarousel: 'ᲙᲐᲠᲣᲡᲔᲚᲘ',
+                arModeQuick:    'სწრაფი AR',
             }
         };
 
@@ -821,6 +857,7 @@
             document.getElementById('xr-exit').textContent       = u.exitAR;
             const btnText = window.__arCap === 'none' ? u.view3D : u.viewAR;
             document.querySelectorAll('.ar-btn:not(:disabled)').forEach(b => { b.textContent = btnText; });
+            updateARModeBtn();
             document.querySelectorAll('[data-field][data-idx]').forEach(el => {
                 const item = menuItems[parseInt(el.dataset.idx)];
                 if (item) el.textContent = t(item, el.dataset.field);
@@ -832,6 +869,13 @@
 
         document.getElementById('lang-toggle').addEventListener('click', () => {
             applyLang(window.__lang === 'en' ? 'ka' : 'en');
+        });
+
+        document.getElementById('ar-mode-toggle').addEventListener('click', () => {
+            _arMode = _arMode === 'simple' ? 'webxr' : 'simple';
+            localStorage.setItem('bl-ar-mode', _arMode);
+            updateARModeBtn();
+            if (_arMode === 'webxr') window.XR.preload(); // start fetching Three.js now
         });
 
         // ── Theme ──────────────────────────────────────────────────────
@@ -850,8 +894,9 @@
 
         // ── XR session state ───────────────────────────────────────────
         document.addEventListener('xr-session-start', () => {
-            document.getElementById('theme-toggle').style.display = 'none';
-            document.getElementById('lang-toggle').style.display  = 'none';
+            document.getElementById('theme-toggle').style.display    = 'none';
+            document.getElementById('lang-toggle').style.display     = 'none';
+            document.getElementById('ar-mode-toggle').style.display  = 'none';
         });
 
         document.addEventListener('xr-session-end', e => {
@@ -859,6 +904,7 @@
             setARButtonsState(false);
             document.getElementById('theme-toggle').style.display = '';
             document.getElementById('lang-toggle').style.display  = '';
+            if (_webxrAvailable) document.getElementById('ar-mode-toggle').style.display = '';
             if (e.detail?.fallbackIdx != null) openModal(e.detail.fallbackIdx, _arCatItems || menuItems);
         });
 
@@ -952,14 +998,15 @@
             });
         }
 
-        // ── iOS AR launcher — hidden model-viewers pre-load so activateAR()
-        //    can fire synchronously from the tap without losing the gesture context.
+        // ── Native AR launcher — hidden model-viewers pre-loaded so activateAR()
+        //    fires synchronously from the tap without losing the gesture context.
+        //    scene-viewer = Android native AR; quick-look = iOS native AR.
         const _arLaunchers = {};
         function _getARLauncher(src) {
             if (!_arLaunchers[src]) {
                 const mv = document.createElement('model-viewer');
                 mv.setAttribute('ar', '');
-                mv.setAttribute('ar-modes', 'quick-look');
+                mv.setAttribute('ar-modes', 'scene-viewer quick-look');
                 mv.src = src;
                 mv.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px;';
                 document.body.appendChild(mv);
@@ -968,14 +1015,24 @@
             return _arLaunchers[src];
         }
 
-        // Pre-load both models on iOS so USDZ is ready before the user taps
-        const _isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
-            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        if (_isIOS) ['food.glb', 'Druidi.glb'].forEach(src => _getARLauncher(src));
+        function _preloadNativeAR() {
+            ['food.glb', 'Druidi.glb'].forEach(src => _getARLauncher(src));
+        }
 
         // ── AR routing ─────────────────────────────────────────────────
+        // _arMode: 'simple' = native scene-viewer/quick-look (default, no Three.js)
+        //          'webxr'  = Three.js carousel (Android ARCore only)
+        let _arMode     = localStorage.getItem('bl-ar-mode') || 'simple';
         let _arOpening  = false;
         let _arCatItems = null;
+        let _webxrAvailable = false;
+
+        function updateARModeBtn() {
+            const btn = document.getElementById('ar-mode-toggle');
+            if (!btn) return;
+            const u = UI[window.__lang];
+            btn.textContent = _arMode === 'simple' ? u.arModeCarousel : u.arModeQuick;
+        }
 
         async function openAR(localIdx, catItems) {
             if (_arOpening) return;
@@ -988,7 +1045,8 @@
 
             if (!item) { setARButtonsState(false); _arOpening = false; return; }
 
-            if (cap === 'webxr' && window.XR) {
+            if (cap === 'webxr' && _arMode === 'webxr') {
+                // Android ARCore + carousel mode: Three.js WebXR
                 try {
                     await window.XR.start(localIdx, _arCatItems);
                 } catch (err) {
@@ -997,12 +1055,11 @@
                     setARButtonsState(false);
                     _arOpening = false;
                 }
-            } else if (cap === 'arkit') {
-                // iOS — fire Quick Look directly via pre-loaded hidden model-viewer
+            } else if (cap === 'webxr' || cap === 'arkit') {
+                // Simple mode: native scene-viewer (Android) or quick-look (iOS)
                 _getARLauncher(item.model || 'food.glb').activateAR();
                 setTimeout(() => { setARButtonsState(false); _arOpening = false; }, 2500);
             } else {
-                // No AR support (non-ARCore Android, desktop) — open 3D modal
                 openModal(localIdx, _arCatItems);
                 setARButtonsState(false);
                 _arOpening = false;
@@ -1141,12 +1198,25 @@
 
             applyLang(window.__lang);
 
-            // Correct button labels once AR detection resolves (instant if cap was cached)
-            arCapPromise.then(() => {
+            // After AR detection: correct labels, show toggle, preload launchers
+            arCapPromise.then(cap => {
                 const u = UI[window.__lang];
                 const finalLabel = window.__arCap === 'none' ? u.view3D : u.viewAR;
                 if (finalLabel !== initialLabel)
                     document.querySelectorAll('.ar-btn:not(:disabled)').forEach(b => { b.textContent = finalLabel; });
+
+                if (cap === 'webxr') {
+                    _webxrAvailable = true;
+                    const btn = document.getElementById('ar-mode-toggle');
+                    btn.style.display = '';
+                    updateARModeBtn();
+                }
+
+                // Pre-load native AR model launchers for quick-look / scene-viewer
+                if (cap === 'arkit' || cap === 'webxr') _preloadNativeAR();
+
+                // Pre-load Three.js in background if carousel mode is already preferred
+                if (cap === 'webxr' && _arMode === 'webxr') window.XR.preload();
             });
         }
 
