@@ -118,7 +118,7 @@
             display: flex;
             padding: 12px;
             gap: 12px;
-            align-items: center;
+            align-items: flex-start;
             transition: background var(--t), border-color var(--t);
             contain: content;
             touch-action: manipulation;
@@ -192,6 +192,10 @@
             line-height: 1.45;
             transition: color var(--t);
             overflow-wrap: break-word;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .price {
