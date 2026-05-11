@@ -229,14 +229,22 @@
         }
         #modal.active { opacity: 1; }
 
+        #modal-header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 16px 16px 0;
+            gap: 12px;
+        }
+
         #modal-title {
             font-family: 'Bebas Neue', sans-serif;
             font-size: clamp(1.8rem, 6vw, 2.6rem);
             letter-spacing: 4px;
             color: var(--accent);
+            flex: 1;
+            min-width: 0;
             text-align: center;
-            width: 100%;
-            padding: 0 80px;
             line-height: 1.2;
             transition: color var(--t);
         }
@@ -252,9 +260,7 @@
         }
 
         .close-btn {
-            position: absolute;
-            top: 16px;
-            right: 16px;
+            flex-shrink: 0;
             background: var(--card2);
             color: var(--text);
             border: 1px solid var(--border);
@@ -400,8 +406,10 @@
     <div id="modal">
         <button class="nav-arrow left-arrow"  id="modal-prev">&#10094;</button>
         <button class="nav-arrow right-arrow" id="modal-next">&#10095;</button>
-        <button class="close-btn" id="close-btn">Close</button>
-        <div id="modal-title"></div>
+        <div id="modal-header">
+            <div id="modal-title"></div>
+            <button class="close-btn" id="close-btn">Close</button>
+        </div>
         <model-viewer id="modal-viewer"
             camera-controls
             shadow-intensity="1"
