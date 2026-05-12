@@ -996,12 +996,11 @@
             document.querySelectorAll('[data-field][data-idx]').forEach(el => {
                 const item = menuItems[parseInt(el.dataset.idx)];
                 if (item) el.textContent = t(item, el.dataset.field);
-                const carouselBtn = document.getElementById('xr-carousel-toggle');
-const labelBtn    = document.getElementById('xr-label-toggle');
-const u2 = UI[lang];
-if (carouselBtn) carouselBtn.textContent = _xrSingleItem ? u2.carouselBtn : u2.singleBtn;
-if (labelBtn)    labelBtn.textContent    = (localStorage.getItem('bl-xr-label') || 'float') === 'float' ? u2.onTable : u2.floating;
             });
+            const carouselBtn = document.getElementById('xr-carousel-toggle');
+            const labelBtn    = document.getElementById('xr-label-toggle');
+            if (carouselBtn) carouselBtn.textContent = (localStorage.getItem('bl-xr-view') || 'single') === 'single' ? u.carouselBtn : u.singleBtn;
+            if (labelBtn)    labelBtn.textContent    = (localStorage.getItem('bl-xr-label') || 'float') === 'float' ? u.onTable : u.floating;
             document.querySelectorAll('.category-header[data-cat-name]').forEach(el => {
                 el.textContent = (lang === 'ka' && el.dataset.catNameKa) ? el.dataset.catNameKa : el.dataset.catName;
             });
