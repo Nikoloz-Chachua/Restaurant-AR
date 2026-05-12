@@ -322,18 +322,21 @@
             pointer-events: all;
         }
         #xr-place-hint {
-            position: absolute;
-            bottom: 110px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.7);
-            color: white;
-            font-family: 'Nunito', sans-serif;
-            font-size: 15px;
-            padding: 12px 22px;
-            border-radius: 24px;
-            white-space: nowrap;
-        }
+    position: absolute;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    background: rgba(0,0,0,0.65);
+    padding: 10px 20px;
+    border-radius: 20px;
+    white-space: normal;
+    text-align: center;
+    width: 80%;
+    max-width: 320px;
+}
         #xr-nav-row {
             display: none;
             position: absolute;
@@ -570,6 +573,8 @@
             }
             const btn = document.getElementById('xr-label-toggle');
             if (btn) btn.textContent = labelMode === 'float' ? 'ON TABLE' : 'FLOATING';
+            const u = UI[window.__lang || 'en'];
+    if (btn) btn.textContent = labelMode === 'float' ? u.onTable : u.floating;
         }
 
         // ── Models ────────────────────────────────────────────────────
@@ -864,9 +869,10 @@
             });
 
             function updateXRToggleBtn() {
-                document.getElementById('xr-carousel-toggle').textContent =
-                    _xrSingleItem ? 'CAROUSEL' : 'SINGLE';
-            }
+    const u = UI[window.__lang || 'en'];
+    document.getElementById('xr-carousel-toggle').textContent =
+        _xrSingleItem ? u.carouselBtn : u.singleBtn;
+}
             updateXRToggleBtn();
             updateLabelTransform();
 
@@ -939,6 +945,10 @@
                 langBtn:   'ქარ',
                 themeDay:  'Day',
                 themeNight:'Night',
+                carouselBtn: 'CAROUSEL',
+    singleBtn:   'SINGLE ITEM',
+    onTable:     'ON TABLE',
+    floating:    'FLOATING',
             },
             ka: {
                 tagline:   'გასინჯე ველური გემო',
@@ -953,6 +963,10 @@
                 langBtn:   'EN',
                 themeDay:  'ნათელი თემა',
                 themeNight:'მუქი თემა',
+                carouselBtn: 'კარუსელი',
+    singleBtn:   'ცალი',
+    onTable:     'მაგიდაზე ტექსტი ',
+    floating:    'მოლივლივე ტექსტი',
             }
         };
 
@@ -982,6 +996,11 @@
             document.querySelectorAll('[data-field][data-idx]').forEach(el => {
                 const item = menuItems[parseInt(el.dataset.idx)];
                 if (item) el.textContent = t(item, el.dataset.field);
+                const carouselBtn = document.getElementById('xr-carousel-toggle');
+const labelBtn    = document.getElementById('xr-label-toggle');
+const u2 = UI[lang];
+if (carouselBtn) carouselBtn.textContent = _xrSingleItem ? u2.carouselBtn : u2.singleBtn;
+if (labelBtn)    labelBtn.textContent    = (localStorage.getItem('bl-xr-label') || 'float') === 'float' ? u2.onTable : u2.floating;
             });
             document.querySelectorAll('.category-header[data-cat-name]').forEach(el => {
                 el.textContent = (lang === 'ka' && el.dataset.catNameKa) ? el.dataset.catNameKa : el.dataset.catName;
