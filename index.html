@@ -1005,6 +1005,7 @@ if (labelBtn)    labelBtn.textContent    = (localStorage.getItem('bl-xr-label') 
             document.querySelectorAll('.category-header[data-cat-name]').forEach(el => {
                 el.textContent = (lang === 'ka' && el.dataset.catNameKa) ? el.dataset.catNameKa : el.dataset.catName;
             });
+            if (modal.classList.contains('active')) updateModal();
         }
 
         document.getElementById('lang-toggle').addEventListener('click', () => {
