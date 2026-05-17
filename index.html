@@ -907,6 +907,7 @@
                     console.error('XR session failed:', e);
                     xrStarting = false;
                     window.__arCap = 'none';
+                    localStorage.setItem('bl-ar-cap', 'none');
                     document.dispatchEvent(new CustomEvent('xr-session-end', { detail: { fallbackIdx: itemIndex } }));
                     return;
                 }
@@ -1099,8 +1100,7 @@
         // ── AR capability detection ────────────────────────────────────
         async function detectAR() {
             const cached = localStorage.getItem('bl-ar-cap');
-            if (cached === 'none') localStorage.removeItem('bl-ar-cap'); // never trust a cached failure
-            if (cached && cached !== 'none') { window.__arCap = cached; return cached; }
+            if (cached) { window.__arCap = cached; return cached; }
 
             const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
                           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
