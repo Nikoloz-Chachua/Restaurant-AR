@@ -219,7 +219,6 @@
 
         let MENU    = [];
         let current = 0;
-        let inAR    = false;
 
         // ── Language ──────────────────────────────────────────────────
         let lang = localStorage.getItem('bl-lang') || 'en';
@@ -297,14 +296,6 @@
             if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) && Date.now() - _tt < 500)
                 navigate(dx < 0 ? 1 : -1);
         }, { passive: true });
-
-        // ── AR session events from model-viewer ───────────────────────
-        viewer.addEventListener('ar-status', e => {
-            const s = e.detail.status;
-            if (s === 'session-started')   { inAR = true; }
-            else if (s === 'not-presenting') { inAR = false; }
-            else if (s === 'failed')         { inAR = false; }
-        });
 
         // ── Boot ──────────────────────────────────────────────────────
         const FALLBACK = [

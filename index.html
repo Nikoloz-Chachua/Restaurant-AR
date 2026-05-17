@@ -512,33 +512,27 @@
 
             ctx.clearRect(0, 0, W, H);
 
-            // Background
             ctx.fillStyle = 'rgba(8, 8, 8, 0.92)';
             _rrPath(ctx, 6, 6, W - 12, H - 12, 20);
             ctx.fill();
 
-            // Golden border
             ctx.strokeStyle = 'rgba(240, 192, 64, 0.7)';
             ctx.lineWidth = 3;
             _rrPath(ctx, 6, 6, W - 12, H - 12, 20);
             ctx.stroke();
 
-            // Name
             ctx.fillStyle = '#f0c040';
             ctx.font = 'bold 44px Arial, sans-serif';
             ctx.fillText(name, 28, 52, W - 56);
 
-            // Thin divider under name
             ctx.strokeStyle = 'rgba(240, 192, 64, 0.30)';
             ctx.lineWidth = 1;
             ctx.beginPath(); ctx.moveTo(28, 66); ctx.lineTo(W - 28, 66); ctx.stroke();
 
-            // Description
             ctx.fillStyle = '#c0c0c0';
             ctx.font = '22px Arial, sans-serif';
             _wrapText(ctx, desc, 28, 88, W - 56, 28, 3);
 
-            // Price at bottom
             ctx.fillStyle = '#f0c040';
             ctx.font = 'bold 36px Arial, sans-serif';
             ctx.fillText(item.price, 28, H - 20);
@@ -572,9 +566,8 @@
                 labelMesh.rotation.set(0, 0, 0);
             }
             const btn = document.getElementById('xr-label-toggle');
-            if (btn) btn.textContent = labelMode === 'float' ? 'ON TABLE' : 'FLOATING';
             const u = UI[window.__lang || 'en'];
-    if (btn) btn.textContent = labelMode === 'float' ? u.onTable : u.floating;
+            if (btn) btn.textContent = labelMode === 'float' ? u.onTable : u.floating;
         }
 
         // ── Models ────────────────────────────────────────────────────
