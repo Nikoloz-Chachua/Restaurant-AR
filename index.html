@@ -1232,6 +1232,11 @@
         let _iosLauncher = null;
 
         function showIOSHint(launcher) {
+            if (localStorage.getItem('bl-ios-ar-seen')) {
+                launcher.activateAR();
+                setTimeout(() => { setARButtonsState(false); _arOpening = false; }, 2500);
+                return;
+            }
             _iosLauncher = launcher;
             const u = UI[window.__lang];
             document.getElementById('ios-hint-title').textContent = u.iosHintTitle;
@@ -1243,6 +1248,7 @@
         }
 
         document.getElementById('ios-hint-launch').addEventListener('click', () => {
+            localStorage.setItem('bl-ios-ar-seen', '1');
             document.getElementById('ios-hint').classList.remove('active');
             if (_iosLauncher) { _iosLauncher.activateAR(); _iosLauncher = null; }
             setTimeout(() => { setARButtonsState(false); _arOpening = false; }, 2500);
