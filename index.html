@@ -1230,14 +1230,32 @@
 
         // ── iOS AR instruction sheet ───────────────────────────────────
         let _iosLauncher = null;
+        let _iosLocalIdx = 0;
 
-        function showIOSHint(launcher) {
+        function _launchIOSAR(launcher, localIdx) {
+            function onARStatus(e) {
+                const s = e.detail.status;
+                if (s === 'failed') {
+                    launcher.removeEventListener('ar-status', onARStatus);
+                    setARButtonsState(false);
+                    _arOpening = false;
+                    openModal(localIdx, _arCatItems);
+                } else if (s === 'session-started') {
+                    launcher.removeEventListener('ar-status', onARStatus);
+                }
+            }
+            launcher.addEventListener('ar-status', onARStatus);
+            launcher.activateAR();
+            setTimeout(() => { setARButtonsState(false); _arOpening = false; }, 2500);
+        }
+
+        function showIOSHint(launcher, localIdx) {
             if (localStorage.getItem('bl-ios-ar-seen')) {
-                launcher.activateAR();
-                setTimeout(() => { setARButtonsState(false); _arOpening = false; }, 2500);
+                _launchIOSAR(launcher, localIdx);
                 return;
             }
             _iosLauncher = launcher;
+            _iosLocalIdx = localIdx;
             const u = UI[window.__lang];
             document.getElementById('ios-hint-title').textContent = u.iosHintTitle;
             const ol = document.getElementById('ios-hint-steps');
@@ -1250,8 +1268,7 @@
         document.getElementById('ios-hint-launch').addEventListener('click', () => {
             localStorage.setItem('bl-ios-ar-seen', '1');
             document.getElementById('ios-hint').classList.remove('active');
-            if (_iosLauncher) { _iosLauncher.activateAR(); _iosLauncher = null; }
-            setTimeout(() => { setARButtonsState(false); _arOpening = false; }, 2500);
+            if (_iosLauncher) { _launchIOSAR(_iosLauncher, _iosLocalIdx); _iosLauncher = null; }
         });
 
         document.getElementById('ios-hint-cancel').addEventListener('click', () => {
@@ -1286,7 +1303,7 @@
                     _arOpening = false;
                 }
             } else if (cap === 'arkit') {
-                showIOSHint(_getARLauncher(item.model || 'food.glb'));
+                showIOSHint(_getARLauncher(item.model || 'food.glb'), localIdx);
             } else {
                 // No AR support (non-ARCore Android, desktop) — open 3D modal
                 openModal(localIdx, _arCatItems);
