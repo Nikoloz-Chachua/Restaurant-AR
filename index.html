@@ -390,6 +390,69 @@
         #xr-exit             { top: 18px; right: 18px; }
         #xr-carousel-toggle  { top: 18px; left: 18px; display: none; }
         #xr-label-toggle     { top: 58px; left: 18px; display: none; }
+
+        /* ── iOS AR instruction sheet ── */
+        #ios-hint {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            background: rgba(0,0,0,0.55);
+            align-items: flex-end;
+        }
+        #ios-hint.active { display: flex; }
+        .ios-hint-card {
+            width: 100%;
+            background: var(--card);
+            border-radius: 20px 20px 0 0;
+            padding: 28px 20px 44px;
+            border-top: 1px solid var(--border);
+            transition: background var(--t), border-color var(--t);
+        }
+        #ios-hint-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 3px;
+            color: var(--accent);
+            margin-bottom: 16px;
+            transition: color var(--t);
+        }
+        #ios-hint-steps {
+            color: var(--text);
+            font-size: 0.88rem;
+            line-height: 1.8;
+            padding-left: 18px;
+            margin-bottom: 24px;
+            transition: color var(--t);
+        }
+        .ios-hint-btns { display: flex; gap: 10px; }
+        #ios-hint-cancel {
+            flex: 1;
+            padding: 13px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text);
+            border-radius: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background var(--t), color var(--t), border-color var(--t);
+        }
+        #ios-hint-launch {
+            flex: 2;
+            padding: 13px;
+            border: none;
+            background: var(--accent);
+            color: var(--accent-text);
+            border-radius: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: background var(--t);
+        }
     </style>
 </head>
 <body>
@@ -430,6 +493,17 @@
         <button id="xr-exit">Exit AR</button>
         <button id="xr-carousel-toggle"></button>
         <button id="xr-label-toggle"></button>
+    </div>
+
+    <div id="ios-hint">
+        <div class="ios-hint-card">
+            <div id="ios-hint-title"></div>
+            <ol id="ios-hint-steps"></ol>
+            <div class="ios-hint-btns">
+                <button id="ios-hint-cancel"></button>
+                <button id="ios-hint-launch"></button>
+            </div>
+        </div>
     </div>
 
     <!-- WebXR — Three.js loaded lazily on first AR tap, not on page load -->
@@ -939,10 +1013,14 @@
                 langBtn:   'ქარ',
                 themeDay:  'Day',
                 themeNight:'Night',
-                carouselBtn: 'CAROUSEL',
-    singleBtn:   'SINGLE ITEM',
-    onTable:     'ON TABLE',
-    floating:    'FLOATING',
+                carouselBtn:  'CAROUSEL',
+    singleBtn:    'SINGLE ITEM',
+    onTable:      'ON TABLE',
+    floating:     'FLOATING',
+                iosHintTitle: 'AR Instructions',
+                iosHintSteps: ['Point your camera at a flat surface (table or floor)', 'Tap on the surface to place the dish', 'Pinch to resize · Drag to move'],
+                iosLaunch:    'Open AR',
+                iosCancel:    'Cancel',
             },
             ka: {
                 tagline:   'გასინჯე ველური გემო',
@@ -957,10 +1035,14 @@
                 langBtn:   'EN',
                 themeDay:  'ნათელი თემა',
                 themeNight:'მუქი თემა',
-                carouselBtn: 'კარუსელი',
-    singleBtn:   'ცალი',
-    onTable:     'მაგიდაზე ტექსტი ',
-    floating:    'მოლივლივე ტექსტი',
+                carouselBtn:  'კარუსელი',
+    singleBtn:    'ცალი',
+    onTable:      'მაგიდაზე ტექსტი ',
+    floating:     'მოლივლივე ტექსტი',
+                iosHintTitle: 'AR-ის გამოყენება',
+                iosHintSteps: ['მიუშვირე კამერა ბრტყელ ზედაპირს (მაგიდას ან იატაკს)', 'შეეხე ზედაპირს კერძის განსათავსებლად', 'ორი თითით ზომის შეცვლა · ჩათრიე გადასატანად'],
+                iosLaunch:    'AR-ის გახსნა',
+                iosCancel:    'გაუქმება',
             }
         };
 
@@ -1146,6 +1228,33 @@
             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if (_isIOS) ['food.glb', 'Druidi.glb'].forEach(src => _getARLauncher(src));
 
+        // ── iOS AR instruction sheet ───────────────────────────────────
+        let _iosLauncher = null;
+
+        function showIOSHint(launcher) {
+            _iosLauncher = launcher;
+            const u = UI[window.__lang];
+            document.getElementById('ios-hint-title').textContent = u.iosHintTitle;
+            const ol = document.getElementById('ios-hint-steps');
+            ol.innerHTML = u.iosHintSteps.map(s => `<li>${s}</li>`).join('');
+            document.getElementById('ios-hint-launch').textContent = u.iosLaunch;
+            document.getElementById('ios-hint-cancel').textContent = u.iosCancel;
+            document.getElementById('ios-hint').classList.add('active');
+        }
+
+        document.getElementById('ios-hint-launch').addEventListener('click', () => {
+            document.getElementById('ios-hint').classList.remove('active');
+            if (_iosLauncher) { _iosLauncher.activateAR(); _iosLauncher = null; }
+            setTimeout(() => { setARButtonsState(false); _arOpening = false; }, 2500);
+        });
+
+        document.getElementById('ios-hint-cancel').addEventListener('click', () => {
+            document.getElementById('ios-hint').classList.remove('active');
+            _iosLauncher = null;
+            setARButtonsState(false);
+            _arOpening = false;
+        });
+
         // ── AR routing ─────────────────────────────────────────────────
         let _arOpening  = false;
         let _arCatItems = null;
@@ -1171,9 +1280,7 @@
                     _arOpening = false;
                 }
             } else if (cap === 'arkit') {
-                // iOS — fire Quick Look directly via pre-loaded hidden model-viewer
-                _getARLauncher(item.model || 'food.glb').activateAR();
-                setTimeout(() => { setARButtonsState(false); _arOpening = false; }, 2500);
+                showIOSHint(_getARLauncher(item.model || 'food.glb'));
             } else {
                 // No AR support (non-ARCore Android, desktop) — open 3D modal
                 openModal(localIdx, _arCatItems);
