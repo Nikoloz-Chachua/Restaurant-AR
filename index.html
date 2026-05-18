@@ -659,6 +659,7 @@
             if (!gltf) return null;
             const obj = gltf.scene.clone(true);
             obj.traverse(n => { if (n.isMesh && n.material) n.material = n.material.clone(); });
+            obj.scale.setScalar(5); // cancel the 0.2 GLB scale that exists for iOS Quick Look sizing
             return obj;
         }
 
