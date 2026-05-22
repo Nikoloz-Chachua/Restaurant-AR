@@ -391,68 +391,7 @@
         #xr-carousel-toggle  { top: 18px; left: 18px; display: none; }
         #xr-label-toggle     { top: 58px; left: 18px; display: none; }
 
-        /* ── iOS AR instruction sheet ── */
-        #ios-hint {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 9998;
-            background: rgba(0,0,0,0.55);
-            align-items: flex-end;
-        }
-        #ios-hint.active { display: flex; }
-        .ios-hint-card {
-            width: 100%;
-            background: var(--card);
-            border-radius: 20px 20px 0 0;
-            padding: 28px 20px 44px;
-            border-top: 1px solid var(--border);
-            transition: background var(--t), border-color var(--t);
-        }
-        #ios-hint-title {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.4rem;
-            letter-spacing: 3px;
-            color: var(--accent);
-            margin-bottom: 16px;
-            transition: color var(--t);
-        }
-        #ios-hint-steps {
-            color: var(--text);
-            font-size: 0.88rem;
-            line-height: 1.8;
-            padding-left: 18px;
-            margin-bottom: 24px;
-            transition: color var(--t);
-        }
-        .ios-hint-btns { display: flex; gap: 10px; }
-        #ios-hint-cancel {
-            flex: 1;
-            padding: 13px;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: var(--text);
-            border-radius: 12px;
-            font-family: 'Nunito', sans-serif;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: background var(--t), color var(--t), border-color var(--t);
-        }
-        #ios-hint-launch {
-            flex: 2;
-            padding: 13px;
-            border: none;
-            background: var(--accent);
-            color: var(--accent-text);
-            border-radius: 12px;
-            font-family: 'Nunito', sans-serif;
-            font-weight: 800;
-            font-size: 0.9rem;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            transition: background var(--t);
-        }
+
     </style>
 </head>
 <body>
@@ -495,16 +434,6 @@
         <button id="xr-label-toggle"></button>
     </div>
 
-    <div id="ios-hint">
-        <div class="ios-hint-card">
-            <div id="ios-hint-title"></div>
-            <ol id="ios-hint-steps"></ol>
-            <div class="ios-hint-btns">
-                <button id="ios-hint-cancel"></button>
-                <button id="ios-hint-launch"></button>
-            </div>
-        </div>
-    </div>
 
     <!-- WebXR — Three.js loaded lazily on first AR tap, not on page load -->
     <script>
@@ -659,7 +588,6 @@
             if (!gltf) return null;
             const obj = gltf.scene.clone(true);
             obj.traverse(n => { if (n.isMesh && n.material) n.material = n.material.clone(); });
-            obj.scale.setScalar(5); // cancel the 0.2 GLB scale that exists for iOS Quick Look sizing
             return obj;
         }
 
@@ -668,8 +596,13 @@
             if (old) slotGroups[slotIdx].remove(old);
             const obj = cloneModel(menuIdx);
             if (obj) {
+                // Normalize: longest bounding-box axis = 1 unit so slot group scale = real-world metres
                 const box = new THREE.Box3().setFromObject(obj);
-                if (isFinite(box.min.y)) obj.position.y = -box.min.y;
+                const size = box.getSize(new THREE.Vector3());
+                const longest = Math.max(size.x, size.y, size.z);
+                if (longest > 0 && isFinite(longest)) obj.scale.setScalar(1 / longest);
+                const seated = new THREE.Box3().setFromObject(obj);
+                if (isFinite(seated.min.y)) obj.position.y = -seated.min.y;
                 slotGroups[slotIdx].add(obj);
                 meshObjs[slotIdx] = obj;
             }
@@ -983,6 +916,7 @@
                     xrStarting = false;
                     window.__arCap = 'none';
                     localStorage.setItem('bl-ar-cap', 'none');
+                    localStorage.setItem('bl-ar-cap-ts', String(Date.now()));
                     document.dispatchEvent(new CustomEvent('xr-session-end', { detail: { fallbackIdx: itemIndex } }));
                     return;
                 }
@@ -990,6 +924,7 @@
                 xrSession.addEventListener('select', onSelect);
                 await renderer.xr.setSession(xrSession);
                 localStorage.setItem('bl-ar-cap', 'webxr');
+                localStorage.setItem('bl-ar-cap-ts', String(Date.now()));
                 xrCanvas.style.display  = 'block';
                 xrOverlay.style.display = 'block';
                 document.dispatchEvent(new CustomEvent('xr-session-start'));
@@ -1018,10 +953,6 @@
     singleBtn:    'SINGLE ITEM',
     onTable:      'ON TABLE',
     floating:     'FLOATING',
-                iosHintTitle: 'AR Instructions',
-                iosHintSteps: ['Point your camera at a flat surface (table or floor)', 'Tap on the surface to place the dish', 'Pinch to resize · Drag to move'],
-                iosLaunch:    'Open AR',
-                iosCancel:    'Cancel',
             },
             ka: {
                 tagline:   'გასინჯე ველური გემო',
@@ -1040,10 +971,6 @@
     singleBtn:    'ცალი',
     onTable:      'მაგიდაზე ტექსტი ',
     floating:     'მოლივლივე ტექსტი',
-                iosHintTitle: 'AR-ის გამოყენება',
-                iosHintSteps: ['მიუშვირე კამერა ბრტყელ ზედაპირს (მაგიდას ან იატაკს)', 'შეეხე ზედაპირს კერძის განსათავსებლად', 'ორი თითით ზომის შეცვლა · ჩათრიე გადასატანად'],
-                iosLaunch:    'AR-ის გახსნა',
-                iosCancel:    'გაუქმება',
             }
         };
 
@@ -1183,7 +1110,8 @@
         // ── AR capability detection ────────────────────────────────────
         async function detectAR() {
             const cached = localStorage.getItem('bl-ar-cap');
-            if (cached) { window.__arCap = cached; return cached; }
+            const ts = parseInt(localStorage.getItem('bl-ar-cap-ts') || '0');
+            if (cached && (Date.now() - ts < 7 * 24 * 60 * 60 * 1000)) { window.__arCap = cached; return cached; }
 
             const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
                           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -1195,7 +1123,10 @@
             }
             if (cap === 'none' && isIOS) cap = 'arkit';
             window.__arCap = cap;
-            if (cap !== 'webxr') localStorage.setItem('bl-ar-cap', cap);
+            if (cap !== 'webxr') {
+                localStorage.setItem('bl-ar-cap', cap);
+                localStorage.setItem('bl-ar-cap-ts', String(Date.now()));
+            }
             return cap;
         }
 
@@ -1227,11 +1158,10 @@
         // Pre-load both models on iOS so USDZ is ready before the user taps
         const _isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        if (_isIOS) ['food.glb', 'Druidi.glb'].forEach(src => _getARLauncher(src));
-
-        // ── iOS AR instruction sheet ───────────────────────────────────
-        let _iosLauncher = null;
-        let _iosLocalIdx = 0;
+        if (_isIOS) {
+            ['food.glb', 'Druidi.glb'].forEach(src => _getARLauncher(src));
+            if (!window.__arCap) window.__arCap = 'arkit';
+        }
 
         function _launchIOSAR(launcher, localIdx) {
             function onARStatus(e) {
@@ -1249,35 +1179,6 @@
             launcher.activateAR();
             setTimeout(() => { setARButtonsState(false); _arOpening = false; }, 2500);
         }
-
-        function showIOSHint(launcher, localIdx) {
-            if (localStorage.getItem('bl-ios-ar-seen')) {
-                _launchIOSAR(launcher, localIdx);
-                return;
-            }
-            _iosLauncher = launcher;
-            _iosLocalIdx = localIdx;
-            const u = UI[window.__lang];
-            document.getElementById('ios-hint-title').textContent = u.iosHintTitle;
-            const ol = document.getElementById('ios-hint-steps');
-            ol.innerHTML = u.iosHintSteps.map(s => `<li>${s}</li>`).join('');
-            document.getElementById('ios-hint-launch').textContent = u.iosLaunch;
-            document.getElementById('ios-hint-cancel').textContent = u.iosCancel;
-            document.getElementById('ios-hint').classList.add('active');
-        }
-
-        document.getElementById('ios-hint-launch').addEventListener('click', () => {
-            localStorage.setItem('bl-ios-ar-seen', '1');
-            document.getElementById('ios-hint').classList.remove('active');
-            if (_iosLauncher) { _launchIOSAR(_iosLauncher, _iosLocalIdx); _iosLauncher = null; }
-        });
-
-        document.getElementById('ios-hint-cancel').addEventListener('click', () => {
-            document.getElementById('ios-hint').classList.remove('active');
-            _iosLauncher = null;
-            setARButtonsState(false);
-            _arOpening = false;
-        });
 
         // ── AR routing ─────────────────────────────────────────────────
         let _arOpening  = false;
@@ -1304,7 +1205,7 @@
                     _arOpening = false;
                 }
             } else if (cap === 'arkit') {
-                showIOSHint(_getARLauncher(item.model || 'food.glb'), localIdx);
+                _launchIOSAR(_getARLauncher(item.model || 'food.glb'), localIdx);
             } else {
                 // No AR support (non-ARCore Android, desktop) — open 3D modal
                 openModal(localIdx, _arCatItems);
@@ -1367,9 +1268,9 @@
                 { name: 'Tiramisu',        name_ka: 'ტირამისუ',            category: 'Desserts',category_ka: 'ტკბილეული', description: 'Classic tiramisu dessert.',                                                                                       description_ka: 'კლასიკური ტირამისუ.',                                                                                    price: '10 ₾',   model: 'food.glb'   },
             ];
 
-            // Read cached AR cap synchronously so first render uses correct label if known
             const cachedCap = localStorage.getItem('bl-ar-cap');
-            if (cachedCap) window.__arCap = cachedCap;
+            const cachedCapTs = parseInt(localStorage.getItem('bl-ar-cap-ts') || '0');
+            if (cachedCap && (Date.now() - cachedCapTs < 7 * 24 * 60 * 60 * 1000)) window.__arCap = cachedCap;
             // Start detection in background — don't block menu render on it
             const arCapPromise = detectAR();
 
