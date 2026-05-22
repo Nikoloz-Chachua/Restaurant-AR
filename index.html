@@ -1149,6 +1149,13 @@
                 mv.setAttribute('ar-modes', 'quick-look');
                 mv.src = src;
                 mv.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px;';
+                mv.addEventListener('load', () => {
+                    if (!mv.model) return;
+                    mv.model.materials.forEach(mat => {
+                        const pbr = mat.pbrMetallicRoughness;
+                        if (pbr) pbr.setMetallicFactor(0);
+                    });
+                });
                 document.body.appendChild(mv);
                 _arLaunchers[src] = mv;
             }
@@ -1269,8 +1276,7 @@
             ];
 
             const cachedCap = localStorage.getItem('bl-ar-cap');
-            const cachedCapTs = parseInt(localStorage.getItem('bl-ar-cap-ts') || '0');
-            if (cachedCap && (Date.now() - cachedCapTs < 7 * 24 * 60 * 60 * 1000)) window.__arCap = cachedCap;
+            if (cachedCap) window.__arCap = cachedCap;
             // Start detection in background — don't block menu render on it
             const arCapPromise = detectAR();
 
