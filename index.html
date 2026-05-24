@@ -391,6 +391,60 @@
         #xr-carousel-toggle  { top: 18px; left: 18px; display: none; }
         #xr-label-toggle     { top: 58px; left: 18px; display: none; }
 
+        #xr-cat-badge {
+            display: none;
+            position: absolute;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.65);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* ── Category filter bar ── */
+        .cat-filter {
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 0 0 4px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .cat-filter::-webkit-scrollbar { display: none; }
+
+        .cat-pill {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 8px 14px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--dim);
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: background var(--t), border-color var(--t), color var(--t);
+            touch-action: manipulation;
+        }
+        .cat-pill:active { opacity: 0.7; transition: opacity 0.08s; }
+        .cat-pill.active {
+            background: var(--accent);
+            color: var(--accent-text);
+            border-color: var(--accent);
+        }
+
+        .cat-section { display: contents; }
 
     </style>
 </head>
@@ -403,6 +457,8 @@
         <h1>Burger Lions</h1>
         <div class="tagline" id="tagline">Taste the Wild</div>
     </div>
+
+    <div id="cat-filter" class="cat-filter"></div>
 
     <div class="menu-list" id="menu-list"></div>
 
@@ -423,6 +479,7 @@
 
     <div id="xr-overlay">
         <div id="xr-gesture-layer"></div>
+        <div id="xr-cat-badge"></div>
         <div id="xr-place-hint">Point at a flat surface, then tap to place</div>
         <div id="xr-nav-row">
             <button id="xr-prev">&#10094;</button>
@@ -573,6 +630,19 @@
             if (btn) btn.textContent = labelMode === 'float' ? u.onTable : u.floating;
         }
 
+        // ── Category badge (DOM overlay) ─────────────────────────────
+        const _CAT_ICONS = { Burgers: '🍔', Sides: '🍟', Drinks: '🥤', Desserts: '🍰' };
+        function updateXRCatBadge() {
+            const badge = document.getElementById('xr-cat-badge');
+            if (!badge || !MENU.length) return;
+            const item = MENU[currentCenterMenu];
+            if (!item) return;
+            const lang = window.__lang || 'en';
+            const cat = (lang === 'ka' && item.category_ka) ? item.category_ka : item.category;
+            badge.textContent = (_CAT_ICONS[item.category] || '🍽') + ' ' + cat;
+            badge.style.display = 'block';
+        }
+
         // ── Models ────────────────────────────────────────────────────
         function preloadModels() {
             const paths = [...new Set(MENU.map(m => m.model || 'food.glb'))];
@@ -620,6 +690,7 @@
                 slotGroups[i].rotation.set(0, 0, 0);
                 setOpacity(i, opacities[i]);
             });
+            updateXRCatBadge();
         }
 
         // ── Opacity ───────────────────────────────────────────────────
@@ -686,6 +757,7 @@
                 hiddenSide = 'farLeft'; currentCenterMenu = mod(currentCenterMenu + 1);
                 isAnimating = false;
                 if (labelMesh && labelMesh.visible) drawLabel(MENU[currentCenterMenu]);
+                updateXRCatBadge();
             }, DUR + 10);
         }
 
@@ -707,6 +779,7 @@
                 hiddenSide = 'farRight'; currentCenterMenu = mod(currentCenterMenu - 1);
                 isAnimating = false;
                 if (labelMesh && labelMesh.visible) drawLabel(MENU[currentCenterMenu]);
+                updateXRCatBadge();
             }, DUR + 10);
         }
 
@@ -1006,6 +1079,7 @@
                 el.textContent = (lang === 'ka' && el.dataset.catNameKa) ? el.dataset.catNameKa : el.dataset.catName;
             });
             if (modal.classList.contains('active')) updateModal();
+            if (window._updateFilterPillLabels) window._updateFilterPillLabels(lang);
         }
 
         document.getElementById('lang-toggle').addEventListener('click', () => {
@@ -1296,16 +1370,21 @@
             });
 
             const list = document.getElementById('menu-list');
+            const CAT_ICONS = { Burgers: '🍔', Sides: '🍟', Drinks: '🥤', Desserts: '🍰' };
 
             categories.forEach(cat => {
                 const catItems = cat.items.map(e => e.item);
+
+                const section = document.createElement('div');
+                section.className = 'cat-section';
+                section.dataset.cat = cat.name;
 
                 const header = document.createElement('div');
                 header.className = 'category-header';
                 header.dataset.catName   = cat.name;
                 header.dataset.catNameKa = cat.name_ka;
                 header.textContent = window.__lang === 'ka' ? cat.name_ka : cat.name;
-                list.appendChild(header);
+                section.appendChild(header);
 
                 cat.items.forEach(({ item, globalIdx }, localIdx) => {
                     const card = document.createElement('div');
@@ -1345,9 +1424,60 @@
                     card.querySelector('.item-details').addEventListener('click', () => openModal(localIdx, catItems));
                     card.querySelector('.ar-btn').addEventListener('click', e => { e.stopPropagation(); openAR(localIdx, catItems); });
 
-                    list.appendChild(card);
+                    section.appendChild(card);
                 });
+
+                list.appendChild(section);
             });
+
+            // ── Category filter pills ──────────────────────────────────
+            const filterDiv = document.getElementById('cat-filter');
+            let _activeFilter = '';
+
+            const allPill = document.createElement('button');
+            allPill.className = 'cat-pill active';
+            allPill.dataset.cat   = '';
+            allPill.dataset.catKa = '';
+            allPill.textContent   = window.__lang === 'ka' ? 'ყველა' : 'All';
+            filterDiv.appendChild(allPill);
+
+            categories.forEach(cat => {
+                const pill = document.createElement('button');
+                pill.className      = 'cat-pill';
+                pill.dataset.cat    = cat.name;
+                pill.dataset.catKa  = cat.name_ka;
+                pill.dataset.icon   = CAT_ICONS[cat.name] || '🍽';
+                const label = window.__lang === 'ka' ? cat.name_ka : cat.name;
+                pill.textContent    = pill.dataset.icon + ' ' + label;
+                filterDiv.appendChild(pill);
+            });
+
+            function applyFilter(cat) {
+                _activeFilter = cat;
+                document.querySelectorAll('.cat-pill').forEach(p =>
+                    p.classList.toggle('active', p.dataset.cat === cat)
+                );
+                document.querySelectorAll('.cat-section').forEach(s => {
+                    s.style.display = (cat === '' || s.dataset.cat === cat) ? '' : 'none';
+                });
+            }
+
+            filterDiv.addEventListener('click', e => {
+                const pill = e.target.closest('.cat-pill');
+                if (pill) applyFilter(pill.dataset.cat);
+            });
+
+            // expose so applyLang can update pill text
+            window._updateFilterPillLabels = function(lang) {
+                document.querySelectorAll('.cat-pill').forEach(p => {
+                    if (p.dataset.cat === '') {
+                        p.textContent = lang === 'ka' ? 'ყველა' : 'All';
+                    } else {
+                        const name = lang === 'ka' ? p.dataset.catKa : p.dataset.cat;
+                        p.textContent = (p.dataset.icon || '🍽') + ' ' + name;
+                    }
+                });
+            };
 
             applyLang(window.__lang);
 
