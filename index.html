@@ -446,6 +446,29 @@
 
         .cat-section { display: contents; }
 
+        /* ── Modal AR button ── */
+        #modal-ar-btn {
+            display: none;
+            background: var(--accent);
+            color: var(--accent-text);
+            border: none;
+            border-radius: 12px;
+            padding: 14px 0;
+            width: 80%;
+            max-width: 320px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 14px;
+            transition: background var(--t), opacity 0.15s;
+            touch-action: manipulation;
+        }
+        #modal-ar-btn:active  { opacity: 0.7; transition: opacity 0.08s; }
+        #modal-ar-btn:disabled { opacity: 0.45; cursor: wait; }
+
     </style>
 </head>
 <body>
@@ -474,6 +497,7 @@
             max-camera-orbit="auto 85deg auto">
         </model-viewer>
         <div id="modal-price"></div>
+        <button id="modal-ar-btn"></button>
         <p class="tip" id="modal-tip">Drag to rotate</p>
     </div>
 
@@ -1058,7 +1082,9 @@
             const theme = document.documentElement.getAttribute('data-theme');
             document.getElementById('tagline').textContent       = u.tagline;
             document.getElementById('lang-toggle').textContent   = u.langBtn;
-            document.getElementById('theme-toggle').textContent  = theme === 'night' ? u.themeDay : u.themeNight;
+            const _themeToggle = document.getElementById('theme-toggle');
+            _themeToggle.innerHTML = theme === 'night' ? _SVG_SUN : _SVG_MOON;
+            _themeToggle.setAttribute('aria-label', theme === 'night' ? u.themeDay : u.themeNight);
             document.getElementById('close-btn').textContent     = u.close;
             document.getElementById('modal-tip').textContent     = u.tip;
             document.getElementById('xr-place-hint').textContent = u.placeHint;
@@ -1079,6 +1105,8 @@
             });
             if (modal.classList.contains('active')) updateModal();
             if (window._updateFilterPillLabels) window._updateFilterPillLabels(lang);
+            const _mArBtn = document.getElementById('modal-ar-btn');
+            if (_mArBtn) _mArBtn.textContent = u.viewAR;
         }
 
         document.getElementById('lang-toggle').addEventListener('click', () => {
@@ -1089,9 +1117,13 @@
         const html     = document.documentElement;
         const themeBtn = document.getElementById('theme-toggle');
 
+        const _SVG_SUN  = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
+        const _SVG_MOON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+
         function applyTheme(theme) {
             html.setAttribute('data-theme', theme);
-            themeBtn.textContent = theme === 'night' ? UI[window.__lang].themeDay : UI[window.__lang].themeNight;
+            themeBtn.innerHTML    = theme === 'night' ? _SVG_SUN : _SVG_MOON;
+            themeBtn.setAttribute('aria-label', theme === 'night' ? UI[window.__lang].themeDay : UI[window.__lang].themeNight);
             localStorage.setItem('bl-theme', theme);
         }
         applyTheme(localStorage.getItem('bl-theme') || 'night');
@@ -1124,6 +1156,14 @@
 
         document.getElementById('close-btn').addEventListener('click', closeModal);
         modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+        const modalArBtn = document.getElementById('modal-ar-btn');
+        modalArBtn.addEventListener('click', () => {
+            const idx   = modalIndex;
+            const items = modalItems;
+            closeModal();
+            openAR(idx, items);
+        });
         document.getElementById('modal-prev').addEventListener('click', e => {
             e.stopPropagation();
             modalIndex = (modalIndex - 1 + modalItems.length) % modalItems.length;
@@ -1147,6 +1187,9 @@
             modalItems = catItems || menuItems;
             modalIndex = localIdx;
             updateModal();
+            const cap = window.__arCap;
+            modalArBtn.textContent  = UI[window.__lang].viewAR;
+            modalArBtn.style.display = (cap && cap !== 'none') ? '' : 'none';
             modal.style.display = 'flex';
             requestAnimationFrame(() => modal.classList.add('active'));
             document.body.style.overflow = 'hidden';
