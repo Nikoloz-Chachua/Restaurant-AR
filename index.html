@@ -914,9 +914,6 @@
                 } catch (e) {
                     console.error('XR session failed:', e);
                     xrStarting = false;
-                    window.__arCap = 'none';
-                    localStorage.setItem('bl-ar-cap', 'none');
-                    localStorage.setItem('bl-ar-cap-ts', String(Date.now()));
                     document.dispatchEvent(new CustomEvent('xr-session-end', { detail: { fallbackIdx: itemIndex } }));
                     return;
                 }
