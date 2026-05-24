@@ -631,7 +631,6 @@
         }
 
         // ── Category badge (DOM overlay) ─────────────────────────────
-        const _CAT_ICONS = { Burgers: '🍔', Sides: '🍟', Drinks: '🥤', Desserts: '🍰' };
         function updateXRCatBadge() {
             const badge = document.getElementById('xr-cat-badge');
             if (!badge || !MENU.length) return;
@@ -639,7 +638,7 @@
             if (!item) return;
             const lang = window.__lang || 'en';
             const cat = (lang === 'ka' && item.category_ka) ? item.category_ka : item.category;
-            badge.textContent = (_CAT_ICONS[item.category] || '🍽') + ' ' + cat;
+            badge.textContent = cat;
             badge.style.display = 'block';
         }
 
@@ -1370,7 +1369,6 @@
             });
 
             const list = document.getElementById('menu-list');
-            const CAT_ICONS = { Burgers: '🍔', Sides: '🍟', Drinks: '🥤', Desserts: '🍰' };
 
             categories.forEach(cat => {
                 const catItems = cat.items.map(e => e.item);
@@ -1446,9 +1444,8 @@
                 pill.className      = 'cat-pill';
                 pill.dataset.cat    = cat.name;
                 pill.dataset.catKa  = cat.name_ka;
-                pill.dataset.icon   = CAT_ICONS[cat.name] || '🍽';
                 const label = window.__lang === 'ka' ? cat.name_ka : cat.name;
-                pill.textContent    = pill.dataset.icon + ' ' + label;
+                pill.textContent    = label;
                 filterDiv.appendChild(pill);
             });
 
@@ -1474,7 +1471,7 @@
                         p.textContent = lang === 'ka' ? 'ყველა' : 'All';
                     } else {
                         const name = lang === 'ka' ? p.dataset.catKa : p.dataset.cat;
-                        p.textContent = (p.dataset.icon || '🍽') + ' ' + name;
+                        p.textContent = name;
                     }
                 });
             };
