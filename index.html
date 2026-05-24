@@ -446,28 +446,71 @@
 
         .cat-section { display: contents; }
 
-        /* ── Add to basket button ── */
-        .add-btn {
+        /* ── Quantity stepper (add-to-basket control) ── */
+        .qty-ctrl { flex-shrink: 0; }
+
+        .qty-add-btn {
             background: transparent;
             color: var(--accent);
             border: 1.5px solid var(--accent);
             border-radius: 9px;
-            padding: 7px 10px;
+            padding: 7px 12px;
             font-size: 0.63rem;
             font-weight: 800;
             font-family: 'Nunito', sans-serif;
             letter-spacing: 0.8px;
             cursor: pointer;
             white-space: nowrap;
-            flex-shrink: 0;
             text-transform: uppercase;
+            display: block;
             transition: background var(--t), color var(--t), border-color var(--t), opacity 0.15s;
             touch-action: manipulation;
         }
-        .add-btn:active { opacity: 0.7; transition: opacity 0.08s; }
-        .add-btn.in-basket {
+        .qty-add-btn:active { opacity: 0.7; transition: opacity 0.08s; }
+
+        .qty-stepper {
+            display: none;
+            align-items: center;
+            border: 1.5px solid var(--accent);
+            border-radius: 9px;
+            overflow: hidden;
+            transition: border-color var(--t);
+        }
+        .qty-stepper.visible { display: flex; }
+
+        .qty-dec, .qty-inc {
+            background: transparent;
+            border: none;
+            color: var(--accent);
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 5px 10px;
+            cursor: pointer;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            touch-action: manipulation;
+            transition: background var(--t), color var(--t);
+            user-select: none;
+        }
+        .qty-dec { border-right: 1px solid var(--accent); }
+        .qty-inc { border-left:  1px solid var(--accent); }
+        .qty-dec:active, .qty-inc:active {
             background: var(--accent);
             color: var(--accent-text);
+            transition: none;
+        }
+
+        .qty-num {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: var(--accent);
+            min-width: 24px;
+            text-align: center;
+            padding: 0 2px;
+            user-select: none;
+            transition: color var(--t);
         }
 
         /* ── Basket bar (fixed bottom) ── */
@@ -1336,11 +1379,7 @@
             // Basket
             document.getElementById('basket-bar-count') && _updateBasketBar();
             if (document.getElementById('basket-panel').style.display !== 'none') _renderBasketPanel();
-            document.querySelectorAll('.add-btn').forEach(btn => {
-                const entry = _basket.get(btn.dataset.idx);
-                const cnt   = entry ? entry.qty : 0;
-                btn.textContent = cnt > 0 ? u.addBtn + ' · ' + cnt : u.addBtn;
-            });
+            document.querySelectorAll('.qty-ctrl').forEach(ctrl => _syncQtyCtrl(ctrl.dataset.idx));
         }
 
         document.getElementById('lang-toggle').addEventListener('click', () => {
@@ -1682,7 +1721,14 @@
                             <p class="ingredients" data-field="description" data-idx="${globalIdx}">${t(item, 'description')}</p>
                             <div class="price-row">
                                 <p class="price">${item.price}</p>
-                                <button class="add-btn" data-idx="${globalIdx}">${UI[window.__lang].addBtn}</button>
+                                <div class="qty-ctrl" data-idx="${globalIdx}">
+                                    <button class="qty-add-btn">${UI[window.__lang].addBtn}</button>
+                                    <div class="qty-stepper">
+                                        <button class="qty-dec">&#8722;</button>
+                                        <span class="qty-num">1</span>
+                                        <button class="qty-inc">+</button>
+                                    </div>
+                                </div>
                                 <button class="ar-btn">${initialLabel}</button>
                             </div>
                         </div>`;
@@ -1699,7 +1745,10 @@
 
                     card.querySelector('.item-details').addEventListener('click', () => openModal(localIdx, catItems));
                     card.querySelector('.ar-btn').addEventListener('click', e => { e.stopPropagation(); openAR(localIdx, catItems); });
-                    card.querySelector('.add-btn').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
+                    const qCtrl = card.querySelector('.qty-ctrl');
+                    qCtrl.querySelector('.qty-add-btn').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
+                    qCtrl.querySelector('.qty-dec').addEventListener('click', e => { e.stopPropagation(); const en = _basket.get(String(globalIdx)); if (en) _setQty(String(globalIdx), en.qty - 1); });
+                    qCtrl.querySelector('.qty-inc').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
 
                     section.appendChild(card);
                 });
@@ -1800,20 +1849,29 @@
             }
         }
 
-        function _syncAddBtn(key) {
+        function _syncQtyCtrl(key) {
             const entry = _basket.get(key);
-            const count = entry ? entry.qty : 0;
-            const u = UI[window.__lang];
-            document.querySelectorAll(`.add-btn[data-idx="${key}"]`).forEach(btn => {
-                btn.textContent = count > 0 ? u.addBtn + ' · ' + count : u.addBtn;
-                btn.classList.toggle('in-basket', count > 0);
+            const qty   = entry ? entry.qty : 0;
+            document.querySelectorAll(`.qty-ctrl[data-idx="${key}"]`).forEach(ctrl => {
+                const addBtn  = ctrl.querySelector('.qty-add-btn');
+                const stepper = ctrl.querySelector('.qty-stepper');
+                const numEl   = ctrl.querySelector('.qty-num');
+                if (qty > 0) {
+                    addBtn.style.display = 'none';
+                    stepper.classList.add('visible');
+                    numEl.textContent = qty;
+                } else {
+                    addBtn.style.display = '';
+                    stepper.classList.remove('visible');
+                    addBtn.textContent = UI[window.__lang].addBtn;
+                }
             });
         }
 
         function addToBasket(key, item) {
             if (_basket.has(key)) _basket.get(key).qty++;
             else                   _basket.set(key, { item, qty: 1 });
-            _syncAddBtn(key);
+            _syncQtyCtrl(key);
             _updateBasketBar();
             if (document.getElementById('basket-panel').style.display !== 'none') _renderBasketPanel();
         }
@@ -1821,7 +1879,7 @@
         function _setQty(key, qty) {
             if (qty <= 0) _basket.delete(key);
             else if (_basket.has(key)) _basket.get(key).qty = qty;
-            _syncAddBtn(key);
+            _syncQtyCtrl(key);
             _updateBasketBar();
             if (document.getElementById('basket-panel').style.display !== 'none') _renderBasketPanel();
         }
@@ -1877,7 +1935,7 @@
         document.getElementById('basket-clear').addEventListener('click', () => {
             const keys = [..._basket.keys()];
             _basket.clear();
-            keys.forEach(k => _syncAddBtn(k));
+            keys.forEach(k => _syncQtyCtrl(k));
             _updateBasketBar();
             _renderBasketPanel();
         });
