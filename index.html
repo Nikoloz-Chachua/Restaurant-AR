@@ -390,6 +390,24 @@
         #xr-exit             { top: 18px; right: 18px; }
         #xr-carousel-toggle  { top: 18px; left: 18px; display: none; }
         #xr-label-toggle     { top: 58px; left: 18px; display: none; }
+        #xr-add-btn {
+            display: none;
+            pointer-events: all;
+            position: absolute;
+            bottom: 120px;
+            right: 18px;
+            background: rgba(240,192,64,0.92);
+            color: #0d0d0d;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+        }
+        #xr-add-btn.visible { display: flex; }
 
         #xr-cat-badge {
             display: none;
@@ -767,6 +785,9 @@
         <button id="xr-exit">Exit AR</button>
         <button id="xr-carousel-toggle"></button>
         <button id="xr-label-toggle"></button>
+        <button id="xr-add-btn" aria-label="Add to basket">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </button>
     </div>
 
 
@@ -1264,6 +1285,7 @@
 
         // ── Public API ────────────────────────────────────────────────
         window.XR = {
+            getCurrentItem() { return MENU.length ? MENU[currentCenterMenu] : null; },
             async start(itemIndex, items) {
                 if (xrStarting || xrSession) return;
                 xrStarting = true;
@@ -1426,6 +1448,7 @@
         document.addEventListener('xr-session-start', () => {
             document.getElementById('theme-toggle').style.display = 'none';
             document.getElementById('lang-toggle').style.display  = 'none';
+            document.getElementById('xr-add-btn').classList.add('visible');
         });
 
         document.addEventListener('xr-session-end', e => {
@@ -1433,6 +1456,7 @@
             setARButtonsState(false);
             document.getElementById('theme-toggle').style.display = '';
             document.getElementById('lang-toggle').style.display  = '';
+            document.getElementById('xr-add-btn').classList.remove('visible');
             if (e.detail?.fallbackIdx != null) openModal(e.detail.fallbackIdx, _arCatItems || menuItems);
         });
 
@@ -1686,6 +1710,7 @@
 
             const items = await fetch('./foods/menu.json').then(r => r.json()).catch(() => fallback);
             menuItems = items;
+            window.__menuItems = items;
 
             const initialLabel = window.__arCap === 'none' ? UI[window.__lang].view3D : UI[window.__lang].viewAR;
 
@@ -1944,6 +1969,14 @@
             setTimeout(() => { panel.style.display = 'none'; }, 230);
             document.body.style.overflow = '';
         }
+
+        document.getElementById('xr-add-btn').addEventListener('click', e => {
+            e.stopPropagation();
+            const item = window.XR?.getCurrentItem();
+            if (!item || !window.__menuItems) return;
+            const idx = window.__menuItems.indexOf(item);
+            if (idx >= 0) addToBasket(String(idx), item);
+        });
 
         document.getElementById('basket-bar').addEventListener('click', _openBasket);
         document.getElementById('basket-bar-delete').addEventListener('click', e => {
