@@ -446,6 +446,202 @@
 
         .cat-section { display: contents; }
 
+        /* ── Add to basket button ── */
+        .add-btn {
+            background: transparent;
+            color: var(--accent);
+            border: 1.5px solid var(--accent);
+            border-radius: 9px;
+            padding: 7px 10px;
+            font-size: 0.63rem;
+            font-weight: 800;
+            font-family: 'Nunito', sans-serif;
+            letter-spacing: 0.8px;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            text-transform: uppercase;
+            transition: background var(--t), color var(--t), border-color var(--t), opacity 0.15s;
+            touch-action: manipulation;
+        }
+        .add-btn:active { opacity: 0.7; transition: opacity 0.08s; }
+        .add-btn.in-basket {
+            background: var(--accent);
+            color: var(--accent-text);
+        }
+
+        /* ── Basket bar (fixed bottom) ── */
+        #basket-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--accent);
+            color: var(--accent-text);
+            padding: 15px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 5000;
+            cursor: pointer;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), background var(--t);
+            touch-action: manipulation;
+            font-family: 'Nunito', sans-serif;
+        }
+        #basket-bar.visible { transform: translateY(0); }
+        body.basket-bar-visible { padding-bottom: 80px; }
+        #basket-bar-count { font-size: 0.82rem; font-weight: 700; }
+        #basket-bar-total {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+        }
+
+        /* ── Basket panel ── */
+        #basket-panel {
+            position: fixed;
+            inset: 0;
+            z-index: 9000;
+            display: none;
+            flex-direction: column;
+            background: var(--bg);
+            opacity: 0;
+            transition: opacity 0.22s ease, background var(--t);
+        }
+        #basket-panel.active { opacity: 1; }
+
+        .basket-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 20px 14px;
+            border-bottom: 1px solid var(--border);
+            gap: 10px;
+            transition: border-color var(--t);
+        }
+        #basket-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 4px;
+            color: var(--accent);
+            flex: 1;
+            transition: color var(--t);
+        }
+        #basket-clear {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--dim);
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: border-color var(--t), color var(--t);
+        }
+        #basket-close {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: background var(--t), color var(--t), border-color var(--t);
+        }
+        #basket-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 20px;
+        }
+        .basket-empty {
+            color: var(--dim);
+            text-align: center;
+            padding: 48px 0;
+            font-size: 0.9rem;
+            transition: color var(--t);
+        }
+        .basket-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 0;
+            border-bottom: 1px solid var(--border);
+            transition: border-color var(--t);
+        }
+        .basket-item-name {
+            flex: 1;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: var(--accent);
+            transition: color var(--t);
+        }
+        .basket-qty {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--card2);
+            border-radius: 8px;
+            padding: 3px 8px;
+            transition: background var(--t);
+        }
+        .qty-btn {
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 1.1rem;
+            width: 26px;
+            height: 26px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+            transition: color var(--t);
+        }
+        .qty-count {
+            font-weight: 700;
+            font-size: 0.88rem;
+            min-width: 18px;
+            text-align: center;
+            color: var(--text);
+            transition: color var(--t);
+        }
+        .basket-item-price {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: var(--text);
+            min-width: 56px;
+            text-align: right;
+            transition: color var(--t);
+        }
+        .basket-footer {
+            padding: 16px 20px;
+            border-top: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: border-color var(--t);
+        }
+        #basket-total-label {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            color: var(--dim);
+            transition: color var(--t);
+        }
+        #basket-total {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            letter-spacing: 3px;
+            color: var(--accent);
+            transition: color var(--t);
+        }
+
         /* ── Modal AR button ── */
         #modal-ar-btn {
             display: none;
@@ -515,6 +711,26 @@
         <button id="xr-label-toggle"></button>
     </div>
 
+
+    <!-- Basket bar -->
+    <div id="basket-bar">
+        <span id="basket-bar-count"></span>
+        <span id="basket-bar-total"></span>
+    </div>
+
+    <!-- Basket panel -->
+    <div id="basket-panel">
+        <div class="basket-header">
+            <span id="basket-title">Basket</span>
+            <button id="basket-clear">Clear</button>
+            <button id="basket-close">Close</button>
+        </div>
+        <div id="basket-items"></div>
+        <div class="basket-footer">
+            <span id="basket-total-label">Total</span>
+            <span id="basket-total">0 ₾</span>
+        </div>
+    </div>
 
     <!-- WebXR — Three.js loaded lazily on first AR tap, not on page load -->
     <script>
@@ -1046,6 +1262,11 @@
     singleBtn:    'SINGLE ITEM',
     onTable:      'ON TABLE',
     floating:     'FLOATING',
+    addBtn:       'ADD',
+    basketTitle:  'Basket',
+    emptyBasket:  'Your basket is empty',
+    total:        'Total',
+    clearBasket:  'Clear',
             },
             ka: {
                 tagline:   'გასინჯე ველური გემო',
@@ -1064,6 +1285,11 @@
     singleBtn:    'ცალი',
     onTable:      'მაგიდაზე ტექსტი ',
     floating:     'მოლივლივე ტექსტი',
+    addBtn:       'დამატება',
+    basketTitle:  'კალათა',
+    emptyBasket:  'კალათა ცარიელია',
+    total:        'სულ',
+    clearBasket:  'გასუფთავება',
             }
         };
 
@@ -1107,6 +1333,14 @@
             if (window._updateFilterPillLabels) window._updateFilterPillLabels(lang);
             const _mArBtn = document.getElementById('modal-ar-btn');
             if (_mArBtn) _mArBtn.textContent = u.viewAR;
+            // Basket
+            document.getElementById('basket-bar-count') && _updateBasketBar();
+            if (document.getElementById('basket-panel').style.display !== 'none') _renderBasketPanel();
+            document.querySelectorAll('.add-btn').forEach(btn => {
+                const entry = _basket.get(btn.dataset.idx);
+                const cnt   = entry ? entry.qty : 0;
+                btn.textContent = cnt > 0 ? u.addBtn + ' · ' + cnt : u.addBtn;
+            });
         }
 
         document.getElementById('lang-toggle').addEventListener('click', () => {
@@ -1448,6 +1682,7 @@
                             <p class="ingredients" data-field="description" data-idx="${globalIdx}">${t(item, 'description')}</p>
                             <div class="price-row">
                                 <p class="price">${item.price}</p>
+                                <button class="add-btn" data-idx="${globalIdx}">${UI[window.__lang].addBtn}</button>
                                 <button class="ar-btn">${initialLabel}</button>
                             </div>
                         </div>`;
@@ -1464,6 +1699,7 @@
 
                     card.querySelector('.item-details').addEventListener('click', () => openModal(localIdx, catItems));
                     card.querySelector('.ar-btn').addEventListener('click', e => { e.stopPropagation(); openAR(localIdx, catItems); });
+                    card.querySelector('.add-btn').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
 
                     section.appendChild(card);
                 });
@@ -1529,6 +1765,128 @@
                     document.querySelectorAll('.ar-btn:not(:disabled)').forEach(b => { b.textContent = finalLabel; });
             });
         }
+
+        // ── Basket ─────────────────────────────────────────────────────
+        const _basket = new Map(); // key = String(globalIdx) -> { item, qty }
+
+        function _parsePrice(str) {
+            return parseFloat(String(str).replace(/[^\d.]/g, '')) || 0;
+        }
+        function _fmtPrice(num) {
+            const n = Math.round(num * 10) / 10;
+            return n + ' ₾';
+        }
+        function _basketTotal() {
+            let s = 0;
+            _basket.forEach(({ item, qty }) => { s += _parsePrice(item.price) * qty; });
+            return s;
+        }
+        function _basketCount() {
+            let n = 0;
+            _basket.forEach(({ qty }) => { n += qty; });
+            return n;
+        }
+
+        function _updateBasketBar() {
+            const count = _basketCount();
+            const bar   = document.getElementById('basket-bar');
+            bar.classList.toggle('visible', count > 0);
+            document.body.classList.toggle('basket-bar-visible', count > 0);
+            if (count > 0) {
+                const u = UI[window.__lang];
+                document.getElementById('basket-bar-count').textContent =
+                    count + ' ' + (window.__lang === 'ka' ? 'პროდუქტი' : count === 1 ? 'item' : 'items');
+                document.getElementById('basket-bar-total').textContent = _fmtPrice(_basketTotal());
+            }
+        }
+
+        function _syncAddBtn(key) {
+            const entry = _basket.get(key);
+            const count = entry ? entry.qty : 0;
+            const u = UI[window.__lang];
+            document.querySelectorAll(`.add-btn[data-idx="${key}"]`).forEach(btn => {
+                btn.textContent = count > 0 ? u.addBtn + ' · ' + count : u.addBtn;
+                btn.classList.toggle('in-basket', count > 0);
+            });
+        }
+
+        function addToBasket(key, item) {
+            if (_basket.has(key)) _basket.get(key).qty++;
+            else                   _basket.set(key, { item, qty: 1 });
+            _syncAddBtn(key);
+            _updateBasketBar();
+            if (document.getElementById('basket-panel').style.display !== 'none') _renderBasketPanel();
+        }
+
+        function _setQty(key, qty) {
+            if (qty <= 0) _basket.delete(key);
+            else if (_basket.has(key)) _basket.get(key).qty = qty;
+            _syncAddBtn(key);
+            _updateBasketBar();
+            if (document.getElementById('basket-panel').style.display !== 'none') _renderBasketPanel();
+        }
+
+        function _renderBasketPanel() {
+            const u   = UI[window.__lang];
+            const box = document.getElementById('basket-items');
+            box.innerHTML = '';
+            document.getElementById('basket-title').textContent      = u.basketTitle;
+            document.getElementById('basket-clear').textContent      = u.clearBasket;
+            document.getElementById('basket-close').textContent      = u.close;
+            document.getElementById('basket-total-label').textContent = u.total;
+            if (_basket.size === 0) {
+                box.innerHTML = `<p class="basket-empty">${u.emptyBasket}</p>`;
+            } else {
+                _basket.forEach(({ item, qty }, key) => {
+                    const line = _parsePrice(item.price) * qty;
+                    const row  = document.createElement('div');
+                    row.className = 'basket-item';
+                    row.innerHTML = `
+                        <span class="basket-item-name">${t(item, 'name')}</span>
+                        <div class="basket-qty">
+                            <button class="qty-btn" data-key="${key}" data-delta="-1">&#8722;</button>
+                            <span class="qty-count">${qty}</span>
+                            <button class="qty-btn" data-key="${key}" data-delta="1">+</button>
+                        </div>
+                        <span class="basket-item-price">${_fmtPrice(line)}</span>`;
+                    box.appendChild(row);
+                });
+            }
+            document.getElementById('basket-total').textContent = _fmtPrice(_basketTotal());
+        }
+
+        function _openBasket() {
+            _renderBasketPanel();
+            const panel = document.getElementById('basket-panel');
+            panel.style.display = 'flex';
+            requestAnimationFrame(() => panel.classList.add('active'));
+            document.body.style.overflow = 'hidden';
+        }
+        function _closeBasket() {
+            const panel = document.getElementById('basket-panel');
+            panel.classList.remove('active');
+            setTimeout(() => { panel.style.display = 'none'; }, 230);
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('basket-bar').addEventListener('click', _openBasket);
+        document.getElementById('basket-close').addEventListener('click', _closeBasket);
+        document.getElementById('basket-panel').addEventListener('click', e => {
+            if (e.target === document.getElementById('basket-panel')) _closeBasket();
+        });
+        document.getElementById('basket-clear').addEventListener('click', () => {
+            const keys = [..._basket.keys()];
+            _basket.clear();
+            keys.forEach(k => _syncAddBtn(k));
+            _updateBasketBar();
+            _renderBasketPanel();
+        });
+        document.getElementById('basket-items').addEventListener('click', e => {
+            const btn = e.target.closest('.qty-btn');
+            if (!btn) return;
+            const entry = _basket.get(btn.dataset.key);
+            if (entry) _setQty(btn.dataset.key, entry.qty + parseInt(btn.dataset.delta));
+        });
 
         buildMenu();
     </script>
