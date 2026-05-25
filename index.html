@@ -258,6 +258,11 @@
             transition: color var(--t);
         }
 
+        #modal-qty-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
         #modal-price {
             font-family: 'Bebas Neue', sans-serif;
             font-size: clamp(1.4rem, 5vw, 2rem);
@@ -382,7 +387,7 @@
         #xr-move-hint {
             display: none;
             position: absolute;
-            bottom: 20px;
+            bottom: 36px;
             left: 50%;
             transform: translateX(-50%);
             color: rgba(255,255,255,0.5);
@@ -862,6 +867,16 @@
             max-camera-orbit="auto 85deg auto">
         </model-viewer>
         <div id="modal-price"></div>
+        <div id="modal-qty-wrap">
+            <div class="qty-ctrl" id="modal-qty-ctrl" data-idx="0">
+                <button class="qty-add-btn" aria-label="Add to basket"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+                <div class="qty-stepper">
+                    <button class="qty-dec">&#8722;</button>
+                    <span class="qty-num">1</span>
+                    <button class="qty-inc">+</button>
+                </div>
+            </div>
+        </div>
         <button id="modal-ar-btn"></button>
         <p class="tip" id="modal-tip">Drag to rotate</p>
     </div>
@@ -949,7 +964,9 @@
 
         const INIT_ROLES    = ['left', 'center', 'right', 'farRight'];
         const DUR           = 350;
-        const ROTATE_SCALE  = 0.02;
+        const ROTATE_SCALE  = 0.0125;
+        const INERTIA_DAMP  = 0.88;
+        let   _rotVelocity  = 0;
         const SCALE_MIN     = 0.2;
         const SCALE_MAX     = 4.0;
         const DEAD_ZONE     = 3;
@@ -1313,6 +1330,7 @@
             // Canvas touch events are consumed by the XR runtime during a session;
             // dom-overlay elements receive normal HTML touch events instead.
             gestureLayer.addEventListener('touchstart', e => {
+                _rotVelocity = 0;
                 for (const t of e.changedTouches)
                     activeTouches.set(t.identifier, { x: t.clientX, y: t.clientY, prevX: t.clientX, prevY: t.clientY });
                 if (activeTouches.size >= 2) {
@@ -1333,7 +1351,8 @@
                     let dx = all[0].x - all[0].prevX;
                     if (Math.abs(dx) < DEAD_ZONE) return;
                     dx = Math.max(-MAX_DELTA, Math.min(MAX_DELTA, dx));
-                    slotGroups[slotOf.center].rotation.y += dx * ROTATE_SCALE;
+                    _rotVelocity = dx * ROTATE_SCALE;
+                    slotGroups[slotOf.center].rotation.y += _rotVelocity;
                 } else if (all.length >= 2 && _pinchDist0) {
                     const [a, b] = all;
                     const dist = Math.hypot(a.x - b.x, a.y - b.y);
@@ -1373,6 +1392,7 @@
                 document.getElementById('xr-carousel-toggle').style.display = 'none';
                 document.getElementById('xr-label-toggle').style.display    = 'none';
                 activeTouches.clear();
+                _rotVelocity = 0;
                 _xrAddedKeys.clear();
                 _pinchDist0 = null; _pinchScale0 = null;
                 if (_scaleHideTimer) { clearTimeout(_scaleHideTimer); _scaleHideTimer = null; }
@@ -1394,6 +1414,10 @@
                             if (pose) { reticle.visible = true; reticle.matrix.fromArray(pose.transform.matrix); }
                         } else { reticle.visible = false; }
                     }
+                }
+                if (placed && Math.abs(_rotVelocity) > 0.0001) {
+                    slotGroups[slotOf.center].rotation.y += _rotVelocity;
+                    _rotVelocity *= INERTIA_DAMP;
                 }
                 if (labelMesh && labelMesh.visible) {
                     const _camPos = new THREE.Vector3();
@@ -1646,6 +1670,10 @@
         let modalItems = [];
         let modalIndex = 0;
 
+        const modalQtyCtrl = document.getElementById('modal-qty-ctrl');
+        modalQtyCtrl.querySelector('.qty-add-btn').addEventListener('click', e => { e.stopPropagation(); const k = modalQtyCtrl.dataset.idx; addToBasket(k, modalItems[modalIndex]); });
+        modalQtyCtrl.querySelector('.qty-dec').addEventListener('click',     e => { e.stopPropagation(); const k = modalQtyCtrl.dataset.idx; const en = _basket.get(k); if (en) _setQty(k, en.qty - 1); });
+        modalQtyCtrl.querySelector('.qty-inc').addEventListener('click',     e => { e.stopPropagation(); const k = modalQtyCtrl.dataset.idx; addToBasket(k, modalItems[modalIndex]); });
         document.getElementById('close-btn').addEventListener('click', closeModal);
         modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
@@ -1673,6 +1701,9 @@
             modalViewer.src        = item.model || 'food.glb';
             modalTitle.textContent = t(item, 'name');
             modalPrice.textContent = item.price;
+            const key = String(modalIndex);
+            document.getElementById('modal-qty-ctrl').dataset.idx = key;
+            _syncQtyCtrl(key);
         }
 
         function openModal(localIdx, catItems) {
@@ -2157,16 +2188,14 @@
             if (idx < 0) return;
             const key = String(idx);
             if (!_basket.has(key)) {
-                // Not in basket — add it and mark as XR-added
                 addToBasket(key, item);
                 _xrAddedKeys.add(key);
             } else if (_xrAddedKeys.has(key)) {
-                // In basket via XR button — toggle it off
                 _setQty(key, 0);
                 _xrAddedKeys.delete(key);
             }
             // Already in basket from outside — do nothing
-            _syncXRAddBtn();
+            document.getElementById('xr-add-btn').classList.toggle('in-basket', _basket.has(key));
         });
 
         document.getElementById('basket-bar').addEventListener('click', _openBasket);
