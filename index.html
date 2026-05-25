@@ -410,7 +410,7 @@
             display: none;
             pointer-events: all;
             position: absolute;
-            bottom: 120px;
+            bottom: 80px;
             right: 18px;
             background: rgba(0,0,0,0.45);
             color: rgba(255,255,255,0.55);
@@ -949,7 +949,7 @@
 
         const INIT_ROLES    = ['left', 'center', 'right', 'farRight'];
         const DUR           = 350;
-        const ROTATE_SCALE  = 0.005;
+        const ROTATE_SCALE  = 0.02;
         const SCALE_MIN     = 0.2;
         const SCALE_MAX     = 4.0;
         const DEAD_ZONE     = 3;
@@ -1373,6 +1373,7 @@
                 document.getElementById('xr-carousel-toggle').style.display = 'none';
                 document.getElementById('xr-label-toggle').style.display    = 'none';
                 activeTouches.clear();
+                _xrAddedKeys.clear();
                 _pinchDist0 = null; _pinchScale0 = null;
                 if (_scaleHideTimer) { clearTimeout(_scaleHideTimer); _scaleHideTimer = null; }
                 document.getElementById('xr-scale-gauge').style.display = 'none';
@@ -2038,6 +2039,7 @@
         // ── Basket ─────────────────────────────────────────────────────
         const _basket = new Map(); // key = String(globalIdx) -> { item, qty }
         window._basket = _basket;
+        const _xrAddedKeys = new Set(); // keys added via XR button (eligible for XR toggle-off)
 
         function _parsePrice(str) {
             return parseFloat(String(str).replace(/[^\d.]/g, '')) || 0;
@@ -2152,7 +2154,19 @@
             const item = window.XR?.getCurrentItem();
             if (!item || !window.__menuItems) return;
             const idx = window.__menuItems.indexOf(item);
-            if (idx >= 0) { addToBasket(String(idx), item); document.getElementById('xr-add-btn').classList.add('in-basket'); }
+            if (idx < 0) return;
+            const key = String(idx);
+            if (!_basket.has(key)) {
+                // Not in basket — add it and mark as XR-added
+                addToBasket(key, item);
+                _xrAddedKeys.add(key);
+            } else if (_xrAddedKeys.has(key)) {
+                // In basket via XR button — toggle it off
+                _setQty(key, 0);
+                _xrAddedKeys.delete(key);
+            }
+            // Already in basket from outside — do nothing
+            _syncXRAddBtn();
         });
 
         document.getElementById('basket-bar').addEventListener('click', _openBasket);
