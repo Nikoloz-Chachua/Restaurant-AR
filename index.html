@@ -1506,8 +1506,9 @@
 
                 initSlots();
 
+                let _xrReq;
                 try {
-                    const _xrReq = navigator.xr.requestSession('immersive-ar', {
+                    _xrReq = navigator.xr.requestSession('immersive-ar', {
                         requiredFeatures: ['hit-test'],
                         optionalFeatures: ['dom-overlay'],
                         domOverlay: { root: xrOverlay }
@@ -1520,6 +1521,8 @@
                     xrSession = await Promise.race([_xrReq, _xrTimeout]);
                 } catch (e) {
                     console.error('XR session failed:', e);
+                    // If the timed-out requestSession eventually resolves, end the ghost session.
+                    if (_xrReq) _xrReq.then(s => s.end()).catch(() => {});
                     // Clear cache so next page load re-runs detection fresh
                     localStorage.removeItem('bl-ar-cap');
                     localStorage.removeItem('bl-ar-cap-ts');
