@@ -718,6 +718,60 @@
             transition: color var(--t);
         }
 
+        /* ── Responsive: desktop grid layout ── */
+        @media (min-width: 640px) {
+            body { padding: 0 32px 64px; }
+
+            .header, .cat-filter { max-width: 880px; }
+
+            .menu-list {
+                max-width: 880px;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+                align-items: start;
+            }
+
+            .category-header {
+                max-width: none;
+                grid-column: 1 / -1;
+                padding: 24px 2px 10px;
+            }
+
+            .menu-item {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 0;
+                overflow: hidden;
+            }
+
+            .thumb-wrap {
+                width: 100%;
+                height: 220px;
+                border-radius: 16px 16px 0 0;
+                border-bottom: none;
+                flex-shrink: 0;
+            }
+
+            .item-details {
+                padding: 13px 14px 14px;
+            }
+
+            .price-row { margin-top: 6px; }
+        }
+
+        @media (min-width: 1100px) {
+            .header, .cat-filter { max-width: 1160px; }
+
+            .menu-list {
+                max-width: 1160px;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+
+            .thumb-wrap { height: 240px; }
+        }
+
         /* ── Modal AR button ── */
         #modal-ar-btn {
             display: none;
