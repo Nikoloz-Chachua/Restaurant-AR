@@ -993,9 +993,8 @@
             if (!labelMesh) return;
             if (labelMode === 'float') {
                 labelMesh.position.set(0, 0.28, 0.06);
-            } else {
-                labelMesh.rotation.set(-Math.PI / 2, 0, 0);
             }
+            // surface rotation updated per-frame in render loop
             const btn = document.getElementById('xr-label-toggle');
             const u = UI[window.__lang || 'en'];
             if (btn) btn.textContent = labelMode === 'float' ? u.onTable : u.floating;
@@ -1333,7 +1332,9 @@
                         );
                         carouselRoot.worldToLocal(_lp);
                         labelMesh.position.copy(_lp);
-                        // rotation is fixed (set in updateLabelTransform), only position orbits
+                        // flat on table, Y-only rotation so text always faces user
+                        const _reu = new THREE.Euler().setFromQuaternion(carouselRoot.quaternion, 'YXZ');
+                        labelMesh.rotation.set(-Math.PI / 2, _ang - _reu.y, 0);
                     }
                 }
                 renderer.render(scene, camera);
