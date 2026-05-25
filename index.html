@@ -1208,6 +1208,10 @@
                 isAnimating = false;
                 if (labelMesh && labelMesh.visible) drawLabel(MENU[currentCenterMenu]);
                 _syncXRAddBtn();
+                const _nItem = MENU[currentCenterMenu];
+                const _nIdx  = (_nItem && window.__menuItems) ? window.__menuItems.indexOf(_nItem) : -1;
+                if (_nIdx >= 0) window._arViewedItems?.add(_nIdx);
+                window.track?.('xr_nav', _nIdx >= 0 ? _nIdx : null, { direction: 'next' });
             }, DUR + 10);
         }
 
@@ -1230,6 +1234,10 @@
                 isAnimating = false;
                 if (labelMesh && labelMesh.visible) drawLabel(MENU[currentCenterMenu]);
                 _syncXRAddBtn();
+                const _pItem = MENU[currentCenterMenu];
+                const _pIdx  = (_pItem && window.__menuItems) ? window.__menuItems.indexOf(_pItem) : -1;
+                if (_pIdx >= 0) window._arViewedItems?.add(_pIdx);
+                window.track?.('xr_nav', _pIdx >= 0 ? _pIdx : null, { direction: 'prev' });
             }, DUR + 10);
         }
 
@@ -1252,6 +1260,9 @@
             carouselRoot.visible = true;
             reticle.visible      = false;
             placed               = true;
+            const _plItem = MENU[currentCenterMenu];
+            const _plIdx  = (_plItem && window.__menuItems) ? window.__menuItems.indexOf(_plItem) : -1;
+            window.track?.('ar_placed', _plIdx >= 0 ? _plIdx : null);
             gestureLayer.style.display = 'block';
             document.getElementById('xr-place-hint').style.display      = 'none';
             document.getElementById('xr-place-again').style.display     = 'block';
@@ -1577,6 +1588,12 @@
                 extra:      extra || null,
             }).then(() => {}).catch(() => {});
         }
+        window.track = track;
+        const _arViewedItems    = new Set(); // global indices viewed in AR this session
+        const _modalViewedItems = new Set(); // global indices viewed in 3D modal this session
+        window._arViewedItems   = _arViewedItems;
+        let   _modalOpenTime    = null;
+        let   _arStartTime      = null;
         track('page_load');
 
         const UI = {
@@ -1705,8 +1722,10 @@
 
         // ── XR session state ───────────────────────────────────────────
         document.addEventListener('xr-session-start', () => {
+            _arStartTime = Date.now();
             const _xrItem = window.XR?.getCurrentItem();
             const _xrIdx  = (_xrItem && menuItems) ? menuItems.indexOf(_xrItem) : null;
+            if (_xrIdx >= 0) _arViewedItems.add(_xrIdx);
             track('ar_success', _xrIdx >= 0 ? _xrIdx : null);
             document.getElementById('theme-toggle').style.display = 'none';
             document.getElementById('lang-toggle').style.display  = 'none';
@@ -1714,6 +1733,7 @@
         });
 
         document.addEventListener('xr-session-end', e => {
+            const _arEndMs = Date.now();
             _arOpening = false;
             setARButtonsState(false);
             document.getElementById('theme-toggle').style.display = '';
@@ -1725,7 +1745,10 @@
                 const _fbIdx   = (_fbItem && menuItems) ? menuItems.indexOf(_fbItem) : null;
                 track('ar_fallback', _fbIdx >= 0 ? _fbIdx : null);
                 openModal(e.detail.fallbackIdx, _fbItems);
+            } else if (_arStartTime != null) {
+                track('ar_duration', null, { duration_ms: _arEndMs - _arStartTime });
             }
+            _arStartTime = null;
         });
 
         // ── Modal ──────────────────────────────────────────────────────
@@ -1778,6 +1801,8 @@
             modalIndex = localIdx;
             const _viewItem = modalItems[localIdx];
             const _viewIdx  = (_viewItem && menuItems) ? menuItems.indexOf(_viewItem) : null;
+            _modalOpenTime = Date.now();
+            if (_viewIdx >= 0) _modalViewedItems.add(_viewIdx);
             track('item_view', _viewIdx >= 0 ? _viewIdx : null);
             updateModal();
             const cap = window.__arCap;
@@ -1799,6 +1824,11 @@
         }
 
         function closeModal() {
+            const _closeItem = modalItems[modalIndex];
+            const _closeIdx  = (_closeItem && menuItems) ? menuItems.indexOf(_closeItem) : null;
+            track('modal_close', _closeIdx >= 0 ? _closeIdx : null,
+                  { duration_ms: _modalOpenTime ? Date.now() - _modalOpenTime : null });
+            _modalOpenTime = null;
             modal.classList.remove('active');
             setTimeout(() => {
                 modal.style.display = 'none';
@@ -1906,7 +1936,8 @@
             _arCatItems = catItems || menuItems;
             const _tapItem = _arCatItems[localIdx];
             const _tapIdx  = (_tapItem && menuItems) ? menuItems.indexOf(_tapItem) : null;
-            track('ar_tap', _tapIdx >= 0 ? _tapIdx : null);
+            track('ar_tap', _tapIdx >= 0 ? _tapIdx : null,
+                  { source: modal.classList.contains('active') ? 'modal' : 'card' });
             setARButtonsState(true);
 
             const cap  = window.__arCap ?? await detectAR();
@@ -2117,7 +2148,10 @@
 
             filterDiv.addEventListener('click', e => {
                 const pill = e.target.closest('.cat-pill');
-                if (pill) applyFilter(pill.dataset.cat);
+                if (pill) {
+                    track('category_filter', null, { category: pill.dataset.cat || 'All' });
+                    applyFilter(pill.dataset.cat);
+                }
             });
 
             // expose so applyLang can update pill text
@@ -2201,7 +2235,13 @@
             const _isNew = !_basket.has(key);
             if (_basket.has(key)) _basket.get(key).qty++;
             else                   _basket.set(key, { item, qty: 1 });
-            if (_isNew) track('basket_add', parseInt(key, 10));
+            if (_isNew) {
+                const _bIdx = parseInt(key, 10);
+                track('basket_add', _bIdx, {
+                    after_ar: _arViewedItems.has(_bIdx),
+                    after_3d: _modalViewedItems.has(_bIdx),
+                });
+            }
             _syncQtyCtrl(key);
             _updateBasketBar();
             if (document.getElementById('basket-panel').style.display !== 'none') _renderBasketPanel();
@@ -2247,6 +2287,7 @@
         }
 
         function _openBasket() {
+            track('basket_open');
             _renderBasketPanel();
             const panel = document.getElementById('basket-panel');
             panel.style.display = 'flex';
