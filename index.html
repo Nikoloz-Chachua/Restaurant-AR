@@ -900,11 +900,13 @@
 
         const INIT_ROLES    = ['left', 'center', 'right', 'farRight'];
         const DUR           = 350;
-        const MOVE_SCALE    = 0.0015;
         const ROTATE_SCALE  = 0.005;
+        const SCALE_MIN     = 0.2;
+        const SCALE_MAX     = 4.0;
         const DEAD_ZONE     = 3;
         const MAX_DELTA     = 40;
         const activeTouches = new Map();
+        let _pinchDist0 = null, _pinchScale0 = null;
 
         // ── AR label (museum card) ────────────────────────────────────
         function _rrPath(ctx, x, y, w, h, r) {
@@ -1244,6 +1246,11 @@
             gestureLayer.addEventListener('touchstart', e => {
                 for (const t of e.changedTouches)
                     activeTouches.set(t.identifier, { x: t.clientX, y: t.clientY, prevX: t.clientX, prevY: t.clientY });
+                if (activeTouches.size >= 2) {
+                    const [a, b] = [...activeTouches.values()];
+                    _pinchDist0  = Math.hypot(a.x - b.x, a.y - b.y);
+                    _pinchScale0 = carouselRoot.scale.x;
+                }
             }, { passive: true });
 
             gestureLayer.addEventListener('touchmove', e => {
@@ -1255,23 +1262,20 @@
                 const all = [...activeTouches.values()];
                 if (all.length === 1) {
                     let dx = all[0].x - all[0].prevX;
-                    let dy = all[0].y - all[0].prevY;
-                    if (Math.abs(dx) < DEAD_ZONE && Math.abs(dy) < DEAD_ZONE) return;
+                    if (Math.abs(dx) < DEAD_ZONE) return;
                     dx = Math.max(-MAX_DELTA, Math.min(MAX_DELTA, dx));
-                    dy = Math.max(-MAX_DELTA, Math.min(MAX_DELTA, dy));
-                    carouselRoot.position.x += dx * MOVE_SCALE;
-                    carouselRoot.position.z += dy * MOVE_SCALE;
-                } else if (all.length >= 2) {
-                    const [left, right] = [...all].sort((a, b) => a.x - b.x);
-                    let twist = ((right.y - right.prevY) - (left.y - left.prevY)) * 0.5;
-                    if (Math.abs(twist) < DEAD_ZONE) return;
-                    twist = Math.max(-MAX_DELTA, Math.min(MAX_DELTA, twist));
-                    slotGroups[slotOf.center].rotation.y -= twist * ROTATE_SCALE;
+                    slotGroups[slotOf.center].rotation.y += dx * ROTATE_SCALE;
+                } else if (all.length >= 2 && _pinchDist0) {
+                    const [a, b] = all;
+                    const dist = Math.hypot(a.x - b.x, a.y - b.y);
+                    const s = Math.max(SCALE_MIN, Math.min(SCALE_MAX, _pinchScale0 * (dist / _pinchDist0)));
+                    carouselRoot.scale.setScalar(s);
                 }
             }, { passive: false });
 
             gestureLayer.addEventListener('touchend', e => {
                 for (const t of e.changedTouches) activeTouches.delete(t.identifier);
+                if (activeTouches.size < 2) { _pinchDist0 = null; _pinchScale0 = null; }
             }, { passive: true });
 
             renderer.xr.addEventListener('sessionstart', async () => {
@@ -1296,6 +1300,8 @@
                 document.getElementById('xr-carousel-toggle').style.display = 'none';
                 document.getElementById('xr-label-toggle').style.display    = 'none';
                 activeTouches.clear();
+                _pinchDist0 = null; _pinchScale0 = null;
+                carouselRoot.scale.setScalar(1);
                 slotOf = { left: 0, center: 1, right: 2, hidden: 3 };
                 hiddenSide = 'farRight'; isAnimating = false;
                 initSlots();
@@ -1428,7 +1434,7 @@
                 close:     'Close',
                 tip:       'Drag to rotate',
                 placeHint: 'Point at a flat surface, then tap to place',
-                moveHint:  'Drag to move · Twist two fingers to rotate',
+                moveHint:  'Drag to rotate · Pinch to scale',
                 exitAR:    'Exit Model view',
                 placeAgain:'Place Again',
                 langBtn:   'ქარ',
@@ -1452,7 +1458,7 @@
                 close:     'დახურვა',
                 tip:       'გაასრიალეთ მოსაბრუნებლად',
                 placeHint: 'მიუშვირე ბრტყელ ზედაპირს, როდესაც გამოჩნდება ნიშნული შეეხე',
-                moveHint:  'გადასაადგილებლად გაასრიალე · შეატრიალე ორი თითით',
+                moveHint:  'გასაბრუნებლად გაასრიალე · პინჩი მასშტაბისთვის',
                 exitAR:    'მოდელის დახურვა',
                 placeAgain:'ხელახლა დადება',
                 langBtn:   'EN',
