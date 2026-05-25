@@ -394,7 +394,9 @@
             color: rgba(255,255,255,0.5);
             font-family: 'Nunito', sans-serif;
             font-size: 12px;
-            white-space: nowrap;
+            white-space: normal;
+            text-align: center;
+            max-width: 80%;
         }
         #xr-exit, #xr-carousel-toggle, #xr-label-toggle, #xr-place-again {
             pointer-events: all;
@@ -1512,6 +1514,11 @@
                     });
                 } catch (e) {
                     console.error('XR session failed:', e);
+                    // Mark as unsupported for this session so buttons flip to "VIEW IN 3D" immediately
+                    window.__arCap = 'none';
+                    // Clear cache so next page load re-runs detection (don't permanently block AR)
+                    localStorage.removeItem('bl-ar-cap');
+                    localStorage.removeItem('bl-ar-cap-ts');
                     xrStarting = false;
                     document.dispatchEvent(new CustomEvent('xr-session-end', { detail: { fallbackIdx: itemIndex } }));
                     return;
@@ -1765,10 +1772,8 @@
             }
             if (cap === 'none' && isIOS) cap = 'arkit';
             window.__arCap = cap;
-            if (cap !== 'webxr') {
-                localStorage.setItem('bl-ar-cap', cap);
-                localStorage.setItem('bl-ar-cap-ts', String(Date.now()));
-            }
+            localStorage.setItem('bl-ar-cap', cap);
+            localStorage.setItem('bl-ar-cap-ts', String(Date.now()));
             return cap;
         }
 
