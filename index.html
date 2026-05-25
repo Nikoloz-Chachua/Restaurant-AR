@@ -1507,16 +1507,20 @@
                 initSlots();
 
                 try {
-                    xrSession = await navigator.xr.requestSession('immersive-ar', {
+                    const _xrReq = navigator.xr.requestSession('immersive-ar', {
                         requiredFeatures: ['hit-test'],
                         optionalFeatures: ['dom-overlay'],
                         domOverlay: { root: xrOverlay }
                     });
+                    // ARCore needs recovery time after a previous session ends.
+                    // requestSession can hang indefinitely — race it against an 8s timeout.
+                    const _xrTimeout = new Promise((_, rej) =>
+                        setTimeout(() => rej(new Error('xr-timeout')), 8000)
+                    );
+                    xrSession = await Promise.race([_xrReq, _xrTimeout]);
                 } catch (e) {
                     console.error('XR session failed:', e);
-                    // Mark as unsupported for this session so buttons flip to "VIEW IN 3D" immediately
-                    window.__arCap = 'none';
-                    // Clear cache so next page load re-runs detection (don't permanently block AR)
+                    // Clear cache so next page load re-runs detection fresh
                     localStorage.removeItem('bl-ar-cap');
                     localStorage.removeItem('bl-ar-cap-ts');
                     xrStarting = false;
