@@ -115,10 +115,13 @@
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: 20px;
-            display: flex;
+            display: grid;
+            grid-template-columns: 108px 1fr;
+            grid-template-rows: auto 1fr;
+            grid-template-areas: "name name" "thumb right";
             padding: 12px;
-            gap: 12px;
-            align-items: stretch;
+            column-gap: 12px;
+            row-gap: 8px;
             transition: background var(--t), border-color var(--t);
             contain: content;
             touch-action: manipulation;
@@ -127,9 +130,8 @@
 
         .thumb-wrap {
             width: 108px;
+            height: 100%;
             min-height: 108px;
-            height: auto;
-            flex-shrink: 0;
             border-radius: 14px;
             overflow: hidden;
             background: var(--thumb-bg);
@@ -146,12 +148,11 @@
         }
 
         .item-left {
-            width: 108px;
-            flex-shrink: 0;
+            grid-area: thumb;
         }
 
         .item-right {
-            flex: 1;
+            grid-area: right;
             min-width: 0;
             display: flex;
             flex-direction: column;
@@ -168,8 +169,9 @@
         }
 
         .item-name {
+            grid-area: name;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             letter-spacing: 1px;
             color: var(--accent);
             line-height: 1.2;
@@ -746,14 +748,12 @@
             }
 
             .menu-item {
-                flex-direction: column;
-                align-items: stretch;
+                grid-template-columns: 1fr;
+                grid-template-rows: 220px auto auto;
+                grid-template-areas: "thumb" "name" "right";
                 padding: 0;
+                row-gap: 0;
                 overflow: hidden;
-            }
-
-            .item-left {
-                width: 100%;
             }
 
             .item-left .thumb-wrap {
@@ -762,15 +762,14 @@
                 min-height: unset;
                 border-radius: 16px 16px 0 0;
                 border-bottom: none;
-                flex-shrink: 0;
+            }
+
+            .item-name {
+                padding: 10px 14px 0;
             }
 
             .item-right {
-                padding: 10px 14px 14px;
-            }
-
-            .item-actions {
-                margin-top: 8px;
+                padding: 6px 14px 14px;
             }
 
             .item-actions .ar-btn {
@@ -1820,6 +1819,7 @@
                     const card = document.createElement('div');
                     card.className = 'menu-item';
                     card.innerHTML = `
+                        <p class="item-name" data-field="name" data-idx="${globalIdx}">${t(item, 'name')}</p>
                         <div class="item-left">
                             <div class="thumb-wrap">
                                 <model-viewer
@@ -1833,7 +1833,6 @@
                             </div>
                         </div>
                         <div class="item-right">
-                            <p class="item-name" data-field="name" data-idx="${globalIdx}">${t(item, 'name')}</p>
                             <p class="ingredients" data-field="description" data-idx="${globalIdx}">${t(item, 'description')}</p>
                             <div class="item-actions">
                                 <p class="price">${item.price}</p>
@@ -1860,6 +1859,7 @@
                     });
 
                     card.querySelector('.item-right').addEventListener('click', () => openModal(localIdx, catItems));
+                    card.querySelector('.item-name').addEventListener('click', () => openModal(localIdx, catItems));
                     card.querySelector('.ar-btn').addEventListener('click', e => { e.stopPropagation(); openAR(localIdx, catItems); });
                     const qCtrl = card.querySelector('.qty-ctrl');
                     qCtrl.querySelector('.qty-add-btn').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
