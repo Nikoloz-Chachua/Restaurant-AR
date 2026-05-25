@@ -9,6 +9,7 @@
     <meta property="og:description" content="Browse our menu and place dishes on your table in Augmented Reality.">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
         :root { --t: 0.22s ease; }
 
@@ -1545,6 +1546,39 @@
 
     <!-- ── Catalog logic ──────────────────────────────────────────────── -->
     <script>
+        // ── Analytics ─────────────────────────────────────────────────
+        const _sbClient = (function() {
+            try { return window.supabase?.createClient(
+                'https://xctoxhaahxtcicfgnmme.supabase.co',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdG94aGFhaHh0Y2ljZmdubW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NDMyMDEsImV4cCI6MjA5NTMxOTIwMX0.VA2tQL6WT96ifBjON4NLaJa0BbzBGI0ipD7iB5fHjnQ'
+            ); } catch(e) { return null; }
+        })();
+        let _sid = sessionStorage.getItem('bl-sid');
+        if (!_sid) {
+            _sid = (crypto?.randomUUID
+                ? crypto.randomUUID()
+                : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+                    const r = Math.random() * 16 | 0;
+                    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+                  }));
+            sessionStorage.setItem('bl-sid', _sid);
+        }
+        function track(event, itemIndex, extra) {
+            if (!_sbClient) return;
+            const item = (itemIndex != null && window.__menuItems) ? window.__menuItems[itemIndex] : null;
+            _sbClient.from('events').insert({
+                session_id: _sid,
+                event,
+                item_index: itemIndex != null ? itemIndex : null,
+                item_name:  item ? item.name : null,
+                category:   item ? item.category : null,
+                lang:       window.__lang || localStorage.getItem('bl-lang') || 'en',
+                ar_cap:     window.__arCap || localStorage.getItem('bl-ar-cap') || null,
+                extra:      extra || null,
+            }).then(() => {}).catch(() => {});
+        }
+        track('page_load');
+
         const UI = {
             en: {
                 tagline:   'Taste the Wild',
@@ -1644,7 +1678,9 @@
         }
 
         document.getElementById('lang-toggle').addEventListener('click', () => {
-            applyLang(window.__lang === 'en' ? 'ka' : 'en');
+            const _from = window.__lang, _to = _from === 'en' ? 'ka' : 'en';
+            track('lang_change', null, { from: _from, to: _to });
+            applyLang(_to);
         });
 
         // ── Theme ──────────────────────────────────────────────────────
@@ -1662,11 +1698,16 @@
         }
         applyTheme(localStorage.getItem('bl-theme') || 'night');
         themeBtn.addEventListener('click', () => {
-            applyTheme(html.getAttribute('data-theme') === 'night' ? 'day' : 'night');
+            const _from = html.getAttribute('data-theme'), _to = _from === 'night' ? 'day' : 'night';
+            track('theme_change', null, { from: _from, to: _to });
+            applyTheme(_to);
         });
 
         // ── XR session state ───────────────────────────────────────────
         document.addEventListener('xr-session-start', () => {
+            const _xrItem = window.XR?.getCurrentItem();
+            const _xrIdx  = (_xrItem && menuItems) ? menuItems.indexOf(_xrItem) : null;
+            track('ar_success', _xrIdx >= 0 ? _xrIdx : null);
             document.getElementById('theme-toggle').style.display = 'none';
             document.getElementById('lang-toggle').style.display  = 'none';
             document.getElementById('xr-add-btn').classList.add('visible');
@@ -1678,7 +1719,13 @@
             document.getElementById('theme-toggle').style.display = '';
             document.getElementById('lang-toggle').style.display  = '';
             document.getElementById('xr-add-btn').classList.remove('visible');
-            if (e.detail?.fallbackIdx != null) openModal(e.detail.fallbackIdx, _arCatItems || menuItems);
+            if (e.detail?.fallbackIdx != null) {
+                const _fbItems = _arCatItems || menuItems;
+                const _fbItem  = _fbItems[e.detail.fallbackIdx];
+                const _fbIdx   = (_fbItem && menuItems) ? menuItems.indexOf(_fbItem) : null;
+                track('ar_fallback', _fbIdx >= 0 ? _fbIdx : null);
+                openModal(e.detail.fallbackIdx, _fbItems);
+            }
         });
 
         // ── Modal ──────────────────────────────────────────────────────
@@ -1729,6 +1776,9 @@
         function openModal(localIdx, catItems) {
             modalItems = catItems || menuItems;
             modalIndex = localIdx;
+            const _viewItem = modalItems[localIdx];
+            const _viewIdx  = (_viewItem && menuItems) ? menuItems.indexOf(_viewItem) : null;
+            track('item_view', _viewIdx >= 0 ? _viewIdx : null);
             updateModal();
             const cap = window.__arCap;
             modalArBtn.textContent  = UI[window.__lang].viewAR;
@@ -1827,13 +1877,18 @@
         function _launchIOSAR(launcher, localIdx) {
             function onARStatus(e) {
                 const s = e.detail.status;
+                const _iosItem = _arCatItems ? _arCatItems[localIdx] : null;
+                const _iosIdx  = (_iosItem && menuItems) ? menuItems.indexOf(_iosItem) : null;
+                const _iosGIdx = _iosIdx >= 0 ? _iosIdx : null;
                 if (s === 'failed') {
                     launcher.removeEventListener('ar-status', onARStatus);
+                    track('ar_fallback', _iosGIdx);
                     setARButtonsState(false);
                     _arOpening = false;
                     openModal(localIdx, _arCatItems);
                 } else if (s === 'session-started') {
                     launcher.removeEventListener('ar-status', onARStatus);
+                    track('ar_success', _iosGIdx);
                 }
             }
             launcher.addEventListener('ar-status', onARStatus);
@@ -1849,6 +1904,9 @@
             if (_arOpening) return;
             _arOpening  = true;
             _arCatItems = catItems || menuItems;
+            const _tapItem = _arCatItems[localIdx];
+            const _tapIdx  = (_tapItem && menuItems) ? menuItems.indexOf(_tapItem) : null;
+            track('ar_tap', _tapIdx >= 0 ? _tapIdx : null);
             setARButtonsState(true);
 
             const cap  = window.__arCap ?? await detectAR();
@@ -2140,16 +2198,20 @@
         }
 
         function addToBasket(key, item) {
+            const _isNew = !_basket.has(key);
             if (_basket.has(key)) _basket.get(key).qty++;
             else                   _basket.set(key, { item, qty: 1 });
+            if (_isNew) track('basket_add', parseInt(key, 10));
             _syncQtyCtrl(key);
             _updateBasketBar();
             if (document.getElementById('basket-panel').style.display !== 'none') _renderBasketPanel();
         }
 
         function _setQty(key, qty) {
-            if (qty <= 0) _basket.delete(key);
-            else if (_basket.has(key)) _basket.get(key).qty = qty;
+            if (qty <= 0) {
+                if (_basket.has(key)) track('basket_remove', parseInt(key, 10));
+                _basket.delete(key);
+            } else if (_basket.has(key)) _basket.get(key).qty = qty;
             _syncQtyCtrl(key);
             _updateBasketBar();
             if (document.getElementById('basket-panel').style.display !== 'none') _renderBasketPanel();
