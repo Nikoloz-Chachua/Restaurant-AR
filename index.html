@@ -751,13 +751,15 @@
             }
 
             .menu-item {
-                grid-template-columns: 1fr;
-                grid-template-rows: 220px auto auto;
-                grid-template-areas: "left" "name" "right";
+                display: flex;
+                flex-direction: column;
                 padding: 0;
-                row-gap: 0;
                 overflow: hidden;
             }
+
+            .item-left  { order: 1; width: 100%; }
+            .item-name  { order: 2; padding: 10px 14px 4px; }
+            .item-right { order: 3; padding: 4px 14px 14px; }
 
             .item-left .thumb-wrap {
                 width: 100%;
@@ -765,14 +767,6 @@
                 min-height: unset;
                 border-radius: 16px 16px 0 0;
                 border-bottom: none;
-            }
-
-            .item-name {
-                padding: 10px 14px 0;
-            }
-
-            .item-right {
-                padding: 6px 14px 14px;
             }
 
         }
