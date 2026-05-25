@@ -1332,9 +1332,14 @@
                         );
                         carouselRoot.worldToLocal(_lp);
                         labelMesh.position.copy(_lp);
-                        // flat on table, Y-only rotation so text always faces user
-                        const _reu = new THREE.Euler().setFromQuaternion(carouselRoot.quaternion, 'YXZ');
-                        labelMesh.rotation.set(-Math.PI / 2, _ang - _reu.y, 0);
+                        // flatten first (Rx -90°), then spin around WORLD Y — quaternion
+                        // composition avoids Euler-order tilt on second axis
+                        const _qFl = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0), -Math.PI/2);
+                        const _qYw = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), _ang);
+                        const _wQ  = _qYw.clone().multiply(_qFl);
+                        const _pQ  = new THREE.Quaternion();
+                        carouselRoot.getWorldQuaternion(_pQ);
+                        labelMesh.quaternion.multiplyQuaternions(_pQ.clone().invert(), _wQ);
                     }
                 }
                 renderer.render(scene, camera);
