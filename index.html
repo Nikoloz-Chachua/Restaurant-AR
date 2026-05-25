@@ -425,6 +425,48 @@
         }
         #xr-add-btn.visible   { display: flex; }
         #xr-add-btn.in-basket { background: rgba(240,192,64,0.92); color: #0d0d0d; border-color: transparent; }
+        #xr-scale-gauge {
+            display: none;
+            position: absolute;
+            bottom: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.65);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 8px 16px;
+            pointer-events: none;
+            min-width: 130px;
+            text-align: center;
+        }
+        #xr-scale-track {
+            height: 4px;
+            background: rgba(255,255,255,0.18);
+            border-radius: 2px;
+            position: relative;
+            margin-bottom: 5px;
+        }
+        #xr-scale-fill {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            background: #f0c040;
+            border-radius: 2px;
+        }
+        #xr-scale-mark {
+            position: absolute;
+            top: -3px;
+            width: 2px;
+            height: 10px;
+            background: rgba(255,255,255,0.55);
+            border-radius: 1px;
+            left: calc(53.7% - 1px);
+        }
+        #xr-scale-pct {
+            font-family: 'Nunito', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+        }
 
         /* ── Category filter bar ── */
         .cat-filter {
@@ -836,6 +878,13 @@
         <button id="xr-place-again"></button>
         <button id="xr-carousel-toggle"></button>
         <button id="xr-label-toggle"></button>
+        <div id="xr-scale-gauge">
+            <div id="xr-scale-track">
+                <div id="xr-scale-fill"></div>
+                <div id="xr-scale-mark"></div>
+            </div>
+            <span id="xr-scale-pct">100%</span>
+        </div>
         <button id="xr-add-btn" aria-label="Add to basket">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         </button>
@@ -906,7 +955,23 @@
         const DEAD_ZONE     = 3;
         const MAX_DELTA     = 40;
         const activeTouches = new Map();
-        let _pinchDist0 = null, _pinchScale0 = null;
+        let _pinchDist0 = null, _pinchScale0 = null, _scaleHideTimer = null;
+        const _LOG_MIN = Math.log(SCALE_MIN), _LOG_MAX = Math.log(SCALE_MAX);
+        function _showScaleGauge() {
+            const s = carouselRoot.scale.x;
+            const fill = (Math.log(s) - _LOG_MIN) / (_LOG_MAX - _LOG_MIN) * 100;
+            document.getElementById('xr-scale-fill').style.width = fill.toFixed(1) + '%';
+            document.getElementById('xr-scale-pct').textContent  = Math.round(s * 100) + '%';
+            document.getElementById('xr-scale-gauge').style.display = 'block';
+            if (_scaleHideTimer) { clearTimeout(_scaleHideTimer); _scaleHideTimer = null; }
+        }
+        function _hideScaleGauge(delay) {
+            if (_scaleHideTimer) clearTimeout(_scaleHideTimer);
+            _scaleHideTimer = setTimeout(() => {
+                document.getElementById('xr-scale-gauge').style.display = 'none';
+                _scaleHideTimer = null;
+            }, delay);
+        }
 
         // ── AR label (museum card) ────────────────────────────────────
         function _rrPath(ctx, x, y, w, h, r) {
@@ -1174,6 +1239,10 @@
         function _resetPlacement() {
             _ignoreNextSelect = true;
             placed = false;
+            carouselRoot.scale.setScalar(1);
+            _pinchDist0 = null; _pinchScale0 = null;
+            if (_scaleHideTimer) { clearTimeout(_scaleHideTimer); _scaleHideTimer = null; }
+            document.getElementById('xr-scale-gauge').style.display = 'none';
             carouselRoot.visible = false;
             reticle.visible = false;
             gestureLayer.style.display = 'none';
@@ -1270,12 +1339,16 @@
                     const dist = Math.hypot(a.x - b.x, a.y - b.y);
                     const s = Math.max(SCALE_MIN, Math.min(SCALE_MAX, _pinchScale0 * (dist / _pinchDist0)));
                     carouselRoot.scale.setScalar(s);
+                    _showScaleGauge();
                 }
             }, { passive: false });
 
             gestureLayer.addEventListener('touchend', e => {
                 for (const t of e.changedTouches) activeTouches.delete(t.identifier);
-                if (activeTouches.size < 2) { _pinchDist0 = null; _pinchScale0 = null; }
+                if (activeTouches.size < 2) {
+                    _pinchDist0 = null; _pinchScale0 = null;
+                    _hideScaleGauge(1200);
+                }
             }, { passive: true });
 
             renderer.xr.addEventListener('sessionstart', async () => {
@@ -1301,6 +1374,8 @@
                 document.getElementById('xr-label-toggle').style.display    = 'none';
                 activeTouches.clear();
                 _pinchDist0 = null; _pinchScale0 = null;
+                if (_scaleHideTimer) { clearTimeout(_scaleHideTimer); _scaleHideTimer = null; }
+                document.getElementById('xr-scale-gauge').style.display = 'none';
                 carouselRoot.scale.setScalar(1);
                 slotOf = { left: 0, center: 1, right: 2, hidden: 3 };
                 hiddenSide = 'farRight'; isAnimating = false;
