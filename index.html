@@ -145,22 +145,42 @@
             touch-action: pan-y;
         }
 
-        .item-details { flex: 1; min-width: 0; user-select: none; }
+        .item-left {
+            width: 108px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
 
-        .item-header {
-            margin-bottom: 5px;
+        .item-right {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            user-select: none;
+        }
+
+        .item-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 8px;
+            flex-shrink: 0;
         }
 
         .item-name {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             letter-spacing: 1px;
             color: var(--accent);
             line-height: 1.2;
             transition: color var(--t);
             overflow-wrap: break-word;
-            word-break: keep-all;
-            min-width: 0;
+            word-break: break-word;
+            margin-top: 6px;
         }
 
         .ar-btn {
@@ -176,9 +196,7 @@
             cursor: pointer;
             white-space: nowrap;
             text-transform: uppercase;
-            display: block;
-            width: 100%;
-            margin-top: 8px;
+            flex-shrink: 1;
             transition: background var(--t), opacity 0.15s;
         }
         .ar-btn:active { opacity: 0.7; transition: opacity 0.08s; }
@@ -187,18 +205,9 @@
         .ingredients {
             font-size: 0.72rem;
             color: var(--dim);
-            margin-bottom: 7px;
             line-height: 1.3;
             transition: color var(--t);
             overflow-wrap: break-word;
-        }
-
-        .price-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            margin-top: 2px;
         }
 
         .price {
@@ -748,19 +757,39 @@
                 overflow: hidden;
             }
 
-            .thumb-wrap {
+            .item-left {
+                width: 100%;
+            }
+
+            .item-left .thumb-wrap {
                 width: 100%;
                 height: 220px;
+                min-height: unset;
                 border-radius: 16px 16px 0 0;
                 border-bottom: none;
                 flex-shrink: 0;
             }
 
-            .item-details {
-                padding: 13px 14px 14px;
+            .item-left .item-name {
+                margin: 10px 14px 0;
             }
 
-            .price-row { margin-top: 6px; }
+            .item-left .price {
+                margin: 3px 14px 0;
+            }
+
+            .item-right {
+                padding: 8px 14px 14px;
+            }
+
+            .item-actions {
+                justify-content: flex-start;
+                margin-top: 8px;
+            }
+
+            .item-actions .ar-btn {
+                flex: 1;
+            }
         }
 
         @media (min-width: 1100px) {
@@ -772,7 +801,7 @@
                 gap: 20px;
             }
 
-            .thumb-wrap { height: 240px; }
+            .item-left .thumb-wrap { height: 240px; }
         }
 
         /* ── Modal AR button ── */
@@ -1804,23 +1833,23 @@
                     const card = document.createElement('div');
                     card.className = 'menu-item';
                     card.innerHTML = `
-                        <div class="thumb-wrap">
-                            <model-viewer
-                                data-src="${item.model || 'food.glb'}"
-                                camera-controls
-                                shadow-intensity="0"
-                                interaction-prompt="none"
-                                min-camera-orbit="auto 0deg auto"
-                                max-camera-orbit="auto 85deg auto">
-                            </model-viewer>
-                        </div>
-                        <div class="item-details">
-                            <div class="item-header">
-                                <p class="item-name" data-field="name" data-idx="${globalIdx}">${t(item, 'name')}</p>
+                        <div class="item-left">
+                            <div class="thumb-wrap">
+                                <model-viewer
+                                    data-src="${item.model || 'food.glb'}"
+                                    camera-controls
+                                    shadow-intensity="0"
+                                    interaction-prompt="none"
+                                    min-camera-orbit="auto 0deg auto"
+                                    max-camera-orbit="auto 85deg auto">
+                                </model-viewer>
                             </div>
+                            <p class="item-name" data-field="name" data-idx="${globalIdx}">${t(item, 'name')}</p>
+                            <p class="price">${item.price}</p>
+                        </div>
+                        <div class="item-right">
                             <p class="ingredients" data-field="description" data-idx="${globalIdx}">${t(item, 'description')}</p>
-                            <div class="price-row">
-                                <p class="price">${item.price}</p>
+                            <div class="item-actions">
                                 <div class="qty-ctrl" data-idx="${globalIdx}">
                                     <button class="qty-add-btn" aria-label="Add to basket"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
                                     <div class="qty-stepper">
@@ -1829,8 +1858,8 @@
                                         <button class="qty-inc">+</button>
                                     </div>
                                 </div>
+                                <button class="ar-btn">${initialLabel}</button>
                             </div>
-                            <button class="ar-btn">${initialLabel}</button>
                         </div>`;
 
                     const mv = card.querySelector('model-viewer');
@@ -1843,7 +1872,9 @@
                             openModal(localIdx, catItems);
                     });
 
-                    card.querySelector('.item-details').addEventListener('click', () => openModal(localIdx, catItems));
+                    card.querySelector('.item-right').addEventListener('click', () => openModal(localIdx, catItems));
+                    card.querySelector('.item-left .item-name').addEventListener('click', () => openModal(localIdx, catItems));
+                    card.querySelector('.item-left .price').addEventListener('click', () => openModal(localIdx, catItems));
                     card.querySelector('.ar-btn').addEventListener('click', e => { e.stopPropagation(); openAR(localIdx, catItems); });
                     const qCtrl = card.querySelector('.qty-ctrl');
                     qCtrl.querySelector('.qty-add-btn').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
