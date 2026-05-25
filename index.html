@@ -1848,12 +1848,12 @@
                     mv.addEventListener('pointerdown', e => { _px = e.clientX; _py = e.clientY; });
                     mv.addEventListener('pointerup', e => {
                         if (Math.abs(e.clientX - _px) < 6 && Math.abs(e.clientY - _py) < 6)
-                            openModal(localIdx, catItems);
+                            openModal(globalIdx, menuItems);
                     });
 
-                    card.querySelector('.item-right').addEventListener('click', () => openModal(localIdx, catItems));
-                    card.querySelector('.item-name').addEventListener('click', () => openModal(localIdx, catItems));
-                    card.querySelector('.ar-btn').addEventListener('click', e => { e.stopPropagation(); openAR(localIdx, catItems); });
+                    card.querySelector('.item-right').addEventListener('click', () => openModal(globalIdx, menuItems));
+                    card.querySelector('.item-name').addEventListener('click', () => openModal(globalIdx, menuItems));
+                    card.querySelector('.ar-btn').addEventListener('click', e => { e.stopPropagation(); openAR(globalIdx, menuItems); });
                     const qCtrl = card.querySelector('.qty-ctrl');
                     qCtrl.querySelector('.qty-add-btn').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
                     qCtrl.querySelector('.qty-dec').addEventListener('click', e => { e.stopPropagation(); const en = _basket.get(String(globalIdx)); if (en) _setQty(String(globalIdx), en.qty - 1); });
