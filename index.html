@@ -166,6 +166,7 @@
             justify-content: space-between;
             margin-top: 8px;
             flex-shrink: 0;
+            min-height: 34px;
         }
 
         .item-name {
@@ -533,10 +534,12 @@
 
         .qty-stepper {
             display: none;
-            align-items: center;
+            align-items: stretch;
             border: 1.5px solid var(--accent);
             border-radius: 9px;
             overflow: hidden;
+            height: 34px;
+            box-sizing: border-box;
             transition: border-color var(--t);
         }
         .qty-stepper.visible { display: flex; }
@@ -547,7 +550,7 @@
             color: var(--accent);
             font-size: 1rem;
             font-weight: 700;
-            padding: 5px 10px;
+            padding: 0 10px;
             cursor: pointer;
             line-height: 1;
             display: flex;
