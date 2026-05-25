@@ -390,7 +390,7 @@
             font-size: 12px;
             white-space: nowrap;
         }
-        #xr-exit, #xr-carousel-toggle, #xr-label-toggle {
+        #xr-exit, #xr-carousel-toggle, #xr-label-toggle, #xr-place-again {
             pointer-events: all;
             position: absolute;
             background: rgba(0,0,0,0.65);
@@ -403,6 +403,7 @@
             cursor: pointer;
         }
         #xr-exit             { top: 18px; right: 18px; }
+        #xr-place-again      { top: 62px; right: 18px; display: none; }
         #xr-carousel-toggle  { top: 18px; left: 18px; display: none; }
         #xr-label-toggle     { top: 58px; left: 18px; display: none; }
         #xr-add-btn {
@@ -411,9 +412,9 @@
             position: absolute;
             bottom: 120px;
             right: 18px;
-            background: rgba(240,192,64,0.92);
-            color: #0d0d0d;
-            border: none;
+            background: rgba(0,0,0,0.45);
+            color: rgba(255,255,255,0.55);
+            border: 1.5px solid rgba(255,255,255,0.25);
             border-radius: 50%;
             width: 48px;
             height: 48px;
@@ -422,25 +423,8 @@
             justify-content: center;
             box-shadow: 0 2px 12px rgba(0,0,0,0.4);
         }
-        #xr-add-btn.visible { display: flex; }
-
-        #xr-cat-badge {
-            display: none;
-            position: absolute;
-            top: 18px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.65);
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-family: 'Nunito', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            pointer-events: none;
-            white-space: nowrap;
-        }
+        #xr-add-btn.visible   { display: flex; }
+        #xr-add-btn.in-basket { background: rgba(240,192,64,0.92); color: #0d0d0d; border-color: transparent; }
 
         /* ── Category filter bar ── */
         .cat-filter {
@@ -842,7 +826,6 @@
 
     <div id="xr-overlay">
         <div id="xr-gesture-layer"></div>
-        <div id="xr-cat-badge"></div>
         <div id="xr-place-hint">Point at a flat surface, then tap to place</div>
         <div id="xr-nav-row">
             <button id="xr-prev">&#10094;</button>
@@ -850,6 +833,7 @@
         </div>
         <div id="xr-move-hint">Drag to move &middot; Twist two fingers to rotate</div>
         <button id="xr-exit">Exit AR</button>
+        <button id="xr-place-again"></button>
         <button id="xr-carousel-toggle"></button>
         <button id="xr-label-toggle"></button>
         <button id="xr-add-btn" aria-label="Add to basket">
@@ -1019,18 +1003,6 @@
             if (btn) btn.textContent = labelMode === 'float' ? u.onTable : u.floating;
         }
 
-        // ── Category badge (DOM overlay) ─────────────────────────────
-        function updateXRCatBadge() {
-            const badge = document.getElementById('xr-cat-badge');
-            if (!badge || !MENU.length) return;
-            const item = MENU[currentCenterMenu];
-            if (!item) return;
-            const lang = window.__lang || 'en';
-            const cat = (lang === 'ka' && item.category_ka) ? item.category_ka : item.category;
-            badge.textContent = cat;
-            badge.style.display = 'block';
-        }
-
         // ── Models ────────────────────────────────────────────────────
         function preloadModels() {
             const paths = [...new Set(MENU.map(m => m.model || 'food.glb'))];
@@ -1078,7 +1050,7 @@
                 slotGroups[i].rotation.set(0, 0, 0);
                 setOpacity(i, opacities[i]);
             });
-            updateXRCatBadge();
+            _syncXRAddBtn();
         }
 
         // ── Opacity ───────────────────────────────────────────────────
@@ -1145,7 +1117,7 @@
                 hiddenSide = 'farLeft'; currentCenterMenu = mod(currentCenterMenu + 1);
                 isAnimating = false;
                 if (labelMesh && labelMesh.visible) drawLabel(MENU[currentCenterMenu]);
-                updateXRCatBadge();
+                _syncXRAddBtn();
             }, DUR + 10);
         }
 
@@ -1167,8 +1139,18 @@
                 hiddenSide = 'farRight'; currentCenterMenu = mod(currentCenterMenu - 1);
                 isAnimating = false;
                 if (labelMesh && labelMesh.visible) drawLabel(MENU[currentCenterMenu]);
-                updateXRCatBadge();
+                _syncXRAddBtn();
             }, DUR + 10);
+        }
+
+        // ── Add-btn basket state sync ─────────────────────────────────
+        function _syncXRAddBtn() {
+            const btn = document.getElementById('xr-add-btn');
+            if (!btn || !window.__menuItems) return;
+            const item = MENU.length ? MENU[currentCenterMenu] : null;
+            const idx  = item ? window.__menuItems.indexOf(item) : -1;
+            const inBasket = idx >= 0 && window._basket && window._basket.has(String(idx));
+            btn.classList.toggle('in-basket', inBasket);
         }
 
         // ── Placement ─────────────────────────────────────────────────
@@ -1181,11 +1163,26 @@
             placed               = true;
             gestureLayer.style.display = 'block';
             document.getElementById('xr-place-hint').style.display      = 'none';
+            document.getElementById('xr-place-again').style.display     = 'block';
             document.getElementById('xr-nav-row').style.display          = 'flex';
             document.getElementById('xr-move-hint').style.display        = 'block';
             document.getElementById('xr-carousel-toggle').style.display  = 'block';
             if (labelMesh) { drawLabel(MENU[currentCenterMenu]); updateLabelTransform(); labelMesh.visible = true; }
             document.getElementById('xr-label-toggle').style.display = 'block';
+        }
+
+        function _resetPlacement() {
+            placed = false;
+            carouselRoot.visible = false;
+            reticle.visible = false;
+            gestureLayer.style.display = 'none';
+            document.getElementById('xr-place-hint').style.display      = '';
+            document.getElementById('xr-place-again').style.display     = 'none';
+            document.getElementById('xr-nav-row').style.display          = 'none';
+            document.getElementById('xr-move-hint').style.display        = 'none';
+            document.getElementById('xr-carousel-toggle').style.display  = 'none';
+            document.getElementById('xr-label-toggle').style.display     = 'none';
+            if (labelMesh) labelMesh.visible = false;
         }
 
         // ── One-time init — deferred until first AR tap ───────────────
@@ -1322,6 +1319,7 @@
             });
 
             document.getElementById('xr-exit').addEventListener('click', () => xrSession?.end());
+            document.getElementById('xr-place-again').addEventListener('click', _resetPlacement);
             document.getElementById('xr-prev').addEventListener('click', goPrev);
             document.getElementById('xr-next').addEventListener('click', goNext);
             document.getElementById('xr-label-toggle').addEventListener('click', () => {
@@ -1405,6 +1403,7 @@
                 placeHint: 'Point at a flat surface, then tap to place',
                 moveHint:  'Drag to move · Twist two fingers to rotate',
                 exitAR:    'Exit Model view',
+                placeAgain:'Place Again',
                 langBtn:   'ქარ',
                 themeDay:  'Day',
                 themeNight:'Night',
@@ -1428,6 +1427,7 @@
                 placeHint: 'მიუშვირე ბრტყელ ზედაპირს, როდესაც გამოჩნდება ნიშნული შეეხე',
                 moveHint:  'გადასაადგილებლად გაასრიალე · შეატრიალე ორი თითით',
                 exitAR:    'მოდელის დახურვა',
+                placeAgain:'ხელახლა დადება',
                 langBtn:   'EN',
                 themeDay:  'ნათელი თემა',
                 themeNight:'მუქი თემა',
@@ -1465,7 +1465,8 @@
             document.getElementById('modal-tip').textContent     = u.tip;
             document.getElementById('xr-place-hint').textContent = u.placeHint;
             document.getElementById('xr-move-hint').textContent  = u.moveHint;
-            document.getElementById('xr-exit').textContent       = u.exitAR;
+            document.getElementById('xr-exit').textContent        = u.exitAR;
+            document.getElementById('xr-place-again').textContent = u.placeAgain;
             const btnText = window.__arCap === 'none' ? u.view3D : u.viewAR;
             document.querySelectorAll('.ar-btn:not(:disabled)').forEach(b => { b.textContent = btnText; });
             document.querySelectorAll('[data-field][data-idx]').forEach(el => {
@@ -1928,6 +1929,7 @@
 
         // ── Basket ─────────────────────────────────────────────────────
         const _basket = new Map(); // key = String(globalIdx) -> { item, qty }
+        window._basket = _basket;
 
         function _parsePrice(str) {
             return parseFloat(String(str).replace(/[^\d.]/g, '')) || 0;
@@ -2042,7 +2044,7 @@
             const item = window.XR?.getCurrentItem();
             if (!item || !window.__menuItems) return;
             const idx = window.__menuItems.indexOf(item);
-            if (idx >= 0) addToBasket(String(idx), item);
+            if (idx >= 0) { addToBasket(String(idx), item); document.getElementById('xr-add-btn').classList.add('in-basket'); }
         });
 
         document.getElementById('basket-bar').addEventListener('click', _openBasket);
