@@ -173,8 +173,10 @@
             letter-spacing: 0.8px;
             cursor: pointer;
             white-space: nowrap;
-            flex-shrink: 0;
             text-transform: uppercase;
+            display: block;
+            width: 100%;
+            margin-top: 8px;
             transition: background var(--t), opacity 0.15s;
         }
         .ar-btn:active { opacity: 0.7; transition: opacity 0.08s; }
@@ -1825,8 +1827,8 @@
                                         <button class="qty-inc">+</button>
                                     </div>
                                 </div>
-                                <button class="ar-btn">${initialLabel}</button>
                             </div>
+                            <button class="ar-btn">${initialLabel}</button>
                         </div>`;
 
                     const mv = card.querySelector('model-viewer');
