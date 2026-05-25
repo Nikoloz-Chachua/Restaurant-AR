@@ -979,8 +979,8 @@
             ctx.beginPath(); ctx.moveTo(28, 66); ctx.lineTo(W - 28, 66); ctx.stroke();
 
             ctx.fillStyle = '#c0c0c0';
-            ctx.font = '11px Arial, sans-serif';
-            _wrapText(ctx, desc, 28, 88, W - 56, 14, 5);
+            ctx.font = '22px Arial, sans-serif';
+            _wrapText(ctx, desc, 28, 88, W - 56, 28, 3);
 
             ctx.fillStyle = '#f0c040';
             ctx.font = 'bold 36px Arial, sans-serif';
@@ -998,7 +998,7 @@
             const mat = new THREE.MeshBasicMaterial({
                 map: labelTexture, transparent: true, depthWrite: false, side: THREE.DoubleSide
             });
-            const planeW = 0.30, planeH = planeW * H / W;
+            const planeW = 0.15, planeH = planeW * H / W;
             labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), mat);
             labelMesh.position.set(0, 0.28, 0.06);
             labelMesh.visible = false;
