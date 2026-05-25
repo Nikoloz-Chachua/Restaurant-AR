@@ -873,7 +873,7 @@
         let carouselRoot, slotGroups = [];
         let gestureLayer, xrOverlay;
         let hitTestSource = null, xrSession = null, xrStarting = false;
-        let placed = false, isAnimating = false;
+        let placed = false, isAnimating = false, _ignoreNextSelect = false;
         let _xrSingleItem = (localStorage.getItem('bl-xr-view') || 'single') === 'single';
 
         let MENU = [], N = 0;
@@ -1155,6 +1155,7 @@
 
         // ── Placement ─────────────────────────────────────────────────
         function onSelect() {
+            if (_ignoreNextSelect) { _ignoreNextSelect = false; return; }
             if (placed || !reticle.visible) return;
             carouselRoot.position.setFromMatrixPosition(reticle.matrix);
             carouselRoot.quaternion.setFromRotationMatrix(reticle.matrix);
@@ -1172,6 +1173,7 @@
         }
 
         function _resetPlacement() {
+            _ignoreNextSelect = true;
             placed = false;
             carouselRoot.visible = false;
             reticle.visible = false;
