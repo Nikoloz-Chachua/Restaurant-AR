@@ -45,6 +45,23 @@ On iOS, both model files (`food.glb`, `Druidi.glb`) are pre-loaded into hidden l
 
 Both files are in the project root. AR sessions show no name/price labels — clean, immersive model-only view.
 
+## Deployment rule — MUST follow every time
+
+**Whenever any of these files change, bump `CACHE_NAME` in `sw.js` in the same commit:**
+
+| File changed | Why |
+|---|---|
+| `index.html` | App code/UI updated |
+| `foods/menu.json` | Menu items/prices changed |
+| `food.glb` / `Druidi.glb` | 3D models replaced |
+| Any new file served to the browser | Needs to enter the cache |
+
+How to bump: open `sw.js`, change `'bl-v1'` → `'bl-v2'` (then v3, v4, …).
+
+If you forget, users who visited before will keep seeing the old cached version until they hard-refresh. The service worker will NOT deliver your update automatically.
+
+Claude Code: this is your responsibility when committing on behalf of the user. Check whether any of the above files are in the diff before committing. If they are, bump the cache version in the same commit.
+
 ## Key design decisions
 
 - Three.js is loaded **lazily** on first AR tap (not on page load) to avoid blocking the menu.
