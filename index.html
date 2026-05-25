@@ -1324,14 +1324,18 @@
                         const _rPos = new THREE.Vector3();
                         carouselRoot.getWorldPosition(_rPos);
                         const _ang = Math.atan2(_camPos.x - _rPos.x, _camPos.z - _rPos.z);
-                        const _r = 0.22, _h = 0.08;
+                        const _r = 0.22, _h = 0.004;
                         const _wx = _rPos.x + Math.sin(_ang) * _r;
                         const _wy = _rPos.y + _h;
                         const _wz = _rPos.z + Math.cos(_ang) * _r;
                         const _lp = new THREE.Vector3(_wx, _wy, _wz);
                         carouselRoot.worldToLocal(_lp);
                         labelMesh.position.copy(_lp);
-                        labelMesh.lookAt(new THREE.Vector3(_camPos.x, _wy, _camPos.z));
+                        // flat on table, text top pointing toward user
+                        const _wq = new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, _ang, 0));
+                        const _pq = new THREE.Quaternion();
+                        carouselRoot.getWorldQuaternion(_pq);
+                        labelMesh.quaternion.copy(_pq.invert().multiply(_wq));
                     }
                 }
                 renderer.render(scene, camera);
