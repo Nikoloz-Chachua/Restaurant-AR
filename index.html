@@ -472,15 +472,14 @@
             color: var(--accent);
             border: 1.5px solid var(--accent);
             border-radius: 9px;
-            padding: 7px 12px;
-            font-size: 0.63rem;
-            font-weight: 800;
-            font-family: 'Nunito', sans-serif;
-            letter-spacing: 0.8px;
+            width: 34px;
+            height: 34px;
+            padding: 0;
             cursor: pointer;
-            white-space: nowrap;
-            text-transform: uppercase;
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
             transition: background var(--t), color var(--t), border-color var(--t), opacity 0.15s;
             touch-action: manipulation;
         }
@@ -1819,7 +1818,7 @@
                             <div class="price-row">
                                 <p class="price">${item.price}</p>
                                 <div class="qty-ctrl" data-idx="${globalIdx}">
-                                    <button class="qty-add-btn">${UI[window.__lang].addBtn}</button>
+                                    <button class="qty-add-btn" aria-label="Add to basket"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
                                     <div class="qty-stepper">
                                         <button class="qty-dec">&#8722;</button>
                                         <span class="qty-num">1</span>
@@ -1960,7 +1959,6 @@
                 } else {
                     addBtn.style.display = '';
                     stepper.classList.remove('visible');
-                    addBtn.textContent = UI[window.__lang].addBtn;
                 }
             });
         }
