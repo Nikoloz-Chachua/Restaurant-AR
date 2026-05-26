@@ -175,6 +175,10 @@
                 <div class="chart-title" data-i18n="ch_timeline">Sessions &amp; Basket Adds per Day</div>
                 <canvas id="ch-timeline"></canvas>
             </div>
+            <div class="chart-box wide">
+                <div class="chart-title" data-i18n="ch_hourly">Visits by Hour of Day (00–23)</div>
+                <canvas id="ch-hourly"></canvas>
+            </div>
         </div>
 
         <!-- Funnel & Attribution -->
@@ -387,7 +391,7 @@ const T = {
         ch_attr:'Basket Add Attribution', ch_top_views:'Top Items — 3D Views',
         ch_top_basket:'Top Items — Basket Adds', ch_top_ar:'Top Items — AR Success',
         ch_top_duration:'Longest 3D View Time (avg sec)', ch_cats:'Category Interest (filter taps)',
-        ch_hours:'Peak Hours', ch_dow:'Day of Week', ch_devices:'Device AR Capability',
+        ch_hourly:'Visits by Hour of Day (00–23)', ch_hours:'Peak Hours', ch_dow:'Day of Week', ch_devices:'Device AR Capability',
         ch_lang:'Language', ch_ar_source:'AR Source (card vs modal)', ch_theme:'Theme Preference',
         ch_lang_switch:'Language Switches', ch_theme_switch:'Theme Switches',
         ch_platform:'Platform (iOS / Android / Desktop)', ch_ar_capable:'AR Capable vs No AR',
@@ -444,7 +448,7 @@ const T = {
         ch_attr:'შეკვეთის ატრიბუცია', ch_top_views:'ტოპ კერძები — 3D',
         ch_top_basket:'ტოპ კერძები — კალათი', ch_top_ar:'ტოპ კერძები — AR',
         ch_top_duration:'ყველაზე გრძელი 3D ნახვა', ch_cats:'კატეგორიის ინტერესი',
-        ch_hours:'პიკური საათები', ch_dow:'კვირის დღე', ch_devices:'AR შესაძლებლობა',
+        ch_hourly:'ვიზიტები საათების მიხედვით (00–23)', ch_hours:'პიკური საათები', ch_dow:'კვირის დღე', ch_devices:'AR შესაძლებლობა',
         ch_lang:'ენა', ch_ar_source:'AR წყარო', ch_theme:'თემის პრეფ.',
         ch_lang_switch:'ენის გადართვა', ch_theme_switch:'თემის გადართვა',
         ch_platform:'პლატფორმა (iOS / Android / სხვა)', ch_ar_capable:'AR შეუძლია vs არა',
@@ -864,6 +868,22 @@ function renderAll(events) {
             { label:t('lbl_filter_taps'), data:allCats.map(c=>cats[c]||0),       backgroundColor:BLUE, borderRadius:3 },
             { label:t('lbl_views'),       data:allCats.map(c=>viewsByCat[c]||0), backgroundColor:DIM,  borderRadius:3 },
         ]);
+    }
+
+    // ── Hourly traffic distribution (wide, 3 series)
+    {
+        const hSess  = Array(24).fill(0);
+        const hAR    = Array(24).fill(0);
+        const hBask  = Array(24).fill(0);
+        sessions.forEach(e => { hSess[new Date(e.created_at).getHours()]++; });
+        arTaps.forEach(e  => { hAR  [new Date(e.created_at).getHours()]++; });
+        (by.basket_add||[]).forEach(e => { hBask[new Date(e.created_at).getHours()]++; });
+        const labels = Array.from({length:24}, (_,i) => i.toString().padStart(2,'0'));
+        mkChart('ch-hourly','bar', labels, [
+            { label:t('lbl_sessions'), data:hSess, backgroundColor:GOLD,  borderRadius:3 },
+            { label:'AR Taps',         data:hAR,   backgroundColor:BLUE,  borderRadius:3 },
+            { label:t('lbl_basket'),   data:hBask, backgroundColor:GREEN, borderRadius:3 },
+        ], { opts:{ plugins:{ legend:{ display:true } }, scales:{ x:{ ticks:{ font:{ size:10 } } } } } });
     }
 
     // ── Peak hours
