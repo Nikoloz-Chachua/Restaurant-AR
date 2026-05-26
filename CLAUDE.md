@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Burger Lions** — a WebAR restaurant menu app. Customers browse a 32-item menu with live 3D thumbnails, then place dishes in Augmented Reality before ordering. No build step; all AR libraries load from CDN.
+**Burger Lions** — a WebAR restaurant menu app. Customers browse a 14-item menu with live 3D thumbnails, then place dishes in Augmented Reality before ordering. No build step; all AR libraries load from CDN.
 
 ## Development Commands
 
@@ -19,7 +19,7 @@ npm run dev      # Serve static files at http://localhost:3000
 
 ### Pages
 
-**`index.html`** — the full menu app. Loads `foods/menu.json`, renders 32 items across 4 categories (Burgers, Sides, Drinks, Desserts) with lazy 3D thumbnails and a full 3D modal. AR button routing:
+**`index.html`** — the full menu app. Loads `foods/menu.json`, renders 14 items across 5 categories (Burgers, Sides, Drinks, Desserts, Coffee) with lazy 3D thumbnails and a full 3D modal. AR button routing:
 
 | Device | AR capability | Result |
 |---|---|---|
@@ -36,7 +36,7 @@ On iOS, both model files (`food.glb`, `Druidi.glb`) are pre-loaded into hidden l
 
 ### Data
 
-**`foods/menu.json`** — array of 32 items. Each item has: `name`, `name_ka`, `category`, `category_ka`, `description`, `description_ka`, `price`, `model` (filename of the GLB to load).
+**`foods/menu.json`** — array of 14 items across 5 categories. Each item has: `name`, `name_ka`, `category`, `category_ka`, `description`, `description_ka`, `price`, `model` (filename of the GLB to load).
 
 ### 3D assets
 
@@ -67,5 +67,5 @@ Claude Code: this is your responsibility when committing on behalf of the user. 
 - Three.js is loaded **lazily** on first AR tap (not on page load) to avoid blocking the menu.
 - Thumbnails are loaded **staggered** (150 ms apart) via IntersectionObserver to prevent competing WebGL context inits.
 - The WebXR carousel in index.html is **category-scoped** — only items in the same category as the tapped item appear in the carousel.
-- `advanced-ar.html` navigates through **all 32 items** (simple prev/next), not category-scoped. It is not used by `index.html`'s AR routing — access it directly via URL if needed.
+- `advanced-ar.html` navigates through **all 14 items** (simple prev/next), not category-scoped. It is not used by `index.html`'s AR routing — access it directly via URL if needed.
 - AR labels (name, price) are intentionally absent from all AR flows — AR is for immersive 3D viewing only.
