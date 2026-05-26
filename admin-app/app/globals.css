@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+:root {
+  --gold: #f2b535;
+  --gold-dim: rgba(242,181,53,0.15);
+  --text: #ede6d4;
+  --dim: #8a7a62;
+  --bg: #0f0b07;
+  --card: #1d1610;
+  --card2: #261d13;
+  --border: rgba(242,181,53,0.18);
+  --danger: #e05252;
+  --success: #4caf7d;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+input, textarea, select {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--gold);
+}
+input[type="color"] {
+  padding: 2px 4px;
+  height: 36px;
+  cursor: pointer;
+}
+button { cursor: pointer; }
