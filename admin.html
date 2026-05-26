@@ -575,6 +575,8 @@ function isWithinHours(isoDate) {
     const end   = _getHoursVal('hours-end');
     const d     = new Date(isoDate);
     const hhmm  = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+    // Cross-midnight range (e.g. 10:00 → 01:00): match if >= start OR <= end
+    if (end < start) return hhmm >= start || hhmm <= end;
     return hhmm >= start && hhmm <= end;
 }
 function applyHoursFilter(events) {
