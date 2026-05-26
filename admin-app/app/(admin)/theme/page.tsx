@@ -175,9 +175,9 @@ export default function ThemePage() {
       <div className="mt-8 p-4 rounded-xl text-sm"
            style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
         <span style={{ color: 'var(--dim)' }}>After saving, reload the menu to see changes: </span>
-        <a href="https://golden-dodol-0efadd.netlify.app" target="_blank" rel="noreferrer"
+        <a href="https://temotkesh.github.io/Restaurant-AR" target="_blank" rel="noreferrer"
            style={{ color: 'var(--gold)' }}>
-          golden-dodol-0efadd.netlify.app ↗
+          temotkesh.github.io/Restaurant-AR ↗
         </a>
       </div>
     </div>

@@ -31,7 +31,7 @@ export default function DashboardPage() {
       <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
         <iframe
           ref={iframeRef}
-          src="https://golden-dodol-0efadd.netlify.app/admin.html"
+          src="https://temotkesh.github.io/Restaurant-AR/admin.html"
           className="w-full"
           style={{ height: 'calc(100vh - 140px)', border: 'none' }}
           title="Analytics Dashboard"
