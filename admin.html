@@ -114,8 +114,6 @@
             <option value="0"  data-i18n="allTime">All time</option>
         </select>
         <button class="hbtn" id="hours-btn" title="Set working hours">🕐 Hours</button>
-        <button class="hbtn" id="lang-btn" title="Switch language">KA</button>
-        <button class="hbtn" id="theme-btn" title="Switch theme">☀</button>
         <button class="hbtn" id="refresh-btn" data-i18n="refresh">↻ Refresh</button>
     </header>
     <div id="hours-panel" style="display:none; background:var(--card2); border-bottom:1px solid var(--border); padding:12px 28px; display:none; align-items:center; gap:16px; flex-wrap:wrap;">
@@ -495,7 +493,6 @@ let _charts = {};
 function applyTheme(light) {
     _isLight = light;
     document.documentElement.classList.toggle('light', light);
-    document.getElementById('theme-btn').textContent = light ? '🌙' : '☀';
     const dim = light ? '#8a7060' : '#7a6a50';
     const border = light ? 'rgba(155,98,8,0.1)' : 'rgba(242,181,53,0.06)';
     Chart.defaults.color = dim;
@@ -505,7 +502,6 @@ function applyTheme(light) {
 
 function applyLang(lang) {
     _lang = lang;
-    document.getElementById('lang-btn').textContent = lang === 'en' ? 'KA' : 'EN';
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const v = T[lang][el.dataset.i18n];
@@ -519,10 +515,15 @@ function applyLang(lang) {
     if (_lastEvents) renderAll(_lastEvents);
 }
 
-document.getElementById('theme-btn').addEventListener('click', () => applyTheme(!_isLight));
-document.getElementById('lang-btn').addEventListener('click', () => applyLang(_lang === 'en' ? 'ka' : 'en'));
 document.getElementById('refresh-btn').addEventListener('click', loadData);
 document.getElementById('range-sel').addEventListener('change', loadData);
+
+// Relay lang/theme changes from the parent admin panel
+window.addEventListener('message', e => {
+    if (!e.data || e.data.type !== 'bl-pref') return;
+    if (typeof e.data.dark === 'boolean') applyTheme(!e.data.dark);
+    if (typeof e.data.lang === 'string')  applyLang(e.data.lang);
+});
 
 // ── Working hours
 const hoursPanel = document.getElementById('hours-panel');

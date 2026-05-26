@@ -11,9 +11,8 @@ type MenuItem = {
 }
 const EMPTY_ITEM: Omit<MenuItem, 'id'> = {
   name_en: '', name_ka: '', description_en: '', description_ka: '',
-  price: '', category_id: null, model: 'food.glb', sort_order: 0, visible: true, ar_scale: 1.0,
+  price: '', category_id: null, model: '', sort_order: 0, visible: true, ar_scale: 1.0,
 }
-const MODELS = ['food.glb', 'Druidi.glb']
 
 export default function MenuPage() {
   const supabase = createClient()
@@ -317,22 +316,7 @@ export default function MenuPage() {
             </Field>
             <Field label="3D Model" className="col-span-2">
               <div className="space-y-2">
-                {/* Built-in quick-select */}
                 <div className="flex gap-2">
-                  {MODELS.map(m => (
-                    <button key={m} type="button"
-                            onClick={() => { setItemForm(f => ({ ...f, model: m })); setUploadProgress('') }}
-                            className="px-3 py-1.5 rounded text-xs font-medium transition-all"
-                            style={{
-                              background: itemForm.model === m ? 'var(--gold)' : 'var(--card2)',
-                              color: itemForm.model === m ? '#0f0b07' : 'var(--dim)',
-                              border: '1px solid var(--border)',
-                            }}>
-                      {m}
-                    </button>
-                  ))}
-                  <span className="text-xs self-center px-2" style={{ color: 'var(--dim)' }}>or</span>
-                  {/* Upload button */}
                   <button type="button" disabled={uploading}
                           onClick={() => fileInputRef.current?.click()}
                           className="px-3 py-1.5 rounded text-xs font-medium"
@@ -343,14 +327,13 @@ export default function MenuPage() {
                   <input ref={fileInputRef} type="file" accept=".glb" style={{ display: 'none' }}
                          onChange={e => { const f = e.target.files?.[0]; if (f) uploadGLB(f); e.target.value = '' }} />
                 </div>
-                {/* Current value display */}
                 <div className="text-xs px-2 py-1.5 rounded truncate"
                      style={{ background: 'var(--card2)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
                   {uploadProgress
                     ? <span style={{ color: uploadProgress.startsWith('✓') ? 'var(--success)' : 'var(--danger)' }}>{uploadProgress}</span>
-                    : itemForm.model.startsWith('http')
-                      ? <span>Custom: <span style={{ color: 'var(--text)' }}>{itemForm.model.split('/').pop()}</span></span>
-                      : <span>Built-in: <span style={{ color: 'var(--text)' }}>{itemForm.model}</span></span>
+                    : itemForm.model
+                      ? <span>Current: <span style={{ color: 'var(--text)' }}>{itemForm.model.startsWith('http') ? itemForm.model.split('/').pop() : itemForm.model}</span></span>
+                      : <span style={{ color: 'var(--dim)' }}>No model uploaded</span>
                   }
                 </div>
               </div>

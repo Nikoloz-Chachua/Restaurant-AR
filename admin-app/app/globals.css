@@ -13,6 +13,19 @@
   --success: #4caf7d;
 }
 
+html.light {
+  --text: #1c1308;
+  --dim: #8a7060;
+  --bg: #f5f0e8;
+  --card: #ffffff;
+  --card2: #ede7d8;
+  --border: rgba(155,98,8,0.18);
+  --gold: #c07808;
+  --gold-dim: rgba(192,120,8,0.12);
+  --danger: #cc3333;
+  --success: #2d7a50;
+}
+
 body {
   background: var(--bg);
   color: var(--text);
