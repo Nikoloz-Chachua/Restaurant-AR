@@ -7,11 +7,11 @@ type MenuItem = {
   id: number; name_en: string; name_ka: string
   description_en: string; description_ka: string
   price: string; category_id: number | null; model: string
-  sort_order: number; visible: boolean
+  sort_order: number; visible: boolean; ar_scale: number
 }
 const EMPTY_ITEM: Omit<MenuItem, 'id'> = {
   name_en: '', name_ka: '', description_en: '', description_ka: '',
-  price: '', category_id: null, model: 'food.glb', sort_order: 0, visible: true,
+  price: '', category_id: null, model: 'food.glb', sort_order: 0, visible: true, ar_scale: 1.0,
 }
 const MODELS = ['food.glb', 'Druidi.glb']
 
@@ -66,7 +66,7 @@ export default function MenuPage() {
     setItemForm({ name_en: item.name_en, name_ka: item.name_ka,
       description_en: item.description_en, description_ka: item.description_ka,
       price: item.price, category_id: item.category_id, model: item.model,
-      sort_order: item.sort_order, visible: item.visible })
+      sort_order: item.sort_order, visible: item.visible, ar_scale: item.ar_scale ?? 1.0 })
     setItemModal(true)
   }
   async function saveItem() {
@@ -358,6 +358,14 @@ export default function MenuPage() {
             <Field label="Sort Order">
               <input type="number" value={itemForm.sort_order}
                      onChange={e => setItemForm(f => ({ ...f, sort_order: Number(e.target.value) }))} />
+            </Field>
+            <Field label="AR Scale">
+              <input type="number" min="0.01" max="10" step="0.05"
+                     value={itemForm.ar_scale}
+                     onChange={e => setItemForm(f => ({ ...f, ar_scale: Number(e.target.value) }))} />
+              <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
+                1.0 = default (25cm). If model looks 2× too big → set 0.5. Too small → set 2.0.
+              </p>
             </Field>
             <Field label="Visibility" className="col-span-2">
               <label className="flex items-center gap-2 cursor-pointer">

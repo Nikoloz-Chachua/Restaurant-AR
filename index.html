@@ -963,11 +963,11 @@
         let labelMode = localStorage.getItem('bl-xr-label') || 'float';
 
         const CFG = {
-            farLeft:  { x: -0.35, z: -0.12, s: 0.20, opacity: 0    },
-            left:     { x: -0.14, z: -0.08, s: 0.20, opacity: 0.65 },
-            center:   { x:  0,    z:  0,    s: 0.25, opacity: 1.0  },
-            right:    { x:  0.14, z: -0.08, s: 0.20, opacity: 0.65 },
-            farRight: { x:  0.35, z: -0.12, s: 0.20, opacity: 0    },
+            farLeft:  { x: -0.35, z: -0.12, s: 0.85, opacity: 0    },
+            left:     { x: -0.14, z: -0.08, s: 0.85, opacity: 0.65 },
+            center:   { x:  0,    z:  0,    s: 1.0,  opacity: 1.0  },
+            right:    { x:  0.14, z: -0.08, s: 0.85, opacity: 0.65 },
+            farRight: { x:  0.35, z: -0.12, s: 0.85, opacity: 0    },
         };
         // Returns target opacity for a role based on current view mode
         const _roleOp = role => _xrSingleItem ? (role === 'center' ? 1.0 : 0) : CFG[role].opacity;
@@ -1117,11 +1117,11 @@
             if (old) slotGroups[slotIdx].remove(old);
             const obj = cloneModel(menuIdx);
             if (obj) {
-                // Normalize: longest bounding-box axis = 1 unit so slot group scale = real-world metres
-                const box = new THREE.Box3().setFromObject(obj);
-                const size = box.getSize(new THREE.Vector3());
-                const longest = Math.max(size.x, size.y, size.z);
-                if (longest > 0 && isFinite(longest)) obj.scale.setScalar(1 / longest);
+                // Trust the GLB's own scale (1 unit = 1 metre).
+                // ar_scale is an optional per-item override (default 1.0 = no change).
+                const arScale = MENU[menuIdx].ar_scale || 1.0;
+                if (arScale !== 1.0) obj.scale.setScalar(arScale);
+                // Seat the model: bottom of bounding box sits at y=0
                 const seated = new THREE.Box3().setFromObject(obj);
                 if (isFinite(seated.min.y)) obj.position.y = -seated.min.y;
                 slotGroups[slotIdx].add(obj);
@@ -2129,6 +2129,7 @@
                             description_ka: r.description_ka,
                             price:          r.price,
                             model:          r.model,
+                            ar_scale:       r.ar_scale ?? 1.0,
                         }));
                     }
                 } catch (_) {}
