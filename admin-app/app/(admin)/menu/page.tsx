@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 type Category = { id: number; name_en: string; name_ka: string; sort_order: number }
@@ -36,6 +36,9 @@ export default function MenuPage() {
   const [deleteCatId, setDeleteCatId]   = useState<number | null>(null)
 
   const [msg, setMsg] = useState('')
+  const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -73,7 +76,7 @@ export default function MenuPage() {
     } else {
       await supabase.from('menu_items').insert(itemForm)
     }
-    setSaving(false); setItemModal(false); await load()
+    setSaving(false); setItemModal(false); setUploadProgress(''); await load()
     flash(editItem ? 'Item updated.' : 'Item added.')
   }
   async function confirmDelete() {
@@ -111,6 +114,29 @@ export default function MenuPage() {
 
   const catName = (id: number | null) =>
     categories.find(c => c.id === id)?.name_en ?? '—'
+
+  async function uploadGLB(file: File) {
+    if (!file.name.toLowerCase().endsWith('.glb')) {
+      setUploadProgress('Only .glb files are supported')
+      return
+    }
+    setUploading(true)
+    setUploadProgress('Uploading…')
+    const filename = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
+    const { error } = await supabase.storage.from('models').upload(filename, file, {
+      contentType: 'model/gltf-binary',
+      upsert: false,
+    })
+    if (error) {
+      setUploadProgress(`Upload failed: ${error.message}`)
+      setUploading(false)
+      return
+    }
+    const { data: { publicUrl } } = supabase.storage.from('models').getPublicUrl(filename)
+    setItemForm(f => ({ ...f, model: publicUrl }))
+    setUploadProgress(`✓ ${file.name}`)
+    setUploading(false)
+  }
 
   return (
     <div>
@@ -289,11 +315,45 @@ export default function MenuPage() {
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name_en}</option>)}
               </select>
             </Field>
-            <Field label="3D Model">
-              <select value={itemForm.model}
-                      onChange={e => setItemForm(f => ({ ...f, model: e.target.value }))}>
-                {MODELS.map(m => <option key={m} value={m}>{m}</option>)}
-              </select>
+            <Field label="3D Model" className="col-span-2">
+              <div className="space-y-2">
+                {/* Built-in quick-select */}
+                <div className="flex gap-2">
+                  {MODELS.map(m => (
+                    <button key={m} type="button"
+                            onClick={() => { setItemForm(f => ({ ...f, model: m })); setUploadProgress('') }}
+                            className="px-3 py-1.5 rounded text-xs font-medium transition-all"
+                            style={{
+                              background: itemForm.model === m ? 'var(--gold)' : 'var(--card2)',
+                              color: itemForm.model === m ? '#0f0b07' : 'var(--dim)',
+                              border: '1px solid var(--border)',
+                            }}>
+                      {m}
+                    </button>
+                  ))}
+                  <span className="text-xs self-center px-2" style={{ color: 'var(--dim)' }}>or</span>
+                  {/* Upload button */}
+                  <button type="button" disabled={uploading}
+                          onClick={() => fileInputRef.current?.click()}
+                          className="px-3 py-1.5 rounded text-xs font-medium"
+                          style={{ background: 'var(--card2)', color: 'var(--gold)',
+                                   border: '1px solid var(--border)', opacity: uploading ? 0.5 : 1 }}>
+                    {uploading ? 'Uploading…' : '↑ Upload .glb'}
+                  </button>
+                  <input ref={fileInputRef} type="file" accept=".glb" style={{ display: 'none' }}
+                         onChange={e => { const f = e.target.files?.[0]; if (f) uploadGLB(f); e.target.value = '' }} />
+                </div>
+                {/* Current value display */}
+                <div className="text-xs px-2 py-1.5 rounded truncate"
+                     style={{ background: 'var(--card2)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
+                  {uploadProgress
+                    ? <span style={{ color: uploadProgress.startsWith('✓') ? 'var(--success)' : 'var(--danger)' }}>{uploadProgress}</span>
+                    : itemForm.model.startsWith('http')
+                      ? <span>Custom: <span style={{ color: 'var(--text)' }}>{itemForm.model.split('/').pop()}</span></span>
+                      : <span>Built-in: <span style={{ color: 'var(--text)' }}>{itemForm.model}</span></span>
+                  }
+                </div>
+              </div>
             </Field>
             <Field label="Sort Order">
               <input type="number" value={itemForm.sort_order}
