@@ -190,6 +190,19 @@
             </div>
         </div>
 
+        <!-- Time Spent -->
+        <div class="section-label" data-i18n="sec_time">Time Spent per Item</div>
+        <div class="charts-grid">
+            <div class="chart-box">
+                <div class="chart-title" data-i18n="ch_ar_dur_item">Avg AR Session Duration per Item (sec)</div>
+                <canvas id="ch-ar-dur-item"></canvas>
+            </div>
+            <div class="chart-box">
+                <div class="chart-title" data-i18n="ch_3d_dur_item">Avg 3D View Duration per Item (sec)</div>
+                <canvas id="ch-3d-dur-item"></canvas>
+            </div>
+        </div>
+
         <!-- User Behaviour -->
         <div class="section-label" data-i18n="sec_behaviour">User Behaviour</div>
         <div class="charts-3">
@@ -359,6 +372,9 @@ const T = {
         ch_platform:'Platform (iOS / Android / Desktop)', ch_ar_capable:'AR Capable vs No AR',
         ch_ar_by_platform:'AR Funnel by Platform',
         ch_first_3d:'First Dish Opened in 3D (per session)', ch_first_ar:'First Dish Tapped for AR (per session)',
+        sec_time:'Time Spent per Item',
+        ch_ar_dur_item:'Avg AR Session Duration per Item (sec)',
+        ch_3d_dur_item:'Avg 3D View Duration per Item (sec)',
         ins_most_viewed:'Most Viewed Dish', ins_most_ordered:'Most Ordered Dish', ins_most_ar:"Most AR'd Dish",
         ins_ar_abandon:'AR Abandonment Rate', ins_ar_abandon_note:"taps that didn't launch",
         ins_basket_opens:'Basket Opens', ins_ar_fallback:'AR Fallbacks', ins_ar_fallback_note:'AR failed → 3D shown',
@@ -410,6 +426,9 @@ const T = {
         ch_platform:'პლატფორმა (iOS / Android / სხვა)', ch_ar_capable:'AR შეუძლია vs არა',
         ch_ar_by_platform:'AR ძაბრი პლატფ. მიხ.',
         ch_first_3d:'პირველი 3D კერძი სესიაზე', ch_first_ar:'პირველი AR კერძი სესიაზე',
+        sec_time:'კერძზე გატარებული დრო',
+        ch_ar_dur_item:'საშ. AR სესიის ხანგძლივობა კერძის მიხ. (წმ)',
+        ch_3d_dur_item:'საშ. 3D ნახვის ხანგძლივობა კერძის მიხ. (წმ)',
         ins_most_viewed:'ყველ. ნანახი კერძი', ins_most_ordered:'ყველ. შეკვეთილი', ins_most_ar:'ყველ. AR-ში ნანახი',
         ins_ar_abandon:'AR მიტოვება %', ins_ar_abandon_note:'ვერ გაიხსნა',
         ins_basket_opens:'კალათის გახსნა', ins_ar_fallback:'AR წარუმ.', ins_ar_fallback_note:'AR ვერ გაიხსნა',
@@ -710,6 +729,37 @@ function renderAll(events) {
         const top = sortDesc(rows, e=>e[1]).slice(0,10);
         mkChart('ch-top-duration','bar', top.map(e=>e[0]),
             [{ label:'avg s', data:top.map(e=>(e[1]/1000).toFixed(1)), backgroundColor:PURPLE, borderRadius:4 }],
+            { opts:{ indexAxis:'y', plugins:{ legend:{ display:false } } } });
+    }
+
+    // ── AR duration per item (join ar_duration → ar_success by session_id)
+    {
+        const sessionDur = {};
+        arDurs.forEach(e => {
+            if (e.session_id && e.extra?.duration_ms) sessionDur[e.session_id] = Number(e.extra.duration_ms);
+        });
+        const itemDurs = {};
+        arSuccess.forEach(e => {
+            if (e.item_name && sessionDur[e.session_id]) {
+                (itemDurs[e.item_name] = itemDurs[e.item_name] || []).push(sessionDur[e.session_id]);
+            }
+        });
+        const rows = Object.entries(itemDurs).map(([name, durs]) => [name, avg(durs)]).filter(([,v])=>v!=null);
+        const top  = sortDesc(rows, e=>e[1]).slice(0,10);
+        mkChart('ch-ar-dur-item','bar', top.map(e=>e[0]),
+            [{ data:top.map(e=>(e[1]/1000).toFixed(1)), backgroundColor:BLUE, borderRadius:4 }],
+            { opts:{ indexAxis:'y', plugins:{ legend:{ display:false } } } });
+    }
+
+    // ── 3D view duration per item
+    {
+        const byItem = groupBy(modalCloses.filter(e=>e.item_name && e.extra?.duration_ms), e=>e.item_name);
+        const rows = Object.entries(byItem)
+            .map(([name, evs]) => [name, avg(evs.map(e=>Number(e.extra.duration_ms)))])
+            .filter(([,v])=>v!=null);
+        const top = sortDesc(rows, e=>e[1]).slice(0,10);
+        mkChart('ch-3d-dur-item','bar', top.map(e=>e[0]),
+            [{ data:top.map(e=>(e[1]/1000).toFixed(1)), backgroundColor:PURPLE, borderRadius:4 }],
             { opts:{ indexAxis:'y', plugins:{ legend:{ display:false } } } });
     }
 
