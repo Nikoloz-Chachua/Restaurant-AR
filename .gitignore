@@ -7,3 +7,4 @@ coverage/
 .env*
 .claude/
 Userstemotmap3d/
+.mcp.json
