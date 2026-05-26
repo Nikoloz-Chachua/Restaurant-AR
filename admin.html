@@ -20,74 +20,74 @@
             --blue:   #4a9fd4;
             --purple: #a47fd4;
         }
+        :root.light {
+            --bg:     #f5f0e8;
+            --card:   #ffffff;
+            --card2:  #ede7d8;
+            --border: rgba(155,98,8,0.18);
+            --text:   #1c1308;
+            --dim:    #8a7060;
+            --gold:   #c07808;
+            --green:  #2d7a50;
+            --red:    #cc3333;
+            --blue:   #2a7ab4;
+            --purple: #7a4fb4;
+        }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; min-height: 100vh; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; min-height: 100vh; transition: background 0.25s, color 0.25s; }
 
-        /* ── Auth ─────────────────────────────────────────── */
-
-        /* ── Dashboard ────────────────────────────────────── */
         #dash { display: none; }
 
-        header { background: var(--card); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
+        header { background: var(--card); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; transition: background 0.25s, border-color 0.25s; }
         .header-title { font-size: 1.2rem; letter-spacing: 5px; color: var(--gold); font-family: 'Georgia', serif; font-weight: 900; flex: 1; min-width: 140px; }
         #last-updated { color: var(--dim); font-size: 0.7rem; }
-        header select, .hbtn { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 7px 14px; font-size: 0.78rem; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+        header select, .hbtn { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 7px 14px; font-size: 0.78rem; cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.25s; }
         .hbtn:hover { border-color: var(--gold); color: var(--gold); }
+        .hbtn.active { border-color: var(--gold); color: var(--gold); }
 
         .content { padding: 24px 28px 48px; max-width: 1440px; margin: 0 auto; }
 
-        /* ── KPI Cards ────────────────────────────────────── */
-        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 22px; }
-        .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 18px 14px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 12px; margin-bottom: 22px; }
+        .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 18px 14px; transition: background 0.25s, border-color 0.25s; }
         .kpi-label { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-bottom: 8px; }
         .kpi-value { font-size: 2rem; font-weight: 800; color: var(--gold); line-height: 1; }
         .kpi-sub   { font-size: 0.68rem; color: var(--dim); margin-top: 5px; line-height: 1.3; }
         .kpi.accent { border-color: rgba(242,181,53,0.35); }
 
-        /* ── Insight Banner ───────────────────────────────── */
         .insight-row { display: flex; gap: 12px; margin-bottom: 22px; flex-wrap: wrap; }
-        .insight { background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 12px 18px; flex: 1; min-width: 200px; }
+        .insight { background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 12px 18px; flex: 1; min-width: 180px; transition: background 0.25s; }
         .insight-label { font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-bottom: 4px; }
         .insight-value { font-size: 1.05rem; font-weight: 700; color: var(--text); }
         .insight-value span { color: var(--gold); }
 
-        /* ── Charts ───────────────────────────────────────── */
         .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
-        .chart-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 20px 16px; }
+        .chart-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 20px 16px; transition: background 0.25s, border-color 0.25s; }
         .chart-box.wide { grid-column: 1 / -1; }
-        .chart-box.third { /* used in a 3-col row */ }
         .chart-title { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-bottom: 14px; }
         .chart-box canvas { max-height: 260px; }
         .charts-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
 
-        /* ── Tables ───────────────────────────────────────── */
-        .tbl-section { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px; overflow-x: auto; }
+        .tbl-section { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px; overflow-x: auto; transition: background 0.25s; }
         .tbl-title { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-bottom: 14px; }
         table { width: 100%; border-collapse: collapse; }
         th { font-size: 0.65rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--dim); padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
         td { padding: 9px 10px; border-bottom: 1px solid rgba(242,181,53,0.06); font-size: 0.8rem; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: rgba(242,181,53,0.03); }
-        .hl  { color: var(--gold); font-weight: 700; }
+        .hl   { color: var(--gold); font-weight: 700; }
         .good { color: var(--green); font-weight: 700; }
         .bad  { color: var(--red); }
         .dim  { color: var(--dim); }
-        .pill { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.68rem; font-weight: 700; }
-        .pill-ar   { background: rgba(74,159,212,0.18);  color: var(--blue); }
-        .pill-3d   { background: rgba(76,175,125,0.18);  color: var(--green); }
-        .pill-dir  { background: rgba(255,255,255,0.07); color: var(--dim); }
-        .pill-ev   { display: inline-block; padding: 1px 7px; border-radius: 20px; font-size: 0.68rem; font-weight: 700; }
+        .pill-ev { display: inline-block; padding: 1px 7px; border-radius: 20px; font-size: 0.68rem; font-weight: 700; }
         .bar-bg { background: rgba(242,181,53,0.12); border-radius: 4px; height: 6px; min-width: 60px; }
         .bar-fill { background: var(--gold); border-radius: 4px; height: 6px; transition: width 0.4s; }
 
-        /* ── Loading ──────────────────────────────────────── */
         #loading { display: none; position: fixed; inset: 0; background: rgba(13,10,7,0.88); align-items: center; justify-content: center; z-index: 500; flex-direction: column; gap: 16px; }
         #loading.on { display: flex; }
         .spinner { width: 36px; height: 36px; border: 3px solid rgba(242,181,53,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .loading-text { color: var(--gold); font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase; }
 
-        /* ── Section divider ──────────────────────────────── */
         .section-label { font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase; color: var(--dim); margin: 28px 0 12px; padding-left: 2px; }
         .empty-state { color: var(--dim); text-align: center; padding: 28px; font-size: 0.82rem; }
 
@@ -97,217 +97,386 @@
 </head>
 <body>
 
-<!-- ══ Auth ══════════════════════════════════════════════════ -->
-<!-- ══ Loading ═══════════════════════════════════════════════ -->
 <div id="loading">
     <div class="spinner"></div>
-    <div class="loading-text">Loading data…</div>
+    <div class="loading-text" id="loading-text">Loading data…</div>
 </div>
 
-<!-- ══ Dashboard ══════════════════════════════════════════════ -->
 <div id="dash">
     <header>
         <div class="header-title">BURGER LIONS · Analytics</div>
         <span id="last-updated"></span>
         <select id="range-sel">
-            <option value="1">Today</option>
-            <option value="7" selected>Last 7 days</option>
-            <option value="30">Last 30 days</option>
-            <option value="90">Last 90 days</option>
-            <option value="0">All time</option>
+            <option value="1"  data-i18n="today">Today</option>
+            <option value="7"  selected data-i18n="last7">Last 7 days</option>
+            <option value="30" data-i18n="last30">Last 30 days</option>
+            <option value="90" data-i18n="last90">Last 90 days</option>
+            <option value="0"  data-i18n="allTime">All time</option>
         </select>
-        <button class="hbtn" id="refresh-btn">↻ Refresh</button>
+        <button class="hbtn" id="lang-btn" title="Switch language">KA</button>
+        <button class="hbtn" id="theme-btn" title="Switch theme">☀</button>
+        <button class="hbtn" id="refresh-btn" data-i18n="refresh">↻ Refresh</button>
     </header>
 
     <div class="content">
 
-        <!-- ── Overview KPIs ── -->
-        <div class="section-label">Overview</div>
-        <div class="kpi-grid" id="kpi-grid">
-            <div class="kpi accent"><div class="kpi-label">Sessions</div><div class="kpi-value" id="kv-sessions">—</div><div class="kpi-sub">page loads in range</div></div>
-            <div class="kpi"><div class="kpi-label">3D Views</div><div class="kpi-value" id="kv-views">—</div><div class="kpi-sub">modal opens</div></div>
-            <div class="kpi"><div class="kpi-label">AR Taps</div><div class="kpi-value" id="kv-artaps">—</div><div class="kpi-sub">VIEW ON TABLE tapped</div></div>
-            <div class="kpi"><div class="kpi-label">AR Launches</div><div class="kpi-value" id="kv-arsuccess">—</div><div class="kpi-sub">sessions AR actually opened</div></div>
-            <div class="kpi"><div class="kpi-label">Models Placed</div><div class="kpi-value" id="kv-placed">—</div><div class="kpi-sub">placed on real table</div></div>
-            <div class="kpi accent"><div class="kpi-label">Basket Adds</div><div class="kpi-value" id="kv-adds">—</div><div class="kpi-sub">items added to order</div></div>
-            <div class="kpi accent"><div class="kpi-label">AR→Basket</div><div class="kpi-value" id="kv-ar-basket">—</div><div class="kpi-sub">adds driven by AR</div></div>
-            <div class="kpi"><div class="kpi-label">3D→Basket</div><div class="kpi-value" id="kv-3d-basket">—</div><div class="kpi-sub">adds driven by 3D view</div></div>
-            <div class="kpi"><div class="kpi-label">AR Launch Rate</div><div class="kpi-value" id="kv-ar-launch-rate">—</div><div class="kpi-sub">of taps that launched</div></div>
-            <div class="kpi"><div class="kpi-label">Avg AR Duration</div><div class="kpi-value" id="kv-ar-dur">—</div><div class="kpi-sub">seconds per AR session</div></div>
-            <div class="kpi"><div class="kpi-label">Avg 3D View</div><div class="kpi-value" id="kv-modal-dur">—</div><div class="kpi-sub">seconds studying a dish</div></div>
-            <div class="kpi"><div class="kpi-label">AR Devices</div><div class="kpi-value" id="kv-ar-devices">—</div><div class="kpi-sub">% visitors with AR</div></div>
+        <div class="section-label" data-i18n="sec_overview">Overview</div>
+        <div class="kpi-grid">
+            <div class="kpi accent"><div class="kpi-label" data-i18n="kpi_sessions">Sessions</div><div class="kpi-value" id="kv-sessions">—</div><div class="kpi-sub" data-i18n="kpi_sessions_sub">page loads in range</div></div>
+            <div class="kpi"><div class="kpi-label" data-i18n="kpi_views">3D Views</div><div class="kpi-value" id="kv-views">—</div><div class="kpi-sub" data-i18n="kpi_views_sub">modal opens</div></div>
+            <div class="kpi"><div class="kpi-label" data-i18n="kpi_artaps">AR Taps</div><div class="kpi-value" id="kv-artaps">—</div><div class="kpi-sub" data-i18n="kpi_artaps_sub">VIEW ON TABLE tapped</div></div>
+            <div class="kpi"><div class="kpi-label" data-i18n="kpi_arsuccess">AR Launches</div><div class="kpi-value" id="kv-arsuccess">—</div><div class="kpi-sub" data-i18n="kpi_arsuccess_sub">AR actually opened</div></div>
+            <div class="kpi"><div class="kpi-label" data-i18n="kpi_placed">Models Placed</div><div class="kpi-value" id="kv-placed">—</div><div class="kpi-sub" data-i18n="kpi_placed_sub">placed on real table</div></div>
+            <div class="kpi accent"><div class="kpi-label" data-i18n="kpi_adds">Basket Adds</div><div class="kpi-value" id="kv-adds">—</div><div class="kpi-sub" data-i18n="kpi_adds_sub">items added to order</div></div>
+            <div class="kpi accent"><div class="kpi-label" data-i18n="kpi_ar_basket">AR→Basket</div><div class="kpi-value" id="kv-ar-basket">—</div><div class="kpi-sub" data-i18n="kpi_ar_basket_sub">adds driven by AR</div></div>
+            <div class="kpi"><div class="kpi-label" data-i18n="kpi_3d_basket">3D→Basket</div><div class="kpi-value" id="kv-3d-basket">—</div><div class="kpi-sub" data-i18n="kpi_3d_basket_sub">adds driven by 3D</div></div>
+            <div class="kpi"><div class="kpi-label" data-i18n="kpi_ar_rate">AR Launch Rate</div><div class="kpi-value" id="kv-ar-launch-rate">—</div><div class="kpi-sub" data-i18n="kpi_ar_rate_sub">of taps that launched</div></div>
+            <div class="kpi"><div class="kpi-label" data-i18n="kpi_ar_dur">Avg AR Duration</div><div class="kpi-value" id="kv-ar-dur">—</div><div class="kpi-sub" data-i18n="kpi_ar_dur_sub">seconds per AR session</div></div>
+            <div class="kpi"><div class="kpi-label" data-i18n="kpi_modal_dur">Avg 3D View</div><div class="kpi-value" id="kv-modal-dur">—</div><div class="kpi-sub" data-i18n="kpi_modal_dur_sub">seconds studying a dish</div></div>
+            <div class="kpi"><div class="kpi-label" data-i18n="kpi_ar_devices">AR Devices</div><div class="kpi-value" id="kv-ar-devices">—</div><div class="kpi-sub" data-i18n="kpi_ar_devices_sub">% visitors with AR</div></div>
         </div>
 
-        <!-- ── Insight row ── -->
         <div class="insight-row" id="insights"></div>
 
-        <!-- ── Timeline ── -->
-        <div class="section-label">Activity Over Time</div>
+        <!-- All Events Summary -->
+        <div class="section-label" data-i18n="sec_summary">All Events Summary</div>
         <div class="charts-grid">
             <div class="chart-box wide">
-                <div class="chart-title">Sessions &amp; Basket Adds per Day</div>
+                <div class="chart-title" data-i18n="ch_summary">Event counts — overview of all tracked actions</div>
+                <canvas id="ch-summary"></canvas>
+            </div>
+        </div>
+
+        <!-- Activity -->
+        <div class="section-label" data-i18n="sec_activity">Activity Over Time</div>
+        <div class="charts-grid">
+            <div class="chart-box wide">
+                <div class="chart-title" data-i18n="ch_timeline">Sessions &amp; Basket Adds per Day</div>
                 <canvas id="ch-timeline"></canvas>
             </div>
         </div>
 
-        <!-- ── Funnels & Attribution ── -->
-        <div class="section-label">Conversion Funnel &amp; Attribution</div>
+        <!-- Funnel & Attribution -->
+        <div class="section-label" data-i18n="sec_funnel">Conversion Funnel &amp; Attribution</div>
         <div class="charts-grid">
             <div class="chart-box">
-                <div class="chart-title">AR Funnel — where users drop off</div>
+                <div class="chart-title" data-i18n="ch_funnel">AR Funnel — where users drop off</div>
                 <canvas id="ch-funnel"></canvas>
             </div>
             <div class="chart-box">
-                <div class="chart-title">Basket Add Attribution</div>
+                <div class="chart-title" data-i18n="ch_attr">Basket Add Attribution</div>
                 <canvas id="ch-attr"></canvas>
             </div>
         </div>
 
-        <!-- ── Item popularity ── -->
-        <div class="section-label">Item Popularity</div>
+        <!-- Item Popularity -->
+        <div class="section-label" data-i18n="sec_items">Item Popularity</div>
         <div class="charts-grid">
             <div class="chart-box">
-                <div class="chart-title">Top Items — 3D Views</div>
+                <div class="chart-title" data-i18n="ch_top_views">Top Items — 3D Views</div>
                 <canvas id="ch-top-views"></canvas>
             </div>
             <div class="chart-box">
-                <div class="chart-title">Top Items — Basket Adds</div>
+                <div class="chart-title" data-i18n="ch_top_basket">Top Items — Basket Adds</div>
                 <canvas id="ch-top-basket"></canvas>
             </div>
             <div class="chart-box">
-                <div class="chart-title">Top Items — AR Success</div>
+                <div class="chart-title" data-i18n="ch_top_ar">Top Items — AR Success</div>
                 <canvas id="ch-top-ar"></canvas>
             </div>
             <div class="chart-box">
-                <div class="chart-title">Longest 3D View Time (avg seconds)</div>
+                <div class="chart-title" data-i18n="ch_top_duration">Longest 3D View Time (avg sec)</div>
                 <canvas id="ch-top-duration"></canvas>
             </div>
         </div>
 
-        <!-- ── Behaviour ── -->
-        <div class="section-label">User Behaviour</div>
+        <!-- User Behaviour -->
+        <div class="section-label" data-i18n="sec_behaviour">User Behaviour</div>
         <div class="charts-3">
             <div class="chart-box">
-                <div class="chart-title">Category Interest (filter taps)</div>
+                <div class="chart-title" data-i18n="ch_cats">Category Interest (filter taps)</div>
                 <canvas id="ch-cats"></canvas>
             </div>
             <div class="chart-box">
-                <div class="chart-title">Peak Hours</div>
+                <div class="chart-title" data-i18n="ch_hours">Peak Hours</div>
                 <canvas id="ch-hours"></canvas>
             </div>
             <div class="chart-box">
-                <div class="chart-title">Day of Week</div>
+                <div class="chart-title" data-i18n="ch_dow">Day of Week</div>
                 <canvas id="ch-dow"></canvas>
             </div>
         </div>
 
-        <!-- ── Device & Language ── -->
-        <div class="section-label">Audience</div>
+        <!-- Audience -->
+        <div class="section-label" data-i18n="sec_audience">Audience</div>
         <div class="charts-3">
             <div class="chart-box">
-                <div class="chart-title">Device AR Capability</div>
+                <div class="chart-title" data-i18n="ch_devices">Device AR Capability</div>
                 <canvas id="ch-devices"></canvas>
             </div>
             <div class="chart-box">
-                <div class="chart-title">Language</div>
+                <div class="chart-title" data-i18n="ch_lang">Language</div>
                 <canvas id="ch-lang"></canvas>
             </div>
             <div class="chart-box">
-                <div class="chart-title">AR Source (card vs modal)</div>
+                <div class="chart-title" data-i18n="ch_ar_source">AR Source (card vs modal)</div>
                 <canvas id="ch-ar-source"></canvas>
             </div>
         </div>
 
-        <!-- ── Language & Theme ── -->
-        <div class="section-label">Language &amp; Theme</div>
+        <!-- Language & Theme -->
+        <div class="section-label" data-i18n="sec_lang_theme">Language &amp; Theme</div>
         <div class="charts-3">
             <div class="chart-box">
-                <div class="chart-title">Theme Preference</div>
+                <div class="chart-title" data-i18n="ch_theme">Theme Preference</div>
                 <canvas id="ch-theme"></canvas>
             </div>
             <div class="chart-box">
-                <div class="chart-title">Language Switches</div>
+                <div class="chart-title" data-i18n="ch_lang_switch">Language Switches</div>
                 <canvas id="ch-lang-switch"></canvas>
             </div>
             <div class="chart-box">
-                <div class="chart-title">Theme Switches</div>
+                <div class="chart-title" data-i18n="ch_theme_switch">Theme Switches</div>
                 <canvas id="ch-theme-switch"></canvas>
             </div>
         </div>
 
-        <!-- ── AR Efficiency Table ── -->
-        <div class="section-label">AR Efficiency by Item</div>
+        <!-- Device Breakdown -->
+        <div class="section-label" data-i18n="sec_devices">Device Breakdown</div>
+        <div class="charts-3">
+            <div class="chart-box">
+                <div class="chart-title" data-i18n="ch_platform">Platform (iOS / Android / Desktop)</div>
+                <canvas id="ch-platform"></canvas>
+            </div>
+            <div class="chart-box">
+                <div class="chart-title" data-i18n="ch_ar_capable">AR Capable vs No AR</div>
+                <canvas id="ch-ar-capable"></canvas>
+            </div>
+            <div class="chart-box">
+                <div class="chart-title" data-i18n="ch_ar_by_platform">AR Funnel by Platform</div>
+                <canvas id="ch-ar-platform"></canvas>
+            </div>
+        </div>
+
+        <!-- First Dish Explored -->
+        <div class="section-label" data-i18n="sec_first_dish">First Dish Explored per Session</div>
+        <div class="charts-grid">
+            <div class="chart-box">
+                <div class="chart-title" data-i18n="ch_first_3d">First Dish Opened in 3D (per session)</div>
+                <canvas id="ch-first-3d"></canvas>
+            </div>
+            <div class="chart-box">
+                <div class="chart-title" data-i18n="ch_first_ar">First Dish Tapped for AR (per session)</div>
+                <canvas id="ch-first-ar"></canvas>
+            </div>
+        </div>
+
+        <!-- Upsell Impact -->
+        <div class="section-label" data-i18n="sec_upsell">Upsell Impact — Does AR &amp; 3D Drive Sales?</div>
         <div class="tbl-section">
-            <div class="tbl-title">How well each item converts in AR — sorted by Interest Score</div>
+            <div class="tbl-title" data-i18n="sec_upsell_desc">Order conversion rate per item: customers who used AR/3D vs those who did not</div>
             <table>
-                <thead><tr>
-                    <th>#</th><th>Item</th><th>Category</th>
-                    <th>Views</th><th>AR Taps</th><th>AR Success</th><th>Placed</th>
-                    <th>Added after AR</th><th>AR Conv %</th><th>Interest Score ⬆</th>
-                </tr></thead>
+                <thead id="th-upsell"></thead>
+                <tbody id="tb-upsell"></tbody>
+            </table>
+        </div>
+
+        <!-- AR Efficiency Table -->
+        <div class="section-label" data-i18n="sec_ar_eff">AR Efficiency by Item</div>
+        <div class="tbl-section">
+            <div class="tbl-title" data-i18n="sec_ar_eff_desc">How well each item converts in AR — sorted by Interest Score</div>
+            <table>
+                <thead id="th-efficiency"></thead>
                 <tbody id="tb-efficiency"></tbody>
             </table>
         </div>
 
-        <!-- ── 3D Engagement Table ── -->
-        <div class="section-label">3D Modal Engagement by Item</div>
+        <!-- 3D Engagement Table -->
+        <div class="section-label" data-i18n="sec_3d_eng">3D Modal Engagement by Item</div>
         <div class="tbl-section">
-            <div class="tbl-title">How long people study each dish in the 3D viewer</div>
+            <div class="tbl-title" data-i18n="sec_3d_eng_desc">How long people study each dish in the 3D viewer</div>
             <table>
-                <thead><tr>
-                    <th>Item</th><th>Opens</th><th>Avg View Time</th>
-                    <th>Added after 3D</th><th>3D Conv %</th><th>XR Carousel Navs</th>
-                </tr></thead>
+                <thead id="th-3d"></thead>
                 <tbody id="tb-3d"></tbody>
             </table>
         </div>
 
-        <!-- ── Recent Events ── -->
-        <div class="section-label">Recent Events (last 50)</div>
+        <!-- Recent Events -->
+        <div class="section-label" data-i18n="sec_recent">Recent Events (last 50)</div>
         <div class="tbl-section">
             <table>
-                <thead><tr><th>Time</th><th>Event</th><th>Item</th><th>Category</th><th>Lang</th><th>AR Cap</th><th>Extra</th></tr></thead>
+                <thead id="th-recent"></thead>
                 <tbody id="tb-recent"></tbody>
             </table>
         </div>
 
-    </div><!-- /content -->
-</div><!-- /dash -->
+    </div>
+</div>
 
 <script>
 // ════════════════════════════════════════════════════════════════
 // CONFIG
 // ════════════════════════════════════════════════════════════════
 const CFG = {
-    supabaseUrl:  'https://xctoxhaahxtcicfgnmme.supabase.co',
-    supabaseKey:  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdG94aGFhaHh0Y2ljZmdubW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NDMyMDEsImV4cCI6MjA5NTMxOTIwMX0.VA2tQL6WT96ifBjON4NLaJa0BbzBGI0ipD7iB5fHjnQ',
+    supabaseUrl: 'https://xctoxhaahxtcicfgnmme.supabase.co',
+    supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdG94aGFhaHh0Y2ljZmdubW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NDMyMDEsImV4cCI6MjA5NTMxOTIwMX0.VA2tQL6WT96ifBjON4NLaJa0BbzBGI0ipD7iB5fHjnQ',
 };
 
 // ════════════════════════════════════════════════════════════════
-// Init
+// TRANSLATIONS
+// ════════════════════════════════════════════════════════════════
+const T = {
+    en: {
+        refresh:'↻ Refresh', today:'Today', last7:'Last 7 days', last30:'Last 30 days', last90:'Last 90 days', allTime:'All time',
+        updated:'Updated', loading:'Loading data…',
+        sec_overview:'Overview', sec_summary:'All Events Summary', sec_activity:'Activity Over Time',
+        sec_funnel:'Conversion Funnel & Attribution', sec_items:'Item Popularity', sec_behaviour:'User Behaviour',
+        sec_audience:'Audience', sec_lang_theme:'Language & Theme', sec_devices:'Device Breakdown',
+        sec_first_dish:'First Dish Explored per Session', sec_upsell:'Upsell Impact — Does AR & 3D Drive Sales?',
+        sec_ar_eff:'AR Efficiency by Item', sec_ar_eff_desc:'How well each item converts in AR — sorted by Interest Score',
+        sec_3d_eng:'3D Modal Engagement by Item', sec_3d_eng_desc:'How long people study each dish in the 3D viewer',
+        sec_recent:'Recent Events (last 50)', sec_upsell_desc:'Order conversion rate per item: customers who used AR/3D vs those who did not',
+        kpi_sessions:'Sessions', kpi_sessions_sub:'page loads in range',
+        kpi_views:'3D Views', kpi_views_sub:'modal opens',
+        kpi_artaps:'AR Taps', kpi_artaps_sub:'VIEW ON TABLE tapped',
+        kpi_arsuccess:'AR Launches', kpi_arsuccess_sub:'AR actually opened',
+        kpi_placed:'Models Placed', kpi_placed_sub:'placed on real table',
+        kpi_adds:'Basket Adds', kpi_adds_sub:'items added to order',
+        kpi_ar_basket:'AR→Basket', kpi_ar_basket_sub:'adds driven by AR',
+        kpi_3d_basket:'3D→Basket', kpi_3d_basket_sub:'adds driven by 3D',
+        kpi_ar_rate:'AR Launch Rate', kpi_ar_rate_sub:'of taps that launched',
+        kpi_ar_dur:'Avg AR Duration', kpi_ar_dur_sub:'seconds per AR session',
+        kpi_modal_dur:'Avg 3D View', kpi_modal_dur_sub:'seconds studying a dish',
+        kpi_ar_devices:'AR Devices', kpi_ar_devices_sub:'% visitors with AR',
+        ch_summary:'Event counts — overview of all tracked actions',
+        ch_timeline:'Sessions & Basket Adds per Day', ch_funnel:'AR Funnel — where users drop off',
+        ch_attr:'Basket Add Attribution', ch_top_views:'Top Items — 3D Views',
+        ch_top_basket:'Top Items — Basket Adds', ch_top_ar:'Top Items — AR Success',
+        ch_top_duration:'Longest 3D View Time (avg sec)', ch_cats:'Category Interest (filter taps)',
+        ch_hours:'Peak Hours', ch_dow:'Day of Week', ch_devices:'Device AR Capability',
+        ch_lang:'Language', ch_ar_source:'AR Source (card vs modal)', ch_theme:'Theme Preference',
+        ch_lang_switch:'Language Switches', ch_theme_switch:'Theme Switches',
+        ch_platform:'Platform (iOS / Android / Desktop)', ch_ar_capable:'AR Capable vs No AR',
+        ch_ar_by_platform:'AR Funnel by Platform',
+        ch_first_3d:'First Dish Opened in 3D (per session)', ch_first_ar:'First Dish Tapped for AR (per session)',
+        ins_most_viewed:'Most Viewed Dish', ins_most_ordered:'Most Ordered Dish', ins_most_ar:"Most AR'd Dish",
+        ins_ar_abandon:'AR Abandonment Rate', ins_ar_abandon_note:"taps that didn't launch",
+        ins_basket_opens:'Basket Opens', ins_ar_fallback:'AR Fallbacks', ins_ar_fallback_note:'AR failed → 3D shown',
+        th_rank:'#', th_item:'Item', th_category:'Category', th_views:'Views', th_ar_taps:'AR Taps',
+        th_ar_success:'AR Success', th_placed:'Placed', th_after_ar:'Added after AR', th_ar_conv:'AR Conv %',
+        th_interest:'Interest Score ⬆', th_opens:'Opens', th_avg_view:'Avg View Time',
+        th_after_3d:'Added after 3D', th_3d_conv:'3D Conv %', th_xr_navs:'XR Navs',
+        th_time:'Time', th_event:'Event', th_lang:'Lang', th_ar_cap:'AR Cap', th_extra:'Extra',
+        th_total_orders:'Total Orders', th_ar_orders:'After AR', th_3d_orders:'After 3D',
+        th_direct_orders:'Direct', th_ar_lift:'AR Lift', th_3d_lift:'3D Lift',
+        lbl_ar_only:'AR only', lbl_ar_3d:'AR + 3D', lbl_3d_only:'3D only', lbl_direct:'Direct',
+        lbl_ios:'iOS (ARKit)', lbl_android_ar:'Android AR (WebXR)', lbl_no_ar:'No AR / Desktop',
+        lbl_ar_capable:'AR Capable', lbl_no_ar_cap:'No AR',
+        lbl_sessions:'Sessions', lbl_basket:'Basket Adds', lbl_removes:'Basket Removes',
+        lbl_filter_taps:'Filter Taps', lbl_views:'Views', lbl_ar_launches:'AR Launches',
+        lbl_placed:'Placed', lbl_no_data:'No data yet — events will appear once the app gets traffic.',
+        days:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+    },
+    ka: {
+        refresh:'↻ განახლება', today:'დღეს', last7:'ბოლო 7 დღე', last30:'ბოლო 30 დღე', last90:'ბოლო 90 დღე', allTime:'სულ',
+        updated:'განახლდა', loading:'მონაცემები იტვირთება…',
+        sec_overview:'მიმოხილვა', sec_summary:'ყველა მოვლენა', sec_activity:'დროში აქტივობა',
+        sec_funnel:'კონვერსიის ძაბრი', sec_items:'კერძების პოპულარობა', sec_behaviour:'მომხმარებლის ქცევა',
+        sec_audience:'აუდიტორია', sec_lang_theme:'ენა და თემა', sec_devices:'მოწყობილობები',
+        sec_first_dish:'პირველი კერძი სესიაზე', sec_upsell:'გაყიდვების ზრდა — AR & 3D-ის გავლენა',
+        sec_ar_eff:'AR ეფექტიანობა კერძის მიხედვით', sec_ar_eff_desc:'AR კონვერსია — ქულის მიხედვით',
+        sec_3d_eng:'3D ჩართულობა კერძის მიხედვით', sec_3d_eng_desc:'3D შესწავლის დრო კერძის მიხედვით',
+        sec_recent:'ბოლო მოვლენები (50)', sec_upsell_desc:'AR/3D-ის შემდეგ შეკვეთის კონვერსია vs პირდაპირი',
+        kpi_sessions:'სესიები', kpi_sessions_sub:'გვერდის ჩატვირთვა',
+        kpi_views:'3D ნახვები', kpi_views_sub:'3D მოდალი გაიხსნა',
+        kpi_artaps:'AR დაჭერა', kpi_artaps_sub:'VIEW ON TABLE',
+        kpi_arsuccess:'AR გაშვება', kpi_arsuccess_sub:'AR წარმატებით გაიხსნა',
+        kpi_placed:'განთავსებული', kpi_placed_sub:'მაგიდაზე დაყენდა',
+        kpi_adds:'კალათი', kpi_adds_sub:'კერძი შეკვეთაში',
+        kpi_ar_basket:'AR→კალათი', kpi_ar_basket_sub:'AR-ის შემდეგ შეკვეთა',
+        kpi_3d_basket:'3D→კალათი', kpi_3d_basket_sub:'3D ნახვის შემდეგ',
+        kpi_ar_rate:'AR გაშვ. %', kpi_ar_rate_sub:'დაჭერიდან გაიშვა',
+        kpi_ar_dur:'AR ხანგძ. საშ.', kpi_ar_dur_sub:'წამი AR სესიაზე',
+        kpi_modal_dur:'3D ნახვა საშ.', kpi_modal_dur_sub:'წამი კერძის შესწავლაში',
+        kpi_ar_devices:'AR მოწყობ.', kpi_ar_devices_sub:'% ვიზიტ. AR-ით',
+        ch_summary:'ყველა მოვლენის რაოდენობა',
+        ch_timeline:'სესიები და კალათი დღეში', ch_funnel:'AR ძაბრი',
+        ch_attr:'შეკვეთის ატრიბუცია', ch_top_views:'ტოპ კერძები — 3D',
+        ch_top_basket:'ტოპ კერძები — კალათი', ch_top_ar:'ტოპ კერძები — AR',
+        ch_top_duration:'ყველაზე გრძელი 3D ნახვა', ch_cats:'კატეგორიის ინტერესი',
+        ch_hours:'პიკური საათები', ch_dow:'კვირის დღე', ch_devices:'AR შესაძლებლობა',
+        ch_lang:'ენა', ch_ar_source:'AR წყარო', ch_theme:'თემის პრეფ.',
+        ch_lang_switch:'ენის გადართვა', ch_theme_switch:'თემის გადართვა',
+        ch_platform:'პლატფორმა (iOS / Android / სხვა)', ch_ar_capable:'AR შეუძლია vs არა',
+        ch_ar_by_platform:'AR ძაბრი პლატფ. მიხ.',
+        ch_first_3d:'პირველი 3D კერძი სესიაზე', ch_first_ar:'პირველი AR კერძი სესიაზე',
+        ins_most_viewed:'ყველ. ნანახი კერძი', ins_most_ordered:'ყველ. შეკვეთილი', ins_most_ar:'ყველ. AR-ში ნანახი',
+        ins_ar_abandon:'AR მიტოვება %', ins_ar_abandon_note:'ვერ გაიხსნა',
+        ins_basket_opens:'კალათის გახსნა', ins_ar_fallback:'AR წარუმ.', ins_ar_fallback_note:'AR ვერ გაიხსნა',
+        th_rank:'#', th_item:'კერძი', th_category:'კატეგ.', th_views:'ნახვ.', th_ar_taps:'AR დაჭ.',
+        th_ar_success:'AR წარმ.', th_placed:'განთ.', th_after_ar:'AR შემდ.', th_ar_conv:'AR კონვ.%',
+        th_interest:'ქულა ⬆', th_opens:'გახსნ.', th_avg_view:'საშ. ნახვ. დრო',
+        th_after_3d:'3D შემდ.', th_3d_conv:'3D კონვ.%', th_xr_navs:'XR ნავ.',
+        th_time:'დრო', th_event:'მოვლენა', th_lang:'ენა', th_ar_cap:'AR', th_extra:'დამატ.',
+        th_total_orders:'სულ შეკვ.', th_ar_orders:'AR შემდ.', th_3d_orders:'3D შემდ.',
+        th_direct_orders:'პირდ.', th_ar_lift:'AR ზრდა', th_3d_lift:'3D ზრდა',
+        lbl_ar_only:'მხოლ. AR', lbl_ar_3d:'AR + 3D', lbl_3d_only:'მხოლ. 3D', lbl_direct:'პირდაპირ',
+        lbl_ios:'iOS (ARKit)', lbl_android_ar:'Android AR (WebXR)', lbl_no_ar:'AR გარეშე',
+        lbl_ar_capable:'AR შეუძლია', lbl_no_ar_cap:'AR არ შეუძლია',
+        lbl_sessions:'სესიები', lbl_basket:'კალათი', lbl_removes:'კალათიდან ამოღება',
+        lbl_filter_taps:'ფილტრი', lbl_views:'ნახვები', lbl_ar_launches:'AR გაშვება',
+        lbl_placed:'განთავსება', lbl_no_data:'მონაცემები არ არის.',
+        days:['კვი','ორშ','სამ','ოთხ','ხუთ','პარ','შაბ'],
+    }
+};
+
+let _lang = 'en';
+const t = k => T[_lang][k] !== undefined ? T[_lang][k] : (T.en[k] !== undefined ? T.en[k] : k);
+
+// ════════════════════════════════════════════════════════════════
+// INIT
 // ════════════════════════════════════════════════════════════════
 const sb = supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey);
 
-Chart.defaults.color           = '#7a6a50';
-Chart.defaults.borderColor     = 'rgba(242,181,53,0.08)';
-Chart.defaults.font.family     = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
-Chart.defaults.font.size       = 11;
-
-const GOLD='#f2b535', GREEN='#4caf7d', RED='#e05252', BLUE='#4a9fd4', PURPLE='#a47fd4', DIM='rgba(242,181,53,0.25)';
-
-const $dash = document.getElementById('dash');
-
-function showDash() { $dash.style.display='block'; loadData(); }
-
-// ════════════════════════════════════════════════════════════════
-// Data loading
-// ════════════════════════════════════════════════════════════════
+let _isLight = false;
+let _lastEvents = null;
 let _charts = {};
-let _autoTimer = null;
 
+function applyTheme(light) {
+    _isLight = light;
+    document.documentElement.classList.toggle('light', light);
+    document.getElementById('theme-btn').textContent = light ? '🌙' : '☀';
+    const dim = light ? '#8a7060' : '#7a6a50';
+    const border = light ? 'rgba(155,98,8,0.1)' : 'rgba(242,181,53,0.06)';
+    Chart.defaults.color = dim;
+    Chart.defaults.borderColor = border;
+    if (_lastEvents) renderAll(_lastEvents);
+}
+
+function applyLang(lang) {
+    _lang = lang;
+    document.getElementById('lang-btn').textContent = lang === 'en' ? 'KA' : 'EN';
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const v = T[lang][el.dataset.i18n];
+        if (v !== undefined) el.textContent = v;
+    });
+    document.querySelectorAll('#range-sel option[data-i18n]').forEach(opt => {
+        const v = T[lang][opt.dataset.i18n];
+        if (v !== undefined) opt.textContent = v;
+    });
+    document.getElementById('loading-text').textContent = t('loading');
+    if (_lastEvents) renderAll(_lastEvents);
+}
+
+document.getElementById('theme-btn').addEventListener('click', () => applyTheme(!_isLight));
+document.getElementById('lang-btn').addEventListener('click', () => applyLang(_lang === 'en' ? 'ka' : 'en'));
 document.getElementById('refresh-btn').addEventListener('click', loadData);
 document.getElementById('range-sel').addEventListener('change', loadData);
 
+// ════════════════════════════════════════════════════════════════
+// DATA LOADING
+// ════════════════════════════════════════════════════════════════
 function getDateRange() {
     const days = parseInt(document.getElementById('range-sel').value);
     const end  = new Date().toISOString();
@@ -335,9 +504,10 @@ async function loadData() {
             if (!data || data.length < 1000) break;
             from += 1000;
         }
+        _lastEvents = all;
         renderAll(all);
         document.getElementById('last-updated').textContent =
-            'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            t('updated') + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     } catch(err) {
         console.error('Load error:', err);
     } finally {
@@ -346,162 +516,170 @@ async function loadData() {
 }
 
 // ════════════════════════════════════════════════════════════════
-// Helpers
+// HELPERS
 // ════════════════════════════════════════════════════════════════
-const groupBy = (arr, fn) => arr.reduce((m, x) => { const k=fn(x); (m[k]=m[k]||[]).push(x); return m; }, {});
-const countBy = (arr, fn) => arr.reduce((m, x) => { const k=fn(x); m[k]=(m[k]||0)+1; return m; }, {});
-const sum     = arr => arr.reduce((a,b) => a+b, 0);
-const avg     = arr => arr.length ? sum(arr)/arr.length : null;
-const avgField= (arr, f) => { const v=arr.map(e=>e.extra?.[f]).filter(v=>v!=null).map(Number); return v.length ? avg(v) : null; };
-const pct     = (a, b) => b > 0 ? Math.round(a/b*100) : 0;
-const fmtN    = n => n == null ? '—' : n >= 1000 ? (n/1000).toFixed(1)+'k' : String(Math.round(n));
-const fmtS    = ms => ms == null ? '—' : (ms/1000).toFixed(1)+'s';
+const groupBy  = (arr, fn) => arr.reduce((m,x) => { const k=fn(x); (m[k]=m[k]||[]).push(x); return m; }, {});
+const countBy  = (arr, fn) => arr.reduce((m,x) => { const k=fn(x); m[k]=(m[k]||0)+1; return m; }, {});
+const sum      = arr => arr.reduce((a,b) => a+b, 0);
+const avg      = arr => arr.length ? sum(arr)/arr.length : null;
+const avgField = (arr, f) => { const v=arr.map(e=>e.extra?.[f]).filter(v=>v!=null).map(Number); return v.length ? avg(v) : null; };
+const pct      = (a, b) => b > 0 ? Math.round(a/b*100) : 0;
+const fmtN     = n => n == null ? '—' : n >= 1000 ? (n/1000).toFixed(1)+'k' : String(Math.round(n));
+const fmtS     = ms => ms == null ? '—' : (ms/1000).toFixed(1)+'s';
 const sortDesc = (arr, fn) => [...arr].sort((a,b) => fn(b)-fn(a));
 
 function mkChart(id, type, labels, datasets, extra = {}) {
-    if (_charts[id]) _charts[id].destroy();
-    _charts[id] = new Chart(document.getElementById(id), {
+    if (_charts[id]) { _charts[id].destroy(); delete _charts[id]; }
+    const el = document.getElementById(id);
+    if (!el) return;
+    _charts[id] = new Chart(el, {
         type,
         data: { labels, datasets },
         options: {
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-                legend: { labels: { color: '#7a6a50', boxWidth: 11, padding: 14 }, ...extra.legend },
+                legend: { labels: { color: _isLight ? '#8a7060' : '#7a6a50', boxWidth: 11, padding: 14 }, ...extra.legend },
                 tooltip: { callbacks: extra.tooltipCb || {} }
             },
             scales: (type === 'doughnut' || type === 'pie') ? {} : {
-                x: { ticks: { color: '#7a6a50', maxRotation: 45 }, grid: { color: 'rgba(242,181,53,0.06)' } },
-                y: { ticks: { color: '#7a6a50' }, grid: { color: 'rgba(242,181,53,0.06)' }, beginAtZero: true }
+                x: { ticks: { color: _isLight ? '#8a7060' : '#7a6a50', maxRotation: 45 }, grid: { color: _isLight ? 'rgba(155,98,8,0.08)' : 'rgba(242,181,53,0.06)' } },
+                y: { ticks: { color: _isLight ? '#8a7060' : '#7a6a50' }, grid: { color: _isLight ? 'rgba(155,98,8,0.08)' : 'rgba(242,181,53,0.06)' }, beginAtZero: true }
             },
             ...extra.opts
         }
     });
 }
 
+const GOLD='#f2b535', GREEN='#4caf7d', RED='#e05252', BLUE='#4a9fd4', PURPLE='#a47fd4', DIM='rgba(242,181,53,0.25)';
+
 const eventColors = {
-    page_load:'#7a6a50', item_view: GOLD, modal_close: DIM, ar_tap: BLUE,
-    ar_success: GREEN, ar_placed: GREEN, ar_duration: GREEN, ar_fallback: RED,
-    basket_add: GOLD, basket_remove: RED, basket_open: PURPLE,
-    category_filter:'#9a8a6a', xr_nav: BLUE, lang_change: DIM, theme_change: DIM
+    page_load:'#7a6a50', item_view:GOLD, modal_close:DIM, ar_tap:BLUE,
+    ar_success:GREEN, ar_placed:GREEN, ar_duration:GREEN, ar_fallback:RED,
+    basket_add:GOLD, basket_remove:RED, basket_open:PURPLE,
+    category_filter:'#9a8a6a', xr_nav:BLUE, lang_change:DIM, theme_change:DIM
 };
 
 // ════════════════════════════════════════════════════════════════
-// Render
+// RENDER
 // ════════════════════════════════════════════════════════════════
 function renderAll(events) {
-    // ── Split by event type
-    const by          = groupBy(events, e => e.event);
-    const sessions    = by.page_load      || [];
-    const itemViews   = by.item_view      || [];
-    const modalCloses = by.modal_close    || [];
-    const arTaps      = by.ar_tap         || [];
-    const arSuccess   = by.ar_success     || [];
-    const arPlaced    = by.ar_placed      || [];
-    const arDurs      = by.ar_duration    || [];
-    const arFallback  = by.ar_fallback    || [];
-    const basketAdds  = by.basket_add     || [];
-    const basketRem   = by.basket_remove  || [];
-    const basketOpens = by.basket_open    || [];
-    const catFilter   = by.category_filter|| [];
-    const xrNavs      = by.xr_nav         || [];
-    const langChanges  = by.lang_change   || [];
-    const themeChanges = by.theme_change  || [];
+    const by           = groupBy(events, e => e.event);
+    const sessions     = by.page_load       || [];
+    const itemViews    = by.item_view       || [];
+    const modalCloses  = by.modal_close     || [];
+    const arTaps       = by.ar_tap          || [];
+    const arSuccess    = by.ar_success      || [];
+    const arPlaced     = by.ar_placed       || [];
+    const arDurs       = by.ar_duration     || [];
+    const arFallback   = by.ar_fallback     || [];
+    const basketAdds   = by.basket_add      || [];
+    const basketRem    = by.basket_remove   || [];
+    const basketOpens  = by.basket_open     || [];
+    const catFilter    = by.category_filter || [];
+    const xrNavs       = by.xr_nav          || [];
+    const langChanges  = by.lang_change     || [];
+    const themeChanges = by.theme_change    || [];
 
-    // Attribution buckets
-    const arOnly   = basketAdds.filter(e => e.extra?.after_ar === true  && e.extra?.after_3d !== true);
-    const tdOnly   = basketAdds.filter(e => e.extra?.after_ar !== true  && e.extra?.after_3d === true);
-    const arAnd3d  = basketAdds.filter(e => e.extra?.after_ar === true  && e.extra?.after_3d === true);
-    const direct   = basketAdds.filter(e => e.extra?.after_ar !== true  && e.extra?.after_3d !== true);
-    const afterAR  = basketAdds.filter(e => e.extra?.after_ar === true);
-    const after3D  = basketAdds.filter(e => e.extra?.after_3d === true);
+    const arOnly  = basketAdds.filter(e => e.extra?.after_ar === true  && e.extra?.after_3d !== true);
+    const tdOnly  = basketAdds.filter(e => e.extra?.after_ar !== true  && e.extra?.after_3d === true);
+    const arAnd3d = basketAdds.filter(e => e.extra?.after_ar === true  && e.extra?.after_3d === true);
+    const direct  = basketAdds.filter(e => e.extra?.after_ar !== true  && e.extra?.after_3d !== true);
+    const afterAR = basketAdds.filter(e => e.extra?.after_ar === true);
+    const after3D = basketAdds.filter(e => e.extra?.after_3d === true);
 
-    const arCapable = sessions.filter(e => e.ar_cap === 'webxr' || e.ar_cap === 'arkit').length;
-    const avgARdur  = avgField(arDurs, 'duration_ms');
-    const avgMdur   = avgField(modalCloses, 'duration_ms');
+    const iosCount     = sessions.filter(e => e.ar_cap === 'arkit').length;
+    const androidARCnt = sessions.filter(e => e.ar_cap === 'webxr').length;
+    const noARCnt      = sessions.filter(e => e.ar_cap === 'none' || !e.ar_cap).length;
+    const arCapable    = iosCount + androidARCnt;
+    const avgARdur     = avgField(arDurs, 'duration_ms');
+    const avgMdur      = avgField(modalCloses, 'duration_ms');
 
     // ── KPIs
-    document.getElementById('kv-sessions').textContent    = fmtN(sessions.length);
-    document.getElementById('kv-views').textContent       = fmtN(itemViews.length);
-    document.getElementById('kv-artaps').textContent      = fmtN(arTaps.length);
-    document.getElementById('kv-arsuccess').textContent   = fmtN(arSuccess.length);
-    document.getElementById('kv-placed').textContent      = fmtN(arPlaced.length);
-    document.getElementById('kv-adds').textContent        = fmtN(basketAdds.length);
-    document.getElementById('kv-ar-basket').textContent   = pct(afterAR.length, basketAdds.length) + '%';
-    document.getElementById('kv-3d-basket').textContent   = pct(after3D.length, basketAdds.length) + '%';
-    document.getElementById('kv-ar-launch-rate').textContent = pct(arSuccess.length, arTaps.length) + '%';
-    document.getElementById('kv-ar-dur').textContent      = fmtS(avgARdur);
-    document.getElementById('kv-modal-dur').textContent   = fmtS(avgMdur);
-    document.getElementById('kv-ar-devices').textContent  = pct(arCapable, sessions.length) + '%';
+    document.getElementById('kv-sessions').textContent        = fmtN(sessions.length);
+    document.getElementById('kv-views').textContent           = fmtN(itemViews.length);
+    document.getElementById('kv-artaps').textContent          = fmtN(arTaps.length);
+    document.getElementById('kv-arsuccess').textContent       = fmtN(arSuccess.length);
+    document.getElementById('kv-placed').textContent          = fmtN(arPlaced.length);
+    document.getElementById('kv-adds').textContent            = fmtN(basketAdds.length);
+    document.getElementById('kv-ar-basket').textContent       = pct(afterAR.length, basketAdds.length) + '%';
+    document.getElementById('kv-3d-basket').textContent       = pct(after3D.length, basketAdds.length) + '%';
+    document.getElementById('kv-ar-launch-rate').textContent  = pct(arSuccess.length, arTaps.length) + '%';
+    document.getElementById('kv-ar-dur').textContent          = fmtS(avgARdur);
+    document.getElementById('kv-modal-dur').textContent       = fmtS(avgMdur);
+    document.getElementById('kv-ar-devices').textContent      = pct(arCapable, sessions.length) + '%';
 
     // ── Insights
     {
-        const byItem = groupBy(arSuccess, e => e.item_name || '');
-        const bestAR = sortDesc(Object.entries(byItem), e => e[1].length).find(e => e[0])?.[0] || '—';
+        const byItem     = groupBy(arSuccess, e => e.item_name || '');
+        const bestAR     = sortDesc(Object.entries(byItem), e => e[1].length).find(e => e[0])?.[0] || '—';
         const viewCounts = countBy(itemViews.filter(e=>e.item_name), e => e.item_name);
-        const topView = sortDesc(Object.entries(viewCounts), e => e[1])[0]?.[0] || '—';
-        const addCounts = countBy(basketAdds.filter(e=>e.item_name), e => e.item_name);
-        const topAdd  = sortDesc(Object.entries(addCounts), e => e[1])[0]?.[0] || '—';
-        const arAbandonment = pct(arTaps.length - arSuccess.length, arTaps.length);
+        const topView    = sortDesc(Object.entries(viewCounts), e => e[1])[0]?.[0] || '—';
+        const addCounts  = countBy(basketAdds.filter(e=>e.item_name), e => e.item_name);
+        const topAdd     = sortDesc(Object.entries(addCounts), e => e[1])[0]?.[0] || '—';
+        const arAbandon  = pct(arTaps.length - arSuccess.length, arTaps.length);
         document.getElementById('insights').innerHTML = [
-            { label: 'Most Viewed Dish',       val: topView },
-            { label: 'Most Ordered Dish',      val: topAdd },
-            { label: 'Most AR\'d Dish',         val: bestAR },
-            { label: 'AR Abandonment Rate',    val: arAbandonment + '%', note: 'taps that didn\'t launch' },
-            { label: 'Basket Opens',           val: fmtN(basketOpens.length) },
-            { label: 'AR Fallbacks (failures)',val: fmtN(arFallback.length), note: 'AR failed → 3D shown' },
+            { lk:'ins_most_viewed',  val: topView },
+            { lk:'ins_most_ordered', val: topAdd },
+            { lk:'ins_most_ar',      val: bestAR },
+            { lk:'ins_ar_abandon',   val: arAbandon + '%', note: t('ins_ar_abandon_note') },
+            { lk:'ins_basket_opens', val: fmtN(basketOpens.length) },
+            { lk:'ins_ar_fallback',  val: fmtN(arFallback.length), note: t('ins_ar_fallback_note') },
         ].map(i => `<div class="insight">
-            <div class="insight-label">${i.label}</div>
-            <div class="insight-value"><span>${i.val}</span>${i.note ? ' <span style="color:var(--dim);font-size:.72rem">'+i.note+'</span>' : ''}</div>
+            <div class="insight-label">${t(i.lk)}</div>
+            <div class="insight-value"><span>${i.val}</span>${i.note ? ' <span style="color:var(--dim);font-size:.72rem">' + i.note + '</span>' : ''}</div>
         </div>`).join('');
+    }
+
+    // ── Summary chart (all event types)
+    {
+        const order = ['page_load','item_view','ar_tap','ar_success','ar_placed','ar_duration',
+                       'modal_close','ar_fallback','basket_add','basket_remove','basket_open',
+                       'category_filter','xr_nav','lang_change','theme_change'];
+        const vals  = order.map(k => (by[k]||[]).length);
+        const cols  = order.map(k => eventColors[k] || DIM);
+        mkChart('ch-summary', 'bar', order,
+            [{ data: vals, backgroundColor: cols, borderRadius: 4 }],
+            { opts: { plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 45 } } } } });
     }
 
     // ── Timeline
     {
         const days = parseInt(document.getElementById('range-sel').value);
         const n = days === 0 ? 90 : Math.min(days, 90);
-        const dates = Array.from({length: n}, (_, i) => {
+        const dates = Array.from({length: n}, (_,i) => {
             const d = new Date(Date.now() - (n-1-i)*864e5);
             return d.toISOString().slice(0,10);
         });
-        const sMap = countBy(sessions, e => e.created_at.slice(0,10));
-        const aMap = countBy(basketAdds, e => e.created_at.slice(0,10));
-        const rMap = countBy(basketRem,  e => e.created_at.slice(0,10));
+        const sMap = countBy(sessions,    e => e.created_at.slice(0,10));
+        const aMap = countBy(basketAdds,  e => e.created_at.slice(0,10));
+        const rMap = countBy(basketRem,   e => e.created_at.slice(0,10));
         mkChart('ch-timeline', 'line', dates.map(d => d.slice(5)), [
-            { label:'Sessions',     data: dates.map(d=>sMap[d]||0), borderColor:GOLD,   backgroundColor:'rgba(242,181,53,0.08)', tension:0.3, fill:true, pointRadius:2 },
-            { label:'Basket Adds',  data: dates.map(d=>aMap[d]||0), borderColor:GREEN,  backgroundColor:'rgba(76,175,125,0.08)', tension:0.3, fill:true, pointRadius:2 },
-            { label:'Basket Removes', data: dates.map(d=>rMap[d]||0), borderColor:RED, backgroundColor:'rgba(224,82,82,0.05)', tension:0.3, fill:true, pointRadius:2 },
+            { label: t('lbl_sessions'), data: dates.map(d=>sMap[d]||0), borderColor:GOLD,  backgroundColor:'rgba(242,181,53,0.08)', tension:0.3, fill:true, pointRadius:2 },
+            { label: t('lbl_basket'),   data: dates.map(d=>aMap[d]||0), borderColor:GREEN, backgroundColor:'rgba(76,175,125,0.08)', tension:0.3, fill:true, pointRadius:2 },
+            { label: t('lbl_removes'),  data: dates.map(d=>rMap[d]||0), borderColor:RED,   backgroundColor:'rgba(224,82,82,0.05)', tension:0.3, fill:true, pointRadius:2 },
         ]);
     }
 
     // ── AR Funnel
-    {
-        const arBasketAdds = afterAR.length;
-        const vals  = [arTaps.length, arSuccess.length, arPlaced.length, arBasketAdds];
-        const max   = vals[0] || 1;
-        mkChart('ch-funnel', 'bar',
-            ['AR Tapped','AR Launched','Placed on Table','Added to Basket'],
-            [{ label:'Users', data: vals,
-               backgroundColor: [DIM, BLUE, GREEN, GOLD],
-               borderRadius: 4 }],
-            { opts:{ indexAxis:'y', plugins:{ legend:{ display:false } } } }
-        );
-    }
+    mkChart('ch-funnel', 'bar',
+        [t('kpi_artaps'), t('kpi_arsuccess'), t('kpi_placed'), 'AR→'+t('kpi_adds')],
+        [{ data:[arTaps.length, arSuccess.length, arPlaced.length, afterAR.length],
+           backgroundColor:[DIM,BLUE,GREEN,GOLD], borderRadius:4 }],
+        { opts:{ indexAxis:'y', plugins:{ legend:{ display:false } } } });
 
     // ── Attribution doughnut
     mkChart('ch-attr', 'doughnut',
-        ['AR only','Saw AR + 3D','3D only','Direct (no preview)'],
+        [t('lbl_ar_only'), t('lbl_ar_3d'), t('lbl_3d_only'), t('lbl_direct')],
         [{ data:[arOnly.length, arAnd3d.length, tdOnly.length, direct.length],
-           backgroundColor:[BLUE, PURPLE, GREEN, DIM],
-           borderWidth:2, borderColor:'#1a1410' }]
-    );
+           backgroundColor:[BLUE,PURPLE,GREEN,DIM], borderWidth:2, borderColor: _isLight?'#fff':'#1a1410' }]);
 
     // ── Top items: views
     {
         const counts = countBy(itemViews.filter(e=>e.item_name), e=>e.item_name);
         const top = sortDesc(Object.entries(counts), e=>e[1]).slice(0,10);
         mkChart('ch-top-views','bar', top.map(e=>e[0]),
-            [{ label:'Views', data:top.map(e=>e[1]), backgroundColor:GOLD, borderRadius:4 }],
+            [{ label:t('lbl_views'), data:top.map(e=>e[1]), backgroundColor:GOLD, borderRadius:4 }],
             { opts:{ indexAxis:'y', plugins:{ legend:{ display:false } } } });
     }
 
@@ -510,7 +688,7 @@ function renderAll(events) {
         const counts = countBy(basketAdds.filter(e=>e.item_name), e=>e.item_name);
         const top = sortDesc(Object.entries(counts), e=>e[1]).slice(0,10);
         mkChart('ch-top-basket','bar', top.map(e=>e[0]),
-            [{ label:'Basket Adds', data:top.map(e=>e[1]), backgroundColor:GREEN, borderRadius:4 }],
+            [{ label:t('lbl_basket'), data:top.map(e=>e[1]), backgroundColor:GREEN, borderRadius:4 }],
             { opts:{ indexAxis:'y', plugins:{ legend:{ display:false } } } });
     }
 
@@ -519,7 +697,7 @@ function renderAll(events) {
         const counts = countBy(arSuccess.filter(e=>e.item_name), e=>e.item_name);
         const top = sortDesc(Object.entries(counts), e=>e[1]).slice(0,10);
         mkChart('ch-top-ar','bar', top.map(e=>e[0]),
-            [{ label:'AR Launches', data:top.map(e=>e[1]), backgroundColor:BLUE, borderRadius:4 }],
+            [{ label:t('lbl_ar_launches'), data:top.map(e=>e[1]), backgroundColor:BLUE, borderRadius:4 }],
             { opts:{ indexAxis:'y', plugins:{ legend:{ display:false } } } });
     }
 
@@ -531,22 +709,19 @@ function renderAll(events) {
             .filter(([,v])=>v!=null);
         const top = sortDesc(rows, e=>e[1]).slice(0,10);
         mkChart('ch-top-duration','bar', top.map(e=>e[0]),
-            [{ label:'Avg seconds', data:top.map(e=>(e[1]/1000).toFixed(1)), backgroundColor:PURPLE, borderRadius:4 }],
+            [{ label:'avg s', data:top.map(e=>(e[1]/1000).toFixed(1)), backgroundColor:PURPLE, borderRadius:4 }],
             { opts:{ indexAxis:'y', plugins:{ legend:{ display:false } } } });
     }
 
     // ── Category interest
     {
         const cats = countBy(catFilter.filter(e=>e.extra?.category), e=>e.extra.category);
-        const sorted = sortDesc(Object.entries(cats), e=>e[1]);
-        // Also count item_views by category
         const viewsByCat = countBy(itemViews.filter(e=>e.category), e=>e.category);
         const allCats = [...new Set([...Object.keys(cats), ...Object.keys(viewsByCat)])];
-        mkChart('ch-cats','bar', allCats,
-            [
-                { label:'Filter Taps', data:allCats.map(c=>cats[c]||0), backgroundColor:BLUE, borderRadius:3 },
-                { label:'Views',       data:allCats.map(c=>viewsByCat[c]||0), backgroundColor:DIM, borderRadius:3 },
-            ]);
+        mkChart('ch-cats','bar', allCats, [
+            { label:t('lbl_filter_taps'), data:allCats.map(c=>cats[c]||0),       backgroundColor:BLUE, borderRadius:3 },
+            { label:t('lbl_views'),       data:allCats.map(c=>viewsByCat[c]||0), backgroundColor:DIM,  borderRadius:3 },
+        ]);
     }
 
     // ── Peak hours
@@ -555,86 +730,168 @@ function renderAll(events) {
         sessions.forEach(e => { const h = new Date(e.created_at).getHours(); hours[h]++; });
         mkChart('ch-hours','bar',
             Array.from({length:24}, (_,i) => i+'h'),
-            [{ label:'Sessions', data:hours, backgroundColor:hours.map(v=>v===Math.max(...hours)?GOLD:DIM), borderRadius:3 }],
+            [{ data:hours, backgroundColor:hours.map(v=>v===Math.max(...hours)?GOLD:DIM), borderRadius:3 }],
             { opts:{ plugins:{ legend:{ display:false } } } });
     }
 
     // ── Day of week
     {
-        const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const days = t('days');
         const counts = Array(7).fill(0);
         sessions.forEach(e => { counts[new Date(e.created_at).getDay()]++; });
         mkChart('ch-dow','bar', days,
-            [{ label:'Sessions', data:counts, backgroundColor:counts.map(v=>v===Math.max(...counts)?GOLD:DIM), borderRadius:3 }],
+            [{ data:counts, backgroundColor:counts.map(v=>v===Math.max(...counts)?GOLD:DIM), borderRadius:3 }],
             { opts:{ plugins:{ legend:{ display:false } } } });
     }
 
-    // ── Device capability
+    // ── Device AR capability (webxr / arkit / none)
     {
-        const caps = countBy(sessions, e=>e.ar_cap||'unknown');
+        const caps = countBy(sessions, e=>e.ar_cap||'none');
         mkChart('ch-devices','doughnut', Object.keys(caps),
-            [{ data:Object.values(caps), backgroundColor:[GOLD,BLUE,GREEN,DIM,RED], borderWidth:2, borderColor:'#1a1410' }]);
+            [{ data:Object.values(caps), backgroundColor:[GOLD,BLUE,GREEN,DIM,RED], borderWidth:2, borderColor:_isLight?'#fff':'#1a1410' }]);
     }
 
-    // ── Language
+    // ── Language distribution
     {
-        const langs = countBy(sessions, e=>e.lang||'unknown');
+        const langs = countBy(sessions, e=>e.lang||'en');
         mkChart('ch-lang','doughnut', Object.keys(langs),
-            [{ data:Object.values(langs), backgroundColor:[GOLD,BLUE,DIM], borderWidth:2, borderColor:'#1a1410' }]);
-    }
-
-    // ── Theme distribution
-    {
-        const themes = countBy(sessions, e => {
-            const t = e.extra?.theme || e.extra?.t;
-            return t || 'day';
-        });
-        // Also factor in theme_change events to infer last-known theme per session
-        const sessionTheme = {};
-        themeChanges.forEach(e => { if (e.session_id) sessionTheme[e.session_id] = e.extra?.to || 'day'; });
-        sessions.forEach(e => { if (!sessionTheme[e.session_id]) sessionTheme[e.session_id] = 'day'; });
-        const dist = countBy(Object.values(sessionTheme), t => t);
-        mkChart('ch-theme', 'doughnut', Object.keys(dist),
-            [{ data: Object.values(dist), backgroundColor: [GOLD, '#3a3a5c', DIM], borderWidth: 2, borderColor: '#1a1410' }]);
-    }
-
-    // ── Language switches
-    {
-        const dirs = countBy(langChanges.filter(e => e.extra?.from && e.extra?.to),
-            e => (e.extra.from + ' → ' + e.extra.to).toUpperCase());
-        const labels = Object.keys(dirs).length ? Object.keys(dirs) : ['No switches yet'];
-        const vals   = Object.keys(dirs).length ? Object.values(dirs) : [0];
-        mkChart('ch-lang-switch', 'bar', labels,
-            [{ label: 'Switches', data: vals, backgroundColor: [GOLD, BLUE, DIM], borderRadius: 4 }],
-            { opts: { plugins: { legend: { display: false } } } });
-    }
-
-    // ── Theme switches
-    {
-        const dirs = countBy(themeChanges.filter(e => e.extra?.from && e.extra?.to),
-            e => (e.extra.from + ' → ' + e.extra.to));
-        const labels = Object.keys(dirs).length ? Object.keys(dirs) : ['No switches yet'];
-        const vals   = Object.keys(dirs).length ? Object.values(dirs) : [0];
-        mkChart('ch-theme-switch', 'bar', labels,
-            [{ label: 'Switches', data: vals, backgroundColor: [GOLD, '#3a3a5c', DIM], borderRadius: 4 }],
-            { opts: { plugins: { legend: { display: false } } } });
+            [{ data:Object.values(langs), backgroundColor:[GOLD,BLUE,DIM], borderWidth:2, borderColor:_isLight?'#fff':'#1a1410' }]);
     }
 
     // ── AR source: card vs modal
     {
         const src = countBy(arTaps.filter(e=>e.extra?.source), e=>e.extra.source);
         mkChart('ch-ar-source','doughnut', Object.keys(src),
-            [{ data:Object.values(src), backgroundColor:[GOLD,BLUE,DIM], borderWidth:2, borderColor:'#1a1410' }]);
+            [{ data:Object.values(src), backgroundColor:[GOLD,BLUE,DIM], borderWidth:2, borderColor:_isLight?'#fff':'#1a1410' }]);
+    }
+
+    // ── Theme preference (last theme per session)
+    {
+        const sessionTheme = {};
+        themeChanges.forEach(e => { if (e.session_id) sessionTheme[e.session_id] = e.extra?.to || 'day'; });
+        sessions.forEach(e => { if (!sessionTheme[e.session_id]) sessionTheme[e.session_id] = 'day'; });
+        const dist = countBy(Object.values(sessionTheme), t => t);
+        mkChart('ch-theme','doughnut', Object.keys(dist),
+            [{ data:Object.values(dist), backgroundColor:[GOLD,'#3a3a5c',DIM], borderWidth:2, borderColor:_isLight?'#fff':'#1a1410' }]);
+    }
+
+    // ── Language switches
+    {
+        const dirs = countBy(langChanges.filter(e=>e.extra?.from && e.extra?.to),
+            e => (e.extra.from+' → '+e.extra.to).toUpperCase());
+        const labels = Object.keys(dirs).length ? Object.keys(dirs) : ['—'];
+        const vals   = Object.keys(dirs).length ? Object.values(dirs) : [0];
+        mkChart('ch-lang-switch','bar', labels,
+            [{ data:vals, backgroundColor:[GOLD,BLUE,DIM], borderRadius:4 }],
+            { opts:{ plugins:{ legend:{ display:false } } } });
+    }
+
+    // ── Theme switches
+    {
+        const dirs = countBy(themeChanges.filter(e=>e.extra?.from && e.extra?.to),
+            e => e.extra.from+' → '+e.extra.to);
+        const labels = Object.keys(dirs).length ? Object.keys(dirs) : ['—'];
+        const vals   = Object.keys(dirs).length ? Object.values(dirs) : [0];
+        mkChart('ch-theme-switch','bar', labels,
+            [{ data:vals, backgroundColor:[GOLD,'#3a3a5c',DIM], borderRadius:4 }],
+            { opts:{ plugins:{ legend:{ display:false } } } });
+    }
+
+    // ── Platform breakdown: iOS / Android AR / No AR
+    mkChart('ch-platform','doughnut',
+        [t('lbl_ios'), t('lbl_android_ar'), t('lbl_no_ar')],
+        [{ data:[iosCount, androidARCnt, noARCnt],
+           backgroundColor:[BLUE, GREEN, DIM], borderWidth:2, borderColor:_isLight?'#fff':'#1a1410' }]);
+
+    // ── AR capable vs not
+    mkChart('ch-ar-capable','doughnut',
+        [t('lbl_ar_capable'), t('lbl_no_ar_cap')],
+        [{ data:[arCapable, noARCnt],
+           backgroundColor:[GOLD, DIM], borderWidth:2, borderColor:_isLight?'#fff':'#1a1410' }]);
+
+    // ── AR funnel by platform (grouped bar: iOS vs Android)
+    {
+        const iosTaps     = arTaps.filter(e=>e.ar_cap==='arkit').length;
+        const iosSuccess  = arSuccess.filter(e=>e.ar_cap==='arkit').length;
+        const droidTaps   = arTaps.filter(e=>e.ar_cap==='webxr').length;
+        const droidSuccess= arSuccess.filter(e=>e.ar_cap==='webxr').length;
+        mkChart('ch-ar-platform','bar',
+            [t('kpi_artaps'), t('kpi_arsuccess')],
+            [
+                { label:'iOS',     data:[iosTaps, iosSuccess],   backgroundColor:BLUE,  borderRadius:4 },
+                { label:'Android', data:[droidTaps,droidSuccess], backgroundColor:GREEN, borderRadius:4 },
+            ]);
+    }
+
+    // ── First dish explored: first item_view per session
+    {
+        const bySession = groupBy(itemViews.filter(e=>e.item_name && e.session_id), e=>e.session_id);
+        const firstViews = Object.values(bySession).map(evs =>
+            evs.sort((a,b) => new Date(a.created_at)-new Date(b.created_at))[0].item_name
+        );
+        const counts = countBy(firstViews, n=>n);
+        const top = sortDesc(Object.entries(counts), e=>e[1]).slice(0,10);
+        mkChart('ch-first-3d','bar', top.map(e=>e[0]),
+            [{ data:top.map(e=>e[1]), backgroundColor:GOLD, borderRadius:4 }],
+            { opts:{ indexAxis:'y', plugins:{ legend:{ display:false } } } });
+    }
+
+    // ── First dish tapped for AR: first ar_tap per session
+    {
+        const bySession = groupBy(arTaps.filter(e=>e.item_name && e.session_id), e=>e.session_id);
+        const firstAR = Object.values(bySession).map(evs =>
+            evs.sort((a,b) => new Date(a.created_at)-new Date(b.created_at))[0].item_name
+        );
+        const counts = countBy(firstAR, n=>n);
+        const top = sortDesc(Object.entries(counts), e=>e[1]).slice(0,10);
+        mkChart('ch-first-ar','bar', top.map(e=>e[0]),
+            [{ data:top.map(e=>e[1]), backgroundColor:BLUE, borderRadius:4 }],
+            { opts:{ indexAxis:'y', plugins:{ legend:{ display:false } } } });
+    }
+
+    // ── Upsell table
+    {
+        const allItems = [...new Set([...itemViews,...arTaps,...basketAdds].map(e=>e.item_name).filter(Boolean))];
+        const rows = allItems.map(name => {
+            const views      = itemViews.filter(e=>e.item_name===name).length;
+            const taps       = arTaps.filter(e=>e.item_name===name).length;
+            const totalAdds  = basketAdds.filter(e=>e.item_name===name).length;
+            const arAdds     = basketAdds.filter(e=>e.item_name===name && e.extra?.after_ar===true).length;
+            const tdAdds     = basketAdds.filter(e=>e.item_name===name && e.extra?.after_3d===true).length;
+            const dirAdds    = basketAdds.filter(e=>e.item_name===name && !e.extra?.after_ar && !e.extra?.after_3d).length;
+            const arConvRate = pct(arAdds, taps);
+            const tdConvRate = pct(tdAdds, views);
+            const dirRate    = pct(dirAdds, views);
+            const arLift     = (taps > 0 && views > 0) ? (arConvRate / Math.max(dirRate, 1)).toFixed(1) : null;
+            const tdLift     = (views > 0) ? (tdConvRate / Math.max(dirRate, 1)).toFixed(1) : null;
+            return { name, views, taps, totalAdds, arAdds, tdAdds, dirAdds, arConvRate, tdConvRate, arLift, tdLift };
+        }).sort((a,b) => b.totalAdds - a.totalAdds);
+
+        document.getElementById('th-upsell').innerHTML = `<tr>
+            <th>${t('th_item')}</th><th>${t('th_views')}</th><th>${t('th_ar_taps')}</th>
+            <th>${t('th_total_orders')}</th><th>${t('th_ar_orders')}</th><th>${t('th_3d_orders')}</th>
+            <th>${t('th_direct_orders')}</th><th>${t('th_ar_lift')}</th><th>${t('th_3d_lift')}</th>
+        </tr>`;
+        document.getElementById('tb-upsell').innerHTML = rows.length
+            ? rows.map(r => `<tr>
+                <td class="hl">${r.name}</td>
+                <td>${r.views}</td>
+                <td>${r.taps}</td>
+                <td>${r.totalAdds}</td>
+                <td>${r.arAdds > 0 ? '<span class="good">'+r.arAdds+'</span>' : '<span class="dim">0</span>'}</td>
+                <td>${r.tdAdds > 0 ? '<span style="color:'+BLUE+'">'+r.tdAdds+'</span>' : '<span class="dim">0</span>'}</td>
+                <td class="dim">${r.dirAdds}</td>
+                <td>${r.arLift != null ? `<span class="${r.arLift>=2?'good':r.arLift>=1.2?'hl':'dim'}">${r.arLift}×</span>` : '<span class="dim">—</span>'}</td>
+                <td>${r.tdLift != null ? `<span class="${r.tdLift>=2?'good':r.tdLift>=1.2?'hl':'dim'}">${r.tdLift}×</span>` : '<span class="dim">—</span>'}</td>
+            </tr>`).join('')
+            : `<tr><td colspan="9" class="empty-state">${t('lbl_no_data')}</td></tr>`;
     }
 
     // ── AR Efficiency table
     {
-        const allItems = [...new Set([
-            ...itemViews, ...arTaps, ...arSuccess, ...arPlaced, ...basketAdds
-        ].map(e=>e.item_name).filter(Boolean))];
-
+        const allItems = [...new Set([...itemViews,...arTaps,...arSuccess,...arPlaced,...basketAdds].map(e=>e.item_name).filter(Boolean))];
         const rows = allItems.map(name => {
-            const cat     = (itemViews.find(e=>e.item_name===name)||arTaps.find(e=>e.item_name===name)||{}).category || '';
+            const cat     = (itemViews.find(e=>e.item_name===name)||arTaps.find(e=>e.item_name===name)||{}).category||'';
             const views   = itemViews.filter(e=>e.item_name===name).length;
             const taps    = arTaps.filter(e=>e.item_name===name).length;
             const success = arSuccess.filter(e=>e.item_name===name).length;
@@ -643,59 +900,67 @@ function renderAll(events) {
             const arConv  = success > 0 ? pct(adds, success) : null;
             const score   = views*1 + taps*2 + success*3 + placed*4 + adds*5;
             return { name, cat, views, taps, success, placed, adds, arConv, score };
-        }).sort((a,b) => b.score - a.score);
+        }).sort((a,b) => b.score-a.score);
 
         const maxScore = rows[0]?.score || 1;
+        document.getElementById('th-efficiency').innerHTML = `<tr>
+            <th>${t('th_rank')}</th><th>${t('th_item')}</th><th>${t('th_category')}</th>
+            <th>${t('th_views')}</th><th>${t('th_ar_taps')}</th><th>${t('th_ar_success')}</th>
+            <th>${t('th_placed')}</th><th>${t('th_after_ar')}</th><th>${t('th_ar_conv')}</th><th>${t('th_interest')}</th>
+        </tr>`;
         document.getElementById('tb-efficiency').innerHTML = rows.length
             ? rows.map((r,i) => `<tr>
                 <td class="dim">${i+1}</td>
                 <td class="hl">${r.name}</td>
                 <td class="dim">${r.cat}</td>
-                <td>${r.views}</td>
-                <td>${r.taps}</td>
+                <td>${r.views}</td><td>${r.taps}</td>
                 <td style="color:${r.success>0?BLUE:'var(--dim)'}">${r.success}</td>
                 <td style="color:${r.placed>0?GREEN:'var(--dim)'}">${r.placed}</td>
-                <td>${r.adds > 0 ? '<span class="good">'+r.adds+'</span>' : '<span class="dim">'+r.adds+'</span>'}</td>
-                <td>${r.arConv != null
-                    ? `<span class="${r.arConv>=30?'good':r.arConv>=10?'hl':'bad'}">${r.arConv}%</span>`
-                    : '<span class="dim">—</span>'}</td>
-                <td>
-                    <div style="display:flex;align-items:center;gap:8px">
-                        <div class="bar-bg" style="flex:1"><div class="bar-fill" style="width:${pct(r.score,maxScore)}%"></div></div>
-                        <span class="hl" style="min-width:28px;text-align:right">${r.score}</span>
-                    </div>
-                </td>
+                <td>${r.adds>0?'<span class="good">'+r.adds+'</span>':'<span class="dim">0</span>'}</td>
+                <td>${r.arConv!=null?`<span class="${r.arConv>=30?'good':r.arConv>=10?'hl':'bad'}">${r.arConv}%</span>`:'<span class="dim">—</span>'}</td>
+                <td><div style="display:flex;align-items:center;gap:8px">
+                    <div class="bar-bg" style="flex:1"><div class="bar-fill" style="width:${pct(r.score,maxScore)}%"></div></div>
+                    <span class="hl" style="min-width:28px;text-align:right">${r.score}</span>
+                </div></td>
             </tr>`).join('')
-            : `<tr><td colspan="10" class="empty-state">No data yet — events will appear once the app gets traffic.</td></tr>`;
+            : `<tr><td colspan="10" class="empty-state">${t('lbl_no_data')}</td></tr>`;
     }
 
     // ── 3D Engagement table
     {
         const allItems = [...new Set(modalCloses.map(e=>e.item_name).filter(Boolean))];
         const rows = allItems.map(name => {
-            const opens   = itemViews.filter(e=>e.item_name===name).length;
-            const closes  = modalCloses.filter(e=>e.item_name===name && e.extra?.duration_ms);
-            const avgT    = closes.length ? avg(closes.map(e=>Number(e.extra.duration_ms))) : null;
-            const adds    = basketAdds.filter(e=>e.item_name===name && e.extra?.after_3d===true).length;
-            const conv    = opens > 0 ? pct(adds, opens) : null;
-            const navs    = xrNavs.filter(e=>e.item_name===name).length;
+            const opens  = itemViews.filter(e=>e.item_name===name).length;
+            const closes = modalCloses.filter(e=>e.item_name===name && e.extra?.duration_ms);
+            const avgT   = closes.length ? avg(closes.map(e=>Number(e.extra.duration_ms))) : null;
+            const adds   = basketAdds.filter(e=>e.item_name===name && e.extra?.after_3d===true).length;
+            const conv   = opens>0 ? pct(adds,opens) : null;
+            const navs   = xrNavs.filter(e=>e.item_name===name).length;
             return { name, opens, avgT, adds, conv, navs };
         }).sort((a,b) => (b.avgT||0)-(a.avgT||0));
 
+        document.getElementById('th-3d').innerHTML = `<tr>
+            <th>${t('th_item')}</th><th>${t('th_opens')}</th><th>${t('th_avg_view')}</th>
+            <th>${t('th_after_3d')}</th><th>${t('th_3d_conv')}</th><th>${t('th_xr_navs')}</th>
+        </tr>`;
         document.getElementById('tb-3d').innerHTML = rows.length
             ? rows.map(r => `<tr>
                 <td class="hl">${r.name}</td>
                 <td>${r.opens}</td>
                 <td class="${r.avgT&&r.avgT>10000?'good':''}">${fmtS(r.avgT)}</td>
-                <td>${r.adds > 0 ? '<span class="good">'+r.adds+'</span>' : '<span class="dim">0</span>'}</td>
-                <td>${r.conv != null ? `<span class="${r.conv>=20?'good':r.conv>=10?'hl':'dim'}">${r.conv}%</span>` : '<span class="dim">—</span>'}</td>
+                <td>${r.adds>0?'<span class="good">'+r.adds+'</span>':'<span class="dim">0</span>'}</td>
+                <td>${r.conv!=null?`<span class="${r.conv>=20?'good':r.conv>=10?'hl':'dim'}">${r.conv}%</span>`:'<span class="dim">—</span>'}</td>
                 <td class="dim">${r.navs}</td>
             </tr>`).join('')
-            : `<tr><td colspan="6" class="empty-state">No data yet.</td></tr>`;
+            : `<tr><td colspan="6" class="empty-state">${t('lbl_no_data')}</td></tr>`;
     }
 
     // ── Recent events
     {
+        document.getElementById('th-recent').innerHTML = `<tr>
+            <th>${t('th_time')}</th><th>${t('th_event')}</th><th>${t('th_item')}</th>
+            <th>${t('th_category')}</th><th>${t('th_lang')}</th><th>${t('th_ar_cap')}</th><th>${t('th_extra')}</th>
+        </tr>`;
         document.getElementById('tb-recent').innerHTML = events.slice(0,50).map(e => {
             const col  = eventColors[e.event] || '#7a6a50';
             const time = new Date(e.created_at).toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
@@ -716,7 +981,8 @@ function renderAll(events) {
 }
 
 // ── Boot
-showDash();
+document.getElementById('dash').style.display = 'block';
+loadData();
 </script>
 </body>
 </html>
