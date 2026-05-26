@@ -24,14 +24,6 @@
         body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; min-height: 100vh; }
 
         /* ── Auth ─────────────────────────────────────────── */
-        #auth { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .auth-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 48px 40px; width: 320px; text-align: center; }
-        .auth-logo { font-size: 2.2rem; letter-spacing: 8px; color: var(--gold); font-family: 'Georgia', serif; font-weight: 900; margin-bottom: 4px; }
-        .auth-sub  { color: var(--dim); font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 32px; }
-        .auth-box input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; color: var(--text); font-size: 1rem; margin-bottom: 12px; outline: none; transition: border-color 0.2s; }
-        .auth-box input:focus { border-color: var(--gold); }
-        .auth-box button { width: 100%; background: var(--gold); color: #0d0a07; border: none; border-radius: 10px; padding: 13px; font-weight: 800; font-size: 0.82rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
-        #auth-err { color: var(--red); font-size: 0.78rem; margin-top: 10px; min-height: 16px; }
 
         /* ── Dashboard ────────────────────────────────────── */
         #dash { display: none; }
@@ -106,16 +98,6 @@
 <body>
 
 <!-- ══ Auth ══════════════════════════════════════════════════ -->
-<div id="auth">
-    <div class="auth-box">
-        <div class="auth-logo">BL</div>
-        <div class="auth-sub">Analytics Dashboard</div>
-        <input type="password" id="pw-input" placeholder="Password" autocomplete="current-password">
-        <button id="login-btn">Enter</button>
-        <div id="auth-err"></div>
-    </div>
-</div>
-
 <!-- ══ Loading ═══════════════════════════════════════════════ -->
 <div id="loading">
     <div class="spinner"></div>
@@ -135,7 +117,6 @@
             <option value="0">All time</option>
         </select>
         <button class="hbtn" id="refresh-btn">↻ Refresh</button>
-        <button class="hbtn" id="logout-btn">Logout</button>
     </header>
 
     <div class="content">
@@ -278,10 +259,9 @@
 
 <script>
 // ════════════════════════════════════════════════════════════════
-// CONFIG  —  change password before sharing the URL
+// CONFIG
 // ════════════════════════════════════════════════════════════════
 const CFG = {
-    password:     'lions2026',
     supabaseUrl:  'https://xctoxhaahxtcicfgnmme.supabase.co',
     supabaseKey:  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdG94aGFhaHh0Y2ljZmdubW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NDMyMDEsImV4cCI6MjA5NTMxOTIwMX0.VA2tQL6WT96ifBjON4NLaJa0BbzBGI0ipD7iB5fHjnQ',
 };
@@ -298,29 +278,9 @@ Chart.defaults.font.size       = 11;
 
 const GOLD='#f2b535', GREEN='#4caf7d', RED='#e05252', BLUE='#4a9fd4', PURPLE='#a47fd4', DIM='rgba(242,181,53,0.25)';
 
-// ════════════════════════════════════════════════════════════════
-// Auth
-// ════════════════════════════════════════════════════════════════
-const $auth = document.getElementById('auth');
 const $dash = document.getElementById('dash');
 
-function tryAuth() {
-    if (sessionStorage.getItem('bl-admin') === '1') { showDash(); }
-}
-
-document.getElementById('login-btn').addEventListener('click', () => {
-    if (document.getElementById('pw-input').value === CFG.password) {
-        sessionStorage.setItem('bl-admin', '1');
-        document.getElementById('auth-err').textContent = '';
-        showDash();
-    } else {
-        document.getElementById('auth-err').textContent = 'Wrong password.';
-    }
-});
-document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('login-btn').click(); });
-document.getElementById('logout-btn').addEventListener('click', () => { sessionStorage.removeItem('bl-admin'); $dash.style.display='none'; $auth.style.display='flex'; });
-
-function showDash() { $auth.style.display='none'; $dash.style.display=''; loadData(); }
+function showDash() { $dash.style.display=''; loadData(); }
 
 // ════════════════════════════════════════════════════════════════
 // Data loading
@@ -700,7 +660,7 @@ function renderAll(events) {
 }
 
 // ── Boot
-tryAuth();
+showDash();
 </script>
 </body>
 </html>
