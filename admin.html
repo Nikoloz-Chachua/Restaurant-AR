@@ -120,13 +120,17 @@
     </header>
     <div id="hours-panel" style="display:none; background:var(--card2); border-bottom:1px solid var(--border); padding:12px 28px; display:none; align-items:center; gap:16px; flex-wrap:wrap;">
         <span style="font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--dim)" data-i18n="hours_label">Working Hours Filter</span>
-        <label style="font-size:0.8rem;color:var(--text);display:flex;align-items:center;gap:8px">
+        <label style="font-size:0.8rem;color:var(--text);display:flex;align-items:center;gap:6px">
             <span data-i18n="hours_from">From</span>
-            <input type="time" id="hours-start" value="10:00" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:0.8rem;">
+            <select id="hours-start-h" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:0.8rem;"></select>
+            <span style="color:var(--dim)">:</span>
+            <select id="hours-start-m" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:0.8rem;"></select>
         </label>
-        <label style="font-size:0.8rem;color:var(--text);display:flex;align-items:center;gap:8px">
+        <label style="font-size:0.8rem;color:var(--text);display:flex;align-items:center;gap:6px">
             <span data-i18n="hours_to">To</span>
-            <input type="time" id="hours-end" value="23:00" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:0.8rem;">
+            <select id="hours-end-h" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:0.8rem;"></select>
+            <span style="color:var(--dim)">:</span>
+            <select id="hours-end-m" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:0.8rem;"></select>
         </label>
         <label style="font-size:0.8rem;color:var(--text);display:flex;align-items:center;gap:8px">
             <input type="checkbox" id="hours-filter" style="accent-color:var(--gold);">
@@ -521,9 +525,37 @@ const hoursPanel = document.getElementById('hours-panel');
 document.getElementById('hours-btn').addEventListener('click', () => {
     hoursPanel.style.display = hoursPanel.style.display === 'none' ? 'flex' : 'none';
 });
+// Populate hour (00-23) and minute (00,15,30,45) selects
+(function() {
+    ['hours-start-h','hours-end-h'].forEach(id => {
+        const sel = document.getElementById(id);
+        for (let h = 0; h < 24; h++) {
+            const o = document.createElement('option');
+            o.value = o.textContent = h.toString().padStart(2,'0');
+            sel.appendChild(o);
+        }
+    });
+    ['hours-start-m','hours-end-m'].forEach(id => {
+        const sel = document.getElementById(id);
+        ['00','15','30','45'].forEach(m => {
+            const o = document.createElement('option');
+            o.value = o.textContent = m;
+            sel.appendChild(o);
+        });
+    });
+    // Default values
+    document.getElementById('hours-start-h').value = '10';
+    document.getElementById('hours-start-m').value = '00';
+    document.getElementById('hours-end-h').value   = '23';
+    document.getElementById('hours-end-m').value   = '00';
+})();
+
+function _getHoursVal(prefix) {
+    return document.getElementById(prefix+'-h').value + ':' + document.getElementById(prefix+'-m').value;
+}
 document.getElementById('hours-apply').addEventListener('click', () => {
-    localStorage.setItem('bl-admin-hours-start', document.getElementById('hours-start').value);
-    localStorage.setItem('bl-admin-hours-end',   document.getElementById('hours-end').value);
+    localStorage.setItem('bl-admin-hours-start', _getHoursVal('hours-start'));
+    localStorage.setItem('bl-admin-hours-end',   _getHoursVal('hours-end'));
     localStorage.setItem('bl-admin-hours-filter', document.getElementById('hours-filter').checked ? '1' : '0');
     hoursPanel.style.display = 'none';
     if (_lastEvents) renderAll(_lastEvents);
@@ -533,14 +565,14 @@ document.getElementById('hours-apply').addEventListener('click', () => {
     const s = localStorage.getItem('bl-admin-hours-start');
     const e = localStorage.getItem('bl-admin-hours-end');
     const f = localStorage.getItem('bl-admin-hours-filter');
-    if (s) document.getElementById('hours-start').value = s;
-    if (e) document.getElementById('hours-end').value   = e;
+    if (s) { const [h,m] = s.split(':'); document.getElementById('hours-start-h').value = h; document.getElementById('hours-start-m').value = m || '00'; }
+    if (e) { const [h,m] = e.split(':'); document.getElementById('hours-end-h').value   = h; document.getElementById('hours-end-m').value   = m || '00'; }
     if (f) document.getElementById('hours-filter').checked = f === '1';
 })();
 
 function isWithinHours(isoDate) {
-    const start = document.getElementById('hours-start').value || '00:00';
-    const end   = document.getElementById('hours-end').value   || '23:59';
+    const start = _getHoursVal('hours-start');
+    const end   = _getHoursVal('hours-end');
     const d     = new Date(isoDate);
     const hhmm  = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
     return hhmm >= start && hhmm <= end;
