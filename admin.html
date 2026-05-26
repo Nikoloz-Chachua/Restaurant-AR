@@ -218,6 +218,23 @@
             </div>
         </div>
 
+        <!-- ── Language & Theme ── -->
+        <div class="section-label">Language &amp; Theme</div>
+        <div class="charts-3">
+            <div class="chart-box">
+                <div class="chart-title">Theme Preference</div>
+                <canvas id="ch-theme"></canvas>
+            </div>
+            <div class="chart-box">
+                <div class="chart-title">Language Switches</div>
+                <canvas id="ch-lang-switch"></canvas>
+            </div>
+            <div class="chart-box">
+                <div class="chart-title">Theme Switches</div>
+                <canvas id="ch-theme-switch"></canvas>
+            </div>
+        </div>
+
         <!-- ── AR Efficiency Table ── -->
         <div class="section-label">AR Efficiency by Item</div>
         <div class="tbl-section">
@@ -388,6 +405,8 @@ function renderAll(events) {
     const basketOpens = by.basket_open    || [];
     const catFilter   = by.category_filter|| [];
     const xrNavs      = by.xr_nav         || [];
+    const langChanges  = by.lang_change   || [];
+    const themeChanges = by.theme_change  || [];
 
     // Attribution buckets
     const arOnly   = basketAdds.filter(e => e.extra?.after_ar === true  && e.extra?.after_3d !== true);
@@ -562,6 +581,43 @@ function renderAll(events) {
         const langs = countBy(sessions, e=>e.lang||'unknown');
         mkChart('ch-lang','doughnut', Object.keys(langs),
             [{ data:Object.values(langs), backgroundColor:[GOLD,BLUE,DIM], borderWidth:2, borderColor:'#1a1410' }]);
+    }
+
+    // ── Theme distribution
+    {
+        const themes = countBy(sessions, e => {
+            const t = e.extra?.theme || e.extra?.t;
+            return t || 'day';
+        });
+        // Also factor in theme_change events to infer last-known theme per session
+        const sessionTheme = {};
+        themeChanges.forEach(e => { if (e.session_id) sessionTheme[e.session_id] = e.extra?.to || 'day'; });
+        sessions.forEach(e => { if (!sessionTheme[e.session_id]) sessionTheme[e.session_id] = 'day'; });
+        const dist = countBy(Object.values(sessionTheme), t => t);
+        mkChart('ch-theme', 'doughnut', Object.keys(dist),
+            [{ data: Object.values(dist), backgroundColor: [GOLD, '#3a3a5c', DIM], borderWidth: 2, borderColor: '#1a1410' }]);
+    }
+
+    // ── Language switches
+    {
+        const dirs = countBy(langChanges.filter(e => e.extra?.from && e.extra?.to),
+            e => (e.extra.from + ' → ' + e.extra.to).toUpperCase());
+        const labels = Object.keys(dirs).length ? Object.keys(dirs) : ['No switches yet'];
+        const vals   = Object.keys(dirs).length ? Object.values(dirs) : [0];
+        mkChart('ch-lang-switch', 'bar', labels,
+            [{ label: 'Switches', data: vals, backgroundColor: [GOLD, BLUE, DIM], borderRadius: 4 }],
+            { opts: { plugins: { legend: { display: false } } } });
+    }
+
+    // ── Theme switches
+    {
+        const dirs = countBy(themeChanges.filter(e => e.extra?.from && e.extra?.to),
+            e => (e.extra.from + ' → ' + e.extra.to));
+        const labels = Object.keys(dirs).length ? Object.keys(dirs) : ['No switches yet'];
+        const vals   = Object.keys(dirs).length ? Object.values(dirs) : [0];
+        mkChart('ch-theme-switch', 'bar', labels,
+            [{ label: 'Switches', data: vals, backgroundColor: [GOLD, '#3a3a5c', DIM], borderRadius: 4 }],
+            { opts: { plugins: { legend: { display: false } } } });
     }
 
     // ── AR source: card vs modal
