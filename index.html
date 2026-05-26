@@ -748,7 +748,7 @@
             text-align: right;
             transition: color var(--t);
         }
-        .basket-footer {
+.basket-footer {
             padding: 16px 20px;
             border-top: 2px solid var(--border);
             display: flex;
@@ -1575,27 +1575,61 @@
                   }));
             sessionStorage.setItem('bl-sid', _sid);
         }
+        // Persistent visitor ID — survives across sessions on same device
+        let _vid = localStorage.getItem('bl-vid');
+        const _isReturnVisitor = !!_vid;
+        if (!_vid) {
+            _vid = (crypto?.randomUUID
+                ? crypto.randomUUID()
+                : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+                    const r = Math.random() * 16 | 0;
+                    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+                  }));
+            localStorage.setItem('bl-vid', _vid);
+        }
         function track(event, itemIndex, extra) {
             if (!_sbClient) return;
             const item = (itemIndex != null && window.__menuItems) ? window.__menuItems[itemIndex] : null;
             _sbClient.from('events').insert({
-                session_id: _sid,
+                session_id:  _sid,
+                visitor_id:  _vid,
                 event,
-                item_index: itemIndex != null ? itemIndex : null,
-                item_name:  item ? item.name : null,
-                category:   item ? item.category : null,
-                lang:       window.__lang || localStorage.getItem('bl-lang') || 'en',
-                ar_cap:     window.__arCap || localStorage.getItem('bl-ar-cap') || null,
-                extra:      extra || null,
+                item_index:  itemIndex != null ? itemIndex : null,
+                item_name:   item ? item.name : null,
+                category:    item ? item.category : null,
+                lang:        window.__lang || localStorage.getItem('bl-lang') || 'en',
+                ar_cap:      window.__arCap || localStorage.getItem('bl-ar-cap') || null,
+                extra:       extra || null,
             }).then(() => {}).catch(() => {});
         }
         window.track = track;
-        const _arViewedItems    = new Set(); // global indices viewed in AR this session
-        const _modalViewedItems = new Set(); // global indices viewed in 3D modal this session
+        const _arViewedItems    = new Set();
+        const _modalViewedItems = new Set();
         window._arViewedItems   = _arViewedItems;
         let   _modalOpenTime    = null;
         let   _arStartTime      = null;
-        track('page_load');
+        // First interaction timing
+        const _pageLoadTime = Date.now();
+        let   _firstInteractionDone = false;
+        function _trackFirstInteraction(type) {
+            if (_firstInteractionDone) return;
+            _firstInteractionDone = true;
+            track('first_interaction', null, { ms: Date.now() - _pageLoadTime, type });
+        }
+        // Scroll depth milestones
+        const _scrollMilestones = new Set();
+        window.addEventListener('scroll', () => {
+            const scrolled = window.scrollY + window.innerHeight;
+            const total    = document.documentElement.scrollHeight;
+            const pct      = Math.round(scrolled / total * 100);
+            [25, 50, 75, 100].forEach(m => {
+                if (pct >= m && !_scrollMilestones.has(m)) {
+                    _scrollMilestones.add(m);
+                    track('scroll_depth', null, { pct: m });
+                }
+            });
+        }, { passive: true });
+        track('page_load', null, { return_visitor: _isReturnVisitor });
 
         const UI = {
             en: {
@@ -1621,6 +1655,8 @@
     emptyBasket:  'Your basket is empty',
     total:        'Total',
     clearBasket:  'Clear',
+    readyBtn:     '✓ Ready to Order',
+    readyDone:    '✓ Order Noted!',
             },
             ka: {
                 tagline:   'გასინჯე ველური გემო',
@@ -1645,6 +1681,8 @@
     emptyBasket:  'კალათა ცარიელია',
     total:        'სულ',
     clearBasket:  'გასუფთავება',
+    readyBtn:     '✓ შეკვეთა მზადაა',
+    readyDone:    '✓ მიღებულია!',
             }
         };
 
@@ -1803,8 +1841,10 @@
             const _viewItem = modalItems[localIdx];
             const _viewIdx  = (_viewItem && menuItems) ? menuItems.indexOf(_viewItem) : null;
             _modalOpenTime = Date.now();
+            const _repeatView = _viewIdx >= 0 && _modalViewedItems.has(_viewIdx);
             if (_viewIdx >= 0) _modalViewedItems.add(_viewIdx);
-            track('item_view', _viewIdx >= 0 ? _viewIdx : null);
+            track('item_view', _viewIdx >= 0 ? _viewIdx : null, _repeatView ? { repeat: true } : null);
+            _trackFirstInteraction('3d');
             updateModal();
             const cap = window.__arCap;
             modalArBtn.textContent  = UI[window.__lang].viewAR;
@@ -1939,6 +1979,7 @@
             const _tapIdx  = (_tapItem && menuItems) ? menuItems.indexOf(_tapItem) : null;
             track('ar_tap', _tapIdx >= 0 ? _tapIdx : null,
                   { source: modal.classList.contains('active') ? 'modal' : 'card' });
+            _trackFirstInteraction('ar');
             setARButtonsState(true);
 
             const cap  = window.__arCap ?? await detectAR();
@@ -2333,13 +2374,26 @@
             if (e.target === document.getElementById('basket-panel')) _closeBasket();
         });
         document.getElementById('basket-clear').addEventListener('click', () => {
+            if (_basket.size > 0) {
+                const snapshot = [];
+                let total = 0;
+                _basket.forEach(({ item, qty }) => {
+                    snapshot.push({ name: item.name, qty, price: item.price });
+                    total += _parsePrice(item.price) * qty;
+                });
+                track('basket_clear', null, {
+                    item_count: snapshot.length,
+                    items: snapshot,
+                    total_gel: Math.round(total * 10) / 10,
+                });
+            }
             const keys = [..._basket.keys()];
             _basket.clear();
             keys.forEach(k => _syncQtyCtrl(k));
             _updateBasketBar();
             _renderBasketPanel();
         });
-        document.getElementById('basket-items').addEventListener('click', e => {
+document.getElementById('basket-items').addEventListener('click', e => {
             const btn = e.target.closest('.qty-btn');
             if (!btn) return;
             const entry = _basket.get(btn.dataset.key);

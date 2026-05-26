@@ -113,10 +113,27 @@
             <option value="90" data-i18n="last90">Last 90 days</option>
             <option value="0"  data-i18n="allTime">All time</option>
         </select>
+        <button class="hbtn" id="hours-btn" title="Set working hours">🕐 Hours</button>
         <button class="hbtn" id="lang-btn" title="Switch language">KA</button>
         <button class="hbtn" id="theme-btn" title="Switch theme">☀</button>
         <button class="hbtn" id="refresh-btn" data-i18n="refresh">↻ Refresh</button>
     </header>
+    <div id="hours-panel" style="display:none; background:var(--card2); border-bottom:1px solid var(--border); padding:12px 28px; display:none; align-items:center; gap:16px; flex-wrap:wrap;">
+        <span style="font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--dim)" data-i18n="hours_label">Working Hours Filter</span>
+        <label style="font-size:0.8rem;color:var(--text);display:flex;align-items:center;gap:8px">
+            <span data-i18n="hours_from">From</span>
+            <input type="time" id="hours-start" value="10:00" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:0.8rem;">
+        </label>
+        <label style="font-size:0.8rem;color:var(--text);display:flex;align-items:center;gap:8px">
+            <span data-i18n="hours_to">To</span>
+            <input type="time" id="hours-end" value="23:00" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:0.8rem;">
+        </label>
+        <label style="font-size:0.8rem;color:var(--text);display:flex;align-items:center;gap:8px">
+            <input type="checkbox" id="hours-filter" style="accent-color:var(--gold);">
+            <span data-i18n="hours_filter_label">Filter data to working hours only</span>
+        </label>
+        <button class="hbtn" id="hours-apply" data-i18n="hours_apply">Apply</button>
+    </div>
 
     <div class="content">
 
@@ -391,6 +408,9 @@ const T = {
         lbl_sessions:'Sessions', lbl_basket:'Basket Adds', lbl_removes:'Basket Removes',
         lbl_filter_taps:'Filter Taps', lbl_views:'Views', lbl_ar_launches:'AR Launches',
         lbl_placed:'Placed', lbl_no_data:'No data yet — events will appear once the app gets traffic.',
+        hours_label:'Working Hours Filter', hours_from:'From', hours_to:'To',
+        hours_filter_label:'Filter data to working hours only', hours_apply:'Apply',
+        lbl_outside_hours:'Outside hours', lbl_in_hours:'Within hours',
         days:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
     },
     ka: {
@@ -445,6 +465,9 @@ const T = {
         lbl_sessions:'სესიები', lbl_basket:'კალათი', lbl_removes:'კალათიდან ამოღება',
         lbl_filter_taps:'ფილტრი', lbl_views:'ნახვები', lbl_ar_launches:'AR გაშვება',
         lbl_placed:'განთავსება', lbl_no_data:'მონაცემები არ არის.',
+        hours_label:'სამუშაო საათების ფილტრი', hours_from:'დან', hours_to:'მდე',
+        hours_filter_label:'მხოლოდ სამუშაო საათების მონაცემები', hours_apply:'გამოყენება',
+        lbl_outside_hours:'სამუშაო საათების გარეთ', lbl_in_hours:'სამუშაო საათებში',
         days:['კვი','ორშ','სამ','ოთხ','ხუთ','პარ','შაბ'],
     }
 };
@@ -492,6 +515,40 @@ document.getElementById('theme-btn').addEventListener('click', () => applyTheme(
 document.getElementById('lang-btn').addEventListener('click', () => applyLang(_lang === 'en' ? 'ka' : 'en'));
 document.getElementById('refresh-btn').addEventListener('click', loadData);
 document.getElementById('range-sel').addEventListener('change', loadData);
+
+// ── Working hours
+const hoursPanel = document.getElementById('hours-panel');
+document.getElementById('hours-btn').addEventListener('click', () => {
+    hoursPanel.style.display = hoursPanel.style.display === 'none' ? 'flex' : 'none';
+});
+document.getElementById('hours-apply').addEventListener('click', () => {
+    localStorage.setItem('bl-admin-hours-start', document.getElementById('hours-start').value);
+    localStorage.setItem('bl-admin-hours-end',   document.getElementById('hours-end').value);
+    localStorage.setItem('bl-admin-hours-filter', document.getElementById('hours-filter').checked ? '1' : '0');
+    hoursPanel.style.display = 'none';
+    if (_lastEvents) renderAll(_lastEvents);
+});
+// Restore saved settings
+(function() {
+    const s = localStorage.getItem('bl-admin-hours-start');
+    const e = localStorage.getItem('bl-admin-hours-end');
+    const f = localStorage.getItem('bl-admin-hours-filter');
+    if (s) document.getElementById('hours-start').value = s;
+    if (e) document.getElementById('hours-end').value   = e;
+    if (f) document.getElementById('hours-filter').checked = f === '1';
+})();
+
+function isWithinHours(isoDate) {
+    const start = document.getElementById('hours-start').value || '00:00';
+    const end   = document.getElementById('hours-end').value   || '23:59';
+    const d     = new Date(isoDate);
+    const hhmm  = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+    return hhmm >= start && hhmm <= end;
+}
+function applyHoursFilter(events) {
+    if (!document.getElementById('hours-filter').checked) return events;
+    return events.filter(e => isWithinHours(e.created_at));
+}
 
 // ════════════════════════════════════════════════════════════════
 // DATA LOADING
@@ -583,6 +640,7 @@ const eventColors = {
 // RENDER
 // ════════════════════════════════════════════════════════════════
 function renderAll(events) {
+    events = applyHoursFilter(events);
     const by           = groupBy(events, e => e.event);
     const sessions     = by.page_load       || [];
     const itemViews    = by.item_view       || [];
