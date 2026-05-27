@@ -507,7 +507,7 @@ let sb = supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey);
 let _isLight = false;
 let _lastEvents = null;
 let _charts = {};
-let _authTimer;
+let _loadGeneration = 0;
 
 function _refreshChartColors() {
     if (!Object.keys(_charts).length) return;
@@ -569,19 +569,11 @@ window.addEventListener('message', e => {
         applyLang(e.data.lang);
         try { localStorage.setItem('bl-analytics-lang', e.data.lang); } catch(ex) {}
     }
-    if (typeof e.data.token === 'string') {
-        clearTimeout(_authTimer);
-        if (e.data.token) {
-            sb = supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, {
-                global: { headers: { Authorization: `Bearer ${e.data.token}` } }
-            });
-            if (!_lastEvents) loadData();
-        } else {
-            document.getElementById('loading').classList.remove('on');
-            const lu = document.getElementById('last-updated');
-            lu.textContent = '⚠ Session error — reload the admin panel';
-            lu.style.color = 'var(--red)';
-        }
+    if (e.data.token && typeof e.data.token === 'string') {
+        sb = supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, {
+            global: { headers: { Authorization: `Bearer ${e.data.token}` } }
+        });
+        loadData();
     }
 });
 
@@ -670,6 +662,7 @@ function getDateRange() {
 }
 
 async function loadData() {
+    const gen = ++_loadGeneration;
     const $loading = document.getElementById('loading');
     const $lu = document.getElementById('last-updated');
     $loading.classList.add('on');
@@ -688,16 +681,18 @@ async function loadData() {
             if (!data || data.length < 1000) break;
             from += 1000;
         }
+        if (gen !== _loadGeneration) return;
         _lastEvents = all;
         renderAll(all);
         $lu.textContent = t('updated') + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         $lu.style.color = '';
     } catch(err) {
+        if (gen !== _loadGeneration) return;
         console.error('Load error:', err);
         $lu.textContent = '⚠ Failed to load — click ↻ Refresh to retry';
         $lu.style.color = 'var(--red)';
     } finally {
-        $loading.classList.remove('on');
+        if (gen === _loadGeneration) $loading.classList.remove('on');
     }
 }
 
@@ -1217,13 +1212,7 @@ function renderAll(events) {
 // ── Boot
 document.getElementById('dash').style.display = 'block';
 applyLang(_lang);
-document.getElementById('loading').classList.add('on');
-_authTimer = setTimeout(() => {
-    document.getElementById('loading').classList.remove('on');
-    const lu = document.getElementById('last-updated');
-    lu.textContent = '⚠ Timed out — reload the page';
-    lu.style.color = 'var(--red)';
-}, 4000);
+loadData();
 </script>
 </body>
 </html>

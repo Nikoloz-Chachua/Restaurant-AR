@@ -47,8 +47,8 @@ export default function Sidebar() {
   const T = translations[lang]
 
   const NAV = [
-    { href: '/dashboard', label: T.navAnalytics, icon: '📊' },
     { href: '/menu',      label: T.navMenu,       icon: '🍔' },
+    { href: '/dashboard', label: T.navAnalytics,  icon: '📊' },
     { href: '/theme',     label: T.navTheme,      icon: '🎨' },
   ]
 
