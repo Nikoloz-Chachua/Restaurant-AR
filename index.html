@@ -434,148 +434,6 @@
         }
         #xr-add-btn.visible   { display: flex; }
         #xr-add-btn.in-basket { background: rgba(240,192,64,0.92); color: #0d0d0d; border-color: transparent; }
-        /* ── AR Coaching Overlay ──────────────────────────────── */
-        #xr-coach {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            pointer-events: none;
-            padding-bottom: 44px;
-        }
-        #xr-coach.hidden { display: none; }
-        #xr-coach-card {
-            background: rgba(18,18,18,0.78);
-            backdrop-filter: blur(28px) saturate(1.6);
-            -webkit-backdrop-filter: blur(28px) saturate(1.6);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 30px;
-            padding: 32px 36px 28px;
-            width: min(310px, 84vw);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 12px 48px rgba(0,0,0,0.7), 0 1px 0 rgba(255,255,255,0.07) inset;
-        }
-        #xr-coach.entering #xr-coach-card {
-            animation: coach-in 0.55s cubic-bezier(0.34,1.56,0.64,1) both;
-        }
-        #xr-coach.dismissing #xr-coach-card {
-            animation: coach-out 0.38s cubic-bezier(0.4,0,1,1) forwards;
-        }
-        @keyframes coach-in {
-            from { transform: translateY(90px); opacity: 0; }
-            to   { transform: translateY(0);    opacity: 1; }
-        }
-        @keyframes coach-out {
-            from { transform: translateY(0);     opacity: 1; }
-            to   { transform: translateY(110px); opacity: 0; }
-        }
-        #xr-phone-wrap {
-            position: relative;
-            width: 88px;
-            height: 88px;
-            margin-bottom: 22px;
-            flex-shrink: 0;
-        }
-        /* Rotating arm — phone sits at the top, always faces inward via rotate(180deg) */
-        #xr-orbit-arm {
-            position: absolute;
-            inset: 0;
-            animation: orbit-spin 2.6s linear infinite;
-            transform-origin: center center;
-        }
-        #xr-phone-icon {
-            position: absolute;
-            top: 2px;
-            left: 50%;
-            width: 28px;
-            height: 28px;
-            transform: translateX(-50%) rotate(180deg);
-            filter: drop-shadow(0 0 6px rgba(255,255,255,0.3));
-        }
-        @keyframes orbit-spin {
-            from { transform: rotate(0deg); }
-            to   { transform: rotate(360deg); }
-        }
-        /* Center target dot */
-        #xr-scan-dot {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 7px; height: 7px;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            background: rgba(255,255,255,0.85);
-            box-shadow: 0 0 10px rgba(255,255,255,0.5);
-            pointer-events: none;
-        }
-        /* Concentric scan rings around the target dot */
-        .xr-arc {
-            position: absolute;
-            top: 50%; left: 50%;
-            border-radius: 50%;
-            border: 1.5px solid rgba(255,255,255,0.0);
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-        }
-        .xr-arc-1 { width: 30px; height: 30px; border-color: rgba(255,255,255,0.5); animation: ring-pulse 2.2s ease-in-out infinite 0s; }
-        .xr-arc-2 { width: 50px; height: 50px; border-color: rgba(255,255,255,0.3); animation: ring-pulse 2.2s ease-in-out infinite 0.35s; }
-        .xr-arc-3 { width: 70px; height: 70px; border-color: rgba(255,255,255,0.14); animation: ring-pulse 2.2s ease-in-out infinite 0.7s; }
-        @keyframes ring-pulse {
-            0%,100% { opacity: 1;   transform: translate(-50%,-50%) scale(1);    }
-            50%     { opacity: 0.35; transform: translate(-50%,-50%) scale(1.07); }
-        }
-        #xr-coach-title {
-            font-family: 'Nunito', sans-serif;
-            font-size: 18px;
-            font-weight: 700;
-            color: #fff;
-            text-align: center;
-            margin-bottom: 8px;
-            letter-spacing: -0.015em;
-            transition: color 0.35s ease;
-        }
-        #xr-coach-sub {
-            font-family: 'Nunito', sans-serif;
-            font-size: 13px;
-            color: rgba(255,255,255,0.5);
-            text-align: center;
-            line-height: 1.5;
-            margin-bottom: 22px;
-            transition: color 0.35s ease;
-        }
-        #xr-coach-dots { display: flex; gap: 7px; }
-        .xr-dot {
-            width: 7px; height: 7px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.22);
-            animation: dot-pulse 1.6s ease-in-out infinite;
-        }
-        .xr-dot:nth-child(1) { animation-delay: 0s;    }
-        .xr-dot:nth-child(2) { animation-delay: 0.22s; }
-        .xr-dot:nth-child(3) { animation-delay: 0.44s; }
-        @keyframes dot-pulse {
-            0%,100% { background: rgba(255,255,255,0.22); transform: scale(1);    }
-            50%     { background: rgba(255,255,255,0.75); transform: scale(1.25); }
-        }
-        #xr-coach.found #xr-orbit-arm   { opacity: 0; transition: opacity 0.3s ease; }
-        #xr-coach.found .xr-arc         { animation: ring-found 0.55s ease-out forwards; border-color: #4ade80 !important; }
-        .xr-arc-2.found-delay           { animation-delay: 0.1s !important; }
-        .xr-arc-3.found-delay2          { animation-delay: 0.2s !important; }
-        #xr-coach.found #xr-scan-dot    { background: #4ade80; box-shadow: 0 0 18px rgba(74,222,128,0.9); transition: all 0.3s; animation: dot-found 0.55s ease-out forwards; }
-        #xr-coach.found #xr-coach-title { color: #4ade80; }
-        #xr-coach.found .xr-dot         { animation: none; background: #4ade80; transition: background 0.3s; }
-        @keyframes ring-found {
-            0%   { transform: translate(-50%,-50%) scale(1);   opacity: 0.9; }
-            100% { transform: translate(-50%,-50%) scale(1.5); opacity: 0;   }
-        }
-        @keyframes dot-found {
-            0%   { transform: translate(-50%,-50%) scale(1);   }
-            50%  { transform: translate(-50%,-50%) scale(2.2); }
-            100% { transform: translate(-50%,-50%) scale(1.2); }
-        }
-        /* ────────────────────────────────────────────────────── */
         #xr-hint-step {
             font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
             color: rgba(255,255,255,.5); margin-bottom: 3px;
@@ -1039,31 +897,6 @@
 
     <div id="xr-overlay">
         <div id="xr-gesture-layer"></div>
-        <div id="xr-coach" class="hidden">
-            <div id="xr-coach-card">
-                <div id="xr-phone-wrap">
-                    <div class="xr-arc xr-arc-1"></div>
-                    <div class="xr-arc xr-arc-2"></div>
-                    <div class="xr-arc xr-arc-3"></div>
-                    <div id="xr-scan-dot"></div>
-                    <div id="xr-orbit-arm">
-                        <svg id="xr-phone-icon" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <rect x="9" y="2" width="26" height="40" rx="6" stroke="white" stroke-width="2.2"/>
-                            <rect x="15" y="5.5" width="14" height="2" rx="1" fill="rgba(255,255,255,0.35)"/>
-                            <circle cx="22" cy="37.5" r="2" fill="rgba(255,255,255,0.4)"/>
-                            <rect x="12" y="9" width="20" height="22" rx="2" fill="rgba(255,255,255,0.08)"/>
-                        </svg>
-                    </div>
-                </div>
-                <div id="xr-coach-title">Find a Surface</div>
-                <div id="xr-coach-sub">Slowly move your phone over a flat surface</div>
-                <div id="xr-coach-dots">
-                    <div class="xr-dot"></div>
-                    <div class="xr-dot"></div>
-                    <div class="xr-dot"></div>
-                </div>
-            </div>
-        </div>
         <div id="xr-place-hint">
             <div id="xr-hint-step"></div>
             <div id="xr-hint-main"></div>
@@ -1124,7 +957,6 @@
         let hitTestSource = null, xrSession = null, xrStarting = false;
         let placed = false, isAnimating = false, _ignoreNextSelect = false;
         let _reticleWasVisible = false;
-        let _coachPhase = 'hidden'; // 'hidden' | 'scanning' | 'found'
         let _xrSingleItem = (localStorage.getItem('bl-xr-view') || 'single') === 'single';
 
         let MENU = [], N = 0;
@@ -1421,57 +1253,10 @@
 
         // ── Scan/tap hint state ───────────────────────────────────────
         function _updateScanHint(found) {
-            const u = UI[window.__lang || 'en'];
-
-            if (_coachPhase === 'scanning') {
-                // Refresh coach text (handles language change)
-                const titleEl = document.getElementById('xr-coach-title');
-                const subEl   = document.getElementById('xr-coach-sub');
-                if (titleEl) titleEl.textContent = u.coachScan;
-                if (subEl)   subEl.textContent   = u.coachScanSub;
-
-                if (found) {
-                    // Surface detected — transition coach to "found" state
-                    _coachPhase = 'found';
-                    const coach = document.getElementById('xr-coach');
-                    if (coach) {
-                        if (titleEl) titleEl.textContent = u.coachFound;
-                        if (subEl)   subEl.textContent   = u.coachFoundSub;
-                        coach.classList.remove('scanning', 'entering');
-                        coach.classList.add('found');
-                    }
-                    setTimeout(() => {
-                        if (_coachPhase !== 'found') return;
-                        const c2 = document.getElementById('xr-coach');
-                        if (c2) c2.classList.add('dismissing');
-                        setTimeout(() => {
-                            if (_coachPhase !== 'found') return;
-                            _coachPhase = 'hidden';
-                            const c3 = document.getElementById('xr-coach');
-                            if (c3) {
-                                c3.classList.add('hidden');
-                                c3.classList.remove('found', 'dismissing', 'scanning', 'entering');
-                            }
-                            if (!placed) {
-                                const hintEl = document.getElementById('xr-place-hint');
-                                const stepEl = document.getElementById('xr-hint-step');
-                                const mainEl = document.getElementById('xr-hint-main');
-                                if (hintEl) hintEl.style.display = 'block';
-                                if (stepEl) stepEl.textContent = u.hintStep2;
-                                if (mainEl) mainEl.textContent = u.hintTap;
-                            }
-                        }, 400);
-                    }, 700);
-                }
-                return;
-            }
-
-            if (_coachPhase === 'found') return; // Don't interrupt the found transition
-
-            // Coach is hidden — update the pill hint
             const stepEl = document.getElementById('xr-hint-step');
             const mainEl = document.getElementById('xr-hint-main');
             if (!stepEl) return;
+            const u = UI[window.__lang || 'en'];
             stepEl.textContent = found ? u.hintStep2 : u.hintStep1;
             mainEl.textContent = found ? u.hintTap   : u.hintScan;
         }
@@ -1518,9 +1303,6 @@
             carouselRoot.visible = false;
             reticle.visible = false;
             gestureLayer.style.display = 'none';
-            _coachPhase = 'hidden';
-            const _coachEl = document.getElementById('xr-coach');
-            if (_coachEl) { _coachEl.classList.add('hidden'); _coachEl.classList.remove('scanning','found','entering','dismissing'); }
             document.getElementById('xr-place-hint').style.display      = '';
             _reticleWasVisible = false; _updateScanHint(false);
             document.getElementById('xr-place-again').style.display     = 'none';
@@ -1631,16 +1413,7 @@
 
             renderer.xr.addEventListener('sessionstart', async () => {
                 _reticleWasVisible = false;
-                _coachPhase = 'scanning';
-                const _coach = document.getElementById('xr-coach');
-                if (_coach) {
-                    _coach.classList.remove('hidden', 'found', 'dismissing');
-                    _coach.classList.add('scanning', 'entering');
-                    const _u = UI[window.__lang || 'en'];
-                    document.getElementById('xr-coach-title').textContent = _u.coachScan;
-                    document.getElementById('xr-coach-sub').textContent   = _u.coachScanSub;
-                }
-                document.getElementById('xr-place-hint').style.display = 'none';
+                _updateScanHint(false);
                 try {
                     const session     = renderer.xr.getSession();
                     const viewerSpace = await session.requestReferenceSpace('viewer');
@@ -1650,9 +1423,6 @@
 
             renderer.xr.addEventListener('sessionend', () => {
                 hitTestSource = null; placed = false; _reticleWasVisible = false;
-                _coachPhase = 'hidden';
-                const _coachEnd = document.getElementById('xr-coach');
-                if (_coachEnd) { _coachEnd.classList.add('hidden'); _coachEnd.classList.remove('scanning','found','entering','dismissing'); }
                 xrSession = null; xrStarting = false;
                 carouselRoot.visible = false; reticle.visible = false;
                 if (labelMesh) labelMesh.visible = false;
