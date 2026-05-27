@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bl-v10';
+const CACHE_NAME = 'bl-v11';
 
 // Pre-cached on install — these are ready before the user taps anything
 const PRECACHE = [
