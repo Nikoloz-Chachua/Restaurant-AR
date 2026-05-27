@@ -419,7 +419,7 @@
             display: none;
             pointer-events: all;
             position: absolute;
-            bottom: 80px;
+            bottom: 55px;
             right: 18px;
             background: rgba(0,0,0,0.45);
             color: rgba(255,255,255,0.55);
@@ -434,6 +434,49 @@
         }
         #xr-add-btn.visible   { display: flex; }
         #xr-add-btn.in-basket { background: rgba(240,192,64,0.92); color: #0d0d0d; border-color: transparent; }
+        /* ── AR tutorial animations ──────────────────────────── */
+        #xr-scan-anim, #xr-tap-anim { margin: 0 auto 8px; }
+        #xr-scan-anim svg { display: block; }
+        .xr-corner { animation: xrCornerPulse 2s ease-in-out infinite; }
+        @keyframes xrCornerPulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+        .xr-scan-line {
+            animation: xrScanLine 1.8s ease-in-out infinite;
+            transform-box: fill-box; transform-origin: center;
+        }
+        @keyframes xrScanLine {
+            0%,100%{transform:translateY(-16px);opacity:.5}
+            50%    {transform:translateY(16px); opacity:.85}
+        }
+        #xr-tap-anim {
+            display: none; position: relative;
+            width: 56px; height: 56px; overflow: visible;
+        }
+        .xr-ring {
+            position: absolute; inset: 0; border-radius: 50%;
+            border: 2px solid rgba(255,255,255,.75);
+            animation: xrRipple 1.5s ease-out infinite;
+        }
+        .xr-ring2 { animation-delay: .65s; }
+        @keyframes xrRipple {
+            0%  {transform:scale(.35);opacity:.85}
+            100%{transform:scale(2);  opacity:0}
+        }
+        .xr-tap-core {
+            position: absolute; top:50%; left:50%;
+            transform: translate(-50%,-50%);
+            width: 18px; height: 18px; border-radius: 50%;
+            background: rgba(255,255,255,.9);
+            animation: xrTapCore 1.5s ease-in-out infinite;
+        }
+        @keyframes xrTapCore {
+            0%,100%{background:rgba(255,255,255,.9);transform:translate(-50%,-50%) scale(1)}
+            50%    {background:rgba(242,181,53,.95); transform:translate(-50%,-50%) scale(.78)}
+        }
+        #xr-hint-step {
+            font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+            color: rgba(255,255,255,.5); margin-bottom: 3px;
+        }
+        #xr-hint-main { font-size: 14px; color: #fff; }
         #xr-scale-gauge {
             display: none;
             position: absolute;
@@ -892,7 +935,24 @@
 
     <div id="xr-overlay">
         <div id="xr-gesture-layer"></div>
-        <div id="xr-place-hint">Point at a flat surface, then tap to place</div>
+        <div id="xr-place-hint">
+            <div id="xr-scan-anim">
+                <svg viewBox="0 0 80 56" width="80" height="56" aria-hidden="true">
+                    <polyline class="xr-corner"                              points="6,20 6,6 20,6"    fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                    <polyline class="xr-corner" style="animation-delay:.4s"  points="60,6 74,6 74,20"  fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                    <polyline class="xr-corner" style="animation-delay:.8s"  points="6,36 6,50 20,50"  fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                    <polyline class="xr-corner" style="animation-delay:1.2s" points="60,50 74,50 74,36" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                    <line class="xr-scan-line" x1="12" y1="28" x2="68" y2="28" stroke="rgba(242,181,53,.8)" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div id="xr-tap-anim">
+                <div class="xr-ring xr-ring1"></div>
+                <div class="xr-ring xr-ring2"></div>
+                <div class="xr-tap-core"></div>
+            </div>
+            <div id="xr-hint-step"></div>
+            <div id="xr-hint-main"></div>
+        </div>
         <div id="xr-nav-row">
             <button id="xr-prev">&#10094;</button>
             <button id="xr-next">&#10095;</button>
@@ -910,7 +970,7 @@
             <span id="xr-scale-pct">100%</span>
         </div>
         <button id="xr-add-btn" aria-label="Add to basket">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
         </button>
     </div>
 
@@ -948,6 +1008,7 @@
         let gestureLayer, xrOverlay;
         let hitTestSource = null, xrSession = null, xrStarting = false;
         let placed = false, isAnimating = false, _ignoreNextSelect = false;
+        let _reticleWasVisible = false;
         let _xrSingleItem = (localStorage.getItem('bl-xr-view') || 'single') === 'single';
 
         let MENU = [], N = 0;
@@ -1242,6 +1303,27 @@
             }, DUR + 10);
         }
 
+        // ── Scan/tap hint state ───────────────────────────────────────
+        function _updateScanHint(found) {
+            const scanEl = document.getElementById('xr-scan-anim');
+            const tapEl  = document.getElementById('xr-tap-anim');
+            const stepEl = document.getElementById('xr-hint-step');
+            const mainEl = document.getElementById('xr-hint-main');
+            if (!stepEl) return;
+            const u = UI[window.__lang || 'en'];
+            if (found) {
+                scanEl.style.display = 'none';
+                tapEl.style.display  = 'block';
+                stepEl.textContent   = u.hintStep2;
+                mainEl.textContent   = u.hintTap;
+            } else {
+                scanEl.style.display = '';
+                tapEl.style.display  = 'none';
+                stepEl.textContent   = u.hintStep1;
+                mainEl.textContent   = u.hintScan;
+            }
+        }
+
         // ── Add-btn basket state sync ─────────────────────────────────
         function _syncXRAddBtn() {
             const btn = document.getElementById('xr-add-btn');
@@ -1285,6 +1367,7 @@
             reticle.visible = false;
             gestureLayer.style.display = 'none';
             document.getElementById('xr-place-hint').style.display      = '';
+            _reticleWasVisible = false; _updateScanHint(false);
             document.getElementById('xr-place-again').style.display     = 'none';
             document.getElementById('xr-nav-row').style.display          = 'none';
             document.getElementById('xr-move-hint').style.display        = 'none';
@@ -1392,6 +1475,8 @@
             }, { passive: true });
 
             renderer.xr.addEventListener('sessionstart', async () => {
+                _reticleWasVisible = false;
+                _updateScanHint(false);
                 try {
                     const session     = renderer.xr.getSession();
                     const viewerSpace = await session.requestReferenceSpace('viewer');
@@ -1400,7 +1485,7 @@
             });
 
             renderer.xr.addEventListener('sessionend', () => {
-                hitTestSource = null; placed = false;
+                hitTestSource = null; placed = false; _reticleWasVisible = false;
                 xrSession = null; xrStarting = false;
                 carouselRoot.visible = false; reticle.visible = false;
                 if (labelMesh) labelMesh.visible = false;
@@ -1436,6 +1521,8 @@
                         } else { reticle.visible = false; }
                     }
                 }
+                const _rvNow = !placed && reticle.visible;
+                if (_rvNow !== _reticleWasVisible) { _reticleWasVisible = _rvNow; _updateScanHint(_rvNow); }
                 if (placed && Math.abs(_rotVelocity) > 0.0001) {
                     slotGroups[slotOf.center].rotation.y += _rotVelocity;
                     _rotVelocity *= INERTIA_DAMP;
@@ -1505,6 +1592,7 @@
         // ── Public API ────────────────────────────────────────────────
         window.XR = {
             getCurrentItem() { return MENU.length ? MENU[currentCenterMenu] : null; },
+            refreshHint() { if (_setupDone) _updateScanHint(_reticleWasVisible); },
             async start(itemIndex, items) {
                 if (xrStarting || xrSession) return;
                 xrStarting = true;
@@ -1643,6 +1731,10 @@
                 moveHint:  'Drag to rotate · Pinch to scale',
                 exitAR:    'Exit Model view',
                 placeAgain:'Place Again',
+                hintStep1: 'STEP 1 OF 2',
+                hintScan:  'Move slowly over a table or floor',
+                hintStep2: 'STEP 2 OF 2',
+                hintTap:   'Tap to place your dish',
                 langBtn:   'ქარ',
                 themeDay:  'Day',
                 themeNight:'Night',
@@ -1669,6 +1761,10 @@
                 moveHint:  'გასაბრუნებლად გაასრიალე · პინჩი მასშტაბისთვის',
                 exitAR:    'მოდელის დახურვა',
                 placeAgain:'ხელახლა დადება',
+                hintStep1: 'ნაბიჯი 1 / 2',
+                hintScan:  'ნელა გადაადგილე ბრტყელ ზედაპირზე',
+                hintStep2: 'ნაბიჯი 2 / 2',
+                hintTap:   'შეეხე ეკრანს მოთავსებისთვის',
                 langBtn:   'EN',
                 themeDay:  'ნათელი თემა',
                 themeNight:'მუქი თემა',
@@ -1706,7 +1802,7 @@
             _themeToggle.setAttribute('aria-label', theme === 'night' ? u.themeDay : u.themeNight);
             document.getElementById('close-btn').textContent     = u.close;
             document.getElementById('modal-tip').textContent     = u.tip;
-            document.getElementById('xr-place-hint').textContent = u.placeHint;
+            window.XR?.refreshHint?.();
             document.getElementById('xr-move-hint').textContent  = u.moveHint;
             document.getElementById('xr-exit').textContent        = u.exitAR;
             document.getElementById('xr-place-again').textContent = u.placeAgain;
