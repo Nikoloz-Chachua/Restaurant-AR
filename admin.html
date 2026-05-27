@@ -104,18 +104,31 @@
 
 <div id="dash">
     <header>
-        <div class="header-title">BURGER LIONS · Analytics</div>
+        <div class="header-title" data-i18n="header_title">BURGER LIONS · Analytics</div>
         <span id="last-updated"></span>
         <select id="range-sel">
-            <option value="1"  data-i18n="today">Today</option>
-            <option value="7"  selected data-i18n="last7">Last 7 days</option>
-            <option value="30" data-i18n="last30">Last 30 days</option>
-            <option value="90" data-i18n="last90">Last 90 days</option>
-            <option value="0"  data-i18n="allTime">All time</option>
+            <option value="1"      data-i18n="today">Today</option>
+            <option value="7"      selected data-i18n="last7">Last 7 days</option>
+            <option value="30"     data-i18n="last30">Last 30 days</option>
+            <option value="90"     data-i18n="last90">Last 90 days</option>
+            <option value="0"      data-i18n="allTime">All time</option>
+            <option value="custom" data-i18n="custom">Custom…</option>
         </select>
         <button class="hbtn" id="hours-btn" title="Set working hours">🕐 Hours</button>
         <button class="hbtn" id="refresh-btn" data-i18n="refresh">↻ Refresh</button>
     </header>
+    <div id="custom-range-panel" style="display:none; background:var(--card2); border-bottom:1px solid var(--border); padding:10px 28px; align-items:center; gap:12px; flex-wrap:wrap;">
+        <span style="font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--dim)" data-i18n="custom">Custom…</span>
+        <label style="font-size:0.8rem;color:var(--text);display:flex;align-items:center;gap:6px">
+            <span data-i18n="customFrom">From</span>
+            <input type="date" id="custom-from" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:0.8rem;">
+        </label>
+        <label style="font-size:0.8rem;color:var(--text);display:flex;align-items:center;gap:6px">
+            <span data-i18n="customTo">To</span>
+            <input type="date" id="custom-to" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:0.8rem;">
+        </label>
+        <button class="hbtn" id="custom-apply" data-i18n="customApply">Apply</button>
+    </div>
     <div id="hours-panel" style="display:none; background:var(--card2); border-bottom:1px solid var(--border); padding:12px 28px; display:none; align-items:center; gap:16px; flex-wrap:wrap;">
         <span style="font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--dim)" data-i18n="hours_label">Working Hours Filter</span>
         <label style="font-size:0.8rem;color:var(--text);display:flex;align-items:center;gap:6px">
@@ -363,7 +376,9 @@ const CFG = {
 // ════════════════════════════════════════════════════════════════
 const T = {
     en: {
+        header_title:'BURGER LIONS · Analytics',
         refresh:'↻ Refresh', today:'Today', last7:'Last 7 days', last30:'Last 30 days', last90:'Last 90 days', allTime:'All time',
+        custom:'Custom…', customFrom:'From', customTo:'To', customApply:'Apply',
         updated:'Updated', loading:'Loading data…',
         sec_overview:'Overview', sec_summary:'All Events Summary', sec_activity:'Activity Over Time',
         sec_funnel:'Conversion Funnel & Attribution', sec_items:'Item Popularity', sec_behaviour:'User Behaviour',
@@ -420,7 +435,9 @@ const T = {
         days:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
     },
     ka: {
+        header_title:'ბურგერ ლომები · ანალიტიკა',
         refresh:'↻ განახლება', today:'დღეს', last7:'ბოლო 7 დღე', last30:'ბოლო 30 დღე', last90:'ბოლო 90 დღე', allTime:'სულ',
+        custom:'მორგებული…', customFrom:'დან', customTo:'მდე', customApply:'გამოყენება',
         updated:'განახლდა', loading:'მონაცემები იტვირთება…',
         sec_overview:'მიმოხილვა', sec_summary:'ყველა მოვლენა', sec_activity:'დროში აქტივობა',
         sec_funnel:'კონვერსიის ძაბრი', sec_items:'კერძების პოპულარობა', sec_behaviour:'მომხმარებლის ქცევა',
@@ -516,7 +533,12 @@ function applyLang(lang) {
 }
 
 document.getElementById('refresh-btn').addEventListener('click', loadData);
-document.getElementById('range-sel').addEventListener('change', loadData);
+document.getElementById('range-sel').addEventListener('change', () => {
+    const isCustom = document.getElementById('range-sel').value === 'custom';
+    document.getElementById('custom-range-panel').style.display = isCustom ? 'flex' : 'none';
+    if (!isCustom) loadData();
+});
+document.getElementById('custom-apply').addEventListener('click', loadData);
 
 // Relay lang/theme changes from the parent admin panel
 window.addEventListener('message', e => {
@@ -593,7 +615,15 @@ function applyHoursFilter(events) {
 // DATA LOADING
 // ════════════════════════════════════════════════════════════════
 function getDateRange() {
-    const days = parseInt(document.getElementById('range-sel').value);
+    const val = document.getElementById('range-sel').value;
+    if (val === 'custom') {
+        const fromVal = document.getElementById('custom-from').value;
+        const toVal   = document.getElementById('custom-to').value;
+        const start = fromVal ? new Date(fromVal).toISOString() : new Date('2024-01-01').toISOString();
+        const end   = toVal   ? new Date(toVal + 'T23:59:59').toISOString() : new Date().toISOString();
+        return { start, end, days: -1 };
+    }
+    const days = parseInt(val);
     const end  = new Date().toISOString();
     const start = days === 0
         ? new Date('2024-01-01').toISOString()

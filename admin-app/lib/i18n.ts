@@ -97,7 +97,7 @@ const en = {
 }
 
 const ka: typeof en = {
-  brandTitle: 'ბურგერ ლაიონსი',
+  brandTitle: 'ბურგერ ლომები',
   brandSub: 'ადმინი',
   navAnalytics: 'ანალიტიკა',
   navMenu: 'მენიუს რედაქტორი',
