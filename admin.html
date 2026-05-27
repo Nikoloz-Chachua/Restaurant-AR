@@ -571,10 +571,17 @@ window.addEventListener('message', e => {
     }
     if (typeof e.data.token === 'string') {
         clearTimeout(_authTimer);
-        sb = supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, {
-            global: { headers: { Authorization: `Bearer ${e.data.token}` } }
-        });
-        if (!_lastEvents) loadData();
+        if (e.data.token) {
+            sb = supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, {
+                global: { headers: { Authorization: `Bearer ${e.data.token}` } }
+            });
+            if (!_lastEvents) loadData();
+        } else {
+            document.getElementById('loading').classList.remove('on');
+            const lu = document.getElementById('last-updated');
+            lu.textContent = '⚠ Session error — reload the admin panel';
+            lu.style.color = 'var(--red)';
+        }
     }
 });
 
@@ -664,6 +671,7 @@ function getDateRange() {
 
 async function loadData() {
     const $loading = document.getElementById('loading');
+    const $lu = document.getElementById('last-updated');
     $loading.classList.add('on');
     try {
         const { start, end } = getDateRange();
@@ -682,10 +690,12 @@ async function loadData() {
         }
         _lastEvents = all;
         renderAll(all);
-        document.getElementById('last-updated').textContent =
-            t('updated') + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        $lu.textContent = t('updated') + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        $lu.style.color = '';
     } catch(err) {
         console.error('Load error:', err);
+        $lu.textContent = '⚠ Failed to load — click ↻ Refresh to retry';
+        $lu.style.color = 'var(--red)';
     } finally {
         $loading.classList.remove('on');
     }
@@ -1208,7 +1218,12 @@ function renderAll(events) {
 document.getElementById('dash').style.display = 'block';
 applyLang(_lang);
 document.getElementById('loading').classList.add('on');
-_authTimer = setTimeout(() => { document.getElementById('loading').classList.remove('on'); }, 4000);
+_authTimer = setTimeout(() => {
+    document.getElementById('loading').classList.remove('on');
+    const lu = document.getElementById('last-updated');
+    lu.textContent = '⚠ Timed out — reload the page';
+    lu.style.color = 'var(--red)';
+}, 4000);
 </script>
 </body>
 </html>

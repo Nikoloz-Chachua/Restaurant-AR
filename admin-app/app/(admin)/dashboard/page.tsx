@@ -5,29 +5,49 @@ import { useLang } from '@/lib/useLang'
 
 export default function DashboardPage() {
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const tokenRef  = useRef('')
   const [T] = useLang()
+
+  // Start fetching the session token immediately on mount.
+  // By the time the heavy iframe (Chart.js + Supabase CDN) fires onLoad,
+  // getSession() has already resolved — sendInitialPrefs runs synchronously.
+  useEffect(() => {
+    createClient().auth.getSession()
+      .then(({ data }) => { tokenRef.current = data?.session?.access_token ?? '' })
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     function relay(e: Event) {
       const { lang, dark } = (e as CustomEvent).detail
-      iframeRef.current?.contentWindow?.postMessage(
-        { type: 'bl-pref', lang, dark },
-        '*'
-      )
+      iframeRef.current?.contentWindow?.postMessage({ type: 'bl-pref', lang, dark }, '*')
     }
     window.addEventListener('bl-pref', relay)
     return () => window.removeEventListener('bl-pref', relay)
   }, [])
 
-  async function sendInitialPrefs() {
-    const lang = localStorage.getItem('bl-admin-lang') || 'en'
-    const dark = localStorage.getItem('bl-admin-theme') !== 'light'
-    const supabase = createClient()
-    const { data: { session } } = await supabase.auth.getSession()
-    iframeRef.current?.contentWindow?.postMessage(
-      { type: 'bl-pref', lang, dark, token: session?.access_token ?? '' },
-      '*'
-    )
+  function sendInitialPrefs() {
+    const lang  = localStorage.getItem('bl-admin-lang') || 'en'
+    const dark  = localStorage.getItem('bl-admin-theme') !== 'light'
+    const token = tokenRef.current
+
+    if (token) {
+      iframeRef.current?.contentWindow?.postMessage({ type: 'bl-pref', lang, dark, token }, '*')
+      return
+    }
+
+    // Rare: iframe loaded before getSession resolved — do async fallback
+    createClient().auth.getSession()
+      .then(({ data }) => {
+        tokenRef.current = data?.session?.access_token ?? ''
+        iframeRef.current?.contentWindow?.postMessage(
+          { type: 'bl-pref', lang, dark, token: tokenRef.current },
+          '*'
+        )
+      })
+      .catch(() => {
+        iframeRef.current?.contentWindow?.postMessage({ type: 'bl-pref', lang, dark }, '*')
+      })
   }
 
   return (
