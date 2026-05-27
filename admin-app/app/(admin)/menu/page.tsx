@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useLang } from '@/lib/useLang'
 
 type Category = { id: number; name_en: string; name_ka: string; sort_order: number }
 type MenuItem = {
@@ -16,19 +17,18 @@ const EMPTY_ITEM: Omit<MenuItem, 'id'> = {
 
 export default function MenuPage() {
   const supabase = createClient()
+  const [T] = useLang()
   const [categories, setCategories] = useState<Category[]>([])
   const [items, setItems]           = useState<MenuItem[]>([])
   const [loading, setLoading]       = useState(true)
   const [tab, setTab]               = useState<'items' | 'categories'>('items')
 
-  // item modal state
   const [itemModal, setItemModal]   = useState(false)
   const [editItem, setEditItem]     = useState<MenuItem | null>(null)
   const [itemForm, setItemForm]     = useState<Omit<MenuItem, 'id'>>(EMPTY_ITEM)
   const [saving, setSaving]         = useState(false)
   const [deleteId, setDeleteId]     = useState<number | null>(null)
 
-  // category modal state
   const [catModal, setCatModal]         = useState(false)
   const [editCat, setEditCat]           = useState<Category | null>(null)
   const [catForm, setCatForm]           = useState({ name_en: '', name_ka: '', sort_order: 0 })
@@ -54,7 +54,6 @@ export default function MenuPage() {
 
   function flash(m: string) { setMsg(m); setTimeout(() => setMsg(''), 3000) }
 
-  // ── Item CRUD
   function openNewItem() {
     setEditItem(null)
     setItemForm({ ...EMPTY_ITEM, category_id: categories[0]?.id ?? null })
@@ -76,15 +75,14 @@ export default function MenuPage() {
       await supabase.from('menu_items').insert(itemForm)
     }
     setSaving(false); setItemModal(false); setUploadProgress(''); await load()
-    flash(editItem ? 'Item updated.' : 'Item added.')
+    flash(editItem ? T.itemUpdated : T.itemAdded)
   }
   async function confirmDelete() {
     if (!deleteId) return
     await supabase.from('menu_items').delete().eq('id', deleteId)
-    setDeleteId(null); await load(); flash('Item deleted.')
+    setDeleteId(null); await load(); flash(T.itemDeleted)
   }
 
-  // ── Category CRUD
   function openNewCat() {
     setEditCat(null)
     setCatForm({ name_en: '', name_ka: '', sort_order: categories.length + 1 })
@@ -103,12 +101,12 @@ export default function MenuPage() {
       await supabase.from('categories').insert(catForm)
     }
     setSaving(false); setCatModal(false); await load()
-    flash(editCat ? 'Category updated.' : 'Category added.')
+    flash(editCat ? T.catUpdated : T.catAdded)
   }
   async function confirmDeleteCat() {
     if (!deleteCatId) return
     await supabase.from('categories').delete().eq('id', deleteCatId)
-    setDeleteCatId(null); await load(); flash('Category deleted.')
+    setDeleteCatId(null); await load(); flash(T.catDeleted)
   }
 
   const catName = (id: number | null) =>
@@ -120,7 +118,7 @@ export default function MenuPage() {
       return
     }
     setUploading(true)
-    setUploadProgress('Uploading…')
+    setUploadProgress(T.uploading)
     const filename = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
     const { error } = await supabase.storage.from('models').upload(filename, file, {
       contentType: 'model/gltf-binary',
@@ -141,10 +139,8 @@ export default function MenuPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--gold)' }}>Menu Editor</h1>
-          <p className="text-sm mt-0.5" style={{ color: 'var(--dim)' }}>
-            Changes go live instantly on the AR menu
-          </p>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--gold)' }}>{T.menuTitle}</h1>
+          <p className="text-sm mt-0.5" style={{ color: 'var(--dim)' }}>{T.menuDesc}</p>
         </div>
         {msg && (
           <span className="text-sm px-3 py-1.5 rounded-lg"
@@ -154,7 +150,6 @@ export default function MenuPage() {
         )}
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-1 mb-6 p-1 rounded-lg w-fit"
            style={{ background: 'var(--card)' }}>
         {(['items', 'categories'] as const).map(t => (
@@ -162,27 +157,29 @@ export default function MenuPage() {
                   className="px-4 py-1.5 rounded-md text-sm font-medium transition-all"
                   style={{ background: tab === t ? 'var(--gold)' : 'transparent',
                            color: tab === t ? '#0f0b07' : 'var(--dim)' }}>
-            {t === 'items' ? `Menu Items (${items.length})` : `Categories (${categories.length})`}
+            {t === 'items'
+              ? `${T.tabItems} (${items.length})`
+              : `${T.tabCategories} (${categories.length})`}
           </button>
         ))}
       </div>
 
       {loading ? (
-        <p style={{ color: 'var(--dim)' }}>Loading…</p>
+        <p style={{ color: 'var(--dim)' }}>{T.loading}</p>
       ) : tab === 'items' ? (
         <>
           <button onClick={openNewItem}
                   className="mb-4 px-4 py-2 rounded-lg text-sm font-semibold"
                   style={{ background: 'var(--gold)', color: '#0f0b07' }}>
-            + Add Item
+            {T.addItem}
           </button>
           <div className="rounded-xl overflow-hidden"
                style={{ border: '1px solid var(--border)' }}>
             <table className="w-full text-sm">
               <thead>
                 <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
-                  {['Name', 'Category', 'Price', 'Model', 'Visible', ''].map(h => (
-                    <th key={h} className="px-4 py-3 text-left font-medium"
+                  {[T.colName, T.colCategory, T.colPrice, T.colModel, T.colVisible, ''].map((h, i) => (
+                    <th key={i} className="px-4 py-3 text-left font-medium"
                         style={{ color: 'var(--dim)' }}>{h}</th>
                   ))}
                 </tr>
@@ -209,7 +206,7 @@ export default function MenuPage() {
                       <span className="text-xs px-2 py-0.5 rounded-full"
                             style={{ background: item.visible ? 'rgba(76,175,125,0.15)' : 'rgba(224,82,82,0.12)',
                                      color: item.visible ? 'var(--success)' : 'var(--danger)' }}>
-                        {item.visible ? 'Visible' : 'Hidden'}
+                        {item.visible ? T.visible : T.hidden}
                       </span>
                     </td>
                     <td className="px-4 py-3">
@@ -218,13 +215,13 @@ export default function MenuPage() {
                                 className="text-xs px-2.5 py-1 rounded"
                                 style={{ background: 'var(--gold-dim, rgba(242,181,53,0.12))',
                                          color: 'var(--gold)' }}>
-                          Edit
+                          {T.edit}
                         </button>
                         <button onClick={() => setDeleteId(item.id)}
                                 className="text-xs px-2.5 py-1 rounded"
                                 style={{ background: 'rgba(224,82,82,0.1)',
                                          color: 'var(--danger)' }}>
-                          Delete
+                          {T.delete}
                         </button>
                       </div>
                     </td>
@@ -239,15 +236,15 @@ export default function MenuPage() {
           <button onClick={openNewCat}
                   className="mb-4 px-4 py-2 rounded-lg text-sm font-semibold"
                   style={{ background: 'var(--gold)', color: '#0f0b07' }}>
-            + Add Category
+            {T.addCategory}
           </button>
           <div className="rounded-xl overflow-hidden"
                style={{ border: '1px solid var(--border)' }}>
             <table className="w-full text-sm">
               <thead>
                 <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
-                  {['Name (EN)', 'Name (KA)', 'Sort Order', 'Items', ''].map(h => (
-                    <th key={h} className="px-4 py-3 text-left font-medium"
+                  {[T.nameEn, T.nameKa, T.colSortOrder, T.colItems, ''].map((h, i) => (
+                    <th key={i} className="px-4 py-3 text-left font-medium"
                         style={{ color: 'var(--dim)' }}>{h}</th>
                   ))}
                 </tr>
@@ -269,13 +266,13 @@ export default function MenuPage() {
                                 className="text-xs px-2.5 py-1 rounded"
                                 style={{ background: 'var(--gold-dim, rgba(242,181,53,0.12))',
                                          color: 'var(--gold)' }}>
-                          Edit
+                          {T.edit}
                         </button>
                         <button onClick={() => setDeleteCatId(cat.id)}
                                 className="text-xs px-2.5 py-1 rounded"
                                 style={{ background: 'rgba(224,82,82,0.1)',
                                          color: 'var(--danger)' }}>
-                          Delete
+                          {T.delete}
                         </button>
                       </div>
                     </td>
@@ -287,34 +284,33 @@ export default function MenuPage() {
         </>
       )}
 
-      {/* Item Modal */}
       {itemModal && (
-        <Modal title={editItem ? 'Edit Item' : 'Add Item'} onClose={() => setItemModal(false)}>
+        <Modal title={editItem ? T.editItemTitle : T.addItemTitle} onClose={() => setItemModal(false)}>
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Name (English)">
+            <Field label={T.nameEn}>
               <input value={itemForm.name_en} onChange={e => setItemForm(f => ({ ...f, name_en: e.target.value }))} />
             </Field>
-            <Field label="Name (Georgian)">
+            <Field label={T.nameKa}>
               <input value={itemForm.name_ka} onChange={e => setItemForm(f => ({ ...f, name_ka: e.target.value }))} />
             </Field>
-            <Field label="Description (English)" className="col-span-2">
+            <Field label={T.descEn} className="col-span-2">
               <textarea rows={2} value={itemForm.description_en}
                         onChange={e => setItemForm(f => ({ ...f, description_en: e.target.value }))} />
             </Field>
-            <Field label="Description (Georgian)" className="col-span-2">
+            <Field label={T.descKa} className="col-span-2">
               <textarea rows={2} value={itemForm.description_ka}
                         onChange={e => setItemForm(f => ({ ...f, description_ka: e.target.value }))} />
             </Field>
-            <Field label="Price (e.g. 27.5 ₾)">
+            <Field label={T.priceLabel}>
               <input value={itemForm.price} onChange={e => setItemForm(f => ({ ...f, price: e.target.value }))} />
             </Field>
-            <Field label="Category">
+            <Field label={T.categoryLabel}>
               <select value={itemForm.category_id ?? ''}
                       onChange={e => setItemForm(f => ({ ...f, category_id: Number(e.target.value) }))}>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name_en}</option>)}
               </select>
             </Field>
-            <Field label="3D Model" className="col-span-2">
+            <Field label={T.model3d} className="col-span-2">
               <div className="space-y-2">
                 <div className="flex gap-2">
                   <button type="button" disabled={uploading}
@@ -322,7 +318,7 @@ export default function MenuPage() {
                           className="px-3 py-1.5 rounded text-xs font-medium"
                           style={{ background: 'var(--card2)', color: 'var(--gold)',
                                    border: '1px solid var(--border)', opacity: uploading ? 0.5 : 1 }}>
-                    {uploading ? 'Uploading…' : '↑ Upload .glb'}
+                    {uploading ? T.uploading : T.uploadGlb}
                   </button>
                   <input ref={fileInputRef} type="file" accept=".glb" style={{ display: 'none' }}
                          onChange={e => { const f = e.target.files?.[0]; if (f) uploadGLB(f); e.target.value = '' }} />
@@ -332,29 +328,27 @@ export default function MenuPage() {
                   {uploadProgress
                     ? <span style={{ color: uploadProgress.startsWith('✓') ? 'var(--success)' : 'var(--danger)' }}>{uploadProgress}</span>
                     : itemForm.model
-                      ? <span>Current: <span style={{ color: 'var(--text)' }}>{itemForm.model.startsWith('http') ? itemForm.model.split('/').pop() : itemForm.model}</span></span>
-                      : <span style={{ color: 'var(--dim)' }}>No model uploaded</span>
+                      ? <span>{T.current}<span style={{ color: 'var(--text)' }}>{itemForm.model.startsWith('http') ? itemForm.model.split('/').pop() : itemForm.model}</span></span>
+                      : <span style={{ color: 'var(--dim)' }}>{T.noModel}</span>
                   }
                 </div>
               </div>
             </Field>
-            <Field label="Sort Order">
+            <Field label={T.sortOrder}>
               <input type="number" value={itemForm.sort_order}
                      onChange={e => setItemForm(f => ({ ...f, sort_order: Number(e.target.value) }))} />
             </Field>
-            <Field label="AR Scale">
+            <Field label={T.arScale}>
               <input type="number" min="0.01" max="10" step="0.05"
                      value={itemForm.ar_scale}
                      onChange={e => setItemForm(f => ({ ...f, ar_scale: Number(e.target.value) }))} />
-              <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-                1.0 = default (25cm). If model looks 2× too big → set 0.5. Too small → set 2.0.
-              </p>
+              <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>{T.arScaleHint}</p>
             </Field>
-            <Field label="Visibility" className="col-span-2">
+            <Field label={T.visibility} className="col-span-2">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={itemForm.visible} style={{ width: 'auto' }}
                        onChange={e => setItemForm(f => ({ ...f, visible: e.target.checked }))} />
-                <span className="text-sm" style={{ color: 'var(--dim)' }}>Visible on menu</span>
+                <span className="text-sm" style={{ color: 'var(--dim)' }}>{T.visibleOnMenu}</span>
               </label>
             </Field>
           </div>
@@ -362,28 +356,27 @@ export default function MenuPage() {
             <button onClick={() => setItemModal(false)}
                     className="px-4 py-2 rounded-lg text-sm"
                     style={{ color: 'var(--dim)', border: '1px solid var(--border)' }}>
-              Cancel
+              {T.cancel}
             </button>
             <button onClick={saveItem} disabled={saving}
                     className="px-5 py-2 rounded-lg text-sm font-semibold"
                     style={{ background: 'var(--gold)', color: '#0f0b07', opacity: saving ? 0.6 : 1 }}>
-              {saving ? 'Saving…' : 'Save'}
+              {saving ? T.saving : T.save}
             </button>
           </div>
         </Modal>
       )}
 
-      {/* Category Modal */}
       {catModal && (
-        <Modal title={editCat ? 'Edit Category' : 'Add Category'} onClose={() => setCatModal(false)}>
+        <Modal title={editCat ? T.editCatTitle : T.addCatTitle} onClose={() => setCatModal(false)}>
           <div className="space-y-4">
-            <Field label="Name (English)">
+            <Field label={T.nameEn}>
               <input value={catForm.name_en} onChange={e => setCatForm(f => ({ ...f, name_en: e.target.value }))} />
             </Field>
-            <Field label="Name (Georgian)">
+            <Field label={T.nameKa}>
               <input value={catForm.name_ka} onChange={e => setCatForm(f => ({ ...f, name_ka: e.target.value }))} />
             </Field>
-            <Field label="Sort Order">
+            <Field label={T.sortOrder}>
               <input type="number" value={catForm.sort_order}
                      onChange={e => setCatForm(f => ({ ...f, sort_order: Number(e.target.value) }))} />
             </Field>
@@ -392,54 +385,48 @@ export default function MenuPage() {
             <button onClick={() => setCatModal(false)}
                     className="px-4 py-2 rounded-lg text-sm"
                     style={{ color: 'var(--dim)', border: '1px solid var(--border)' }}>
-              Cancel
+              {T.cancel}
             </button>
             <button onClick={saveCat} disabled={saving}
                     className="px-5 py-2 rounded-lg text-sm font-semibold"
                     style={{ background: 'var(--gold)', color: '#0f0b07', opacity: saving ? 0.6 : 1 }}>
-              {saving ? 'Saving…' : 'Save'}
+              {saving ? T.saving : T.save}
             </button>
           </div>
         </Modal>
       )}
 
-      {/* Delete item confirm */}
       {deleteId && (
-        <Modal title="Delete Item?" onClose={() => setDeleteId(null)}>
-          <p className="text-sm mb-6" style={{ color: 'var(--dim)' }}>
-            This will permanently delete the item. This cannot be undone.
-          </p>
+        <Modal title={T.deleteItemTitle} onClose={() => setDeleteId(null)}>
+          <p className="text-sm mb-6" style={{ color: 'var(--dim)' }}>{T.deleteItemText}</p>
           <div className="flex justify-end gap-3">
             <button onClick={() => setDeleteId(null)}
                     className="px-4 py-2 rounded-lg text-sm"
                     style={{ color: 'var(--dim)', border: '1px solid var(--border)' }}>
-              Cancel
+              {T.cancel}
             </button>
             <button onClick={confirmDelete}
                     className="px-5 py-2 rounded-lg text-sm font-semibold"
                     style={{ background: 'var(--danger)', color: '#fff' }}>
-              Delete
+              {T.delete}
             </button>
           </div>
         </Modal>
       )}
 
-      {/* Delete category confirm */}
       {deleteCatId && (
-        <Modal title="Delete Category?" onClose={() => setDeleteCatId(null)}>
-          <p className="text-sm mb-6" style={{ color: 'var(--dim)' }}>
-            Items in this category will have their category cleared but won't be deleted.
-          </p>
+        <Modal title={T.deleteCatTitle} onClose={() => setDeleteCatId(null)}>
+          <p className="text-sm mb-6" style={{ color: 'var(--dim)' }}>{T.deleteCatText}</p>
           <div className="flex justify-end gap-3">
             <button onClick={() => setDeleteCatId(null)}
                     className="px-4 py-2 rounded-lg text-sm"
                     style={{ color: 'var(--dim)', border: '1px solid var(--border)' }}>
-              Cancel
+              {T.cancel}
             </button>
             <button onClick={confirmDeleteCat}
                     className="px-5 py-2 rounded-lg text-sm font-semibold"
                     style={{ background: 'var(--danger)', color: '#fff' }}>
-              Delete
+              {T.delete}
             </button>
           </div>
         </Modal>

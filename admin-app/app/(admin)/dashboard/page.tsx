@@ -1,8 +1,10 @@
 'use client'
 import { useEffect, useRef } from 'react'
+import { useLang } from '@/lib/useLang'
 
 export default function DashboardPage() {
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const [T] = useLang()
 
   useEffect(() => {
     function relay(e: Event) {
@@ -24,9 +26,9 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--gold)' }}>Analytics</h1>
+      <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--gold)' }}>{T.analyticsTitle}</h1>
       <p className="text-sm mb-6" style={{ color: 'var(--dim)' }}>
-        Live data from Supabase — all visitor events
+        {T.analyticsDesc}
       </p>
       <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
         <iframe
