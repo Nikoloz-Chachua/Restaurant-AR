@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Burger Lions · Analytics</title>
+    <script>(function(){ try { if (localStorage.getItem('bl-analytics-theme')==='light') document.documentElement.classList.add('light'); } catch(e){} })();</script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
@@ -495,26 +496,42 @@ const T = {
     }
 };
 
-let _lang = 'en';
+let _lang = (function(){ try { return localStorage.getItem('bl-analytics-lang') || 'en'; } catch(e){ return 'en'; } })();
 const t = k => T[_lang][k] !== undefined ? T[_lang][k] : (T.en[k] !== undefined ? T.en[k] : k);
 
 // ════════════════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════════════════
-const sb = supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey);
+let sb = supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey);
 
 let _isLight = false;
 let _lastEvents = null;
 let _charts = {};
+let _authTimer;
+
+function _refreshChartColors() {
+    if (!Object.keys(_charts).length) return;
+    const dim = _isLight ? '#8a7060' : '#7a6a50';
+    const grid = _isLight ? 'rgba(155,98,8,0.08)' : 'rgba(242,181,53,0.06)';
+    Object.values(_charts).forEach(chart => {
+        if (chart.options.plugins?.legend?.labels) chart.options.plugins.legend.labels.color = dim;
+        const sc = chart.options.scales;
+        if (sc) ['x','y'].forEach(ax => {
+            if (sc[ax]) {
+                if (sc[ax].ticks) sc[ax].ticks.color = dim;
+                if (sc[ax].grid)  sc[ax].grid.color  = grid;
+            }
+        });
+        chart.update('none');
+    });
+}
 
 function applyTheme(light) {
     _isLight = light;
     document.documentElement.classList.toggle('light', light);
-    const dim = light ? '#8a7060' : '#7a6a50';
-    const border = light ? 'rgba(155,98,8,0.1)' : 'rgba(242,181,53,0.06)';
-    Chart.defaults.color = dim;
-    Chart.defaults.borderColor = border;
-    if (_lastEvents) renderAll(_lastEvents);
+    Chart.defaults.color = light ? '#8a7060' : '#7a6a50';
+    Chart.defaults.borderColor = light ? 'rgba(155,98,8,0.1)' : 'rgba(242,181,53,0.06)';
+    _refreshChartColors();
 }
 
 function applyLang(lang) {
@@ -540,11 +557,25 @@ document.getElementById('range-sel').addEventListener('change', () => {
 });
 document.getElementById('custom-apply').addEventListener('click', loadData);
 
-// Relay lang/theme changes from the parent admin panel
+// Relay lang/theme/auth from the parent admin panel
 window.addEventListener('message', e => {
     if (!e.data || e.data.type !== 'bl-pref') return;
-    if (typeof e.data.dark === 'boolean') applyTheme(!e.data.dark);
-    if (typeof e.data.lang === 'string')  applyLang(e.data.lang);
+    if (typeof e.data.dark === 'boolean') {
+        const light = !e.data.dark;
+        applyTheme(light);
+        try { localStorage.setItem('bl-analytics-theme', light ? 'light' : 'dark'); } catch(ex) {}
+    }
+    if (typeof e.data.lang === 'string') {
+        applyLang(e.data.lang);
+        try { localStorage.setItem('bl-analytics-lang', e.data.lang); } catch(ex) {}
+    }
+    if (typeof e.data.token === 'string') {
+        clearTimeout(_authTimer);
+        sb = supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, {
+            global: { headers: { Authorization: `Bearer ${e.data.token}` } }
+        });
+        if (!_lastEvents) loadData();
+    }
 });
 
 // ── Working hours
@@ -1175,7 +1206,9 @@ function renderAll(events) {
 
 // ── Boot
 document.getElementById('dash').style.display = 'block';
-loadData();
+applyLang(_lang);
+document.getElementById('loading').classList.add('on');
+_authTimer = setTimeout(() => { document.getElementById('loading').classList.remove('on'); }, 4000);
 </script>
 </body>
 </html>

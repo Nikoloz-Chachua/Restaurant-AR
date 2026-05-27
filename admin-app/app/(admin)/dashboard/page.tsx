@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/useLang'
 
 export default function DashboardPage() {
@@ -18,10 +19,15 @@ export default function DashboardPage() {
     return () => window.removeEventListener('bl-pref', relay)
   }, [])
 
-  function sendInitialPrefs() {
+  async function sendInitialPrefs() {
     const lang = localStorage.getItem('bl-admin-lang') || 'en'
     const dark = localStorage.getItem('bl-admin-theme') !== 'light'
-    iframeRef.current?.contentWindow?.postMessage({ type: 'bl-pref', lang, dark }, '*')
+    const supabase = createClient()
+    const { data: { session } } = await supabase.auth.getSession()
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: 'bl-pref', lang, dark, token: session?.access_token ?? '' },
+      '*'
+    )
   }
 
   return (
