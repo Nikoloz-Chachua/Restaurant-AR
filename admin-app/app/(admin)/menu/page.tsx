@@ -137,13 +137,13 @@ export default function MenuPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--gold)' }}>{T.menuTitle}</h1>
+          <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>{T.menuTitle}</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--dim)' }}>{T.menuDesc}</p>
         </div>
         {msg && (
-          <span className="text-sm px-3 py-1.5 rounded-lg"
+          <span className="text-sm px-3 py-1.5 rounded-lg shrink-0"
                 style={{ background: 'rgba(76,175,125,0.15)', color: 'var(--success)' }}>
             {msg}
           </span>
@@ -173,9 +173,9 @@ export default function MenuPage() {
                   style={{ background: 'var(--gold)', color: '#0f0b07' }}>
             {T.addItem}
           </button>
-          <div className="rounded-xl overflow-hidden"
+          <div className="table-scroll rounded-xl"
                style={{ border: '1px solid var(--border)' }}>
-            <table className="w-full text-sm">
+            <table className="w-full text-sm" style={{ minWidth: '600px' }}>
               <thead>
                 <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
                   {[T.colName, T.colCategory, T.colPrice, T.colModel, T.colVisible, ''].map((h, i) => (
@@ -238,9 +238,9 @@ export default function MenuPage() {
                   style={{ background: 'var(--gold)', color: '#0f0b07' }}>
             {T.addCategory}
           </button>
-          <div className="rounded-xl overflow-hidden"
+          <div className="table-scroll rounded-xl"
                style={{ border: '1px solid var(--border)' }}>
-            <table className="w-full text-sm">
+            <table className="w-full text-sm" style={{ minWidth: '420px' }}>
               <thead>
                 <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
                   {[T.nameEn, T.nameKa, T.colSortOrder, T.colItems, ''].map((h, i) => (

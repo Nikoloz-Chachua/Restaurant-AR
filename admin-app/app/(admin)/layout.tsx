@@ -1,15 +1,7 @@
-import Sidebar from '@/components/Sidebar'
+import AdminShell from '@/components/AdminShell'
 
 export const dynamic = 'force-dynamic'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 overflow-auto p-8"
-            style={{ background: 'var(--bg)' }}>
-        {children}
-      </main>
-    </div>
-  )
+  return <AdminShell>{children}</AdminShell>
 }

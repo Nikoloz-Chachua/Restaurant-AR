@@ -99,12 +99,12 @@ export default function ThemePage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--gold)' }}>{T.themeTitle}</h1>
+          <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>{T.themeTitle}</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--dim)' }}>{T.themeDesc}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
           {msg && (
             <span className="text-sm px-3 py-1.5 rounded-lg"
                   style={{ background: 'rgba(76,175,125,0.15)', color: 'var(--success)' }}>

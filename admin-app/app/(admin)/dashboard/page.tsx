@@ -52,8 +52,8 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--gold)' }}>{T.analyticsTitle}</h1>
-      <p className="text-sm mb-6" style={{ color: 'var(--dim)' }}>
+      <h1 className="text-xl md:text-2xl font-bold mb-1 page-title" style={{ color: 'var(--gold)' }}>{T.analyticsTitle}</h1>
+      <p className="text-sm mb-4 md:mb-6" style={{ color: 'var(--dim)' }}>
         {T.analyticsDesc}
       </p>
       <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
@@ -61,7 +61,7 @@ export default function DashboardPage() {
           ref={iframeRef}
           src="https://temotkesh.github.io/Restaurant-AR/admin.html"
           className="w-full"
-          style={{ height: 'calc(100vh - 140px)', border: 'none' }}
+          style={{ height: 'clamp(480px, calc(100dvh - 160px), 1200px)', border: 'none' }}
           title="Analytics Dashboard"
           onLoad={sendInitialPrefs}
         />
