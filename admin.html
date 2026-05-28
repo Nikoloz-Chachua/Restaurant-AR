@@ -558,7 +558,16 @@ document.getElementById('range-sel').addEventListener('change', () => {
 document.getElementById('custom-apply').addEventListener('click', loadData);
 
 // Relay lang/theme/auth from the parent admin panel
+// SECURITY: only accept messages from the Vercel admin panel or local dev.
+// Update the first entry if your Vercel project URL differs.
+const _ADMIN_ORIGINS = [
+    'https://burger-lions-admin.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:3001',
+];
 window.addEventListener('message', e => {
+    const originOk = _ADMIN_ORIGINS.includes(e.origin) || e.origin.endsWith('.vercel.app');
+    if (!originOk) return;
     if (!e.data || e.data.type !== 'bl-pref') return;
     if (typeof e.data.dark === 'boolean') {
         const light = !e.data.dark;

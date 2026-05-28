@@ -3,14 +3,14 @@ import { useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/useLang'
 
+// Only send messages to this exact origin — never '*'
+const ANALYTICS_ORIGIN = 'https://temotkesh.github.io'
+
 export default function DashboardPage() {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const tokenRef  = useRef('')
   const [T] = useLang()
 
-  // Start fetching the session token immediately on mount.
-  // By the time the heavy iframe (Chart.js + Supabase CDN) fires onLoad,
-  // getSession() has already resolved — sendInitialPrefs runs synchronously.
   useEffect(() => {
     createClient().auth.getSession()
       .then(({ data }) => { tokenRef.current = data?.session?.access_token ?? '' })
@@ -20,7 +20,10 @@ export default function DashboardPage() {
   useEffect(() => {
     function relay(e: Event) {
       const { lang, dark } = (e as CustomEvent).detail
-      iframeRef.current?.contentWindow?.postMessage({ type: 'bl-pref', lang, dark }, '*')
+      iframeRef.current?.contentWindow?.postMessage(
+        { type: 'bl-pref', lang, dark },
+        ANALYTICS_ORIGIN
+      )
     }
     window.addEventListener('bl-pref', relay)
     return () => window.removeEventListener('bl-pref', relay)
@@ -32,21 +35,26 @@ export default function DashboardPage() {
     const token = tokenRef.current
 
     if (token) {
-      iframeRef.current?.contentWindow?.postMessage({ type: 'bl-pref', lang, dark, token }, '*')
+      iframeRef.current?.contentWindow?.postMessage(
+        { type: 'bl-pref', lang, dark, token },
+        ANALYTICS_ORIGIN
+      )
       return
     }
 
-    // Rare: iframe loaded before getSession resolved — do async fallback
     createClient().auth.getSession()
       .then(({ data }) => {
         tokenRef.current = data?.session?.access_token ?? ''
         iframeRef.current?.contentWindow?.postMessage(
           { type: 'bl-pref', lang, dark, token: tokenRef.current },
-          '*'
+          ANALYTICS_ORIGIN
         )
       })
       .catch(() => {
-        iframeRef.current?.contentWindow?.postMessage({ type: 'bl-pref', lang, dark }, '*')
+        iframeRef.current?.contentWindow?.postMessage(
+          { type: 'bl-pref', lang, dark },
+          ANALYTICS_ORIGIN
+        )
       })
   }
 
