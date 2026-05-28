@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Burger Lions — AR Menu</title>
-    <meta name="description" content="Burger Lions restaurant menu. View dishes in Augmented Reality before you order.">
-    <meta property="og:title" content="Burger Lions — AR Menu">
-    <meta property="og:description" content="Browse our menu and place dishes on your table in Augmented Reality.">
+    <title>3D AR Menu</title>
+    <meta name="description" content="Interactive 3D AR Menu. View dishes in Augmented Reality before you order.">
+    <meta property="og:title" content="3D AR Menu">
+    <meta property="og:description" content="Browse the menu and place dishes on your table in Augmented Reality.">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -861,8 +861,8 @@
     <button id="lang-toggle" aria-label="Toggle language">KA</button>
 
     <div class="header">
-        <h1>Burger Lions</h1>
-        <div class="tagline" id="tagline">Taste the Wild</div>
+        <h1>3D AR Menu</h1>
+        <div class="tagline" id="tagline"></div>
     </div>
 
     <div id="cat-filter" class="cat-filter"></div>
@@ -1658,7 +1658,7 @@
 
         const UI = {
             en: {
-                tagline:   'Taste the Wild',
+                tagline:   '',
                 viewAR:    'VIEW ON TABLE',
                 view3D:    'VIEW IN 3D',
                 loading:   'Loading...',
@@ -1692,7 +1692,7 @@
     readyDone:    '✓ Order Noted!',
             },
             ka: {
-                tagline:   'გასინჯე ველური გემო',
+                tagline:   '',
                 viewAR:    'ᲛᲐᲒᲘᲓᲐᲖᲔ ᲜᲐᲮᲕᲐ',
                 view3D:    '3D-ში ᲜᲐᲮᲕᲐ',
                 loading:   'იტვირთება...',
