@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ar-v11';
+const CACHE_NAME = 'bl-v25';
 
 const SUPABASE_URL  = 'https://xctoxhaahxtcicfgnmme.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdG94aGFhaHh0Y2ljZmdubW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NDMyMDEsImV4cCI6MjA5NTMxOTIwMX0.VA2tQL6WT96ifBjON4NLaJa0BbzBGI0ipD7iB5fHjnQ';
@@ -8,22 +8,6 @@ const PRECACHE = [
     './',
     './foods/menu.json',
 ];
-
-// Pre-cache Draco WASM decoder so it's ready before the first AR tap
-async function _precacheDraco() {
-    const urls = [
-        'https://www.gstatic.com/draco/versioned/decoders/1.5.6/draco_wasm_wrapper.js',
-        'https://www.gstatic.com/draco/versioned/decoders/1.5.6/draco_decoder.wasm',
-    ];
-    try {
-        const cache = await caches.open(CACHE_NAME);
-        await Promise.allSettled(
-            urls.map(url =>
-                fetch(url).then(r => { if (r.ok) cache.put(url, r.clone()); }).catch(() => {})
-            )
-        );
-    } catch (_) {}
-}
 
 // Fetch all Supabase Storage GLB URLs from the DB and pre-cache them
 async function _precacheModels() {
@@ -51,7 +35,7 @@ self.addEventListener('install', e => {
     e.waitUntil(
         caches.open(CACHE_NAME)
             .then(c => c.addAll(PRECACHE))
-            .then(() => Promise.all([_precacheModels(), _precacheDraco()]))
+            .then(() => _precacheModels())
             .then(() => self.skipWaiting())
     );
 });
