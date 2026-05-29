@@ -1868,7 +1868,9 @@
         function updateModal() {
             const item = modalItems[modalIndex];
             if (!item) return;
-            modalViewer.src        = item.model || 'food.glb';
+            modalViewer.src        = item.model || '';
+            if (item.thumbnail_url) modalViewer.setAttribute('poster', item.thumbnail_url);
+            else modalViewer.removeAttribute('poster');
             modalTitle.textContent = t(item, 'name');
             modalPrice.textContent = item.price;
             const key = String(modalIndex);
@@ -2186,6 +2188,7 @@
                             price:          r.price,
                             model:          r.model,
                             ar_scale:       r.ar_scale ?? 1.0,
+                            thumbnail_url:  r.thumbnail_url || '',
                         }));
                     }
                 } catch (_) {}
@@ -2239,7 +2242,8 @@
                         <div class="item-left">
                             <div class="thumb-wrap">
                                 <model-viewer
-                                    data-src="${item.model || 'food.glb'}"
+                                    data-src="${item.model || ''}"
+                                    ${item.thumbnail_url ? `poster="${item.thumbnail_url}"` : ''}
                                     camera-controls
                                     shadow-intensity="0"
                                     interaction-prompt="none"
