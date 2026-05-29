@@ -171,19 +171,20 @@ export default function MenuPage() {
     }
     setUploading(true)
     setUploadProgress(T.uploading)
-    const filename = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
-    const { error } = await supabase.storage.from('models').upload(filename, file, {
-      contentType: 'model/gltf-binary',
-      upsert: false,
-    })
-    if (error) {
-      setUploadProgress(`Upload failed: ${error.message}`)
-      setUploading(false)
-      return
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/r2-presign', { method: 'POST', body: fd })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || `Server error ${res.status}`)
+      }
+      const { publicUrl } = await res.json()
+      setItemForm(f => ({ ...f, model: publicUrl }))
+      setUploadProgress(`✓ ${file.name}`)
+    } catch (e) {
+      setUploadProgress(`Upload failed: ${e instanceof Error ? e.message : String(e)}`)
     }
-    const { data: { publicUrl } } = supabase.storage.from('models').getPublicUrl(filename)
-    setItemForm(f => ({ ...f, model: publicUrl }))
-    setUploadProgress(`✓ ${file.name}`)
     setUploading(false)
   }
 
