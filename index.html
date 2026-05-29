@@ -1654,6 +1654,15 @@
 
     <!-- ── Catalog logic ──────────────────────────────────────────────── -->
     <script>
+        // Pre-warm Draco WASM decoder into browser HTTP cache while user browses.
+        // Workers share the HTTP cache, so when DRACOLoader later fetches these
+        // files from inside its Web Worker they're served instantly from cache.
+        (function() {
+            const _dp = 'https://www.gstatic.com/draco/versioned/decoders/1.5.6/';
+            fetch(_dp + 'draco_wasm_wrapper.js', { mode: 'cors', credentials: 'omit' }).catch(function(){});
+            fetch(_dp + 'draco_decoder.wasm',    { mode: 'cors', credentials: 'omit' }).catch(function(){});
+        })();
+
         // ── Analytics ─────────────────────────────────────────────────
         const _sbClient = (function() {
             try { return window.supabase?.createClient(
