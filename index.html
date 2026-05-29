@@ -1328,13 +1328,17 @@
             if (_setupDone) return;
             _setupDone = true;
 
-            const [threeNS, loaderMod] = await Promise.all([
+            const [threeNS, loaderMod, dracoMod] = await Promise.all([
                 import('https://esm.sh/three@0.155.0'),
-                import('https://esm.sh/three@0.155.0/examples/jsm/loaders/GLTFLoader')
+                import('https://esm.sh/three@0.155.0/examples/jsm/loaders/GLTFLoader'),
+                import('https://esm.sh/three@0.155.0/examples/jsm/loaders/DRACOLoader'),
             ]);
             THREE      = threeNS;
             GLTFLoader = loaderMod.GLTFLoader;
             loader     = new GLTFLoader();
+            const dracoLoader = new dracoMod.DRACOLoader();
+            dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+            loader.setDRACOLoader(dracoLoader);
 
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setPixelRatio(window.devicePixelRatio);
