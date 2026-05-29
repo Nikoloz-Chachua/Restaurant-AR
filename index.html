@@ -882,12 +882,17 @@
         <button class="nav-arrow right-arrow" id="modal-next">&#10095;</button>
         <button class="close-btn" id="close-btn">Close</button>
         <div id="modal-title"></div>
-        <model-viewer id="modal-viewer"
-            camera-controls
-            shadow-intensity="1"
-            min-camera-orbit="auto 0deg auto"
-            max-camera-orbit="auto 85deg auto">
-        </model-viewer>
+        <div style="position:relative;display:inline-block;width:95vw;">
+            <model-viewer id="modal-viewer"
+                camera-controls
+                shadow-intensity="1"
+                min-camera-orbit="auto 0deg auto"
+                max-camera-orbit="auto 85deg auto">
+            </model-viewer>
+            <div style="position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+                        background:radial-gradient(ellipse at center, transparent 38%, rgba(0,0,0,0.55) 100%);">
+            </div>
+        </div>
         <div id="modal-price"></div>
         <div id="modal-qty-wrap">
             <div class="qty-ctrl" id="modal-qty-ctrl" data-idx="0">
