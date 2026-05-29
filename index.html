@@ -1134,9 +1134,11 @@
             const paths = [...new Set(MENU.map(m => m.model).filter(Boolean))];
             return Promise.allSettled(paths.map(p => {
                 if (modelGLTFs[p]) return Promise.resolve();
-                return new Promise((res, rej) =>
+                if (_modelLoadPromises[p]) return _modelLoadPromises[p];
+                _modelLoadPromises[p] = new Promise((res, rej) =>
                     loader.load(p, gltf => { modelGLTFs[p] = gltf; res(); }, undefined, rej)
                 );
+                return _modelLoadPromises[p];
             })).then(results => {
                 const failed = results.filter(r => r.status === 'rejected');
                 if (failed.length) console.warn('Model load failures:', failed.map(f => f.reason));
@@ -1379,6 +1381,7 @@
         // ── Loader bootstrap (shared between bg preload and _setup) ───
         let _setupDone = false;
         let _loaderPromise = null;
+        const _modelLoadPromises = {};
 
         async function _ensureLoader() {
             if (loader) return;
@@ -1386,18 +1389,13 @@
                 _loaderPromise = Promise.all([
                     import('https://esm.sh/three@0.155.0'),
                     import('https://esm.sh/three@0.155.0/examples/jsm/loaders/GLTFLoader'),
-                    import('https://esm.sh/three@0.155.0/examples/jsm/loaders/DRACOLoader'),
                 ]);
             }
-            const [threeNS, loaderMod, dracoMod] = await _loaderPromise;
+            const [threeNS, loaderMod] = await _loaderPromise;
             if (loader) return; // concurrent call already finished
             THREE      = threeNS;
             GLTFLoader = loaderMod.GLTFLoader;
             loader     = new GLTFLoader();
-            const dracoLoader = new dracoMod.DRACOLoader();
-            dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
-            dracoLoader.preload();
-            loader.setDRACOLoader(dracoLoader);
         }
 
         // ── One-time init — deferred until first AR tap ───────────────
@@ -1674,15 +1672,6 @@
 
     <!-- ── Catalog logic ──────────────────────────────────────────────── -->
     <script>
-        // Pre-warm Draco WASM decoder into browser HTTP cache while user browses.
-        // Workers share the HTTP cache, so when DRACOLoader later fetches these
-        // files from inside its Web Worker they're served instantly from cache.
-        (function() {
-            const _dp = 'https://www.gstatic.com/draco/versioned/decoders/1.5.6/';
-            fetch(_dp + 'draco_wasm_wrapper.js', { mode: 'cors', credentials: 'omit' }).catch(function(){});
-            fetch(_dp + 'draco_decoder.wasm',    { mode: 'cors', credentials: 'omit' }).catch(function(){});
-        })();
-
         // ── Analytics ─────────────────────────────────────────────────
         const _sbClient = (function() {
             try { return window.supabase?.createClient(
