@@ -130,6 +130,7 @@
         .menu-item:active { opacity: 0.75; transition: opacity 0.08s; }
 
         .thumb-wrap {
+            position: relative;
             width: 108px;
             height: 100%;
             min-height: 108px;
@@ -138,6 +139,13 @@
             background: var(--thumb-bg);
             border: 1px solid var(--border);
             transition: background var(--t), border-color var(--t);
+        }
+        .thumb-vignette {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 32%, var(--card) 100%);
+            opacity: 0.6;
         }
         .thumb-wrap model-viewer {
             width: 100%;
@@ -2270,6 +2278,7 @@
                                     min-camera-orbit="auto 0deg auto"
                                     max-camera-orbit="auto 85deg auto">
                                 </model-viewer>`}
+                                <div class="thumb-vignette"></div>
                             </div>
                         </div>
                         <div class="item-right">
