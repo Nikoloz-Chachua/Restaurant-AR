@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ar-v6';
+const CACHE_NAME = 'ar-v7';
 
 const SUPABASE_URL  = 'https://xctoxhaahxtcicfgnmme.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdG94aGFhaHh0Y2ljZmdubW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NDMyMDEsImV4cCI6MjA5NTMxOTIwMX0.VA2tQL6WT96ifBjON4NLaJa0BbzBGI0ipD7iB5fHjnQ';
@@ -60,10 +60,10 @@ self.addEventListener('fetch', e => {
         e.respondWith(
             fetch(e.request)
                 .then(res => {
-                    caches.open(CACHE_NAME).then(c => c.put(e.request, res.clone()));
+                    caches.open(CACHE_NAME).then(c => c.put(e.request, res.clone())).catch(() => {});
                     return res;
                 })
-                .catch(() => caches.match(e.request))
+                .catch(() => caches.match(e.request).then(r => r || new Response('Offline', { status: 503 })))
         );
         return;
     }

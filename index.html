@@ -415,7 +415,7 @@
             text-align: center;
             max-width: 80%;
         }
-        #xr-exit, #xr-carousel-toggle, #xr-label-toggle, #xr-place-again {
+        #xr-exit, #xr-carousel-toggle, #xr-label-toggle, #xr-place-again, #xr-hide-ui {
             pointer-events: all;
             position: absolute;
             background: rgba(0,0,0,0.65);
@@ -431,6 +431,8 @@
         #xr-place-again      { top: 62px; right: 18px; display: none; }
         #xr-carousel-toggle  { top: 18px; left: 18px; display: none; }
         #xr-label-toggle     { top: 58px; left: 18px; display: none; }
+        #xr-hide-ui          { bottom: 18px; left: 18px; display: none; transition: opacity 0.25s; }
+        #xr-hide-ui.ui-hidden { opacity: 0.35; }
         #xr-add-btn {
             display: none;
             pointer-events: all;
@@ -931,6 +933,7 @@
         <button id="xr-place-again"></button>
         <button id="xr-carousel-toggle"></button>
         <button id="xr-label-toggle"></button>
+        <button id="xr-hide-ui"></button>
         <div id="xr-scale-gauge">
             <div id="xr-scale-track">
                 <div id="xr-scale-fill"></div>
@@ -1013,8 +1016,10 @@
         const MAX_DELTA     = 40;
         const activeTouches = new Map();
         let _pinchDist0 = null, _pinchScale0 = null, _scaleHideTimer = null;
+        let _xrUIHidden = false;
         const _LOG_MIN = Math.log(SCALE_MIN), _LOG_MAX = Math.log(SCALE_MAX);
         function _showScaleGauge() {
+            if (_xrUIHidden) return;
             const s = carouselRoot.scale.x;
             const fill = (Math.log(s) - _LOG_MIN) / (_LOG_MAX - _LOG_MIN) * 100;
             document.getElementById('xr-scale-fill').style.width = fill.toFixed(1) + '%';
@@ -1292,6 +1297,33 @@
             btn.classList.toggle('in-basket', inBasket);
         }
 
+        function _applyUIHidden(hidden) {
+            _xrUIHidden = hidden;
+            const u = UI[window.__lang || 'en'];
+            const hideBtn = document.getElementById('xr-hide-ui');
+            if (!hideBtn) return;
+            if (hidden) {
+                ['xr-nav-row','xr-move-hint','xr-carousel-toggle','xr-label-toggle','xr-place-again'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.style.display = 'none';
+                });
+                document.getElementById('xr-add-btn').classList.remove('visible');
+                document.getElementById('xr-scale-gauge').style.display = 'none';
+                if (labelMesh) labelMesh.visible = false;
+                hideBtn.classList.add('ui-hidden');
+                hideBtn.textContent = u.showUI;
+            } else {
+                document.getElementById('xr-nav-row').style.display         = 'flex';
+                document.getElementById('xr-move-hint').style.display       = 'block';
+                document.getElementById('xr-carousel-toggle').style.display = 'block';
+                document.getElementById('xr-label-toggle').style.display    = 'block';
+                document.getElementById('xr-place-again').style.display     = 'block';
+                document.getElementById('xr-add-btn').classList.add('visible');
+                if (labelMesh) { drawLabel(MENU[currentCenterMenu]); updateLabelTransform(); labelMesh.visible = true; }
+                hideBtn.classList.remove('ui-hidden');
+                hideBtn.textContent = u.hideUI;
+            }
+        }
+
         // ── Placement ─────────────────────────────────────────────────
         function onSelect() {
             if (_ignoreNextSelect) { _ignoreNextSelect = false; return; }
@@ -1312,6 +1344,9 @@
             document.getElementById('xr-carousel-toggle').style.display  = 'block';
             if (labelMesh) { drawLabel(MENU[currentCenterMenu]); updateLabelTransform(); labelMesh.visible = true; }
             document.getElementById('xr-label-toggle').style.display = 'block';
+            const _hBtn = document.getElementById('xr-hide-ui');
+            _hBtn.textContent = UI[window.__lang || 'en'].hideUI;
+            _hBtn.style.display = 'block';
         }
 
         function _resetPlacement() {
@@ -1332,6 +1367,9 @@
             document.getElementById('xr-carousel-toggle').style.display  = 'none';
             document.getElementById('xr-label-toggle').style.display     = 'none';
             if (labelMesh) labelMesh.visible = false;
+            _xrUIHidden = false;
+            const _hBtnR = document.getElementById('xr-hide-ui');
+            _hBtnR.style.display = 'none'; _hBtnR.classList.remove('ui-hidden');
         }
 
         // ── One-time init — deferred until first AR tap ───────────────
@@ -1459,6 +1497,9 @@
                 document.getElementById('xr-move-hint').style.display       = 'none';
                 document.getElementById('xr-carousel-toggle').style.display = 'none';
                 document.getElementById('xr-label-toggle').style.display    = 'none';
+                _xrUIHidden = false;
+                const _hBtnS = document.getElementById('xr-hide-ui');
+                _hBtnS.style.display = 'none'; _hBtnS.classList.remove('ui-hidden');
                 activeTouches.clear();
                 _rotVelocity = 0;
                 _xrAddedKeys.clear();
@@ -1530,6 +1571,7 @@
                 localStorage.setItem('bl-xr-label', labelMode);
                 updateLabelTransform();
             });
+            document.getElementById('xr-hide-ui').addEventListener('click', () => _applyUIHidden(!_xrUIHidden));
 
             function updateXRToggleBtn() {
     const u = UI[window.__lang || 'en'];
@@ -1715,6 +1757,8 @@
     clearBasket:  'Clear',
     readyBtn:     '✓ Ready to Order',
     readyDone:    '✓ Order Noted!',
+    hideUI:       'HIDE UI',
+    showUI:       'SHOW UI',
             },
             ka: {
                 tagline:   '',
@@ -1749,6 +1793,8 @@
     clearBasket:  'გასუფთავება',
     readyBtn:     '✓ შეკვეთა მზადაა',
     readyDone:    '✓ მიღებულია!',
+    hideUI:       'UI დამალვა',
+    showUI:       'UI ჩვენება',
             }
         };
 
@@ -1784,8 +1830,10 @@
             });
             const carouselBtn = document.getElementById('xr-carousel-toggle');
             const labelBtn    = document.getElementById('xr-label-toggle');
+            const hideUIBtn   = document.getElementById('xr-hide-ui');
             if (carouselBtn) carouselBtn.textContent = (localStorage.getItem('bl-xr-view') || 'single') === 'single' ? u.carouselBtn : u.singleBtn;
             if (labelBtn)    labelBtn.textContent    = (localStorage.getItem('bl-xr-label') || 'float') === 'float' ? u.onTable : u.floating;
+            if (hideUIBtn)   hideUIBtn.textContent   = _xrUIHidden ? u.showUI : u.hideUI;
             document.querySelectorAll('.category-header[data-cat-name]').forEach(el => {
                 el.textContent = (lang === 'ka' && el.dataset.catNameKa) ? el.dataset.catNameKa : el.dataset.catName;
             });
