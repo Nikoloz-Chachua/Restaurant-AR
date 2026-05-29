@@ -8,11 +8,11 @@ type MenuItem = {
   id: number; name_en: string; name_ka: string
   description_en: string; description_ka: string
   price: string; category_id: number | null; model: string
-  sort_order: number; visible: boolean; ar_scale: number
+  sort_order: number; visible: boolean; ar_scale: number; thumbnail_url: string
 }
 const EMPTY_ITEM: Omit<MenuItem, 'id'> = {
   name_en: '', name_ka: '', description_en: '', description_ka: '',
-  price: '', category_id: null, model: '', sort_order: 0, visible: true, ar_scale: 1.0,
+  price: '', category_id: null, model: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '',
 }
 
 export default function MenuPage() {
@@ -38,6 +38,9 @@ export default function MenuPage() {
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [thumbUploading, setThumbUploading] = useState(false)
+  const [thumbProgress, setThumbProgress] = useState('')
+  const thumbInputRef = useRef<HTMLInputElement>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -64,7 +67,8 @@ export default function MenuPage() {
     setItemForm({ name_en: item.name_en, name_ka: item.name_ka,
       description_en: item.description_en, description_ka: item.description_ka,
       price: item.price, category_id: item.category_id, model: item.model,
-      sort_order: item.sort_order, visible: item.visible, ar_scale: item.ar_scale ?? 1.0 })
+      sort_order: item.sort_order, visible: item.visible, ar_scale: item.ar_scale ?? 1.0,
+      thumbnail_url: item.thumbnail_url ?? '' })
     setItemModal(true)
   }
   async function saveItem() {
@@ -74,7 +78,7 @@ export default function MenuPage() {
     } else {
       await supabase.from('menu_items').insert(itemForm)
     }
-    setSaving(false); setItemModal(false); setUploadProgress(''); await load()
+    setSaving(false); setItemModal(false); setUploadProgress(''); setThumbProgress(''); await load()
     flash(editItem ? T.itemUpdated : T.itemAdded)
   }
   async function confirmDelete() {
@@ -111,6 +115,30 @@ export default function MenuPage() {
 
   const catName = (id: number | null) =>
     categories.find(c => c.id === id)?.name_en ?? '—'
+
+  async function uploadImage(file: File) {
+    const ext = file.name.split('.').pop()?.toLowerCase()
+    if (!['jpg', 'jpeg', 'png', 'webp', 'avif'].includes(ext || '')) {
+      setThumbProgress('Only jpg, png, webp, avif supported')
+      return
+    }
+    setThumbUploading(true)
+    setThumbProgress(T.uploading)
+    const filename = `thumb_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
+    const { error } = await supabase.storage.from('models').upload(filename, file, {
+      contentType: file.type,
+      upsert: false,
+    })
+    if (error) {
+      setThumbProgress(`Upload failed: ${error.message}`)
+      setThumbUploading(false)
+      return
+    }
+    const { data: { publicUrl } } = supabase.storage.from('models').getPublicUrl(filename)
+    setItemForm(f => ({ ...f, thumbnail_url: publicUrl }))
+    setThumbProgress(`✓ ${file.name}`)
+    setThumbUploading(false)
+  }
 
   async function uploadGLB(file: File) {
     if (!file.name.toLowerCase().endsWith('.glb')) {
@@ -330,6 +358,35 @@ export default function MenuPage() {
                     : itemForm.model
                       ? <span>{T.current}<span style={{ color: 'var(--text)' }}>{itemForm.model.startsWith('http') ? itemForm.model.split('/').pop() : itemForm.model}</span></span>
                       : <span style={{ color: 'var(--dim)' }}>{T.noModel}</span>
+                  }
+                </div>
+              </div>
+            </Field>
+            <Field label={T.thumbnailLabel} className="col-span-2">
+              <div className="space-y-2">
+                <div className="flex gap-2 items-center">
+                  <button type="button" disabled={thumbUploading}
+                          onClick={() => thumbInputRef.current?.click()}
+                          className="px-3 py-1.5 rounded text-xs font-medium"
+                          style={{ background: 'var(--card2)', color: 'var(--gold)',
+                                   border: '1px solid var(--border)', opacity: thumbUploading ? 0.5 : 1 }}>
+                    {thumbUploading ? T.uploading : T.uploadThumb}
+                  </button>
+                  {itemForm.thumbnail_url && (
+                    <img src={itemForm.thumbnail_url} alt="thumbnail preview"
+                         style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6,
+                                  border: '1px solid var(--border)' }} />
+                  )}
+                  <input ref={thumbInputRef} type="file" accept="image/*" style={{ display: 'none' }}
+                         onChange={e => { const f = e.target.files?.[0]; if (f) uploadImage(f); e.target.value = '' }} />
+                </div>
+                <div className="text-xs px-2 py-1.5 rounded truncate"
+                     style={{ background: 'var(--card2)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
+                  {thumbProgress
+                    ? <span style={{ color: thumbProgress.startsWith('✓') ? 'var(--success)' : 'var(--danger)' }}>{thumbProgress}</span>
+                    : itemForm.thumbnail_url
+                      ? <span>{T.current}<span style={{ color: 'var(--text)' }}>{itemForm.thumbnail_url.split('/').pop()}</span></span>
+                      : <span style={{ color: 'var(--dim)' }}>{T.noThumbnail}</span>
                   }
                 </div>
               </div>
