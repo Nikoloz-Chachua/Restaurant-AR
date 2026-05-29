@@ -147,6 +147,14 @@
             display: block;
             touch-action: pan-y;
         }
+        .thumb-wrap .thumb-img {
+            width: 100%;
+            height: 100%;
+            min-height: 108px;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+        }
 
         .item-left {
             grid-area: left;
@@ -2241,15 +2249,16 @@
                         <p class="item-name" data-field="name" data-idx="${globalIdx}">${t(item, 'name')}</p>
                         <div class="item-left">
                             <div class="thumb-wrap">
-                                <model-viewer
+                                ${item.thumbnail_url
+                                    ? `<img class="thumb-img" src="${item.thumbnail_url}" alt="${t(item, 'name')}" loading="lazy">`
+                                    : `<model-viewer
                                     data-src="${item.model || ''}"
-                                    ${item.thumbnail_url ? `poster="${item.thumbnail_url}"` : ''}
                                     camera-controls
                                     shadow-intensity="0"
                                     interaction-prompt="none"
                                     min-camera-orbit="auto 0deg auto"
                                     max-camera-orbit="auto 85deg auto">
-                                </model-viewer>
+                                </model-viewer>`}
                             </div>
                         </div>
                         <div class="item-right">
@@ -2269,14 +2278,18 @@
                         </div>`;
 
                     const mv = card.querySelector('model-viewer');
-                    thumbObserver.observe(mv);
-
-                    let _px = 0, _py = 0;
-                    mv.addEventListener('pointerdown', e => { _px = e.clientX; _py = e.clientY; });
-                    mv.addEventListener('pointerup', e => {
-                        if (Math.abs(e.clientX - _px) < 6 && Math.abs(e.clientY - _py) < 6)
-                            openModal(globalIdx, menuItems);
-                    });
+                    if (mv) {
+                        thumbObserver.observe(mv);
+                        let _px = 0, _py = 0;
+                        mv.addEventListener('pointerdown', e => { _px = e.clientX; _py = e.clientY; });
+                        mv.addEventListener('pointerup', e => {
+                            if (Math.abs(e.clientX - _px) < 6 && Math.abs(e.clientY - _py) < 6)
+                                openModal(globalIdx, menuItems);
+                        });
+                    } else {
+                        card.querySelector('.thumb-img')
+                            ?.addEventListener('click', () => openModal(globalIdx, menuItems));
+                    }
 
                     card.querySelector('.item-right').addEventListener('click', () => openModal(globalIdx, menuItems));
                     card.querySelector('.item-name').addEventListener('click', () => openModal(globalIdx, menuItems));
