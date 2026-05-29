@@ -149,7 +149,7 @@ export default function MenuPage() {
       return
     }
     const filename = `thumb_${Date.now()}.webp`
-    const { error } = await supabase.storage.from('models').upload(filename, blob, {
+    const { error } = await supabase.storage.from('thumbnails').upload(filename, blob, {
       contentType: 'image/webp',
       upsert: false,
     })
@@ -158,7 +158,7 @@ export default function MenuPage() {
       setThumbUploading(false)
       return
     }
-    const { data: { publicUrl } } = supabase.storage.from('models').getPublicUrl(filename)
+    const { data: { publicUrl } } = supabase.storage.from('thumbnails').getPublicUrl(filename)
     setItemForm(f => ({ ...f, thumbnail_url: publicUrl }))
     setThumbProgress(`✓ ${file.name}`)
     setThumbUploading(false)
