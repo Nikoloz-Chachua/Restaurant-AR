@@ -1376,25 +1376,36 @@
             _hBtnR.style.display = 'none'; _hBtnR.classList.remove('ui-hidden');
         }
 
-        // ── One-time init — deferred until first AR tap ───────────────
+        // ── Loader bootstrap (shared between bg preload and _setup) ───
         let _setupDone = false;
+        let _loaderPromise = null;
 
-        async function _setup() {
-            if (_setupDone) return;
-            _setupDone = true;
-
-            const [threeNS, loaderMod, dracoMod] = await Promise.all([
-                import('https://esm.sh/three@0.155.0'),
-                import('https://esm.sh/three@0.155.0/examples/jsm/loaders/GLTFLoader'),
-                import('https://esm.sh/three@0.155.0/examples/jsm/loaders/DRACOLoader'),
-            ]);
+        async function _ensureLoader() {
+            if (loader) return;
+            if (!_loaderPromise) {
+                _loaderPromise = Promise.all([
+                    import('https://esm.sh/three@0.155.0'),
+                    import('https://esm.sh/three@0.155.0/examples/jsm/loaders/GLTFLoader'),
+                    import('https://esm.sh/three@0.155.0/examples/jsm/loaders/DRACOLoader'),
+                ]);
+            }
+            const [threeNS, loaderMod, dracoMod] = await _loaderPromise;
+            if (loader) return; // concurrent call already finished
             THREE      = threeNS;
             GLTFLoader = loaderMod.GLTFLoader;
             loader     = new GLTFLoader();
             const dracoLoader = new dracoMod.DRACOLoader();
             dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
-            dracoLoader.preload(); // start WASM decoder download now, not on first parse
+            dracoLoader.preload();
             loader.setDRACOLoader(dracoLoader);
+        }
+
+        // ── One-time init — deferred until first AR tap ───────────────
+        async function _setup() {
+            if (_setupDone) return;
+            _setupDone = true;
+
+            await _ensureLoader();
 
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setPixelRatio(window.devicePixelRatio);
@@ -1602,6 +1613,15 @@
         window.XR = {
             getCurrentItem() { return MENU.length ? MENU[currentCenterMenu] : null; },
             refreshHint() { if (_setupDone) _updateScanHint(_reticleWasVisible); },
+            // Called right after menu renders — imports Three.js + decodes all models
+            // in the background so the first AR tap finds everything ready.
+            async backgroundPreload(items) {
+                MENU = items; N = MENU.length;
+                try {
+                    await _ensureLoader();
+                    await preloadModels();
+                } catch (e) { console.warn('XR bg preload:', e); }
+            },
             async start(itemIndex, items) {
                 if (xrStarting || xrSession) return;
                 xrStarting = true;
@@ -2289,6 +2309,8 @@
 
             menuItems = items;
             window.__menuItems = items;
+            // After menu paints, silently preload Three.js + decode all models
+            setTimeout(() => window.XR?.backgroundPreload?.(items), 200);
 
             const initialLabel = window.__arCap === 'none' ? UI[window.__lang].view3D : UI[window.__lang].viewAR;
 
