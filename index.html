@@ -2298,6 +2298,12 @@
 
             menuItems = items;
             window.__menuItems = items;
+            // iOS: pre-load a Quick Look launcher for every model URL so the
+            // USDZ is ready before the user taps AR (activateAR must fire
+            // synchronously in a gesture handler — launcher must already be loaded)
+            if (_isIOS) {
+                [...new Set(items.map(i => i.model).filter(Boolean))].forEach(src => _getARLauncher(src));
+            }
             // After menu paints, silently preload Three.js + decode all models
             setTimeout(() => window.XR?.backgroundPreload?.(items), 200);
 
