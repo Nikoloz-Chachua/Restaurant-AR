@@ -8,11 +8,11 @@ type MenuItem = {
   id: number; name_en: string; name_ka: string
   description_en: string; description_ka: string
   price: string; category_id: number | null; model: string
-  sort_order: number; visible: boolean; ar_scale: number; thumbnail_url: string
+  sort_order: number; visible: boolean; ar_scale: number; thumbnail_url: string; thumb_3d: boolean
 }
 const EMPTY_ITEM: Omit<MenuItem, 'id'> = {
   name_en: '', name_ka: '', description_en: '', description_ka: '',
-  price: '', category_id: null, model: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '',
+  price: '', category_id: null, model: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '', thumb_3d: false,
 }
 
 export default function MenuPage() {
@@ -68,7 +68,7 @@ export default function MenuPage() {
       description_en: item.description_en, description_ka: item.description_ka,
       price: item.price, category_id: item.category_id, model: item.model,
       sort_order: item.sort_order, visible: item.visible, ar_scale: item.ar_scale ?? 1.0,
-      thumbnail_url: item.thumbnail_url ?? '' })
+      thumbnail_url: item.thumbnail_url ?? '', thumb_3d: item.thumb_3d ?? false })
     setItemModal(true)
   }
   async function saveItem() {
@@ -116,6 +116,23 @@ export default function MenuPage() {
   const catName = (id: number | null) =>
     categories.find(c => c.id === id)?.name_en ?? '—'
 
+  async function toWebP(file: File): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      const url = URL.createObjectURL(file)
+      img.onload = () => {
+        URL.revokeObjectURL(url)
+        const canvas = document.createElement('canvas')
+        canvas.width = img.naturalWidth
+        canvas.height = img.naturalHeight
+        canvas.getContext('2d')!.drawImage(img, 0, 0)
+        canvas.toBlob(b => b ? resolve(b) : reject(new Error('Conversion failed')), 'image/webp', 0.88)
+      }
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not load image')) }
+      img.src = url
+    })
+  }
+
   async function uploadImage(file: File) {
     const ext = file.name.split('.').pop()?.toLowerCase()
     if (!['jpg', 'jpeg', 'png', 'webp', 'avif'].includes(ext || '')) {
@@ -124,9 +141,17 @@ export default function MenuPage() {
     }
     setThumbUploading(true)
     setThumbProgress(T.uploading)
-    const filename = `thumb_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
-    const { error } = await supabase.storage.from('models').upload(filename, file, {
-      contentType: file.type,
+    let blob: Blob
+    try {
+      blob = await toWebP(file)
+    } catch {
+      setThumbProgress('Could not process image')
+      setThumbUploading(false)
+      return
+    }
+    const filename = `thumb_${Date.now()}.webp`
+    const { error } = await supabase.storage.from('models').upload(filename, blob, {
+      contentType: 'image/webp',
       upsert: false,
     })
     if (error) {
@@ -391,6 +416,15 @@ export default function MenuPage() {
                 </div>
               </div>
             </Field>
+            {itemForm.thumbnail_url && (
+              <Field label={T.thumb3dLabel} className="col-span-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={itemForm.thumb_3d} style={{ width: 'auto' }}
+                         onChange={e => setItemForm(f => ({ ...f, thumb_3d: e.target.checked }))} />
+                  <span className="text-sm" style={{ color: 'var(--dim)' }}>{T.thumb3dHint}</span>
+                </label>
+              </Field>
+            )}
             <Field label={T.sortOrder}>
               <input type="number" value={itemForm.sort_order}
                      onChange={e => setItemForm(f => ({ ...f, sort_order: Number(e.target.value) }))} />

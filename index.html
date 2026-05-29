@@ -2197,6 +2197,7 @@
                             model:          r.model,
                             ar_scale:       r.ar_scale ?? 1.0,
                             thumbnail_url:  r.thumbnail_url || '',
+                            thumb_3d:       r.thumb_3d ?? false,
                         }));
                     }
                 } catch (_) {}
@@ -2249,10 +2250,11 @@
                         <p class="item-name" data-field="name" data-idx="${globalIdx}">${t(item, 'name')}</p>
                         <div class="item-left">
                             <div class="thumb-wrap">
-                                ${item.thumbnail_url
+                                ${item.thumbnail_url && !item.thumb_3d
                                     ? `<img class="thumb-img" src="${item.thumbnail_url}" alt="${t(item, 'name')}" loading="lazy">`
                                     : `<model-viewer
                                     data-src="${item.model || ''}"
+                                    ${item.thumbnail_url ? `poster="${item.thumbnail_url}"` : ''}
                                     camera-controls
                                     shadow-intensity="0"
                                     interaction-prompt="none"
