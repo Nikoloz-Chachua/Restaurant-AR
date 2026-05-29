@@ -117,9 +117,8 @@ export default function MenuPage() {
     categories.find(c => c.id === id)?.name_en ?? '—'
 
   async function uploadImage(file: File) {
-    const ext = file.name.split('.').pop()?.toLowerCase()
-    if (!['jpg', 'jpeg', 'png', 'webp', 'avif'].includes(ext || '')) {
-      setThumbProgress('Only jpg, png, webp, avif supported')
+    if (!file.type.startsWith('image/')) {
+      setThumbProgress('Only image files supported (jpg, png, webp, avif…)')
       return
     }
     setThumbUploading(true)
