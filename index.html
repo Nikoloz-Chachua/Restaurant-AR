@@ -1611,6 +1611,9 @@
                     _rotVelocity *= INERTIA_DAMP;
                 }
                 if (labelMesh && labelMesh.visible) {
+                    // grow with burger above 1×; clamp at original size below 1×
+                    const _cs = carouselRoot.scale.x;
+                    labelMesh.scale.setScalar(_cs < 1 ? 1 / _cs : 1);
                     const _camPos = new THREE.Vector3();
                     camera.getWorldPosition(_camPos);
                     if (labelMode === 'float') {
