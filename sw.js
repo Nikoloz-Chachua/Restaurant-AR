@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bl-v38';
+const CACHE_NAME = 'bl-v39';
 
 const SUPABASE_URL  = 'https://xctoxhaahxtcicfgnmme.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdG94aGFhaHh0Y2ljZmdubW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NDMyMDEsImV4cCI6MjA5NTMxOTIwMX0.VA2tQL6WT96ifBjON4NLaJa0BbzBGI0ipD7iB5fHjnQ';
@@ -40,6 +40,11 @@ self.addEventListener('install', e => {
     );
 });
 
+// Page can force a waiting SW to activate by posting SKIP_WAITING
+self.addEventListener('message', e => {
+    if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
+});
+
 // Remove old caches when a new version activates
 self.addEventListener('activate', e => {
     e.waitUntil(
@@ -54,11 +59,12 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
     if (e.request.method !== 'GET') return;
 
-    // Navigation requests (the HTML page itself): network-first so app updates
-    // reach users immediately; serve cached copy only when offline.
+    // Navigation requests (the HTML page itself): network-first with cache:'no-store'
+    // so the browser's HTTP cache AND Cloudflare edge cache are both bypassed —
+    // updates reach users on the very next reload. Cached copy only used offline.
     if (e.request.mode === 'navigate') {
         e.respondWith(
-            fetch(e.request)
+            fetch(e.request, { cache: 'no-store' })
                 .then(res => {
                     caches.open(CACHE_NAME).then(c => c.put(e.request, res.clone())).catch(() => {});
                     return res;

@@ -943,7 +943,7 @@
         <button id="xr-carousel-toggle"></button>
         <button id="xr-label-toggle"></button>
         <button id="xr-hide-ui">HIDE UI</button>
-        <div id="xr-ver">bl-v38</div>
+        <div id="xr-ver">bl-v39</div>
         <div id="xr-scale-gauge">
             <div id="xr-scale-track">
                 <div id="xr-scale-fill"></div>
@@ -2755,8 +2755,29 @@ document.getElementById('basket-items').addEventListener('click', e => {
     </script>
     <script>
         if ('serviceWorker' in navigator) {
+            // Auto-reload the page when a new SW takes over — otherwise users
+            // would keep running the old cached HTML until they manually refresh.
+            let _swReloaded = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (_swReloaded) return;
+                _swReloaded = true;
+                location.reload();
+            });
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js');
+                navigator.serviceWorker.register('./sw.js').then(reg => {
+                    // Force-check for a new SW on every page load.
+                    reg.update().catch(() => {});
+                    reg.addEventListener('updatefound', () => {
+                        const newSW = reg.installing;
+                        if (!newSW) return;
+                        newSW.addEventListener('statechange', () => {
+                            if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                                // A new SW is waiting — activate it immediately
+                                newSW.postMessage({ type: 'SKIP_WAITING' });
+                            }
+                        });
+                    });
+                }).catch(() => {});
             });
         }
     </script>
