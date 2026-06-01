@@ -1017,6 +1017,7 @@
         const activeTouches = new Map();
         let _pinchDist0 = null, _pinchScale0 = null, _scaleHideTimer = null;
         let _xrUIHidden = false;
+        let _lastTouchStart = null;
         const _LOG_MIN = Math.log(SCALE_MIN), _LOG_MAX = Math.log(SCALE_MAX);
         function _showScaleGauge() {
             if (_xrUIHidden) return;
@@ -1113,7 +1114,7 @@
             });
             const planeW = 0.15, planeH = planeW * H / W;
             labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), mat);
-            labelMesh.position.set(0, 0.28, 0.06);
+            labelMesh.position.set(0, 0.14, 0.03);
             labelMesh.visible = false;
             carouselRoot.add(labelMesh);
         }
@@ -1121,7 +1122,7 @@
         function updateLabelTransform() {
             if (!labelMesh) return;
             if (labelMode === 'float') {
-                labelMesh.position.set(0, 0.28, 0.06);
+                labelMesh.position.set(0, 0.14, 0.03);
             }
             // surface rotation updated per-frame in render loop
             const btn = document.getElementById('xr-label-toggle');
@@ -1314,9 +1315,10 @@
                 });
                 document.getElementById('xr-add-btn').classList.remove('visible');
                 document.getElementById('xr-scale-gauge').style.display = 'none';
+                document.getElementById('xr-exit').style.display = 'none';
                 if (labelMesh) labelMesh.visible = false;
-                hideBtn.classList.add('ui-hidden');
-                hideBtn.textContent = u.showUI;
+                hideBtn.style.display = 'none';
+                hideBtn.classList.remove('ui-hidden');
             } else {
                 document.getElementById('xr-nav-row').style.display         = 'flex';
                 document.getElementById('xr-move-hint').style.display       = 'block';
@@ -1324,7 +1326,9 @@
                 document.getElementById('xr-label-toggle').style.display    = 'block';
                 document.getElementById('xr-place-again').style.display     = 'block';
                 document.getElementById('xr-add-btn').classList.add('visible');
+                document.getElementById('xr-exit').style.display = '';
                 if (labelMesh) { drawLabel(MENU[currentCenterMenu]); updateLabelTransform(); labelMesh.visible = true; }
+                hideBtn.style.display = '';
                 hideBtn.classList.remove('ui-hidden');
                 hideBtn.textContent = u.hideUI;
             }
@@ -1374,8 +1378,10 @@
             document.getElementById('xr-label-toggle').style.display     = 'none';
             if (labelMesh) labelMesh.visible = false;
             _xrUIHidden = false;
+            _lastTouchStart = null;
             const _hBtnR = document.getElementById('xr-hide-ui');
             _hBtnR.style.display = 'none'; _hBtnR.classList.remove('ui-hidden');
+            document.getElementById('xr-exit').style.display = '';
         }
 
         // ── Loader bootstrap (shared between bg preload and _setup) ───
@@ -1495,6 +1501,12 @@
                 _rotVelocity = 0;
                 for (const t of e.changedTouches)
                     activeTouches.set(t.identifier, { x: t.clientX, y: t.clientY, prevX: t.clientX, prevY: t.clientY });
+                if (activeTouches.size === 1) {
+                    const t = e.changedTouches[0];
+                    _lastTouchStart = { x: t.clientX, y: t.clientY };
+                } else {
+                    _lastTouchStart = null;
+                }
                 if (activeTouches.size >= 2) {
                     const [a, b] = [...activeTouches.values()];
                     _pinchDist0  = Math.hypot(a.x - b.x, a.y - b.y);
@@ -1525,9 +1537,17 @@
             }, { passive: false });
 
             gestureLayer.addEventListener('touchend', e => {
-                for (const t of e.changedTouches) activeTouches.delete(t.identifier);
+                for (const t of e.changedTouches) {
+                    if (_xrUIHidden && placed && _lastTouchStart && activeTouches.size === 1) {
+                        const dx = t.clientX - _lastTouchStart.x;
+                        const dy = t.clientY - _lastTouchStart.y;
+                        if (Math.hypot(dx, dy) < 10) _applyUIHidden(false);
+                    }
+                    activeTouches.delete(t.identifier);
+                }
                 if (activeTouches.size < 2) {
                     _pinchDist0 = null; _pinchScale0 = null;
+                    _lastTouchStart = null;
                     _hideScaleGauge(1200);
                 }
             }, { passive: true });
@@ -1556,8 +1576,10 @@
                 document.getElementById('xr-carousel-toggle').style.display = 'none';
                 document.getElementById('xr-label-toggle').style.display    = 'none';
                 _xrUIHidden = false;
+                _lastTouchStart = null;
                 const _hBtnS = document.getElementById('xr-hide-ui');
                 _hBtnS.style.display = 'none'; _hBtnS.classList.remove('ui-hidden');
+                document.getElementById('xr-exit').style.display = '';
                 activeTouches.clear();
                 _rotVelocity = 0;
                 _xrAddedKeys.clear();
@@ -1599,7 +1621,7 @@
                         const _rPos = new THREE.Vector3();
                         carouselRoot.getWorldPosition(_rPos);
                         const _ang = Math.atan2(_camPos.x - _rPos.x, _camPos.z - _rPos.z);
-                        const _r = 0.22, _h = 0.004;
+                        const _r = 0.073, _h = 0.004;
                         const _lp = new THREE.Vector3(
                             _rPos.x + Math.sin(_ang) * _r,
                             _rPos.y + _h,
