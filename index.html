@@ -4,6 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Burger Lions — AR Menu</title>
+    <script>
+        // ── KILLSWITCH ────────────────────────────────────────────────
+        // One-shot cleanup for anyone who still has an old service worker
+        // or stale cache from before the auto-update flow shipped (bl-v41+).
+        // Unregisters every SW, deletes every cache, then reloads once.
+        // The localStorage flag stops it from running twice.
+        (async () => {
+            try {
+                const KILL_KEY = 'bl-killswitch-v41';
+                if (localStorage.getItem(KILL_KEY)) return;
+                if (!('serviceWorker' in navigator)) return;
+                const regs = await navigator.serviceWorker.getRegistrations();
+                const cacheNames = await caches.keys();
+                if (regs.length === 0 && cacheNames.length === 0) {
+                    localStorage.setItem(KILL_KEY, '1');
+                    return;
+                }
+                localStorage.setItem(KILL_KEY, '1');
+                await Promise.all(regs.map(r => r.unregister().catch(() => {})));
+                await Promise.all(cacheNames.map(n => caches.delete(n).catch(() => {})));
+                location.reload();
+            } catch (_) {}
+        })();
+    </script>
     <meta name="description" content="Burger Lions restaurant menu. View dishes in Augmented Reality before you order.">
     <meta property="og:title" content="Burger Lions — AR Menu">
     <meta property="og:description" content="Browse our menu and place dishes on your table in Augmented Reality.">
@@ -438,8 +462,9 @@
         #xr-hide-ui.ui-hidden { opacity: 0.35; }
         #xr-ver {
             position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
-            color: rgba(255,255,255,0.25); font-size: 10px; font-family: monospace;
-            pointer-events: none; user-select: none;
+            color: #ff3030; font-size: 16px; font-weight: 700; font-family: monospace;
+            background: rgba(0,0,0,0.7); padding: 2px 8px; border-radius: 4px;
+            pointer-events: none; user-select: none; z-index: 99;
         }
         #xr-add-btn {
             display: none;
@@ -884,6 +909,7 @@
 </head>
 <body>
 
+    <div id="page-ver" style="position:fixed;top:4px;left:4px;z-index:99999;background:#ff3030;color:#fff;font:700 12px monospace;padding:2px 6px;border-radius:3px;pointer-events:none">bl-v41</div>
     <button id="theme-toggle" aria-label="Toggle theme">Day</button>
     <button id="lang-toggle" aria-label="Toggle language">KA</button>
 
@@ -943,7 +969,7 @@
         <button id="xr-carousel-toggle"></button>
         <button id="xr-label-toggle"></button>
         <button id="xr-hide-ui">HIDE UI</button>
-        <div id="xr-ver">bl-v40</div>
+        <div id="xr-ver">bl-v41</div>
         <div id="xr-scale-gauge">
             <div id="xr-scale-track">
                 <div id="xr-scale-fill"></div>
