@@ -460,12 +460,6 @@
         #xr-carousel-toggle  { top: 62px; left: 18px; display: none; }
         #xr-label-toggle     { top: 106px; left: 18px; display: none; }
         #xr-hide-ui.ui-hidden { opacity: 0.35; }
-        #xr-ver {
-            position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
-            color: #ff3030; font-size: 16px; font-weight: 700; font-family: monospace;
-            background: rgba(0,0,0,0.7); padding: 2px 8px; border-radius: 4px;
-            pointer-events: none; user-select: none; z-index: 99;
-        }
         #xr-add-btn {
             display: none;
             pointer-events: all;
@@ -909,7 +903,6 @@
 </head>
 <body>
 
-    <div id="page-ver" style="position:fixed;top:4px;left:4px;z-index:99999;background:#ff3030;color:#fff;font:700 12px monospace;padding:2px 6px;border-radius:3px;pointer-events:none">bl-v41</div>
     <button id="theme-toggle" aria-label="Toggle theme">Day</button>
     <button id="lang-toggle" aria-label="Toggle language">KA</button>
 
@@ -969,7 +962,6 @@
         <button id="xr-carousel-toggle"></button>
         <button id="xr-label-toggle"></button>
         <button id="xr-hide-ui">HIDE UI</button>
-        <div id="xr-ver">bl-v41</div>
         <div id="xr-scale-gauge">
             <div id="xr-scale-track">
                 <div id="xr-scale-fill"></div>
@@ -2790,7 +2782,7 @@ document.getElementById('basket-items').addEventListener('click', e => {
                 location.reload();
             });
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').then(reg => {
+                navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
                     // Force-check for a new SW on every page load.
                     reg.update().catch(() => {});
                     reg.addEventListener('updatefound', () => {
