@@ -1552,6 +1552,11 @@
             renderer.xr.addEventListener('sessionstart', async () => {
                 _reticleWasVisible = false;
                 _updateScanHint(false);
+                const _hBtnStart = document.getElementById('xr-hide-ui');
+                if (_hBtnStart) {
+                    _hBtnStart.textContent = UI[window.__lang || 'en'].hideUI;
+                    _hBtnStart.style.display = 'block';
+                }
                 try {
                     const session     = renderer.xr.getSession();
                     const viewerSpace = await session.requestReferenceSpace('viewer');
@@ -1608,9 +1613,16 @@
                     _rotVelocity *= INERTIA_DAMP;
                 }
                 if (labelMesh && labelMesh.visible) {
-                    // grow with burger above 1×; clamp at original size below 1×
                     const _cs = carouselRoot.scale.x;
-                    labelMesh.scale.setScalar(_cs < 1 ? 1 / _cs : 1);
+                    if (_cs < 1) {
+                        // Counter-scale both size AND position so the label stays
+                        // at a fixed world-space location regardless of burger scale
+                        labelMesh.scale.setScalar(1 / _cs);
+                        labelMesh.position.set(0, 0.07 / _cs, 0.015 / _cs);
+                    } else {
+                        labelMesh.scale.setScalar(1);
+                        labelMesh.position.set(0, 0.07, 0.015);
+                    }
                     const _camPos = new THREE.Vector3();
                     camera.getWorldPosition(_camPos);
                     if (labelMode === 'float') {
