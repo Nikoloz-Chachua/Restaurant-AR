@@ -434,7 +434,7 @@
         #xr-place-again      { top: 62px; right: 18px; display: none; }
         #xr-carousel-toggle  { top: 18px; left: 18px; display: none; }
         #xr-label-toggle     { top: 58px; left: 18px; display: none; }
-        #xr-hide-ui          { bottom: 18px; left: 18px; display: block; transition: opacity 0.25s; }
+        #xr-hide-ui          { bottom: 80px; left: 18px; display: block; transition: opacity 0.25s; }
         #xr-hide-ui.ui-hidden { opacity: 0.35; }
         #xr-add-btn {
             display: none;
@@ -1114,7 +1114,7 @@
             labelCtx = labelCanvas.getContext('2d');
             labelTexture = new THREE.CanvasTexture(labelCanvas);
             const mat = new THREE.MeshBasicMaterial({
-                map: labelTexture, transparent: true, depthWrite: false, side: THREE.DoubleSide
+                map: labelTexture, transparent: true, depthWrite: false, depthTest: false, side: THREE.DoubleSide
             });
             const planeW = 0.15, planeH = planeW * H / W;
             labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), mat);
