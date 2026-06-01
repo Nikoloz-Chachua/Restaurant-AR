@@ -1114,7 +1114,7 @@
             });
             const planeW = 0.15, planeH = planeW * H / W;
             labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), mat);
-            labelMesh.position.set(0, 0.14, 0.03);
+            labelMesh.position.set(0, 0.07, 0.015);
             labelMesh.visible = false;
             carouselRoot.add(labelMesh);
         }
@@ -1122,7 +1122,7 @@
         function updateLabelTransform() {
             if (!labelMesh) return;
             if (labelMode === 'float') {
-                labelMesh.position.set(0, 0.14, 0.03);
+                labelMesh.position.set(0, 0.07, 0.015);
             }
             // surface rotation updated per-frame in render loop
             const btn = document.getElementById('xr-label-toggle');
@@ -1317,8 +1317,7 @@
                 document.getElementById('xr-scale-gauge').style.display = 'none';
                 document.getElementById('xr-exit').style.display = 'none';
                 if (labelMesh) labelMesh.visible = false;
-                hideBtn.style.display = 'none';
-                hideBtn.classList.remove('ui-hidden');
+                hideBtn.textContent = u.showUI;
             } else {
                 document.getElementById('xr-nav-row').style.display         = 'flex';
                 document.getElementById('xr-move-hint').style.display       = 'block';
@@ -1328,8 +1327,6 @@
                 document.getElementById('xr-add-btn').classList.add('visible');
                 document.getElementById('xr-exit').style.display = '';
                 if (labelMesh) { drawLabel(MENU[currentCenterMenu]); updateLabelTransform(); labelMesh.visible = true; }
-                hideBtn.style.display = '';
-                hideBtn.classList.remove('ui-hidden');
                 hideBtn.textContent = u.hideUI;
             }
         }
