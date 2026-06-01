@@ -1,0 +1,12 @@
+# Cloudflare Pages custom response headers
+
+# Service worker must never be cached — browser needs to detect updates
+/sw.js
+  Cache-Control: no-store, max-age=0
+
+# HTML must revalidate on every request
+/
+  Cache-Control: no-cache, max-age=0
+
+/index.html
+  Cache-Control: no-cache, max-age=0
