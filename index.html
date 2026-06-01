@@ -358,6 +358,7 @@
             position: absolute;
             inset: 0;
             pointer-events: all;
+            z-index: 1;
         }
         #xr-place-hint {
     position: absolute;
@@ -378,6 +379,7 @@
         #xr-nav-row {
             display: none;
             position: absolute;
+            z-index: 2;
             bottom: 60px;
             left: 50%;
             transform: translateX(-50%);
@@ -418,6 +420,7 @@
         #xr-exit, #xr-carousel-toggle, #xr-label-toggle, #xr-place-again, #xr-hide-ui {
             pointer-events: all;
             position: absolute;
+            z-index: 2;
             background: rgba(0,0,0,0.65);
             color: #ccc;
             border: 1px solid rgba(255,255,255,0.2);
@@ -437,6 +440,7 @@
             display: none;
             pointer-events: all;
             position: absolute;
+            z-index: 2;
             bottom: 55px;
             right: 18px;
             background: rgba(0,0,0,0.45);
@@ -933,7 +937,7 @@
         <button id="xr-place-again"></button>
         <button id="xr-carousel-toggle"></button>
         <button id="xr-label-toggle"></button>
-        <button id="xr-hide-ui"></button>
+        <button id="xr-hide-ui">HIDE UI</button>
         <div id="xr-scale-gauge">
             <div id="xr-scale-track">
                 <div id="xr-scale-fill"></div>
