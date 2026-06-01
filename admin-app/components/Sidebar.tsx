@@ -164,7 +164,7 @@ export default function Sidebar({ open, onClose }: Props) {
       {/* Footer links */}
       <div className="px-3 pb-4 shrink-0">
         <a
-          href="https://temotkesh.github.io/Restaurant-AR"
+          href="https://3darmenu.pages.dev"
           target="_blank"
           rel="noreferrer"
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm mb-1 transition-colors duration-150"

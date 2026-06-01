@@ -134,9 +134,8 @@ export default function MenuPage() {
   }
 
   async function uploadImage(file: File) {
-    const ext = file.name.split('.').pop()?.toLowerCase()
-    if (!['jpg', 'jpeg', 'png', 'webp', 'avif'].includes(ext || '')) {
-      setThumbProgress('Only jpg, png, webp, avif supported')
+    if (!file.type.startsWith('image/')) {
+      setThumbProgress('Only image files supported (jpg, png, webp, avif…)')
       return
     }
     setThumbUploading(true)
@@ -150,7 +149,7 @@ export default function MenuPage() {
       return
     }
     const filename = `thumb_${Date.now()}.webp`
-    const { error } = await supabase.storage.from('models').upload(filename, blob, {
+    const { error } = await supabase.storage.from('thumbnails').upload(filename, blob, {
       contentType: 'image/webp',
       upsert: false,
     })
@@ -159,7 +158,7 @@ export default function MenuPage() {
       setThumbUploading(false)
       return
     }
-    const { data: { publicUrl } } = supabase.storage.from('models').getPublicUrl(filename)
+    const { data: { publicUrl } } = supabase.storage.from('thumbnails').getPublicUrl(filename)
     setItemForm(f => ({ ...f, thumbnail_url: publicUrl }))
     setThumbProgress(`✓ ${file.name}`)
     setThumbUploading(false)
@@ -172,19 +171,20 @@ export default function MenuPage() {
     }
     setUploading(true)
     setUploadProgress(T.uploading)
-    const filename = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
-    const { error } = await supabase.storage.from('models').upload(filename, file, {
-      contentType: 'model/gltf-binary',
-      upsert: false,
-    })
-    if (error) {
-      setUploadProgress(`Upload failed: ${error.message}`)
-      setUploading(false)
-      return
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/r2-presign', { method: 'POST', body: fd })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || `Server error ${res.status}`)
+      }
+      const { publicUrl } = await res.json()
+      setItemForm(f => ({ ...f, model: publicUrl }))
+      setUploadProgress(`✓ ${file.name}`)
+    } catch (e) {
+      setUploadProgress(`Upload failed: ${e instanceof Error ? e.message : String(e)}`)
     }
-    const { data: { publicUrl } } = supabase.storage.from('models').getPublicUrl(filename)
-    setItemForm(f => ({ ...f, model: publicUrl }))
-    setUploadProgress(`✓ ${file.name}`)
     setUploading(false)
   }
 

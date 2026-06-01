@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/useLang'
 
 // Only send messages to this exact origin — never '*'
-const ANALYTICS_ORIGIN = 'https://temotkesh.github.io'
+const ANALYTICS_ORIGIN = 'https://3darmenu.pages.dev'
 
 export default function DashboardPage() {
   const iframeRef = useRef<HTMLIFrameElement>(null)
@@ -67,7 +67,7 @@ export default function DashboardPage() {
       <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
         <iframe
           ref={iframeRef}
-          src="https://temotkesh.github.io/Restaurant-AR/admin.html"
+          src="https://3darmenu.pages.dev/admin.html"
           className="w-full"
           style={{ height: 'clamp(480px, calc(100dvh - 160px), 1200px)', border: 'none' }}
           title="Analytics Dashboard"

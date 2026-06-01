@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D AR Menu</title>
-    <meta name="description" content="Interactive 3D AR Menu. View dishes in Augmented Reality before you order.">
-    <meta property="og:title" content="3D AR Menu">
-    <meta property="og:description" content="Browse the menu and place dishes on your table in Augmented Reality.">
+    <title>Burger Lions — AR Menu</title>
+    <meta name="description" content="Burger Lions restaurant menu. View dishes in Augmented Reality before you order.">
+    <meta property="og:title" content="Burger Lions — AR Menu">
+    <meta property="og:description" content="Browse our menu and place dishes on your table in Augmented Reality.">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -879,8 +879,8 @@
     <button id="lang-toggle" aria-label="Toggle language">KA</button>
 
     <div class="header">
-        <h1>3D AR Menu</h1>
-        <div class="tagline" id="tagline"></div>
+        <h1>Burger Lions</h1>
+        <div class="tagline" id="tagline">Taste the Wild</div>
     </div>
 
     <div id="cat-filter" class="cat-filter"></div>
@@ -974,7 +974,7 @@
     <!-- WebXR — Three.js loaded lazily on first AR tap, not on page load -->
     <script>
     (function () {
-        let THREE, GLTFLoader;
+        let THREE, GLTFLoader, GLTFExporter;
         let renderer, scene, camera, reticle, xrCanvas;
         let carouselRoot, slotGroups = [];
         let gestureLayer, xrOverlay;
@@ -1389,13 +1389,57 @@
                 _loaderPromise = Promise.all([
                     import('https://esm.sh/three@0.155.0'),
                     import('https://esm.sh/three@0.155.0/examples/jsm/loaders/GLTFLoader'),
+                    import('https://esm.sh/three@0.155.0/examples/jsm/exporters/GLTFExporter'),
                 ]);
             }
-            const [threeNS, loaderMod] = await _loaderPromise;
+            const [threeNS, loaderMod, exporterMod] = await _loaderPromise;
             if (loader) return; // concurrent call already finished
-            THREE      = threeNS;
-            GLTFLoader = loaderMod.GLTFLoader;
-            loader     = new GLTFLoader();
+            THREE        = threeNS;
+            GLTFLoader   = loaderMod.GLTFLoader;
+            GLTFExporter = exporterMod.GLTFExporter;
+            loader       = new GLTFLoader();
+        }
+
+        // ── iOS y-offset correction ───────────────────────────────────────────
+        // Quick Look places the GLB's raw origin on the detected surface.
+        // Most 3D tools export with origin at the model centre, so half the model
+        // sinks below the table.  After backgroundPreload decodes every GLB with
+        // Three.js we re-export a seated version (same fix as Android's setSlotModel)
+        // and swap the launcher's src to the corrected blob.
+        const _iosSeatedBlobs = {};
+        let _resolvePreload;
+        const _preloadDone = new Promise(res => { _resolvePreload = res; });
+
+        async function _makeSeatedBlob(modelUrl, arScale) {
+            const gltf = modelGLTFs[modelUrl];
+            if (!gltf || !GLTFExporter) return null;
+            const scale    = arScale || 1.0;
+            const cacheKey = scale !== 1.0 ? `${modelUrl}::${scale}` : modelUrl;
+            if (_iosSeatedBlobs[cacheKey]) return _iosSeatedBlobs[cacheKey];
+            // Clone, apply ar_scale, seat so bottom sits at y=0
+            const root = gltf.scene.clone(true);
+            root.traverse(n => { if (n.isMesh && n.material) n.material = n.material.clone(); });
+            if (scale !== 1.0) root.scale.setScalar(scale);
+            root.updateMatrixWorld(true);
+            const box = new THREE.Box3().setFromObject(root);
+            if (isFinite(box.min.y) && box.min.y < -0.001) {
+                root.position.y = -box.min.y;
+                root.updateMatrixWorld(true);
+            }
+            return new Promise(resolve => {
+                try {
+                    new GLTFExporter().parse(
+                        root,
+                        glb => {
+                            const url = URL.createObjectURL(new Blob([glb], { type: 'model/gltf-binary' }));
+                            _iosSeatedBlobs[cacheKey] = url;
+                            resolve(url);
+                        },
+                        err => { console.warn('iOS seat export:', err); resolve(null); },
+                        { binary: true }
+                    );
+                } catch (e) { console.warn('iOS seat export:', e); resolve(null); }
+            });
         }
 
         // ── One-time init — deferred until first AR tap ───────────────
@@ -1611,6 +1655,8 @@
         window.XR = {
             getCurrentItem() { return MENU.length ? MENU[currentCenterMenu] : null; },
             refreshHint() { if (_setupDone) _updateScanHint(_reticleWasVisible); },
+            _preloadDone,
+            getSeatedBlob: _makeSeatedBlob,
             // Called right after menu renders — imports Three.js + decodes all models
             // in the background so the first AR tap finds everything ready.
             async backgroundPreload(items) {
@@ -1618,7 +1664,9 @@
                 try {
                     await _ensureLoader();
                     await preloadModels();
-                } catch (e) { console.warn('XR bg preload:', e); }
+                } catch (e) { console.warn('XR bg preload:', e); } finally {
+                    _resolvePreload?.();
+                }
             },
             async start(itemIndex, items) {
                 if (xrStarting || xrSession) return;
@@ -1747,7 +1795,7 @@
 
         const UI = {
             en: {
-                tagline:   '',
+                tagline:   'Taste the Wild',
                 viewAR:    'VIEW ON TABLE',
                 view3D:    'VIEW IN 3D',
                 loading:   'Loading...',
@@ -1783,7 +1831,7 @@
     showUI:       'SHOW UI',
             },
             ka: {
-                tagline:   '',
+                tagline:   'გასინჯე ველური გემო',
                 viewAR:    'ᲛᲐᲒᲘᲓᲐᲖᲔ ᲜᲐᲮᲕᲐ',
                 view3D:    '3D-ში ᲜᲐᲮᲕᲐ',
                 loading:   'იტვირთება...',
@@ -2054,13 +2102,19 @@
 
         // ── iOS AR launcher — hidden model-viewers pre-load so activateAR()
         //    can fire synchronously from the tap without losing the gesture context.
+        //    Cache key includes ar_scale so items with different scales get distinct launchers.
         const _arLaunchers = {};
-        function _getARLauncher(src) {
-            if (!_arLaunchers[src]) {
+        function _getARLauncher(src, arScale) {
+            const scale = arScale || 1.0;
+            const key   = scale !== 1.0 ? `${src}::${scale}` : src;
+            if (!_arLaunchers[key]) {
                 const mv = document.createElement('model-viewer');
                 mv.setAttribute('ar', '');
                 mv.setAttribute('ar-modes', 'quick-look');
                 mv.src = src;
+                // Bake ar_scale into the USDZ so Quick Look places the model at the same
+                // real-world size that the Android Three.js renderer applies via ar_scale.
+                if (scale !== 1.0) mv.setAttribute('scale', `${scale} ${scale} ${scale}`);
                 mv.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px;';
                 mv.addEventListener('load', () => {
                     if (!mv.model) return;
@@ -2070,20 +2124,35 @@
                     });
                 });
                 document.body.appendChild(mv);
-                _arLaunchers[src] = mv;
+                // After Three.js finishes decoding all models, swap to a y-offset-corrected
+                // GLB blob so Quick Look places the model on the surface, not below it.
+                window.XR?._preloadDone?.then(() =>
+                    window.XR.getSeatedBlob?.(src, scale).then(blobUrl => {
+                        if (blobUrl && mv.isConnected) {
+                            mv.removeAttribute('scale'); // scale is baked into the seated blob
+                            mv.src = blobUrl;
+                        }
+                    })
+                );
+                _arLaunchers[key] = mv;
             }
-            return _arLaunchers[src];
+            return _arLaunchers[key];
         }
 
-        // Pre-load both models on iOS so USDZ is ready before the user taps
         const _isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        if (_isIOS) {
-            ['food.glb', 'Druidi.glb'].forEach(src => _getARLauncher(src));
-            if (!window.__arCap) window.__arCap = 'arkit';
-        }
+        if (_isIOS && !window.__arCap) window.__arCap = 'arkit';
 
         function _launchIOSAR(launcher, localIdx) {
+            // activateAR() silently does nothing if the model hasn't finished loading.
+            // Fall back to 3D modal so the user gets content; they can retry AR once
+            // the launcher has finished downloading the GLB and converting to USDZ.
+            if (!launcher.loaded) {
+                setARButtonsState(false);
+                _arOpening = false;
+                openModal(localIdx, _arCatItems);
+                return;
+            }
             function onARStatus(e) {
                 const s = e.detail.status;
                 const _iosItem = _arCatItems ? _arCatItems[localIdx] : null;
@@ -2135,7 +2204,7 @@
                     _arOpening = false;
                 }
             } else if (cap === 'arkit') {
-                _launchIOSAR(_getARLauncher(item.model || 'food.glb'), localIdx);
+                _launchIOSAR(_getARLauncher(item.model || 'food.glb', item.ar_scale), localIdx);
             } else {
                 // No AR support (non-ARCore Android, desktop) — open 3D modal
                 openModal(localIdx, _arCatItems);
@@ -2298,6 +2367,11 @@
 
             menuItems = items;
             window.__menuItems = items;
+            // iOS: pre-load one launcher per unique (model, ar_scale) pair so the
+            // USDZ is ready — and correctly scaled — before the user taps AR.
+            if (_isIOS) {
+                items.forEach(item => { if (item.model) _getARLauncher(item.model, item.ar_scale); });
+            }
             // After menu paints, silently preload Three.js + decode all models
             setTimeout(() => window.XR?.backgroundPreload?.(items), 200);
 

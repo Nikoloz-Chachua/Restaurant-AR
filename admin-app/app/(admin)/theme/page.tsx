@@ -177,9 +177,9 @@ export default function ThemePage() {
       <div className="mt-8 p-4 rounded-xl text-sm"
            style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
         <span style={{ color: 'var(--dim)' }}>{T.reloadHint}</span>
-        <a href="https://temotkesh.github.io/Restaurant-AR" target="_blank" rel="noreferrer"
+        <a href="https://3darmenu.pages.dev" target="_blank" rel="noreferrer"
            style={{ color: 'var(--gold)' }}>
-          temotkesh.github.io/Restaurant-AR ↗
+          3darmenu.pages.dev ↗
         </a>
       </div>
     </div>
