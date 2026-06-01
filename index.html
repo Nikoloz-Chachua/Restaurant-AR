@@ -1612,15 +1612,16 @@
                     slotGroups[slotOf.center].rotation.y += _rotVelocity;
                     _rotVelocity *= INERTIA_DAMP;
                 }
+                // Always sync label scale regardless of visibility
+                if (labelMesh) {
+                    const _cs = carouselRoot.scale.x;
+                    labelMesh.scale.setScalar(_cs < 1 ? 1 / _cs : 1);
+                }
                 if (labelMesh && labelMesh.visible) {
                     const _cs = carouselRoot.scale.x;
                     if (_cs < 1) {
-                        // Counter-scale both size AND position so the label stays
-                        // at a fixed world-space location regardless of burger scale
-                        labelMesh.scale.setScalar(1 / _cs);
                         labelMesh.position.set(0, 0.07 / _cs, 0.015 / _cs);
                     } else {
-                        labelMesh.scale.setScalar(1);
                         labelMesh.position.set(0, 0.07, 0.015);
                     }
                     const _camPos = new THREE.Vector3();
@@ -1746,6 +1747,8 @@
                 localStorage.setItem('bl-ar-cap-ts', String(Date.now()));
                 xrCanvas.style.display  = 'block';
                 xrOverlay.style.display = 'block';
+                const _hbShow = document.getElementById('xr-hide-ui');
+                if (_hbShow) { _hbShow.textContent = UI[window.__lang || 'en'].hideUI; _hbShow.style.display = 'block'; }
                 document.dispatchEvent(new CustomEvent('xr-session-start'));
             }
         };
