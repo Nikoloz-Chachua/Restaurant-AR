@@ -2054,13 +2054,19 @@
 
         // ── iOS AR launcher — hidden model-viewers pre-load so activateAR()
         //    can fire synchronously from the tap without losing the gesture context.
+        //    Cache key includes ar_scale so items with different scales get distinct launchers.
         const _arLaunchers = {};
-        function _getARLauncher(src) {
-            if (!_arLaunchers[src]) {
+        function _getARLauncher(src, arScale) {
+            const scale = arScale || 1.0;
+            const key   = scale !== 1.0 ? `${src}::${scale}` : src;
+            if (!_arLaunchers[key]) {
                 const mv = document.createElement('model-viewer');
                 mv.setAttribute('ar', '');
                 mv.setAttribute('ar-modes', 'quick-look');
                 mv.src = src;
+                // Bake ar_scale into the USDZ so Quick Look places the model at the same
+                // real-world size that the Android Three.js renderer applies via ar_scale.
+                if (scale !== 1.0) mv.setAttribute('scale', `${scale} ${scale} ${scale}`);
                 mv.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px;';
                 mv.addEventListener('load', () => {
                     if (!mv.model) return;
@@ -2070,20 +2076,25 @@
                     });
                 });
                 document.body.appendChild(mv);
-                _arLaunchers[src] = mv;
+                _arLaunchers[key] = mv;
             }
-            return _arLaunchers[src];
+            return _arLaunchers[key];
         }
 
-        // Pre-load both models on iOS so USDZ is ready before the user taps
         const _isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        if (_isIOS) {
-            ['food.glb', 'Druidi.glb'].forEach(src => _getARLauncher(src));
-            if (!window.__arCap) window.__arCap = 'arkit';
-        }
+        if (_isIOS && !window.__arCap) window.__arCap = 'arkit';
 
         function _launchIOSAR(launcher, localIdx) {
+            // activateAR() silently does nothing if the model hasn't finished loading.
+            // Fall back to 3D modal so the user gets content; they can retry AR once
+            // the launcher has finished downloading the GLB and converting to USDZ.
+            if (!launcher.loaded) {
+                setARButtonsState(false);
+                _arOpening = false;
+                openModal(localIdx, _arCatItems);
+                return;
+            }
             function onARStatus(e) {
                 const s = e.detail.status;
                 const _iosItem = _arCatItems ? _arCatItems[localIdx] : null;
@@ -2135,7 +2146,7 @@
                     _arOpening = false;
                 }
             } else if (cap === 'arkit') {
-                _launchIOSAR(_getARLauncher(item.model || 'food.glb'), localIdx);
+                _launchIOSAR(_getARLauncher(item.model || 'food.glb', item.ar_scale), localIdx);
             } else {
                 // No AR support (non-ARCore Android, desktop) — open 3D modal
                 openModal(localIdx, _arCatItems);
@@ -2298,11 +2309,10 @@
 
             menuItems = items;
             window.__menuItems = items;
-            // iOS: pre-load a Quick Look launcher for every model URL so the
-            // USDZ is ready before the user taps AR (activateAR must fire
-            // synchronously in a gesture handler — launcher must already be loaded)
+            // iOS: pre-load one launcher per unique (model, ar_scale) pair so the
+            // USDZ is ready — and correctly scaled — before the user taps AR.
             if (_isIOS) {
-                [...new Set(items.map(i => i.model).filter(Boolean))].forEach(src => _getARLauncher(src));
+                items.forEach(item => { if (item.model) _getARLauncher(item.model, item.ar_scale); });
             }
             // After menu paints, silently preload Three.js + decode all models
             setTimeout(() => window.XR?.backgroundPreload?.(items), 200);
