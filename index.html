@@ -289,6 +289,7 @@
         }
         #modal.active { opacity: 1; }
 
+        /* Mobile: title above viewer */
         #modal-title {
             font-family: 'Bebas Neue', sans-serif;
             font-size: clamp(1.8rem, 6vw, 2.6rem);
@@ -302,11 +303,24 @@
             transition: color var(--t);
         }
 
-        #modal-qty-wrap {
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
+        /* Viewer wrapper */
+        #modal-viewer-wrap {
+            position: relative;
+            display: inline-block;
+            width: 95vw;
+            margin-top: 8px;
         }
+        #modal-viewer { width: 100%; height: 62vh; background: transparent; display: block; }
+        .modal-vignette {
+            position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+            background: radial-gradient(ellipse at center, transparent 38%, rgba(0,0,0,0.55) 100%);
+        }
+
+        /* Mobile: drawer is a flat always-open block */
+        #modal-drawer { width: 100%; text-align: center; padding: 0; background: none; }
+        #modal-drawer-handle { display: none; }
+        #modal-title-d       { display: none; }
+
         #modal-price {
             font-family: 'Bebas Neue', sans-serif;
             font-size: clamp(1.4rem, 5vw, 2rem);
@@ -316,7 +330,6 @@
             margin-top: 6px;
             transition: color var(--t);
         }
-
         #modal-description {
             font-size: 0.75rem;
             color: var(--dim);
@@ -327,6 +340,7 @@
             max-width: 380px;
             transition: color var(--t);
         }
+        #modal-qty-wrap { display: flex; justify-content: center; margin-top: 10px; }
 
         .close-btn {
             position: absolute;
@@ -344,11 +358,60 @@
             transition: background var(--t), color var(--t);
         }
 
-        #modal-viewer {
-            width: 95vw;
-            height: 62vh;
-            background: transparent;
-            margin-top: 8px;
+        /* ── Desktop: slide-up drawer (>=640px) ── */
+        @media (min-width: 640px) {
+            #modal { display: block !important; overflow: hidden; }
+            #modal-title { display: none; }
+
+            /* Viewer shifts up when drawer opens */
+            #modal-viewer-wrap {
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 88px;
+                width: 100%; display: block; margin-top: 0;
+                transition: bottom 0.32s cubic-bezier(0.4,0,0.2,1);
+            }
+            #modal.drawer-expanded #modal-viewer-wrap { bottom: var(--drawer-full-h, 300px); }
+            #modal-viewer { width: 100%; height: 100%; }
+
+            #modal-drawer {
+                position: absolute;
+                bottom: 0; left: 0; right: 0; z-index: 2;
+                padding: 12px 32px max(36px, env(safe-area-inset-bottom, 36px));
+                background: linear-gradient(to bottom,
+                    rgba(var(--modal-rgb),0) 0%,
+                    rgba(var(--modal-rgb),0.9) 22%,
+                    rgba(var(--modal-rgb),0.98) 100%
+                );
+                cursor: pointer; user-select: none; text-align: left;
+                transition: background var(--t);
+            }
+            #modal-drawer.expanded { cursor: default; }
+
+            #modal-drawer-handle {
+                display: block; width: 36px; height: 4px;
+                background: rgba(255,255,255,0.2); border-radius: 2px;
+                margin: 0 auto 14px;
+            }
+            #modal-title-d {
+                display: block;
+                font-family: 'Bebas Neue', sans-serif;
+                font-size: clamp(1.6rem, 3vw, 2.2rem);
+                letter-spacing: 3px; color: var(--accent); line-height: 1.1;
+                transition: color var(--t);
+            }
+            #modal-price { font-size: 1rem; letter-spacing: 2px; opacity: 0.6; margin-top: 2px; text-align: left; }
+
+            #modal-drawer-body {
+                display: grid; grid-template-rows: 0fr;
+                transition: grid-template-rows 0.32s cubic-bezier(0.4,0,0.2,1);
+            }
+            #modal-drawer.expanded #modal-drawer-body { grid-template-rows: 1fr; }
+            #modal-drawer-body > div { overflow: hidden; min-height: 0; }
+
+            #modal-description { text-align: left; padding: 0; margin-top: 14px; }
+            #modal-qty-wrap { justify-content: flex-start; margin-top: 16px; }
+            #modal-ar-btn { width: auto; min-width: 220px; margin-top: 14px; }
+            .close-btn { z-index: 3; }
         }
 
         .tip {
@@ -932,31 +995,37 @@
         <button class="nav-arrow right-arrow" id="modal-next">&#10095;</button>
         <button class="close-btn" id="close-btn">Close</button>
         <div id="modal-title"></div>
-        <div style="position:relative;display:inline-block;width:95vw;">
+        <div id="modal-viewer-wrap">
             <model-viewer id="modal-viewer"
                 camera-controls
                 shadow-intensity="1"
                 min-camera-orbit="auto 0deg auto"
                 max-camera-orbit="auto 85deg auto">
             </model-viewer>
-            <div style="position:absolute;inset:0;pointer-events:none;border-radius:inherit;
-                        background:radial-gradient(ellipse at center, transparent 38%, rgba(0,0,0,0.55) 100%);">
-            </div>
+            <div class="modal-vignette"></div>
         </div>
-        <div id="modal-price"></div>
-        <p id="modal-description"></p>
-        <div id="modal-qty-wrap">
-            <div class="qty-ctrl" id="modal-qty-ctrl" data-idx="0">
-                <button class="qty-add-btn" aria-label="Add to basket"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
-                <div class="qty-stepper">
-                    <button class="qty-dec">&#8722;</button>
-                    <span class="qty-num">1</span>
-                    <button class="qty-inc">+</button>
+        <div id="modal-drawer">
+            <div id="modal-drawer-handle"></div>
+            <div id="modal-title-d"></div>
+            <div id="modal-price"></div>
+            <div id="modal-drawer-body">
+                <div>
+                    <p id="modal-description"></p>
+                    <div id="modal-qty-wrap">
+                        <div class="qty-ctrl" id="modal-qty-ctrl" data-idx="0">
+                            <button class="qty-add-btn" aria-label="Add to basket"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+                            <div class="qty-stepper">
+                                <button class="qty-dec">&#8722;</button>
+                                <span class="qty-num">1</span>
+                                <button class="qty-inc">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="modal-ar-btn"></button>
+                    <p class="tip" id="modal-tip">Drag to rotate</p>
                 </div>
             </div>
         </div>
-        <button id="modal-ar-btn"></button>
-        <p class="tip" id="modal-tip">Drag to rotate</p>
     </div>
 
     <div id="xr-overlay">
@@ -2058,6 +2127,26 @@
         document.getElementById('close-btn').addEventListener('click', closeModal);
         modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
+        // Desktop slide-up drawer — no-op on mobile (<640px)
+        (function() {
+            const _d  = document.getElementById('modal-drawer');
+            const _db = document.getElementById('modal-drawer-body');
+            _db.addEventListener('click', e => e.stopPropagation());
+            _d.addEventListener('click', () => {
+                if (window.innerWidth < 640) return;
+                const expanding = !_d.classList.contains('expanded');
+                if (expanding) {
+                    // Measure body content height to animate viewer shift exactly
+                    const inner = _db.querySelector('div');
+                    const bodyH = inner ? inner.scrollHeight : 240;
+                    const PEEK  = 88;
+                    modal.style.setProperty('--drawer-full-h', (PEEK + bodyH + 48) + 'px');
+                }
+                _d.classList.toggle('expanded');
+                modal.classList.toggle('drawer-expanded', expanding);
+            });
+        })();
+
         const modalArBtn = document.getElementById('modal-ar-btn');
         modalArBtn.addEventListener('click', () => {
             const idx   = modalIndex;
@@ -2083,6 +2172,7 @@
             if (item.thumbnail_url) modalViewer.setAttribute('poster', item.thumbnail_url);
             else modalViewer.removeAttribute('poster');
             modalTitle.textContent = t(item, 'name');
+            document.getElementById('modal-title-d').textContent = t(item, 'name');
             modalPrice.textContent = item.price;
             document.getElementById('modal-description').textContent = t(item, 'description') || '';
             const key = String(modalIndex);
@@ -2101,6 +2191,9 @@
             track('item_view', _viewIdx >= 0 ? _viewIdx : null, _repeatView ? { repeat: true } : null);
             _trackFirstInteraction('3d');
             updateModal();
+            // Reset desktop drawer state
+            document.getElementById('modal-drawer').classList.remove('expanded');
+            modal.classList.remove('drawer-expanded');
             const cap = window.__arCap;
             modalArBtn.textContent  = UI[window.__lang].viewAR;
             modalArBtn.style.display = (cap && cap !== 'none') ? '' : 'none';
