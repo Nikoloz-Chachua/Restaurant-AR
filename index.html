@@ -382,7 +382,7 @@
                     rgba(var(--modal-rgb),0.9) 22%,
                     rgba(var(--modal-rgb),0.98) 100%
                 );
-                cursor: pointer; user-select: none; text-align: left;
+                cursor: pointer; user-select: none; text-align: center;
                 transition: background var(--t);
             }
             #modal-drawer.expanded { cursor: default; }
@@ -399,18 +399,18 @@
                 letter-spacing: 3px; color: var(--accent); line-height: 1.1;
                 transition: color var(--t);
             }
-            #modal-price { font-size: 1rem; letter-spacing: 2px; opacity: 0.6; margin-top: 2px; text-align: left; }
+            #modal-price { font-size: 1rem; letter-spacing: 2px; opacity: 0.6; margin-top: 2px; }
 
             #modal-drawer-body {
                 display: grid; grid-template-rows: 0fr;
                 transition: grid-template-rows 0.32s cubic-bezier(0.4,0,0.2,1);
             }
             #modal-drawer.expanded #modal-drawer-body { grid-template-rows: 1fr; }
-            #modal-drawer-body > div { overflow: hidden; min-height: 0; }
+            #modal-drawer-body > div { overflow: hidden; min-height: 0; padding-bottom: 4px; }
 
-            #modal-description { text-align: left; padding: 0; margin-top: 14px; }
-            #modal-qty-wrap { justify-content: flex-start; margin-top: 16px; }
-            #modal-ar-btn { width: auto; min-width: 220px; margin-top: 14px; }
+            #modal-description { text-align: center; padding: 0; margin-top: 14px; font-size: 0.88rem; }
+            #modal-qty-wrap { justify-content: center; margin-top: 16px; }
+            #modal-ar-btn { width: auto; min-width: 220px; margin: 14px auto 0; display: block; }
             .close-btn { z-index: 3; }
         }
 
