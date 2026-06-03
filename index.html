@@ -983,9 +983,13 @@
         var isIOS = /iPhone|iPad|iPod/i.test(ua) ||
                     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if (!isIOS) return;
-        var inAppSignals = ['Instagram','FBAN','FBAV','WhatsApp','Twitter','Snapchat',
-                            'musical_ly','TikTok','LinkedIn','Pinterest','Telegram','GSA/'];
-        if (!inAppSignals.some(function(s){ return ua.includes(s); })) return;
+        var knownInApp = ['Instagram','FBAN','FBAV','WhatsApp','Twitter','Snapchat',
+                          'musical_ly','TikTok','LinkedIn','Pinterest','Telegram'];
+        var isKnownInApp = knownInApp.some(function(s){ return ua.includes(s); });
+        // Generic WKWebView (Gmail, etc.) — real browsers always add "Safari/" to their UA
+        var isGenericWebView = ua.includes('Mobile/') && !ua.includes('Safari/') &&
+                               !ua.includes('CriOS/') && !ua.includes('FxiOS/');
+        if (!isKnownInApp && !isGenericWebView) return;
 
         var ov = document.createElement('div');
         ov.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#0f0b07;' +
