@@ -48,6 +48,7 @@
             --accent-text: #0f0b07;
             --thumb-bg:    #0a0806;
             --modal-bg:    #0f0b07;
+            --modal-rgb:   15,11,7;
         }
 
         [data-theme="day"] {
@@ -61,6 +62,7 @@
             --accent-text: #ffffff;
             --thumb-bg:    #c8b898;
             --modal-bg:    #f2e8d2;
+            --modal-rgb:   242,232,210;
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -279,46 +281,96 @@
             background: var(--modal-bg);
             z-index: 9999;
             display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             opacity: 0;
             transition: opacity 0.2s, background var(--t);
+            overflow: hidden;
         }
         #modal.active { opacity: 1; }
 
+        #modal-viewer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+
+        /* ── Slide-up info drawer ── */
+        #modal-drawer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 2;
+            padding: 12px 24px max(36px, env(safe-area-inset-bottom, 36px));
+            background: linear-gradient(to bottom,
+                rgba(var(--modal-rgb),0)    0%,
+                rgba(var(--modal-rgb),0.9) 22%,
+                rgba(var(--modal-rgb),0.98) 100%
+            );
+            cursor: pointer;
+            user-select: none;
+            transition: background var(--t);
+        }
+        #modal-drawer.expanded { cursor: default; }
+
+        #modal-drawer-handle {
+            width: 36px;
+            height: 4px;
+            background: rgba(255,255,255,0.18);
+            border-radius: 2px;
+            margin: 0 auto 14px;
+            transition: background 0.15s;
+        }
+        #modal-drawer:not(.expanded) #modal-drawer-handle { background: rgba(255,255,255,0.3); }
+
         #modal-title {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(1.8rem, 6vw, 2.6rem);
-            letter-spacing: 4px;
+            font-size: clamp(1.6rem, 5vw, 2.1rem);
+            letter-spacing: 3px;
             color: var(--accent);
-            text-align: center;
-            width: 100%;
-            padding: 0 24px;
-            margin-top: 56px;
-            line-height: 1.2;
+            line-height: 1.1;
+            transition: color var(--t);
+        }
+
+        #modal-price {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            color: var(--accent);
+            opacity: 0.55;
+            margin-top: 2px;
+            transition: color var(--t);
+        }
+
+        /* Body content — hidden when collapsed, revealed when expanded */
+        #modal-drawer-body {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.32s cubic-bezier(0.4,0,0.2,1);
+        }
+        #modal-drawer.expanded #modal-drawer-body { grid-template-rows: 1fr; }
+        #modal-drawer-body > div { overflow: hidden; min-height: 0; }
+
+        #modal-description {
+            font-size: 0.8rem;
+            color: var(--dim);
+            line-height: 1.55;
+            margin-top: 14px;
             transition: color var(--t);
         }
 
         #modal-qty-wrap {
             display: flex;
             justify-content: center;
-            margin-top: 10px;
-        }
-        #modal-price {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(1.4rem, 5vw, 2rem);
-            letter-spacing: 3px;
-            color: var(--accent);
-            text-align: center;
-            margin-top: 6px;
-            transition: color var(--t);
+            margin-top: 16px;
         }
 
         .close-btn {
             position: absolute;
             top: 16px;
             right: 16px;
+            z-index: 3;
             background: var(--card2);
             color: var(--text);
             border: 1px solid var(--border);
@@ -329,13 +381,6 @@
             font-family: 'Nunito', sans-serif;
             font-weight: 700;
             transition: background var(--t), color var(--t);
-        }
-
-        #modal-viewer {
-            width: 95vw;
-            height: 68vh;
-            background: transparent;
-            margin-top: 8px;
         }
 
         .tip {
@@ -884,8 +929,7 @@
             border: none;
             border-radius: 12px;
             padding: 14px 0;
-            width: 80%;
-            max-width: 320px;
+            width: 100%;
             font-family: 'Nunito', sans-serif;
             font-size: 0.82rem;
             font-weight: 800;
@@ -919,31 +963,34 @@
         <button class="nav-arrow left-arrow"  id="modal-prev">&#10094;</button>
         <button class="nav-arrow right-arrow" id="modal-next">&#10095;</button>
         <button class="close-btn" id="close-btn">Close</button>
-        <div id="modal-title"></div>
-        <div style="position:relative;display:inline-block;width:95vw;">
-            <model-viewer id="modal-viewer"
-                camera-controls
-                shadow-intensity="1"
-                min-camera-orbit="auto 0deg auto"
-                max-camera-orbit="auto 85deg auto">
-            </model-viewer>
-            <div style="position:absolute;inset:0;pointer-events:none;border-radius:inherit;
-                        background:radial-gradient(ellipse at center, transparent 38%, rgba(0,0,0,0.55) 100%);">
-            </div>
-        </div>
-        <div id="modal-price"></div>
-        <div id="modal-qty-wrap">
-            <div class="qty-ctrl" id="modal-qty-ctrl" data-idx="0">
-                <button class="qty-add-btn" aria-label="Add to basket"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
-                <div class="qty-stepper">
-                    <button class="qty-dec">&#8722;</button>
-                    <span class="qty-num">1</span>
-                    <button class="qty-inc">+</button>
+        <model-viewer id="modal-viewer"
+            camera-controls
+            shadow-intensity="1"
+            min-camera-orbit="auto 0deg auto"
+            max-camera-orbit="auto 85deg auto">
+        </model-viewer>
+        <div id="modal-drawer">
+            <div id="modal-drawer-handle"></div>
+            <div id="modal-title"></div>
+            <div id="modal-price"></div>
+            <div id="modal-drawer-body">
+                <div>
+                    <p id="modal-description"></p>
+                    <div id="modal-qty-wrap">
+                        <div class="qty-ctrl" id="modal-qty-ctrl" data-idx="0">
+                            <button class="qty-add-btn" aria-label="Add to basket"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+                            <div class="qty-stepper">
+                                <button class="qty-dec">&#8722;</button>
+                                <span class="qty-num">1</span>
+                                <button class="qty-inc">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="modal-ar-btn"></button>
+                    <p class="tip" id="modal-tip">Drag to rotate</p>
                 </div>
             </div>
         </div>
-        <button id="modal-ar-btn"></button>
-        <p class="tip" id="modal-tip">Drag to rotate</p>
     </div>
 
     <div id="xr-overlay">
@@ -2045,6 +2092,11 @@
         document.getElementById('close-btn').addEventListener('click', closeModal);
         modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
+        // Slide-up drawer toggle — tap header area to expand/collapse, body stops propagation
+        const _mDrawer = document.getElementById('modal-drawer');
+        document.getElementById('modal-drawer-body').addEventListener('click', e => e.stopPropagation());
+        _mDrawer.addEventListener('click', () => _mDrawer.classList.toggle('expanded'));
+
         const modalArBtn = document.getElementById('modal-ar-btn');
         modalArBtn.addEventListener('click', () => {
             const idx   = modalIndex;
@@ -2071,6 +2123,7 @@
             else modalViewer.removeAttribute('poster');
             modalTitle.textContent = t(item, 'name');
             modalPrice.textContent = item.price;
+            document.getElementById('modal-description').textContent = t(item, 'description') || '';
             const key = String(modalIndex);
             document.getElementById('modal-qty-ctrl').dataset.idx = key;
             _syncQtyCtrl(key);
@@ -2087,10 +2140,11 @@
             track('item_view', _viewIdx >= 0 ? _viewIdx : null, _repeatView ? { repeat: true } : null);
             _trackFirstInteraction('3d');
             updateModal();
+            document.getElementById('modal-drawer').classList.remove('expanded');
             const cap = window.__arCap;
             modalArBtn.textContent  = UI[window.__lang].viewAR;
             modalArBtn.style.display = (cap && cap !== 'none') ? '' : 'none';
-            modal.style.display = 'flex';
+            modal.style.display = 'block';
             requestAnimationFrame(() => modal.classList.add('active'));
             document.body.style.overflow = 'hidden';
             // Defer thumbnail teardown past the modal fade-in frame so it doesn't block animation
