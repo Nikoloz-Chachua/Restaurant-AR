@@ -33,7 +33,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             <span className="block h-[2px] w-4 rounded-full transition-all" style={{ background: 'var(--gold)' }} />
             <span className="block h-[2px] w-full rounded-full transition-all" style={{ background: 'var(--gold)' }} />
           </button>
-          <span className="font-bold text-sm" style={{ color: 'var(--gold)' }}>🦁 Burger Lions</span>
+          <span className="font-bold text-sm" style={{ color: 'var(--gold)' }}>3D AR Menu</span>
         </header>
 
         <main

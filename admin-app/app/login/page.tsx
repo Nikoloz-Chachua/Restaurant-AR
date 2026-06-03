@@ -26,9 +26,8 @@ export default function LoginPage() {
          style={{ background: 'var(--bg)' }}>
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="text-4xl mb-2">🦁</div>
           <h1 className="text-2xl font-bold" style={{ color: 'var(--gold)' }}>
-            Burger Lions Admin
+            3D AR Menu Admin
           </h1>
           <p className="text-sm mt-1" style={{ color: 'var(--dim)' }}>
             Sign in to manage the restaurant

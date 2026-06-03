@@ -1,5 +1,5 @@
 {
-  "name": "Burger Lions AR Menu",
+  "name": "3D AR Menu",
   "description": "WebAR restaurant menu — browse 3D dishes and place them on your table in Augmented Reality.",
   "requestFramePermissions": ["camera"],
   "majorCapabilities": []
