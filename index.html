@@ -977,6 +977,58 @@
     </style>
 </head>
 <body>
+    <script>
+    (function() {
+        var ua = navigator.userAgent;
+        var isIOS = /iPhone|iPad|iPod/i.test(ua) ||
+                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        if (!isIOS) return;
+        var inAppSignals = ['Instagram','FBAN','FBAV','WhatsApp','Twitter','Snapchat',
+                            'musical_ly','TikTok','LinkedIn','Pinterest','Telegram'];
+        if (!inAppSignals.some(function(s){ return ua.includes(s); })) return;
+
+        var ov = document.createElement('div');
+        ov.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#0f0b07;' +
+            'display:flex;flex-direction:column;align-items:center;justify-content:center;' +
+            'padding:40px 32px;text-align:center;font-family:Nunito,sans-serif;';
+        ov.innerHTML =
+            '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:2.8rem;letter-spacing:10px;color:#f2b535;line-height:1;">3D AR Menu</div>' +
+            '<div style="font-size:0.62rem;letter-spacing:4px;text-transform:uppercase;color:#8a7a62;margin-top:6px;font-weight:700;">Taste the Wild</div>' +
+            '<div style="margin-top:44px;background:#1d1610;border:1px solid rgba(242,181,53,0.22);border-radius:20px;padding:28px 24px;max-width:320px;">' +
+                '<div style="color:#f2b535;font-family:\'Bebas Neue\',sans-serif;font-size:1.5rem;letter-spacing:2px;margin-bottom:12px;">Open in Safari for AR</div>' +
+                '<div style="color:#ede6d4;font-size:0.85rem;line-height:1.65;">' +
+                    'Tap the <span style="color:#f2b535;font-weight:700;">&middot;&middot;&middot;</span> or ' +
+                    '<span style="color:#f2b535;font-weight:700;">share</span> icon in your browser toolbar,<br>' +
+                    'then choose <span style="color:#f2b535;font-weight:700;">Open in Safari</span>.' +
+                '</div>' +
+            '</div>' +
+            '<button id="iab-copy-btn" style="margin-top:20px;background:transparent;border:1px solid rgba(242,181,53,0.3);' +
+                'border-radius:12px;color:#8a7a62;font-family:Nunito,sans-serif;font-size:0.78rem;font-weight:700;' +
+                'letter-spacing:1px;text-transform:uppercase;padding:11px 24px;cursor:pointer;">Copy Link</button>' +
+            '<div id="iab-copy-ok" style="display:none;color:#f2b535;font-size:0.78rem;margin-top:8px;letter-spacing:1px;">Copied — paste in Safari</div>';
+
+        document.body.appendChild(ov);
+
+        document.getElementById('iab-copy-btn').addEventListener('click', function() {
+            var url = location.href;
+            var done = function() {
+                document.getElementById('iab-copy-ok').style.display = 'block';
+                document.getElementById('iab-copy-btn').textContent = 'Copied!';
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(done).catch(function() {
+                    try { var t=document.createElement('textarea');t.value=url;
+                        document.body.appendChild(t);t.select();document.execCommand('copy');
+                        document.body.removeChild(t);done(); } catch(e){}
+                });
+            } else {
+                try { var t=document.createElement('textarea');t.value=url;
+                    document.body.appendChild(t);t.select();document.execCommand('copy');
+                    document.body.removeChild(t);done(); } catch(e){}
+            }
+        });
+    })();
+    </script>
 
     <button id="theme-toggle" aria-label="Toggle theme">Day</button>
     <button id="lang-toggle" aria-label="Toggle language">KA</button>
