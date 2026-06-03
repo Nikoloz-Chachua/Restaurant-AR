@@ -984,7 +984,7 @@
                     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if (!isIOS) return;
         var inAppSignals = ['Instagram','FBAN','FBAV','WhatsApp','Twitter','Snapchat',
-                            'musical_ly','TikTok','LinkedIn','Pinterest','Telegram'];
+                            'musical_ly','TikTok','LinkedIn','Pinterest','Telegram','GSA/'];
         if (!inAppSignals.some(function(s){ return ua.includes(s); })) return;
 
         var ov = document.createElement('div');
