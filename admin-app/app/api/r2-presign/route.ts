@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { createClient } from '@/lib/supabase/server'
 
 const r2 = new S3Client({
@@ -17,23 +18,25 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const formData = await req.formData()
-  const file = formData.get('file') as File | null
-  if (!file || !file.name.toLowerCase().endsWith('.glb')) {
+  const { filename } = await req.json()
+  if (!filename || !String(filename).toLowerCase().endsWith('.glb')) {
     return NextResponse.json({ error: 'Only .glb files allowed' }, { status: 400 })
   }
 
-  const key = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
-  const bytes = await file.arrayBuffer()
+  const key = `${Date.now()}_${String(filename).replace(/[^a-zA-Z0-9._-]/g, '_')}`
 
-  await r2.send(new PutObjectCommand({
-    Bucket: process.env.R2_BUCKET_NAME!,
-    Key: key,
-    Body: Buffer.from(bytes),
-    ContentType: 'model/gltf-binary',
-  }))
+  const uploadUrl = await getSignedUrl(
+    r2,
+    new PutObjectCommand({
+      Bucket: process.env.R2_BUCKET_NAME!,
+      Key: key,
+      ContentType: 'model/gltf-binary',
+    }),
+    { expiresIn: 300 },
+  )
 
   return NextResponse.json({
+    uploadUrl,
     publicUrl: `${process.env.R2_PUBLIC_URL}/${key}`,
   })
 }
