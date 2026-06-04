@@ -172,14 +172,26 @@ export default function MenuPage() {
     setUploading(true)
     setUploadProgress(T.uploading)
     try {
-      const fd = new FormData()
-      fd.append('file', file)
-      const res = await fetch('/api/r2-presign', { method: 'POST', body: fd })
+      // Step 1: get a presigned URL from the server (no file data sent here)
+      const res = await fetch('/api/r2-presign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name }),
+      })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         throw new Error(err.error || `Server error ${res.status}`)
       }
-      const { publicUrl } = await res.json()
+      const { uploadUrl, publicUrl } = await res.json()
+
+      // Step 2: upload directly to R2 — bypasses Next.js entirely, no size limit
+      const upload = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'model/gltf-binary' },
+        body: file,
+      })
+      if (!upload.ok) throw new Error(`R2 upload failed: ${upload.status}`)
+
       setItemForm(f => ({ ...f, model: publicUrl }))
       setUploadProgress(`✓ ${file.name}`)
     } catch (e) {
