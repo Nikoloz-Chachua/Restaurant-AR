@@ -1937,11 +1937,17 @@
             if (carouselBtn) carouselBtn.textContent = (localStorage.getItem('bl-xr-view') || 'single') === 'single' ? u.carouselBtn : u.singleBtn;
             if (labelBtn)    labelBtn.textContent    = (localStorage.getItem('bl-xr-label') || 'float') === 'float' ? u.onTable : u.floating;
             if (hideUIBtn)   hideUIBtn.textContent   = _xrUIHidden ? u.showUI : u.hideUI;
-            document.querySelectorAll('.category-header[data-cat-name]').forEach(el => {
-                el.textContent = (lang === 'ka' && el.dataset.catNameKa) ? el.dataset.catNameKa : el.dataset.catName;
-            });
+            if (window.__categories) {
+                window.__categories.forEach(cat => {
+                    const header = document.querySelector(`.category-header[data-cat-name="${CSS.escape(cat.name)}"]`);
+                    if (header) header.textContent = (lang === 'ka' && cat.name_ka) ? cat.name_ka : cat.name;
+                    const pill = document.querySelector(`.cat-pill[data-cat="${CSS.escape(cat.name)}"]`);
+                    if (pill) pill.textContent = (lang === 'ka' && cat.name_ka) ? cat.name_ka : cat.name;
+                });
+                const allPill = document.querySelector('.cat-pill[data-cat=""]');
+                if (allPill) allPill.textContent = lang === 'ka' ? 'ყველა' : 'All';
+            }
             if (modal.classList.contains('active')) updateModal();
-            if (window._updateFilterPillLabels) window._updateFilterPillLabels(lang);
             const _mArBtn = document.getElementById('modal-ar-btn');
             if (_mArBtn) _mArBtn.textContent = u.viewAR;
             // Basket
@@ -2412,6 +2418,7 @@
 
             // Group by category, preserving order from JSON
             const categories = [];
+            window.__categories = categories;
             const categoryMap = new Map();
             items.forEach((item, globalIdx) => {
                 const key = item.category || 'Other';
