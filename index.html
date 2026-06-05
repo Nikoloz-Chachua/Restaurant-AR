@@ -1039,7 +1039,6 @@
 
     <div class="header">
         <h1>3D AR Menu</h1>
-        <div class="tagline" id="tagline">გასინჯე ველური გემო</div>
     </div>
 
     <div id="cat-filter" class="cat-filter"></div>
@@ -2030,7 +2029,7 @@
                 loading:   'იტვირთება...',
                 close:     'დახურვა',
                 tip:       'გაასრიალეთ მოსაბრუნებლად',
-                placeHint: 'ბრტყელ ზედაპირს მიუშვირე ტელეფონი, შეეხე კერძის დასადებად',
+                placeHint: 'მიუშვირე ბრტყელ ზედაპირს, როდესაც გამოჩნდება ნიშნული შეეხე',
                 moveHint:  'გასაბრუნებლად გაასრიალე · პინჩი მასშტაბისთვის',
                 exitAR:    'მოდელის დახურვა',
                 placeAgain:'ხელახლა დადება',
@@ -2047,7 +2046,7 @@
                 themeNight:'მუქი თემა',
                 carouselBtn:  'კარუსელი',
     singleBtn:    'ცალი',
-    onTable:      'ᲛᲐᲒᲘᲓᲐᲖᲔ',
+    onTable:      'მაგიდაზე ტექსტი ',
     floating:     'მოლივლივე ტექსტი',
     addBtn:       'დამატება',
     basketTitle:  'კალათა',
@@ -2074,7 +2073,7 @@
             localStorage.setItem('bl-lang', lang);
             const u = UI[lang];
             const theme = document.documentElement.getAttribute('data-theme');
-            document.getElementById('tagline').textContent       = u.tagline;
+
             document.getElementById('lang-toggle').textContent   = u.langBtn;
             const _themeToggle = document.getElementById('theme-toggle');
             _themeToggle.innerHTML = theme === 'night' ? _SVG_SUN : _SVG_MOON;
