@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="night">
+<html lang="ka" data-theme="night">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -876,11 +876,11 @@
 <body>
 
     <button id="theme-toggle" aria-label="Toggle theme">Day</button>
-    <button id="lang-toggle" aria-label="Toggle language">KA</button>
+    <button id="lang-toggle" aria-label="Toggle language">EN</button>
 
     <div class="header">
         <h1>Burger Lions</h1>
-        <div class="tagline" id="tagline">Taste the Wild</div>
+        <div class="tagline" id="tagline">გასინჯე ველური გემო</div>
     </div>
 
     <div id="cat-filter" class="cat-filter"></div>
@@ -1871,7 +1871,7 @@
                 loading:   'იტვირთება...',
                 close:     'დახურვა',
                 tip:       'გაასრიალეთ მოსაბრუნებლად',
-                placeHint: 'მიუშვირე ბრტყელ ზედაპირს, როდესაც გამოჩნდება ნიშნული შეეხე',
+                placeHint: 'ბრტყელ ზედაპირს მიუშვირე ტელეფონი, შეეხე კერძის დასადებად',
                 moveHint:  'გასაბრუნებლად გაასრიალე · პინჩი მასშტაბისთვის',
                 exitAR:    'მოდელის დახურვა',
                 placeAgain:'ხელახლა დადება',
@@ -1888,7 +1888,7 @@
                 themeNight:'მუქი თემა',
                 carouselBtn:  'კარუსელი',
     singleBtn:    'ცალი',
-    onTable:      'მაგიდაზე ტექსტი ',
+    onTable:      'ᲛᲐᲒᲘᲓᲐᲖᲔ',
     floating:     'მოლივლივე ტექსტი',
     addBtn:       'დამატება',
     basketTitle:  'კალათა',
@@ -1903,7 +1903,7 @@
         };
 
         // ── Language ───────────────────────────────────────────────────
-        window.__lang = localStorage.getItem('bl-lang') || 'en';
+        window.__lang = localStorage.getItem('bl-lang') || 'ka';
 
         function t(item, field) {
             const ka = field + '_ka';
