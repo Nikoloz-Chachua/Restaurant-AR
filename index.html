@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="night">
+<html lang="ka" data-theme="night">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -997,19 +997,19 @@
             'padding:40px 32px;text-align:center;font-family:Nunito,sans-serif;';
         ov.innerHTML =
             '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:2.8rem;letter-spacing:10px;color:#f2b535;line-height:1;">3D AR Menu</div>' +
-            '<div style="font-size:0.62rem;letter-spacing:4px;text-transform:uppercase;color:#8a7a62;margin-top:6px;font-weight:700;">Taste the Wild</div>' +
+            '<div style="font-size:0.62rem;letter-spacing:4px;text-transform:uppercase;color:#8a7a62;margin-top:6px;font-weight:700;">გასინჯე ველური გემო</div>' +
             '<div style="margin-top:44px;background:#1d1610;border:1px solid rgba(242,181,53,0.22);border-radius:20px;padding:28px 24px;max-width:320px;">' +
-                '<div style="color:#f2b535;font-family:\'Bebas Neue\',sans-serif;font-size:1.5rem;letter-spacing:2px;margin-bottom:12px;">Open in Safari for AR</div>' +
+                '<div style="color:#f2b535;font-family:\'Bebas Neue\',sans-serif;font-size:1.5rem;letter-spacing:2px;margin-bottom:12px;">Safari-ში გახსენი AR-ისთვის</div>' +
                 '<div style="color:#ede6d4;font-size:0.85rem;line-height:1.65;">' +
-                    'Tap the <span style="color:#f2b535;font-weight:700;">&middot;&middot;&middot;</span> or ' +
-                    '<span style="color:#f2b535;font-weight:700;">share</span> icon in your browser toolbar,<br>' +
-                    'then choose <span style="color:#f2b535;font-weight:700;">Open in Safari</span>.' +
+                    'დააჭირე <span style="color:#f2b535;font-weight:700;">&middot;&middot;&middot;</span> ან ' +
+                    '<span style="color:#f2b535;font-weight:700;">გაზიარების</span> ღილაკს ბრაუზერის პანელზე,<br>' +
+                    'შემდეგ აირჩიე <span style="color:#f2b535;font-weight:700;">Safari-ში გახსნა</span>.' +
                 '</div>' +
             '</div>' +
             '<button id="iab-copy-btn" style="margin-top:20px;background:transparent;border:1px solid rgba(242,181,53,0.3);' +
                 'border-radius:12px;color:#8a7a62;font-family:Nunito,sans-serif;font-size:0.78rem;font-weight:700;' +
-                'letter-spacing:1px;text-transform:uppercase;padding:11px 24px;cursor:pointer;">Copy Link</button>' +
-            '<div id="iab-copy-ok" style="display:none;color:#f2b535;font-size:0.78rem;margin-top:8px;letter-spacing:1px;">Copied — paste in Safari</div>';
+                'letter-spacing:1px;text-transform:uppercase;padding:11px 24px;cursor:pointer;">ბმულის კოპირება</button>' +
+            '<div id="iab-copy-ok" style="display:none;color:#f2b535;font-size:0.78rem;margin-top:8px;letter-spacing:1px;">კოპირებულია — ჩასვი Safari-ში</div>';
 
         document.body.appendChild(ov);
 
@@ -1035,11 +1035,11 @@
     </script>
 
     <button id="theme-toggle" aria-label="Toggle theme">Day</button>
-    <button id="lang-toggle" aria-label="Toggle language">KA</button>
+    <button id="lang-toggle" aria-label="Toggle language">EN</button>
 
     <div class="header">
         <h1>3D AR Menu</h1>
-        <div class="tagline" id="tagline">Taste the Wild</div>
+        <div class="tagline" id="tagline">გასინჯე ველური გემო</div>
     </div>
 
     <div id="cat-filter" class="cat-filter"></div>
@@ -2030,7 +2030,7 @@
                 loading:   'იტვირთება...',
                 close:     'დახურვა',
                 tip:       'გაასრიალეთ მოსაბრუნებლად',
-                placeHint: 'მიუშვირე ბრტყელ ზედაპირს, როდესაც გამოჩნდება ნიშნული შეეხე',
+                placeHint: 'ბრტყელ ზედაპირს მიუშვირე ტელეფონი, შეეხე კერძის დასადებად',
                 moveHint:  'გასაბრუნებლად გაასრიალე · პინჩი მასშტაბისთვის',
                 exitAR:    'მოდელის დახურვა',
                 placeAgain:'ხელახლა დადება',
@@ -2047,7 +2047,7 @@
                 themeNight:'მუქი თემა',
                 carouselBtn:  'კარუსელი',
     singleBtn:    'ცალი',
-    onTable:      'მაგიდაზე ტექსტი ',
+    onTable:      'ᲛᲐᲒᲘᲓᲐᲖᲔ',
     floating:     'მოლივლივე ტექსტი',
     addBtn:       'დამატება',
     basketTitle:  'კალათა',
@@ -2062,7 +2062,7 @@
         };
 
         // ── Language ───────────────────────────────────────────────────
-        window.__lang = localStorage.getItem('bl-lang') || 'en';
+        window.__lang = localStorage.getItem('bl-lang') || 'ka';
 
         function t(item, field) {
             const ka = field + '_ka';
