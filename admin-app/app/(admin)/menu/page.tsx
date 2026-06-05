@@ -410,6 +410,14 @@ export default function MenuPage() {
                     {thumbUploading ? T.uploading : T.uploadThumb}
                   </button>
                   {itemForm.thumbnail_url && (
+                    <button type="button"
+                            onClick={() => { setItemForm(f => ({ ...f, thumbnail_url: '', thumb_3d: false })); setThumbProgress('') }}
+                            className="px-3 py-1.5 rounded text-xs font-medium"
+                            style={{ background: 'rgba(224,82,82,0.1)', color: 'var(--danger)', border: '1px solid rgba(224,82,82,0.25)' }}>
+                      {T.clearThumb}
+                    </button>
+                  )}
+                  {itemForm.thumbnail_url && (
                     <img src={itemForm.thumbnail_url} alt="thumbnail preview"
                          style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6,
                                   border: '1px solid var(--border)' }} />
