@@ -325,7 +325,13 @@ This is a genuine product differentiator: **most QR menus give the restaurant ze
 |---|---|---|---|
 | Customer app + analytics dashboard | **Cloudflare Pages** | Temo | Deploys from the **`cloudflare`** git branch |
 | Model storage | **Cloudflare R2** | Temo | Public bucket |
-| Admin panel | **Vercel** | **George** | Next.js app |
+| Admin panel | **Vercel** | **George** | Next.js app — **deploys from the `main` git branch** |
+
+> ⚠️ **Two branches drive two deploys** (they have diverged — don't assume they're in sync):
+> - **`cloudflare`** → Cloudflare Pages → **customer app** (`index.html`, `sw.js`, `admin.html`, `foods/`).
+> - **`main`** → Vercel → **admin app** (`admin-app/`).
+>
+> So: customer-app changes go on `cloudflare`; **admin-app changes must go on `main`** to actually deploy. A commit to one branch does **not** affect the other deploy.
 | Database, Auth, thumbnails, legacy models | **Supabase** | Temo (personal org) | Project `xctoxhaahxtcicfgnmme` |
 | "Everything hosted via my device" | Local (Temo) | Temo | ⚠️ Single point of failure |
 
@@ -339,7 +345,10 @@ This is a genuine product differentiator: **most QR menus give the restaurant ze
 
 **MUST follow every time** (this is in `CLAUDE.md` too):
 
-1. **Production branch is `cloudflare`.** All customer-app commits go there. Committing to `main` does **nothing** for the live site.
+1. **Two deploy branches — pick the right one:**
+   - **Customer app** (`index.html`, `sw.js`, `admin.html`, `foods/`) → commit to **`cloudflare`** (Cloudflare Pages).
+   - **Admin app** (`admin-app/`) → commit to **`main`** (Vercel).
+   - A commit to one branch does **not** deploy the other. The branches have diverged — don't assume parity.
 2. **Bump `CACHE_NAME` in `sw.js`** (`bl-v55` → `bl-v56` → …) in the **same commit** whenever any of these change:
    - `index.html`, `foods/menu.json`, `sw.js` itself, any local GLB, or any new file served to the browser.
    - If you forget, returning visitors keep seeing the **old cached version** until a hard refresh.
