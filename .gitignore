@@ -8,3 +8,7 @@ coverage/
 .claude/
 Userstemotmap3d/
 .mcp.json
+
+# Private survey data — never commit (contains respondent contact info)
+survey stats not for github/
+*.csv

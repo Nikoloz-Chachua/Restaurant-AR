@@ -517,8 +517,27 @@ Over ~2 weeks (2026-05-26 → 2026-06-09) the live app recorded:
 
 > ⚠️ **Caveat (be honest in any external use):** this traffic is **mostly the team testing** (incognito/multiple devices inflate the "unique visitor" count) plus **one day of early survey traffic** (survey launched **Mon 2026-06-08**). It proves the **system works end-to-end and the AR funnel is real**; it is **not** yet validated external demand.
 
-### Survey (in progress)
-- **Launched 2026-06-08.** Results pending — only a few answers so far. Final survey + results will be dropped into the **repo root** as they accumulate; update §19 with findings then.
+### Survey — first results (n = 23)
+
+Bilingual (Georgian/English) survey; first responses **2026-06-05**, wider distribution from **2026-06-08**. Raw data is kept **out of git** in the local `survey stats not for github/` folder (it contains respondent contacts). **Small, early, warm-audience sample — directional, not conclusive.**
+
+**Device split:** ~61% Android (14) · ~39% iPhone (9).
+
+**Problem is real (strong validation):**
+- **100%** have had a dish arrive looking different than expected; **74%** said it *bothered* them.
+- **78%** hesitate before ordering at least *sometimes* because they can't judge the real size (52% "almost every time").
+- **#1 cited problem: portion size** ("hard to determine portion sizes"), then "food looks different from photos," then "no photos available" and "unclear ingredients" (one respondent also wanted calories).
+
+**The value prop resonates:**
+- **"View on table" rating: avg ~4.3/5** — 77% gave 4–5★ (1 respondent didn't try the AR feature).
+- **91%** said seeing the dish in 3D made them **more likely to order** than a photo (**43% "significantly more"**).
+- **91%** said it would change how they order if it replaced a normal QR menu (**52%** "yes — I'd try dishes I wouldn't normally order").
+
+**⚠️ Most important product insight (from a critical respondent):** 3D/AR alone **does not reliably convey true size** — a small dish can look big on screen, same as a photo. Suggestion: show the dish **next to a common reference object** (or display **real dimensions**). This directly attacks the #1 surveyed pain (portion size) and is cheap to build → see roadmap. Take it seriously; it's the sharpest feedback we have.
+
+**Leads:** 0 genuine restaurant leads so far (the one contact left is a team member). The "leave your contact" CTA is **underused** — strengthen it.
+
+> **Implication:** the *problem* and the *appeal* are validated even in a warm sample; the open questions are real external demand at scale, willingness-to-pay, and closing the size-perception gap. Re-run analysis here as more responses arrive.
 - Distribution opportunity: a university Dean offered access to **~20,000 people** (per project notes) — a major validation channel. 🟡 Confirm final reach + exactly what the survey measures (interest, willingness-to-pay, preferred features).
 
 ### Credibility / wins
@@ -577,6 +596,8 @@ Over ~2 weeks (2026-05-26 → 2026-06-09) the live app recorded:
 - [ ] Centralize credentials in a shared password manager (reduce bus-factor).
 
 **Phase 1 — First revenue**
+- [ ] **Solve the size-perception gap** (from survey): show each dish at **true scale** in AR and/or alongside a **common reference object** (or display real dimensions). This is the sharpest piece of user feedback and directly addresses the #1 pain (portion size) — cheap, high-impact, and reinforces the core value prop.
+- [ ] **Strengthen the "leave your contact" CTA** so the menu itself generates restaurant leads.
 - [ ] Build a **sales playbook**: offer one-pager, demo script, objection handling, pricing sheet.
 - [ ] **Land first paying client** (target: Burger Lions) → first case study + testimonial.
 - [ ] **Register the legal entity**; sign a **founders' agreement with vesting**.
