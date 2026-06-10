@@ -46,7 +46,7 @@
 
 The product is **not** a one-off menu for a single restaurant. It is a **reusable template/platform** designed to be deployed for any restaurant. Our current showcase ("Burger Lions") is built on the real menu of a burger restaurant near our workspace, used as our first real-world test subject to prove and demonstrate the system.
 
-Our long-term advantage — the "moat" — is a **data flywheel**: every restaurant we onboard produces pairs of *(dish photos → finished 3D model)*. Once we accumulate enough of these (we estimate **~3,000 high-quality models** to cover most of the Georgian food market), we fine-tune an open-source image-to-3D AI model so we can generate new dish models from just a few photos. That collapses our production cost and time, which lets us undercut and out-scale anyone doing this manually.
+Our long-term advantage — the "moat" — is a **data flywheel**: every restaurant we onboard produces pairs of *(dish photos → finished 3D model)*. Once we accumulate enough of these (we estimate **~500 unique high-quality models** are enough to train it), we fine-tune an open-source image-to-3D AI model so we can generate new dish models from just a few photos. That collapses our production cost and time, which lets us undercut and out-scale anyone doing this manually.
 
 **Stage:** Pre-revenue. Working MVP built and live. No legal entity or paying clients yet. Immediate goal is to get into two accelerators (**2080 Ventures** and **GITA**), then land our first client.
 
@@ -403,7 +403,7 @@ Land clients → capture (dish photos → finished 3D model) pairs
 
 **Data requirement:**
 - Training a *good* model needs **variety**, not repetition — many *different* burgers, not one burger many times. And that's just burgers.
-- To cover food broadly (Georgian traditional dishes + general cuisine), we estimate **~3,000 high-quality models** would cover **most of the Georgian market**.
+- To train a model with enough variety to generalize across cuisines, we estimate **~500 unique high-quality models** is the threshold.
 - **Current dataset: 1 high-quality model + finished photos.** Everything else is ahead of us. This is why **client acquisition is also data acquisition** — every paid scan grows the training set.
 
 **Status:** Aspirational / Phase 3. No training has started. The near-term value of the pipeline is the paid service; the AI is the long-term cost/scale moat.
@@ -618,7 +618,7 @@ Bilingual (Georgian/English) survey; first responses **2026-06-05**, wider distr
 - [ ] Onboard several clients; **systematize the production pipeline**; grow the dish photo↔model **dataset**.
 
 **Phase 3 — The AI moat**
-- [ ] Reach **~3,000 high-quality models** (food coverage for the Georgian market).
+- [ ] Reach **~500 unique high-quality models** (enough variety to train the AI).
 - [ ] **Fine-tune an open-source image-to-3D model** on our dataset using **rented cloud GPUs**.
 - [ ] Deploy **AI-assisted production** → collapse cost/time per dish.
 
@@ -640,7 +640,7 @@ In priority order, as stated by the CEO:
 
 1. **Get into 2080 Ventures and the GITA collaborative accelerator.** ← immediate focus
 2. **Get the first client** (ideally Burger Lions).
-3. **Gather enough clients and data** to make the AI viable (~3,000 models).
+3. **Gather enough clients and data** to make the AI viable (~500 unique models).
 4. **Train the AI** to generate 3D models from a few photos — the endgame that makes production cheap and scalable.
 
 Long-term vision: become **the leading interactive restaurant-tech platform in Georgia**, then expand internationally — building the largest WebAR food-visualization network in the region and making immersive dining the industry standard.
@@ -655,7 +655,7 @@ Long-term vision: become **the leading interactive restaurant-tech platform in G
 - **Bus factor** — infra spread across personal accounts; CEO hosts "everything" on his device.
 - **Traction is mostly internal** — external demand unproven until survey + first sales calls.
 - **Pricing unvalidated** — ₾50–70/item/month may be steep; per-location rule undecided.
-- **AI is far off** — needs ~3,000 models + GPU budget; we have 1 model today.
+- **AI is far off** — needs ~500 unique models + GPU budget; we have 1 model today.
 - **Concentration** — heavy reliance on one CEO doing most of the work; 2 members under-committed (until summer).
 - **Verify RLS** — make sure the public anon key can't be used to alter menu/theme data.
 
@@ -687,7 +687,7 @@ Thumbnails:         Supabase Storage, client-side WebP
 SW cache version:   bl-v55  (BUMP on index.html / sw.js / menu.json / GLB changes)
 Production:         Lightbox photos → KIRI Engine → Blender → GLB → admin → R2  (~20 min/dish)
 Model sizes:        ~5.8–8.6 MB, no Draco (decoder download not worth it)
-AI plan:            Fine-tune open-source image-to-3D on ~3,000 dish models, rented cloud GPU
+AI plan:            Fine-tune open-source image-to-3D on ~500 unique dish models, rented cloud GPU
 Pricing (₾/mo):     300 (AR only) · 450 (full+analytics+theme) · 900 (unlimited+consult)
 Onboarding:         ₾500 one-time (incl. 5 items)
 Extra items:        ₾50–70 each, recurring monthly; 5 included per tier
