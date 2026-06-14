@@ -34,8 +34,14 @@ async function glbToUsdz(file: File, arScale: number): Promise<Blob> {
   // Bake ar_scale in, then seat the model so its bounding-box bottom sits at y=0.
   // Quick Look drops the raw origin onto the surface, so centred models would sink
   // halfway into the table without this.
-  const scale = arScale || 1.0
-  if (scale !== 1.0) root.scale.setScalar(scale)
+  //
+  // iPhone Quick Look plants models at true real-world size, which reads smaller than
+  // the auto-framed Android view. IOS_AR_BOOST scales the USDZ up so the iPhone AR size
+  // visually matches Android. Tune this one number if it's too big/small (re-upload to
+  // apply). Android is unaffected — it never uses the USDZ.
+  const IOS_AR_BOOST = 2.0
+  const scale = (arScale || 1.0) * IOS_AR_BOOST
+  root.scale.setScalar(scale)
   root.updateMatrixWorld(true)
   const box = new THREE.Box3().setFromObject(root)
   if (isFinite(box.min.y)) {
