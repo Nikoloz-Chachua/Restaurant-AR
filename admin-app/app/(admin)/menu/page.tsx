@@ -39,7 +39,7 @@ async function glbToUsdz(file: File, arScale: number): Promise<Blob> {
   // the auto-framed Android view. IOS_AR_BOOST scales the USDZ up so the iPhone AR size
   // visually matches Android. Tune this one number if it's too big/small (re-upload to
   // apply). Android is unaffected — it never uses the USDZ.
-  const IOS_AR_BOOST = 2.0
+  const IOS_AR_BOOST = 2.5
   const scale = (arScale || 1.0) * IOS_AR_BOOST
   root.scale.setScalar(scale)
   root.updateMatrixWorld(true)
