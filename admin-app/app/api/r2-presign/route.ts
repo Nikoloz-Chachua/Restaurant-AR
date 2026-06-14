@@ -19,9 +19,16 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { filename } = await req.json()
-  if (!filename || !String(filename).toLowerCase().endsWith('.glb')) {
-    return NextResponse.json({ error: 'Only .glb files allowed' }, { status: 400 })
+  const lower = String(filename || '').toLowerCase()
+  const isGlb  = lower.endsWith('.glb')
+  const isUsdz = lower.endsWith('.usdz')
+  if (!filename || (!isGlb && !isUsdz)) {
+    return NextResponse.json({ error: 'Only .glb or .usdz files allowed' }, { status: 400 })
   }
+
+  // Content-Type must match what the browser sends on the PUT, or R2 rejects the
+  // presigned request. .usdz is Apple Quick Look's format (a zipped USD bundle).
+  const contentType = isUsdz ? 'model/vnd.usdz+zip' : 'model/gltf-binary'
 
   const key = `${Date.now()}_${String(filename).replace(/[^a-zA-Z0-9._-]/g, '_')}`
 
@@ -30,7 +37,7 @@ export async function POST(req: NextRequest) {
     new PutObjectCommand({
       Bucket: process.env.R2_BUCKET_NAME!,
       Key: key,
-      ContentType: 'model/gltf-binary',
+      ContentType: contentType,
     }),
     { expiresIn: 300 },
   )

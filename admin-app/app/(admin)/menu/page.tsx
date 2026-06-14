@@ -2,17 +2,62 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/useLang'
+import type { Object3D, Mesh, MeshStandardMaterial } from 'three'
+import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
+
+// Convert a GLB File to a seated, scaled USDZ Blob entirely in the browser, using
+// the same three.js exporter model-viewer runs on-device — but ONCE, at upload
+// time, instead of on every iPhone tap. three is loaded lazily so it never weighs
+// down the rest of the admin panel.
+async function glbToUsdz(file: File, arScale: number): Promise<Blob> {
+  const [THREE, { GLTFLoader }, { USDZExporter }] = await Promise.all([
+    import('three'),
+    import('three/examples/jsm/loaders/GLTFLoader.js'),
+    import('three/examples/jsm/exporters/USDZExporter.js'),
+  ])
+  const buffer = await file.arrayBuffer()
+  const loader = new GLTFLoader()
+  const gltf = await new Promise<GLTF>((resolve, reject) =>
+    loader.parse(buffer, '', resolve, err => reject(err)),
+  )
+  const root = gltf.scene
+
+  // Quick Look renders metallic far shinier than the on-screen WebGL view; zero it
+  // so the iPhone model matches what people see in the menu.
+  root.traverse((n: Object3D) => {
+    const mesh = n as Mesh
+    if (!mesh.isMesh || !mesh.material) return
+    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+    mats.forEach(m => { const mat = m as MeshStandardMaterial; if ('metalness' in mat) mat.metalness = 0 })
+  })
+
+  // Bake ar_scale in, then seat the model so its bounding-box bottom sits at y=0.
+  // Quick Look drops the raw origin onto the surface, so centred models would sink
+  // halfway into the table without this.
+  const scale = arScale || 1.0
+  if (scale !== 1.0) root.scale.setScalar(scale)
+  root.updateMatrixWorld(true)
+  const box = new THREE.Box3().setFromObject(root)
+  if (isFinite(box.min.y)) {
+    root.position.y -= box.min.y
+    root.updateMatrixWorld(true)
+  }
+
+  const exporter = new USDZExporter()
+  const data = await exporter.parseAsync(root)
+  return new Blob([data as BlobPart], { type: 'model/vnd.usdz+zip' })
+}
 
 type Category = { id: number; name_en: string; name_ka: string; sort_order: number }
 type MenuItem = {
   id: number; name_en: string; name_ka: string
   description_en: string; description_ka: string
-  price: string; category_id: number | null; model: string
+  price: string; category_id: number | null; model: string; model_usdz: string
   sort_order: number; visible: boolean; ar_scale: number; thumbnail_url: string; thumb_3d: boolean
 }
 const EMPTY_ITEM: Omit<MenuItem, 'id'> = {
   name_en: '', name_ka: '', description_en: '', description_ka: '',
-  price: '', category_id: null, model: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '', thumb_3d: false,
+  price: '', category_id: null, model: '', model_usdz: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '', thumb_3d: false,
 }
 
 export default function MenuPage() {
@@ -66,7 +111,7 @@ export default function MenuPage() {
     setEditItem(item)
     setItemForm({ name_en: item.name_en, name_ka: item.name_ka,
       description_en: item.description_en, description_ka: item.description_ka,
-      price: item.price, category_id: item.category_id, model: item.model,
+      price: item.price, category_id: item.category_id, model: item.model, model_usdz: item.model_usdz ?? '',
       sort_order: item.sort_order, visible: item.visible, ar_scale: item.ar_scale ?? 1.0,
       thumbnail_url: item.thumbnail_url ?? '', thumb_3d: item.thumb_3d ?? false })
     setItemModal(true)
@@ -192,8 +237,35 @@ export default function MenuPage() {
       })
       if (!upload.ok) throw new Error(`R2 upload failed: ${upload.status}`)
 
-      setItemForm(f => ({ ...f, model: publicUrl }))
+      setItemForm(f => ({ ...f, model: publicUrl, model_usdz: '' }))
       setUploadProgress(`✓ ${file.name}`)
+
+      // Step 3: convert GLB → USDZ in the browser for iOS Quick Look. Non-blocking:
+      // the GLB is already saved above, so if conversion fails the menu still works
+      // (iOS just falls back to the on-device path, same as before this feature).
+      try {
+        setUploadProgress(`✓ ${file.name} — building iPhone AR…`)
+        const usdzBlob = await glbToUsdz(file, itemForm.ar_scale)
+        const usdzName = file.name.replace(/\.glb$/i, '.usdz')
+        const pres = await fetch('/api/r2-presign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: usdzName }),
+        })
+        if (!pres.ok) throw new Error(`presign ${pres.status}`)
+        const { uploadUrl: usdzUrl, publicUrl: usdzPublic } = await pres.json()
+        const put = await fetch(usdzUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'model/vnd.usdz+zip' },
+          body: usdzBlob,
+        })
+        if (!put.ok) throw new Error(`R2 upload ${put.status}`)
+        setItemForm(f => ({ ...f, model_usdz: usdzPublic }))
+        setUploadProgress(`✓ ${file.name} (+ iPhone AR ✓)`)
+      } catch (e) {
+        console.warn('USDZ conversion skipped:', e)
+        setUploadProgress(`✓ ${file.name} (saved — iPhone AR conversion skipped)`)
+      }
     } catch (e) {
       setUploadProgress(`Upload failed: ${e instanceof Error ? e.message : String(e)}`)
     }
