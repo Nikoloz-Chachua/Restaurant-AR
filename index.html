@@ -2397,6 +2397,27 @@
             setTimeout(() => { setARButtonsState(false); _arOpening = false; }, 2500);
         }
 
+        // ── Native iOS Quick Look ──────────────────────────────────────
+        // When an item has a prebuilt USDZ (generated in the admin at upload time),
+        // hand it straight to Safari via an <a rel="ar"> click inside the tap
+        // gesture. No model-viewer, no GLB download, no on-device conversion racing
+        // the gesture — the file is already seated, scaled, and ready.
+        function _launchQuickLook(usdzUrl, localIdx) {
+            const _item = _arCatItems ? _arCatItems[localIdx] : null;
+            const _idx  = (_item && menuItems) ? menuItems.indexOf(_item) : null;
+            const a = document.createElement('a');
+            a.setAttribute('rel', 'ar');
+            a.href = usdzUrl;
+            // Quick Look only triggers from a click on an <a rel="ar"> that holds an <img>.
+            a.appendChild(document.createElement('img'));
+            document.body.appendChild(a);
+            a.click();
+            track('ar_success', _idx >= 0 ? _idx : null);
+            setTimeout(() => a.remove(), 1000);
+            setARButtonsState(false);
+            _arOpening = false;
+        }
+
         // ── AR routing ─────────────────────────────────────────────────
         let _arOpening  = false;
         let _arCatItems = null;
@@ -2427,7 +2448,13 @@
                     _arOpening = false;
                 }
             } else if (cap === 'arkit') {
-                _launchIOSAR(_getARLauncher(item.model || 'food.glb', item.ar_scale), localIdx);
+                if (item.model_usdz) {
+                    // Prebuilt USDZ (made at upload time) — hand it straight to Quick Look.
+                    _launchQuickLook(item.model_usdz, localIdx);
+                } else {
+                    // Legacy items with no USDZ — fall back to on-device conversion.
+                    _launchIOSAR(_getARLauncher(item.model || 'food.glb', item.ar_scale), localIdx);
+                }
             } else {
                 // No AR support (non-ARCore Android, desktop) — open 3D modal
                 openModal(localIdx, _arCatItems);
@@ -2574,6 +2601,7 @@
                             description_ka: r.description_ka,
                             price:          r.price,
                             model:          r.model,
+                            model_usdz:     r.model_usdz || '',
                             ar_scale:       r.ar_scale ?? 1.0,
                             thumbnail_url:  r.thumbnail_url || '',
                             thumb_3d:       r.thumb_3d ?? false,
@@ -2593,7 +2621,9 @@
             // iOS: pre-load one launcher per unique (model, ar_scale) pair so the
             // USDZ is ready — and correctly scaled — before the user taps AR.
             if (_isIOS) {
-                items.forEach(item => { if (item.model) _getARLauncher(item.model, item.ar_scale); });
+                // Only legacy items (no prebuilt USDZ) need the heavy GLB launcher;
+                // USDZ items go straight to native Quick Look, no preload required.
+                items.forEach(item => { if (item.model && !item.model_usdz) _getARLauncher(item.model, item.ar_scale); });
             }
             // After menu paints, silently preload Three.js + decode all models
             setTimeout(() => window.XR?.backgroundPreload?.(items), 200);
