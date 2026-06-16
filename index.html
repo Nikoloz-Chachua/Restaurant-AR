@@ -190,6 +190,22 @@
             cursor: pointer;
         }
 
+        .badge-3d {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--accent);
+            color: var(--accent-text);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 1.5px;
+            padding: 2px 7px 3px;
+            line-height: 1.4;
+            pointer-events: none;
+            z-index: 3;
+            transition: background var(--t), color var(--t);
+        }
+
         .item-left {
             grid-area: left;
         }
@@ -2554,7 +2570,7 @@
                     link.rel  = 'stylesheet';
                     link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(cfg.font_heading)}&display=swap`;
                     document.head.appendChild(link);
-                    document.querySelectorAll('.restaurant-name, .item-name, .category-header')
+                    document.querySelectorAll('.restaurant-name, .item-name, .category-header, .badge-3d')
                         .forEach(el => { el.style.fontFamily = `'${cfg.font_heading}', sans-serif`; });
                 }
                 // Branding
@@ -2679,6 +2695,7 @@
                                     max-camera-orbit="auto 85deg auto">
                                 </model-viewer>`}
                                 <div class="thumb-vignette"></div>
+                                ${item.model ? '<span class="badge-3d">3D</span>' : ''}
                             </div>
                         </div>
                         <div class="item-right">
