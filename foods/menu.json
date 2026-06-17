@@ -1,111 +1,46 @@
 [
   {
-    "name": "Jalapeno Burger",       "name_ka": "ჰალაპენიუ ბურგერი",
-    "category": "Burgers",           "category_ka": "ბურგერები",
-    "description": "300g beef, 4 layers cheddar cheese, 2 layers bacon, caramelized jalapeno with bacon, special sauce, burger bun, onion marinated in Saperavi, iceberg lettuce, pickles.",
-    "description_ka": "ხორცი 300 გრ, ყველი ჩედარი 4 ფენა, ბეკონი 2 ფენა, კარამელიზირებული ჰალაპენიო ბეკონით, სპეც სოუსი, ბურგერის ფუნთუშა, საფერავში დამარინადებული ხახვი, აისბერგი, მჟავე კიტრი.",
-    "price": "27.5 ₾", "model": "Druidi.glb"
-  },
-  {
-    "name": "5 Cheese Burger",        "name_ka": "5 ყველის ბურგერი",
-    "category": "Burgers",            "category_ka": "ბურგერები",
-    "description": "300g beef, 4 layers cheddar cheese, mozzarella, parmesan, emmental, cheese sauce, pickles, iceberg lettuce, burger bun, special sauce.",
-    "description_ka": "საქონლის ხორცი 300გრ, ყველი ჩედარი 4 ფენა, მოცარელა, პარმეზანი, ემენტალი, ყველის სოუსი, მჟავე კიტრი, აისბერგი, ბურგერის ფუნთუშა, სპეც სოუსი.",
-    "price": "29.5 ₾", "model": "food.glb"
-  },
-  {
-    "name": "White Lion",             "name_ka": "თეთრი ლომი",
-    "category": "Burgers",            "category_ka": "ბურგერები",
-    "description": "300g meat, emmental cheese, melted cheese with bacon, camembert, onion marinated in Saperavi, iceberg lettuce, burger bun.",
-    "description_ka": "ხორცი 300 გრ, ემენტალის ყველი, მდნარი ყველი ბეკონით, კამემბერი, საფერავში დამარინადებული ხახვი, აისბერგი, ბურგერის ფუნთუშა.",
-    "price": "27 ₾", "model": "Druidi.glb"
-  },
-  {
-    "name": "Zeus",                   "name_ka": "ზევსი",
-    "category": "Burgers",            "category_ka": "ბურგერები",
-    "description": "300g beef, bacon, cheddar cheese, parmesan, mimolete, cheese sauce, special sauce, pickles, iceberg lettuce, burger bun.",
-    "description_ka": "საქონლის ხორცი 300გრ, ბეკონი, ჩედარი, პარმეზანი, მიმოლეტე, ყველის სოუსი, სპეც სოუსი, მჟავე კიტრი, აისბერგი, ბურგერის ფუნთუშა.",
-    "price": "31.8 ₾", "model": "food.glb"
-  },
-  {
-    "name": "Everest",                "name_ka": "ევერესტი",
-    "category": "Burgers",            "category_ka": "ბურგერები",
-    "description": "450g beef, cheddar cheese, parmesan, barbecue sauce, jalapeno, bacon, cheese sauce, special sauce, pickles and iceberg.",
-    "description_ka": "450 გრ საქონლის ხორცი, ჩედარი, პარმეზანი, ბარბექიუ სოუსი, ჰალაპენიო, ბეკონი, ყველის სოუსი, სპეც სოუსი, მჟავე კიტრი და აისბერგი.",
-    "price": "33 ₾", "model": "Druidi.glb"
-  },
-  {
-    "name": "Asterix",                "name_ka": "ასტერიქსი",
-    "category": "Burgers",            "category_ka": "ბურგერები",
-    "description": "450g beef, 4 layers cheddar cheese, 3 layers bacon, special sauce, pickles, iceberg lettuce, burger bun.",
-    "description_ka": "ხორცი 450 გრ, ყველი ჩედარი 4 ფენა, ბეკონი 3 ფენა, სპეც სოუსი, მჟავე კიტრი, აისბერგი, ბურგერის ფუნთუშა.",
-    "price": "29.8 ₾", "model": "food.glb"
-  },
-  {
-    "name": "Druid",                  "name_ka": "დრუიდი",
+    "name": "BigBurger",              "name_ka": "ბიგბურგერი",
     "category": "Burgers",            "category_ka": "ბურგერები",
     "description": "600g beef, 5 layers cheddar cheese, 4 layers bacon, special sauce, pickles, iceberg lettuce, burger bun.",
     "description_ka": "ხორცი 600 გრ, ყველი ჩედარი 5 ფენა, ბეკონი 4 ფენა, სპეც სოუსი, მჟავე კიტრი, აისბერგი, ბურგერის ფუნთუშა.",
-    "price": "32.8 ₾", "model": "Druidi.glb"
+    "price": "14 ₾",
+    "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/1781449956327_1781446377385_1780602194559_druidi_edited__1_.glb",
+    "ar_scale": 1.0,
+    "thumbnail_url": "",
+    "thumb_3d": false
   },
   {
-    "name": "Julius",                 "name_ka": "იულიუსი",
-    "category": "Burgers",            "category_ka": "ბურგერები",
-    "description": "750g beef, 6 layers cheddar cheese, 5 layers bacon, special sauce, pickles, iceberg lettuce, burger bun.",
-    "description_ka": "ხორცი 750 გრ, ყველი ჩედარი 6 ფენა, ბეკონი 5 ფენა, სპეც სოუსი, მჟავე კიტრი, აისბერგი, ბურგერის ფუნთუშა.",
-    "price": "38.8 ₾", "model": "food.glb"
-  },
-  {
-    "name": "Asteroid",               "name_ka": "ასტეროიდი",
-    "category": "Burgers",            "category_ka": "ბურგერები",
-    "description": "900g beef, cheddar cheese, parmesan, mimolete, bacon, barbecue sauce, cheese sauce, special sauce, pickles and iceberg.",
-    "description_ka": "საქონლის ხორცი 900 გრ, ჩედარი, პარმეზანი, მიმოლეტე, ბეკონი, ბარბექიუ სოუსი, ყველის სოუსი, სპეც სოუსი, მჟავე კიტრი და აისბერგი.",
-    "price": "44.8 ₾", "model": "Druidi.glb"
-  },
-  {
-    "name": "Black Lion",             "name_ka": "შავი ლომი",
-    "category": "Burgers",            "category_ka": "ბურგერები",
-    "description": "450g beef, 12 layers bacon, cheddar cheese, parmesan, mozzarella, special sauce, cucumber, iceberg and burger bun.",
-    "description_ka": "450გრ საქონლის ხორცი, ბეკონი 12 ფენა, ჩედარი, პარმეზანი, მოცარელა, სპეც სოუსი, კიტრი, აისბერგი და ბურგერის ფუნთუშა.",
-    "price": "36.8 ₾", "model": "food.glb"
-  },
-
-  {
-    "name": "Lion Sauce Extra",       "name_ka": "ლომების სოუსი ექსტრა",
+    "name": "Hot Dog",                "name_ka": "ჰოთ დოგი",
     "category": "Sides",              "category_ka": "გარნირი | სოუსები",
-    "description": "Fries, cheese sauce, jalapeno, beef, bacon, onion, parmesan, cheddar and iceberg.",
-    "description_ka": "ფრი, ყველის სოუსი, ჰალაპენიო, საქონლის ხორცი, ბეკონი, ხახვი, პარმეზანი, ჩედარი და აისბერგი.",
-    "price": "23.8 ₾", "model": "Druidi.glb"
-  },
-
-  {
-    "name": "Coca Cola",              "name_ka": "კოკა კოლა",
-    "category": "Drinks",             "category_ka": "სასმელები",
-    "description": "Coca-Cola 0.33L",
-    "description_ka": "კოკა-კოლა 0.33ლ",
-    "price": "3.5 ₾", "model": "food.glb"
+    "description": "classic hot dog",
+    "description_ka": "კლასიკური ჰოთ დოგი",
+    "price": "4 ₾",
+    "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/1781448109151_1780057590342_hot_dog.glb",
+    "ar_scale": 1.0,
+    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/thumb_1780046740147.webp",
+    "thumb_3d": true
   },
   {
-    "name": "Kombucha",               "name_ka": "კომბუჩა",
-    "category": "Drinks",             "category_ka": "სასმელები",
-    "description": "Fermented sparkling kombucha drink with beneficial bacteria.",
-    "description_ka": "ფერმენტირებული შუშხუნა კომბუჩა სასარგებლო ბაქტერიებით.",
-    "price": "8 ₾", "model": "Druidi.glb"
+    "name": "Croissant",             "name_ka": "კრუასანი",
+    "category": "Desserts",           "category_ka": "დესერტები",
+    "description": "Classic croissant with chocolate",
+    "description_ka": "კლასიკური კროასანი შოკოლადით",
+    "price": "2.5 ₾",
+    "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/1781448431982_1780056684195_croissant.glb",
+    "ar_scale": 1.0,
+    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/thumb_1780046967707.webp",
+    "thumb_3d": true
   },
-
   {
-    "name": "Tiramisu",               "name_ka": "ტირამისუ",
-    "category": "Desserts",           "category_ka": "ტკბილეული",
-    "description": "Classic tiramisu dessert.",
-    "description_ka": "კლასიკური ტირამისუ.",
-    "price": "10 ₾", "model": "food.glb"
-  },
-
-  {
-    "name": "Espresso",               "name_ka": "ესპრესო",
-    "category": "Coffee",             "category_ka": "ყავა",
-    "description": "Classic espresso coffee.",
-    "description_ka": "კლასიკური ესპრესო.",
-    "price": "5.5 ₾", "model": "Druidi.glb"
+    "name": "Donut",                  "name_ka": "დონატი",
+    "category": "Desserts",           "category_ka": "დესერტები",
+    "description": "Chocolate donut with banana",
+    "description_ka": "შოკოლადის დონატი ბანანით",
+    "price": "1,5 ₾",
+    "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/1781448149232_1780058154105_donut.glb",
+    "ar_scale": 1.0,
+    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/thumb_1780046956786.webp",
+    "thumb_3d": true
   }
 ]
