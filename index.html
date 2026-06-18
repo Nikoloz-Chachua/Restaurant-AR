@@ -39,21 +39,21 @@
         }
 
         [data-theme="day"] {
-            --bg:          #070805;
-            --card:        rgba(25, 20, 12, 0.92);
-            --card2:       rgba(52, 40, 20, 0.96);
-            --border:      rgba(232, 169, 55, 0.28);
-            --text:        #fff0c7;
-            --dim:         #cfb27c;
-            --accent:      #f3b733;
-            --accent-text: #171006;
-            --leaf:        #0f2415;
-            --leaf2:       #234f2b;
-            --rose:        #c04c36;
-            --wood:        #855027;
-            --glow:        rgba(242, 156, 40, 0.34);
-            --thumb-bg:    #0c0a07;
-            --modal-bg:    #070805;
+            --bg:          #f3ead7;
+            --card:        rgba(255, 248, 232, 0.90);
+            --card2:       rgba(236, 219, 184, 0.96);
+            --border:      rgba(198, 129, 12, 0.26);
+            --text:        #3b2914;
+            --dim:         #7b684c;
+            --accent:      #c97905;
+            --accent-text: #fff8e8;
+            --leaf:        #496c34;
+            --leaf2:       #7f9a4b;
+            --rose:        #b65a34;
+            --wood:        #9b612a;
+            --glow:        rgba(218, 139, 16, 0.18);
+            --thumb-bg:    #ddd0b2;
+            --modal-bg:    #f3ead7;
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -76,6 +76,16 @@
             transition: background var(--t), color var(--t);
             overflow-x: hidden;
             position: relative;
+        }
+
+
+        [data-theme="day"] body {
+            background:
+                radial-gradient(circle at 14% 8%, rgba(207, 126, 13, 0.16), transparent 20rem),
+                radial-gradient(circle at 88% 8%, rgba(96, 128, 61, 0.16), transparent 24rem),
+                radial-gradient(circle at 22% 78%, rgba(95, 125, 58, 0.10), transparent 28rem),
+                radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.34), transparent 30rem),
+                linear-gradient(145deg, #f3ead7, #efe2c6 58%, #e6d7b5);
         }
 
         body::before, body::after {
@@ -303,6 +313,28 @@
                 linear-gradient(135deg, transparent 0 70%, rgba(240,184,51,0.10));
             opacity: 0.72;
         }
+
+        [data-theme="day"] .menu-item {
+            background:
+                radial-gradient(circle at 50% 0%, rgba(210, 132, 8, 0.08), transparent 42%),
+                linear-gradient(180deg, rgba(255, 248, 232, 0.92), rgba(238, 222, 188, 0.94));
+            border-color: rgba(198, 129, 12, 0.24);
+            box-shadow: 0 20px 46px rgba(91, 58, 16, 0.14);
+        }
+        [data-theme="day"] .thumb-wrap {
+            background:
+                radial-gradient(circle at 50% 44%, rgba(255,255,255,0.24), transparent 34%),
+                radial-gradient(circle at 82% 18%, rgba(86, 122, 55, 0.14), transparent 42%),
+                linear-gradient(145deg, #d8ceb3, #cabc9b);
+            border-color: rgba(198, 129, 12, 0.22);
+            box-shadow: inset 0 0 52px rgba(89, 68, 28, 0.16);
+        }
+        [data-theme="day"] .thumb-vignette {
+            background:
+                radial-gradient(ellipse at center, transparent 38%, rgba(235, 221, 190, 0.72) 100%),
+                linear-gradient(135deg, transparent 0 72%, rgba(126, 154, 75, 0.10));
+            opacity: 0.58;
+        }
         .thumb-wrap model-viewer {
             width: 100%;
             height: 100%;
@@ -484,10 +516,10 @@
             -webkit-mask-image: radial-gradient(ellipse at center, #000 0 40%, transparent 76%);
             mask-image: radial-gradient(ellipse at center, #000 0 40%, transparent 76%);
         }
-        [data-theme="day"] .jungle-cover.canopy { opacity: 0.055; mix-blend-mode: screen; filter: saturate(0.62) contrast(1.02) brightness(0.74); }
+        [data-theme="day"] .jungle-cover.canopy { opacity: 0.18; mix-blend-mode: multiply; filter: saturate(0.74) contrast(0.92) brightness(1.08) sepia(0.12); }
         [data-theme="day"] .jungle-cover.side-left,
-        [data-theme="day"] .jungle-cover.side-right { opacity: 0.045; mix-blend-mode: screen; filter: saturate(0.6) contrast(1.02) brightness(0.58); }
-        [data-theme="day"] .jungle-cover.bottom-haze { opacity: 0.035; mix-blend-mode: screen; }
+        [data-theme="day"] .jungle-cover.side-right { opacity: 0.13; mix-blend-mode: multiply; filter: saturate(0.72) contrast(0.92) brightness(1.04); }
+        [data-theme="day"] .jungle-cover.bottom-haze { opacity: 0.09; mix-blend-mode: multiply; filter: saturate(0.68) contrast(0.9) brightness(1.06); }
 
         .palm-frond {
             display: none;
