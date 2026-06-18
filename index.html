@@ -417,6 +417,63 @@
             pointer-events: none;
             overflow: hidden;
         }
+        .jungle-cover {
+            position: absolute;
+            display: block;
+            object-fit: cover;
+            user-select: none;
+            pointer-events: none;
+        }
+        .jungle-cover.canopy {
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: min(34vh, 360px);
+            object-position: 0 0;
+            opacity: 0.20;
+            mix-blend-mode: screen;
+            filter: saturate(0.9) contrast(1.08) sepia(0.08);
+            -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,0.78) 44%, transparent 100%);
+            mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,0.78) 44%, transparent 100%);
+        }
+        .jungle-cover.side-left {
+            left: -170px;
+            top: 18vh;
+            width: clamp(300px, 31vw, 520px);
+            opacity: 0.18;
+            transform: rotate(-9deg);
+            mix-blend-mode: screen;
+            filter: saturate(0.82) contrast(1.08) brightness(0.72);
+            -webkit-mask-image: radial-gradient(ellipse at 46% 52%, #000 0 48%, transparent 72%);
+            mask-image: radial-gradient(ellipse at 46% 52%, #000 0 48%, transparent 72%);
+        }
+        .jungle-cover.side-right {
+            right: -180px;
+            top: 32vh;
+            width: clamp(310px, 34vw, 560px);
+            opacity: 0.16;
+            transform: scaleX(-1) rotate(8deg);
+            mix-blend-mode: screen;
+            filter: saturate(0.82) contrast(1.08) brightness(0.74);
+            -webkit-mask-image: radial-gradient(ellipse at 48% 52%, #000 0 50%, transparent 74%);
+            mask-image: radial-gradient(ellipse at 48% 52%, #000 0 50%, transparent 74%);
+        }
+        .jungle-cover.bottom-haze {
+            left: 50%;
+            bottom: -210px;
+            width: min(760px, 78vw);
+            opacity: 0.09;
+            transform: translateX(-50%) rotate(3deg);
+            mix-blend-mode: screen;
+            filter: saturate(0.78) contrast(1.05) brightness(0.66);
+            -webkit-mask-image: radial-gradient(ellipse at center, #000 0 40%, transparent 76%);
+            mask-image: radial-gradient(ellipse at center, #000 0 40%, transparent 76%);
+        }
+        [data-theme="day"] .jungle-cover.canopy { opacity: 0.15; mix-blend-mode: multiply; filter: saturate(0.88) contrast(0.94) brightness(1.06); }
+        [data-theme="day"] .jungle-cover.side-left,
+        [data-theme="day"] .jungle-cover.side-right { opacity: 0.12; mix-blend-mode: multiply; filter: saturate(0.84) contrast(0.92) brightness(1.02); }
+        [data-theme="day"] .jungle-cover.bottom-haze { opacity: 0.08; mix-blend-mode: multiply; }
+
         .palm-frond {
             position: absolute;
             width: 330px;
@@ -1016,6 +1073,10 @@
         }
 
         @media (max-width: 720px) {
+            .jungle-cover.canopy { height: 230px; opacity: 0.16; }
+            .jungle-cover.side-left { left: -210px; top: 14vh; opacity: 0.12; }
+            .jungle-cover.side-right { right: -240px; top: 42vh; opacity: 0.11; }
+            .jungle-cover.bottom-haze { width: 520px; bottom: -150px; opacity: 0.06; }
             .lion-bg { width: 190px; right: -54px; bottom: 18px; opacity: 0.11; }
             .palm-frond.right { opacity: 0.11; }
         }
@@ -1105,6 +1166,10 @@
     <button id="lang-toggle" aria-label="Toggle language">EN</button>
 
     <div class="safari-scene" aria-hidden="true">
+        <img class="jungle-cover canopy" src="./assets/palm-canopy.webp" alt="" loading="eager" decoding="async">
+        <img class="jungle-cover side-left" src="./assets/jungle-leaves.webp" alt="" loading="eager" decoding="async">
+        <img class="jungle-cover side-right" src="./assets/jungle-leaves.webp" alt="" loading="eager" decoding="async">
+        <img class="jungle-cover bottom-haze" src="./assets/jungle-leaves.webp" alt="" loading="lazy" decoding="async">
         <span class="palm-frond left"></span>
         <span class="palm-frond right"></span>
         <span class="palm-frond low"></span>
