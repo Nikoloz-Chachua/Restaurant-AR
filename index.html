@@ -582,7 +582,11 @@
         #modal {
             position: fixed;
             inset: 0;
-            background: var(--modal-bg);
+            background:
+                radial-gradient(ellipse at 50% 46%, rgba(240, 184, 51, 0.18), transparent 28rem),
+                radial-gradient(ellipse at 50% 64%, rgba(94, 54, 18, 0.18), transparent 34rem),
+                radial-gradient(circle at 82% 18%, rgba(30, 74, 39, 0.10), transparent 28rem),
+                linear-gradient(145deg, color-mix(in srgb, var(--modal-bg) 92%, #16110a 8%), #020302 78%);
             z-index: 9999;
             display: none;
             flex-direction: column;
@@ -1495,7 +1499,7 @@
             });
             const planeW = 0.15, planeH = planeW * H / W;
             labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), mat);
-            labelMesh.position.set(0, 0.07, 0.015);
+            labelMesh.position.set(0, 0.13, 0.05);
             labelMesh.visible = false;
             carouselRoot.add(labelMesh);
         }
@@ -1503,7 +1507,7 @@
         function updateLabelTransform() {
             if (!labelMesh) return;
             if (labelMode === 'float') {
-                labelMesh.position.set(0, 0.07, 0.015);
+                labelMesh.position.set(0, 0.13, 0.05);
             }
             // surface rotation updated per-frame in render loop
             const btn = document.getElementById('xr-label-toggle');
@@ -1999,7 +2003,7 @@
                         // Counter-scale both size AND position so the label stays
                         // at a fixed world-space location regardless of burger scale
                         labelMesh.scale.setScalar(1 / _cs);
-                        labelMesh.position.set(0, 0.07 / _cs, 0.015 / _cs);
+                        labelMesh.position.set(0, 0.13 / _cs, 0.05 / _cs);
                     } else {
                         labelMesh.scale.setScalar(1);
                         labelMesh.position.set(0, 0.07, 0.015);
@@ -2014,7 +2018,7 @@
                         const _rPos = new THREE.Vector3();
                         carouselRoot.getWorldPosition(_rPos);
                         const _ang = Math.atan2(_camPos.x - _rPos.x, _camPos.z - _rPos.z);
-                        const _r = 0.073, _h = 0.004;
+                        const _r = 0.26, _h = 0.006;
                         const _lp = new THREE.Vector3(
                             _rPos.x + Math.sin(_ang) * _r,
                             _rPos.y + _h,
@@ -2322,16 +2326,20 @@
             if (carouselBtn) carouselBtn.textContent = (localStorage.getItem('bl-xr-view') || 'single') === 'single' ? u.carouselBtn : u.singleBtn;
             if (labelBtn)    labelBtn.textContent    = (localStorage.getItem('bl-xr-label') || 'float') === 'float' ? u.onTable : u.floating;
             if (hideUIBtn)   hideUIBtn.textContent   = _xrUIHidden ? u.showUI : u.hideUI;
-            if (window.__categories) {
-                window.__categories.forEach(cat => {
-                    const header = document.querySelector(`.category-header[data-cat-name="${CSS.escape(cat.name)}"]`);
-                    if (header) header.textContent = (lang === 'ka' && cat.name_ka) ? cat.name_ka : cat.name;
-                    const pill = document.querySelector(`.cat-pill[data-cat="${CSS.escape(cat.name)}"]`);
-                    if (pill) pill.textContent = (lang === 'ka' && cat.name_ka) ? cat.name_ka : cat.name;
-                });
-                const allPill = document.querySelector('.cat-pill[data-cat=""]');
-                if (allPill) allPill.textContent = lang === 'ka' ? 'ყველა' : 'All';
-            }
+            document.querySelectorAll('.category-header').forEach(header => {
+                header.textContent = (lang === 'ka' && header.dataset.catNameKa)
+                    ? header.dataset.catNameKa
+                    : (header.dataset.catName || header.textContent);
+            });
+            document.querySelectorAll('.cat-pill').forEach(pill => {
+                if (pill.dataset.cat === '') {
+                    pill.textContent = lang === 'ka' ? 'ყველა' : 'All';
+                } else {
+                    pill.textContent = (lang === 'ka' && pill.dataset.catKa)
+                        ? pill.dataset.catKa
+                        : (pill.dataset.cat || pill.textContent);
+                }
+            });
             if (modal.classList.contains('active')) updateModal();
             const _mArBtn = document.getElementById('modal-ar-btn');
             if (_mArBtn) _mArBtn.textContent = u.viewAR;
@@ -2691,6 +2699,64 @@
                 .forEach(v => document.documentElement.style.removeProperty(v));
         }
 
+        const _GEORGIAN_RE = /[Ⴀ-ჿ]/;
+        const _EN_CATEGORY_FALLBACK = {
+            'ბურგერები': 'Burgers',
+            'გარნირი | სოუსები': 'Sides',
+            'დესერტები': 'Desserts',
+            'სასმელები': 'Drinks',
+            'ყავა': 'Coffee',
+            'სხვა': 'Other'
+        };
+        const _EN_ITEM_FALLBACK = {
+            'ბიგბურგერი': {
+                name: 'BigBurger',
+                description: '600g beef, 5 layers cheddar cheese, 4 layers bacon, special sauce, pickles, iceberg lettuce, burger bun.'
+            },
+            'bigburger': {
+                name: 'BigBurger',
+                description: '600g beef, 5 layers cheddar cheese, 4 layers bacon, special sauce, pickles, iceberg lettuce, burger bun.'
+            },
+            'ჰოთ დოგი': {
+                name: 'Hot Dog',
+                description: 'Classic hot dog.'
+            },
+            'hot dog': {
+                name: 'Hot Dog',
+                description: 'Classic hot dog.'
+            },
+            'კრუასანი': {
+                name: 'Croissant',
+                description: 'Classic croissant with chocolate.'
+            },
+            'croissant': {
+                name: 'Croissant',
+                description: 'Classic croissant with chocolate.'
+            },
+            'დონატი': {
+                name: 'Donut',
+                description: 'Chocolate donut with banana.'
+            },
+            'donut': {
+                name: 'Donut',
+                description: 'Chocolate donut with banana.'
+            }
+        };
+        function _cleanEnText(value, fallback) {
+            const text = String(value || '').trim();
+            return (!text || _GEORGIAN_RE.test(text)) ? fallback : text;
+        }
+        function _fallbackByItem(r) {
+            return _EN_ITEM_FALLBACK[String(r.name_ka || '').trim().toLowerCase()]
+                || _EN_ITEM_FALLBACK[String(r.name_en || r.name || '').trim().toLowerCase()]
+                || {};
+        }
+        function _cleanCategoryEn(en, ka) {
+            const text = String(en || '').trim();
+            if (!text || _GEORGIAN_RE.test(text)) return _EN_CATEGORY_FALLBACK[String(ka || '').trim()] || text || 'Other';
+            return text;
+        }
+
         async function buildMenu() {
             const fallback = [
                 { name: 'Jalapeno Burger', name_ka: 'ჰალაპენიუ ბურგერი', category: 'Burgers', category_ka: 'ბურგერები', description: '300g beef, 4 layers cheddar cheese, 2 layers bacon, caramelized jalapeno with bacon, special sauce, burger bun.', description_ka: 'ხორცი 300 გრ, ყველი ჩედარი 4 ფენა, ბეკონი 2 ფენა, კარამელიზირებული ჰალაპენიო ბეკონით, სპეც სოუსი.', price: '27.5 ₾', model: 'Druidi.glb' },
@@ -2716,19 +2782,23 @@
                         .order('category_id')
                         .order('sort_order');
                     if (data && data.length) {
-                        items = data.map(r => ({
-                            name:           r.name_en,
-                            name_ka:        r.name_ka,
-                            category:       r.categories?.name_en || 'Other',
-                            category_ka:    r.categories?.name_ka || 'სხვა',
-                            description:    r.description_en,
-                            description_ka: r.description_ka,
-                            price:          r.price,
-                            model:          r.model,
-                            ar_scale:       r.ar_scale ?? 1.0,
-                            thumbnail_url:  r.thumbnail_url || '',
-                            thumb_3d:       r.thumb_3d ?? false,
-                        }));
+                        items = data.map(r => {
+                            const fb = _fallbackByItem(r);
+                            const catKa = r.categories?.name_ka || 'სხვა';
+                            return {
+                                name:           _cleanEnText(r.name_en, fb.name || r.name_en || r.name_ka),
+                                name_ka:        r.name_ka,
+                                category:       _cleanCategoryEn(r.categories?.name_en, catKa),
+                                category_ka:    catKa,
+                                description:    _cleanEnText(r.description_en, fb.description || r.description_en || ''),
+                                description_ka: r.description_ka,
+                                price:          r.price,
+                                model:          r.model,
+                                ar_scale:       r.ar_scale ?? 1.0,
+                                thumbnail_url:  r.thumbnail_url || '',
+                                thumb_3d:       r.thumb_3d ?? false,
+                            };
+                        });
                     }
                 } catch (_) {}
             }
