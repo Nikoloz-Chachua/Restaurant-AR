@@ -548,11 +548,7 @@
         #modal {
             position: fixed;
             inset: 0;
-            background-color: var(--modal-bg);
-            background:
-                radial-gradient(circle at 50% 22%, color-mix(in srgb, var(--glow) 52%, transparent), transparent 28rem),
-                linear-gradient(145deg, color-mix(in srgb, var(--modal-bg) 82%, #000 18%), color-mix(in srgb, var(--modal-bg) 55%, #000 45%)),
-                linear-gradient(var(--modal-bg), var(--modal-bg));
+            background: var(--modal-bg);
             z-index: 9999;
             display: none;
             flex-direction: column;
@@ -560,44 +556,20 @@
             justify-content: center;
             opacity: 0;
             transition: opacity 0.2s, background var(--t);
-            overflow: hidden;
-            isolation: isolate;
         }
-        #modal::before, #modal::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            background: url('./assets/palm-canopy.webp') top center / cover no-repeat;
-            opacity: 0.14;
-            mix-blend-mode: screen;
-            -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 58%);
-            mask-image: linear-gradient(180deg, #000 0%, transparent 58%);
-        }
-        #modal::after {
-            background: url('./assets/jungle-leaves.webp') right bottom / min(420px, 70vw) auto no-repeat;
-            opacity: 0.11;
-            -webkit-mask-image: radial-gradient(ellipse at right bottom, #000 0 38%, transparent 72%);
-            mask-image: radial-gradient(ellipse at right bottom, #000 0 38%, transparent 72%);
-        }
-        [data-theme="day"] #modal::before,
-        [data-theme="day"] #modal::after { mix-blend-mode: multiply; opacity: 0.12; }
         #modal.active { opacity: 1; }
-        #modal > * { position: relative; z-index: 1; }
 
         #modal-title {
             font-family: var(--font-display);
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
-            letter-spacing: 0.08em;
+            font-size: clamp(1.8rem, 6vw, 2.6rem);
+            letter-spacing: 4px;
             color: var(--accent);
             text-align: center;
             width: 100%;
-            padding: 0 58px;
-            margin-top: 28px;
+            padding: 0 24px;
+            margin-top: 56px;
             line-height: 1.2;
             transition: color var(--t);
-            position: relative;
-            z-index: 1;
         }
 
         #modal-qty-wrap {
@@ -617,41 +589,25 @@
 
         .close-btn {
             position: absolute;
-            top: 14px;
-            right: 14px;
-            width: 42px;
-            height: 42px;
-            background: color-mix(in srgb, var(--card2) 82%, transparent);
+            top: 16px;
+            right: 16px;
+            background: var(--card2);
             color: var(--text);
             border: 1px solid var(--border);
-            border-radius: 50%;
-            padding: 0;
+            border-radius: 10px;
+            padding: 10px 16px;
             cursor: pointer;
-            font-size: 1.55rem;
-            line-height: 1;
+            font-size: 0.85rem;
             font-family: var(--font-ui);
             font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(14px);
-            z-index: 2;
-            transition: background var(--t), color var(--t), transform var(--t);
+            transition: background var(--t), color var(--t);
         }
-        .close-btn:active { transform: scale(0.94); }
 
         #modal-viewer {
-            width: min(94vw, 980px);
-            height: min(62vh, 620px);
-            background:
-                radial-gradient(ellipse at 50% 54%, color-mix(in srgb, var(--leaf) 18%, transparent), transparent 46%),
-                linear-gradient(145deg, rgba(0,0,0,0.32), rgba(0,0,0,0.08));
-            border: 1px solid color-mix(in srgb, var(--border) 74%, transparent);
-            border-radius: 28px;
-            box-shadow: inset 0 0 80px rgba(0,0,0,0.26), 0 26px 90px rgba(0,0,0,0.34);
-            margin-top: 12px;
-            position: relative;
-            z-index: 1;
+            width: 95vw;
+            height: 68vh;
+            background: transparent;
+            margin-top: 8px;
         }
 
         .tip {
@@ -1168,8 +1124,6 @@
             .jungle-cover.bottom-haze { width: 520px; bottom: -150px; opacity: 0.06; }
             .lion-bg { width: 190px; right: -64px; bottom: 18px; opacity: 0.12; }
             .palm-frond.right { opacity: 0.11; }
-            #modal-title { margin-top: 28px; padding: 0 58px; font-size: clamp(1.25rem, 6vw, 1.8rem); }
-            #modal-viewer { width: calc(100vw - 24px); height: 56vh; border-radius: 22px; }
             .nav-arrow { width: 42px; height: 42px; }
             .left-arrow { left: 8px; }
             .right-arrow { right: 8px; }
@@ -1283,7 +1237,7 @@
     <div id="modal">
         <button class="nav-arrow left-arrow"  id="modal-prev">&#10094;</button>
         <button class="nav-arrow right-arrow" id="modal-next">&#10095;</button>
-        <button class="close-btn" id="close-btn" aria-label="Close">×</button>
+        <button class="close-btn" id="close-btn">Close</button>
         <div id="modal-title"></div>
         <div style="position:relative;display:inline-block;width:95vw;">
             <model-viewer id="modal-viewer"
@@ -2226,7 +2180,7 @@
                 viewAR:    'VIEW ON TABLE',
                 view3D:    'VIEW IN 3D',
                 loading:   'Loading...',
-                close:     '×',
+                close:     'Close',
                 tip:       'Drag to rotate',
                 placeHint: 'Point at a flat surface, then tap to place',
                 moveHint:  'Drag to rotate · Pinch to scale',
@@ -2262,7 +2216,7 @@
                 viewAR:    'ᲛᲐᲒᲘᲓᲐᲖᲔ ᲜᲐᲮᲕᲐ',
                 view3D:    '3D-ში ᲜᲐᲮᲕᲐ',
                 loading:   'იტვირთება...',
-                close:     '×',
+                close:     'დახურვა',
                 tip:       'გაასრიალეთ მოსაბრუნებლად',
                 placeHint: 'მიუშვირე ბრტყელ ზედაპირს, როდესაც გამოჩნდება ნიშნული შეეხე',
                 moveHint:  'გასაბრუნებლად გაასრიალე · პინჩი მასშტაბისთვის',
