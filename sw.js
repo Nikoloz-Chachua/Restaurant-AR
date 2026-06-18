@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bl-v56';
+const CACHE_NAME = 'bl-v57';
 
 const SUPABASE_URL  = 'https://xctoxhaahxtcicfgnmme.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdG94aGFhaHh0Y2ljZmdubW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NDMyMDEsImV4cCI6MjA5NTMxOTIwMX0.VA2tQL6WT96ifBjON4NLaJa0BbzBGI0ipD7iB5fHjnQ';
@@ -7,6 +7,7 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 const PRECACHE = [
     './',
     './foods/menu.json',
+    './assets/resting-lion.jpg',
 ];
 
 // Fetch all Supabase Storage GLB URLs from the DB and pre-cache them
