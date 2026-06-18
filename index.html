@@ -596,6 +596,9 @@
             transition: opacity 0.2s, background var(--t);
         }
         #modal.active { opacity: 1; }
+        [data-theme="day"] #modal {
+            background: #fbf6e8;
+        }
 
         #modal-title {
             font-family: var(--font-display);
@@ -1499,7 +1502,7 @@
             });
             const planeW = 0.15, planeH = planeW * H / W;
             labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), mat);
-            labelMesh.position.set(0, 0.13, 0.05);
+            labelMesh.position.set(-0.16, 0.18, -0.10);
             labelMesh.visible = false;
             carouselRoot.add(labelMesh);
         }
@@ -1507,7 +1510,7 @@
         function updateLabelTransform() {
             if (!labelMesh) return;
             if (labelMode === 'float') {
-                labelMesh.position.set(0, 0.13, 0.05);
+                labelMesh.position.set(-0.16, 0.18, -0.10);
             }
             // surface rotation updated per-frame in render loop
             const btn = document.getElementById('xr-label-toggle');
@@ -2003,10 +2006,10 @@
                         // Counter-scale both size AND position so the label stays
                         // at a fixed world-space location regardless of burger scale
                         labelMesh.scale.setScalar(1 / _cs);
-                        labelMesh.position.set(0, 0.13 / _cs, 0.05 / _cs);
+                        labelMesh.position.set(-0.16 / _cs, 0.18 / _cs, -0.10 / _cs);
                     } else {
                         labelMesh.scale.setScalar(1);
-                        labelMesh.position.set(0, 0.07, 0.015);
+                        labelMesh.position.set(-0.16, 0.18, -0.10);
                     }
                     const _camPos = new THREE.Vector3();
                     camera.getWorldPosition(_camPos);
@@ -2018,11 +2021,15 @@
                         const _rPos = new THREE.Vector3();
                         carouselRoot.getWorldPosition(_rPos);
                         const _ang = Math.atan2(_camPos.x - _rPos.x, _camPos.z - _rPos.z);
-                        const _r = 0.26, _h = 0.006;
+                        // Put the on-table card behind and to the side of the dish from the user's view.
+                        // The old radial-only placement sat directly under/inside the burger on real WebXR.
+                        const _r = 0.34, _h = 0.006, _side = -0.22;
+                        const _dirX = Math.sin(_ang), _dirZ = Math.cos(_ang);
+                        const _sideX = -_dirZ, _sideZ = _dirX;
                         const _lp = new THREE.Vector3(
-                            _rPos.x + Math.sin(_ang) * _r,
+                            _rPos.x - _dirX * _r + _sideX * _side,
                             _rPos.y + _h,
-                            _rPos.z + Math.cos(_ang) * _r
+                            _rPos.z - _dirZ * _r + _sideZ * _side
                         );
                         carouselRoot.worldToLocal(_lp);
                         labelMesh.position.copy(_lp);
