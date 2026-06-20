@@ -31,6 +31,10 @@
     <meta name="description" content="3D AR Menu. View dishes in Augmented Reality before you order.">
     <meta property="og:title" content="3D AR Menu">
     <meta property="og:description" content="Browse our menu and place dishes on your table in Augmented Reality.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev" crossorigin>
+    <link rel="preconnect" href="https://ajax.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -2641,8 +2645,16 @@
                 // USDZ items go straight to native Quick Look, no preload required.
                 items.forEach(item => { if (item.model && !item.model_usdz) _getARLauncher(item.model, item.ar_scale); });
             }
-            // After menu paints, silently preload Three.js + decode all models
-            setTimeout(() => window.XR?.backgroundPreload?.(items), 200);
+            // Preload Three.js + decode models for AR — but only AFTER the page has
+            // fully loaded, and on idle, so it never competes with first paint or menu
+            // interactivity. This used to fire 200ms in and dominated cold-load
+            // bandwidth + main-thread time; AR is still warm by the time a guest taps.
+            const _scheduleARPreload = () => {
+                const idle = window.requestIdleCallback || (cb => setTimeout(cb, 1500));
+                idle(() => window.XR?.backgroundPreload?.(items));
+            };
+            if (document.readyState === 'complete') _scheduleARPreload();
+            else window.addEventListener('load', _scheduleARPreload, { once: true });
 
             const initialLabel = window.__arCap === 'none' ? UI[window.__lang].view3D : UI[window.__lang].viewAR;
 
