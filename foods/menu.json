@@ -6,7 +6,8 @@
     "description_ka": "ხორცი 600 გრ, ყველი ჩედარი 5 ფენა, ბეკონი 4 ფენა, სპეც სოუსი, მჟავე კიტრი, აისბერგი, ბურგერის ფუნთუშა.",
     "price": "14 ₾",
     "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/druidi_balanced_30k_2k.glb",
-    "ar_scale": 1.0,
+    "model_usdz": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/druidi_balanced_30k_2k.usdz",
+    "ar_scale": 1.477,
     "thumbnail_url": "",
     "thumb_3d": false
   },
