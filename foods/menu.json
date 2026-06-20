@@ -17,8 +17,9 @@
     "description": "classic hot dog",
     "description_ka": "კლასიკური ჰოთ დოგი",
     "price": "4 ₾",
-    "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/1781448109151_1780057590342_hot_dog.glb",
-    "ar_scale": 1.0,
+    "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/hot_dog_draco.glb",
+    "model_usdz": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/hot_dog.usdz",
+    "ar_scale": 1.0346,
     "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/thumb_1780046740147.webp",
     "thumb_3d": true
   },
