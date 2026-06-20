@@ -31,11 +31,12 @@
     <meta name="description" content="3D AR Menu. View dishes in Augmented Reality before you order.">
     <meta property="og:title" content="3D AR Menu">
     <meta property="og:description" content="Browse our menu and place dishes on your table in Augmented Reality.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev" crossorigin>
-    <link rel="preconnect" href="https://ajax.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Fonts loaded non-render-blocking: the print->all swap drops the stylesheet off
+         the critical path. display=swap means text shows immediately in a fallback. -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700&display=swap"></noscript>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
@@ -1876,6 +1877,7 @@
         // ── Public API ────────────────────────────────────────────────
         window.XR = {
             getCurrentItem() { return MENU.length ? MENU[currentCenterMenu] : null; },
+            isUIHidden() { return _xrUIHidden; },
             refreshHint() { if (_setupDone) _updateScanHint(_reticleWasVisible); },
             _preloadDone,
             getSeatedBlob: _makeSeatedBlob,
@@ -2125,7 +2127,7 @@
             const hideUIBtn   = document.getElementById('xr-hide-ui');
             if (carouselBtn) carouselBtn.textContent = (localStorage.getItem('bl-xr-view') || 'single') === 'single' ? u.carouselBtn : u.singleBtn;
             if (labelBtn)    labelBtn.textContent    = (localStorage.getItem('bl-xr-label') || 'float') === 'float' ? u.onTable : u.floating;
-            if (hideUIBtn)   hideUIBtn.textContent   = _xrUIHidden ? u.showUI : u.hideUI;
+            if (hideUIBtn)   hideUIBtn.textContent   = (window.XR?.isUIHidden?.()) ? u.showUI : u.hideUI;
             if (window.__categories) {
                 window.__categories.forEach(cat => {
                     const header = document.querySelector(`.category-header[data-cat-name="${CSS.escape(cat.name)}"]`);
