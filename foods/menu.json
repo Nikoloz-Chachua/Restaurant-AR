@@ -7,7 +7,7 @@
     "price": "14 ₾",
     "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/druidi_balanced_30k_2k.glb",
     "model_usdz": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/druidi_balanced_30k_2k.usdz",
-    "ar_scale": 1.477,
+    "ar_scale": 1.5181,
     "thumbnail_url": "",
     "thumb_3d": false
   },
@@ -19,7 +19,7 @@
     "price": "4 ₾",
     "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/hot_dog_draco.glb",
     "model_usdz": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/hot_dog.usdz",
-    "ar_scale": 1.0346,
+    "ar_scale": 0.9312,
     "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/thumb_1780046740147.webp",
     "thumb_3d": true
   },
@@ -29,8 +29,9 @@
     "description": "Classic croissant with chocolate",
     "description_ka": "კლასიკური კროასანი შოკოლადით",
     "price": "2.5 ₾",
-    "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/1781448431982_1780056684195_croissant.glb",
-    "ar_scale": 1.0,
+    "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/croissant_draco.glb",
+    "model_usdz": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/croissant.usdz",
+    "ar_scale": 0.90,
     "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/thumb_1780046967707.webp",
     "thumb_3d": true
   },
@@ -40,8 +41,9 @@
     "description": "Chocolate donut with banana",
     "description_ka": "შოკოლადის დონატი ბანანით",
     "price": "1,5 ₾",
-    "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/1781448149232_1780058154105_donut.glb",
-    "ar_scale": 1.0,
+    "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/donut_draco.glb",
+    "model_usdz": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/donut.usdz",
+    "ar_scale": 0.90,
     "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/thumb_1780046956786.webp",
     "thumb_3d": true
   }
