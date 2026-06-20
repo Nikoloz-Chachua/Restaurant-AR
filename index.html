@@ -1574,14 +1574,24 @@
                     import('https://esm.sh/three@0.155.0'),
                     import('https://esm.sh/three@0.155.0/examples/jsm/loaders/GLTFLoader'),
                     import('https://esm.sh/three@0.155.0/examples/jsm/exporters/GLTFExporter'),
+                    import('https://esm.sh/three@0.155.0/examples/jsm/loaders/DRACOLoader'),
                 ]);
             }
-            const [threeNS, loaderMod, exporterMod] = await _loaderPromise;
+            const [threeNS, loaderMod, exporterMod, dracoMod] = await _loaderPromise;
             if (loader) return; // concurrent call already finished
             THREE        = threeNS;
             GLTFLoader   = loaderMod.GLTFLoader;
             GLTFExporter = exporterMod.GLTFExporter;
             loader       = new GLTFLoader();
+            // Draco support for the WebXR carousel. model-viewer (3D modal + thumbnails)
+            // bundles its own Draco decoder, but this Three.js path never did — that's
+            // why Draco GLBs broke in AR before. The decoder is fetched lazily (only when
+            // a model actually uses Draco) so non-Draco models pay nothing, and the SW
+            // caches it after first use.
+            const draco = new dracoMod.DRACOLoader();
+            draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+            draco.setDecoderConfig({ type: 'wasm' });
+            loader.setDRACOLoader(draco);
         }
 
         // ── iOS y-offset correction ───────────────────────────────────────────
