@@ -2773,7 +2773,7 @@
                         <p class="item-name" data-field="name" data-idx="${globalIdx}">${t(item, 'name')}</p>
                         <div class="item-left">
                             <div class="thumb-wrap">
-                                <img class="thumb-img" src="${item.thumbnail_url || ''}" data-model="${item.model || ''}" alt="${t(item, 'name')}" loading="lazy">
+                                <img class="thumb-img"${item.thumbnail_url ? ` src="${item.thumbnail_url}"` : ''} data-model="${item.model || ''}" alt="${t(item, 'name')}" loading="lazy" onerror="this.style.visibility='hidden'">
                                 <div class="thumb-vignette"></div>
                                 ${item.model ? '<span class="badge-3d">3D</span>' : ''}
                             </div>
