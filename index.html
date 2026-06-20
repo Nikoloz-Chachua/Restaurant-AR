@@ -37,7 +37,11 @@
          the critical path. display=swap means text shows immediately in a fallback. -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700&display=swap"></noscript>
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <!-- model-viewer is NOT loaded here. It costs ~250KB + several seconds of main-thread
+         eval, and is only needed for the grid's live-3D thumbnails and the tap-to-open 3D
+         modal — never for AR (Android = WebXR/Three.js, iOS = native Quick Look). So it is
+         loaded lazily AFTER first paint via _ensureModelViewer(): the menu paints as static
+         poster images, then thumbnails upgrade to live 3D off the critical path. -->
     <!-- Supabase is reached via the REST API with native fetch (see _supaSelect/_supaInsert
          below). We do not load the 51KB @supabase/supabase-js UMD bundle — it was
          render-blocking and cost ~1.3s of main-thread CPU for what is three REST calls. -->
@@ -2276,9 +2280,11 @@
         function updateModal() {
             const item = modalItems[modalIndex];
             if (!item) return;
-            modalViewer.src        = item.model || '';
+            // model-viewer is lazy-loaded; ensure it's defined before setting the source so
+            // the modal's 3D viewer renders (it's usually already loaded from thumbnail upgrades).
             if (item.thumbnail_url) modalViewer.setAttribute('poster', item.thumbnail_url);
             else modalViewer.removeAttribute('poster');
+            _ensureModelViewer().then(() => { modalViewer.src = item.model || ''; });
             modalTitle.textContent = t(item, 'name');
             document.getElementById('modal-title-d').textContent = t(item, 'name');
             modalPrice.textContent = item.price;
@@ -2308,13 +2314,13 @@
             modal.style.display = 'flex';
             requestAnimationFrame(() => modal.classList.add('active'));
             document.body.style.overflow = 'hidden';
-            // Defer thumbnail teardown past the modal fade-in frame so it doesn't block animation
+            // Defer thumbnail teardown past the modal fade-in frame so it doesn't block
+            // animation — pause live thumbnails (free their GPU) while the modal is open.
             requestAnimationFrame(() => {
                 document.querySelectorAll('.thumb-wrap model-viewer').forEach(mv => {
-                    if (!mv.src) return;
-                    const t = _thumbUnload.get(mv);
-                    if (t) { clearTimeout(t); _thumbUnload.delete(mv); }
-                    mv.dataset.pausedSrc = mv.src;
+                    const src = mv.getAttribute('src');
+                    if (!src) return;
+                    mv.dataset.pausedSrc = src;
                     mv.removeAttribute('src');
                 });
             });
@@ -2332,9 +2338,10 @@
                 modalViewer.removeAttribute('src');
                 document.querySelectorAll('.thumb-wrap model-viewer').forEach(mv => {
                     if (!mv.dataset.pausedSrc) return;
+                    const src = mv.dataset.pausedSrc;
                     delete mv.dataset.pausedSrc;
                     const r = mv.getBoundingClientRect();
-                    if (r.bottom > -100 && r.top < window.innerHeight + 100) _scheduleThumb(mv);
+                    if (r.bottom > -100 && r.top < window.innerHeight + 100) mv.setAttribute('src', src);
                 });
             }, 200);
             document.body.style.overflow = '';
@@ -2378,6 +2385,7 @@
             const scale = arScale || 1.0;
             const key   = scale !== 1.0 ? `${src}::${scale}` : src;
             if (!_arLaunchers[key]) {
+                _ensureModelViewer(); // legacy no-USDZ path needs the lazy-loaded library
                 const mv = document.createElement('model-viewer');
                 mv.setAttribute('ar', '');
                 mv.setAttribute('ar-modes', 'quick-look');
@@ -2510,48 +2518,85 @@
             }
         }
 
-        // ── Thumbnail loader — staggered load, delayed unload ──────────────
-        // Stagger prevents simultaneous WebGL context init spikes on page load.
-        // No hard cap — every visible thumbnail loads; unload after 2s off-screen.
-        const _thumbPending = new Set();
-        const _thumbUnload  = new WeakMap();
-        let   _thumbTimer   = null;
-
-        function _drainThumbs() {
-            _thumbTimer = null;
-            const mv = _thumbPending.values().next().value;
-            if (!mv) return;
-            _thumbPending.delete(mv);
-            if (mv.isConnected && !mv.src) mv.src = mv.dataset.src;
-            if (_thumbPending.size > 0) _thumbTimer = setTimeout(_drainThumbs, 150);
+        // ── Lazy model-viewer loader ───────────────────────────────────────
+        // model-viewer is loaded on demand (after first paint, or on modal open) — not
+        // in <head> — so its ~250KB + multi-second eval never blocks the cold load.
+        let _mvPromise = null;
+        function _ensureModelViewer() {
+            if (_mvPromise) return _mvPromise;
+            _mvPromise = new Promise(resolve => {
+                if (window.customElements && customElements.get('model-viewer')) return resolve();
+                const s = document.createElement('script');
+                s.type = 'module';
+                s.src = 'https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js';
+                s.onload  = () => customElements.whenDefined('model-viewer').then(resolve);
+                s.onerror = () => resolve(); // fail open — thumbnails just stay as posters
+                document.head.appendChild(s);
+            });
+            return _mvPromise;
         }
 
-        function _scheduleThumb(mv) {
-            const t = _thumbUnload.get(mv);
-            if (t) { clearTimeout(t); _thumbUnload.delete(mv); }
-            if (_thumbPending.has(mv) || mv.src) return;
-            _thumbPending.add(mv);
-            if (!_thumbTimer) _thumbTimer = setTimeout(_drainThumbs, 0);
+        // ── Poster → live-3D thumbnail upgrade ──────────────────────────────
+        // Thumbnails render first as plain <img> posters (no WebGL, paint with the menu).
+        // After first paint, in-view thumbnails upgrade to a live <model-viewer> overlaid
+        // on the poster — staggered, off the critical path. The poster stays beneath until
+        // the model is ready, then is hidden.
+        const _upgradePending = new Set();
+        let   _upgradeTimer   = null;
+
+        function _drainUpgrades() {
+            _upgradeTimer = null;
+            const img = _upgradePending.values().next().value;
+            if (!img) return;
+            _upgradePending.delete(img);
+            _upgradeThumb(img);
+            if (_upgradePending.size > 0) _upgradeTimer = setTimeout(_drainUpgrades, 150);
         }
 
-        function _unscheduleThumb(mv) {
-            _thumbPending.delete(mv);
-            if (!mv.src) return;
-            const t = setTimeout(() => {
-                _thumbUnload.delete(mv);
-                if (!mv.dataset.pausedSrc) mv.removeAttribute('src');
-                if (_thumbPending.size > 0 && !_thumbTimer)
-                    _thumbTimer = setTimeout(_drainThumbs, 0);
-            }, 2000);
-            _thumbUnload.set(mv, t);
+        function _upgradeThumb(img) {
+            if (!img || img.dataset.upgraded || !img.isConnected) return;
+            const model = img.dataset.model;
+            if (!model) return;
+            img.dataset.upgraded = '1';
+            const wrap = img.closest('.thumb-wrap');
+            const gIdx = parseInt(img.dataset.globalIdx, 10);
+            _ensureModelViewer().then(() => {
+                if (!wrap || !wrap.isConnected) return;
+                const mv = document.createElement('model-viewer');
+                mv.setAttribute('src', model);
+                if (img.getAttribute('src')) mv.setAttribute('poster', img.getAttribute('src'));
+                mv.setAttribute('camera-controls', '');
+                mv.setAttribute('shadow-intensity', '0');
+                mv.setAttribute('interaction-prompt', 'none');
+                mv.setAttribute('min-camera-orbit', 'auto 0deg auto');
+                mv.setAttribute('max-camera-orbit', 'auto 85deg auto');
+                mv.style.cssText = 'position:absolute; inset:0;';
+                wrap.insertBefore(mv, wrap.firstChild);
+                let _px = 0, _py = 0;
+                mv.addEventListener('pointerdown', e => { _px = e.clientX; _py = e.clientY; });
+                mv.addEventListener('pointerup', e => {
+                    if (Math.abs(e.clientX - _px) < 6 && Math.abs(e.clientY - _py) < 6)
+                        openModal(gIdx, menuItems);
+                });
+                mv.addEventListener('load', () => { img.style.visibility = 'hidden'; }, { once: true });
+            });
         }
 
-        const thumbObserver = new IntersectionObserver(entries => {
+        const _upgradeObserver = new IntersectionObserver(entries => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) _scheduleThumb(entry.target);
-                else                       _unscheduleThumb(entry.target);
+                if (entry.isIntersecting && entry.target.dataset.model && !entry.target.dataset.upgraded) {
+                    _upgradePending.add(entry.target);
+                    if (!_upgradeTimer) _upgradeTimer = setTimeout(_drainUpgrades, 0);
+                }
             });
         }, { rootMargin: '200px' });
+
+        // Begin upgrading posters to live 3D — called on idle after first paint.
+        function _startThumbUpgrades() {
+            document.querySelectorAll('.thumb-img[data-model]').forEach(img => {
+                if (img.dataset.model && !img.dataset.upgraded) _upgradeObserver.observe(img);
+            });
+        }
 
         // ── Build menu ─────────────────────────────────────────────────
 
@@ -2668,16 +2713,17 @@
                 // USDZ items go straight to native Quick Look, no preload required.
                 items.forEach(item => { if (item.model && !item.model_usdz) _getARLauncher(item.model, item.ar_scale); });
             }
-            // Preload Three.js + decode models for AR — but only AFTER the page has
-            // fully loaded, and on idle, so it never competes with first paint or menu
-            // interactivity. This used to fire 200ms in and dominated cold-load
-            // bandwidth + main-thread time; AR is still warm by the time a guest taps.
-            const _scheduleARPreload = () => {
-                const idle = window.requestIdleCallback || (cb => setTimeout(cb, 1500));
+            // After first paint, on idle, off the critical path:
+            //  1) upgrade poster thumbnails to live 3D (the visible "wow"), then
+            //  2) preload Three.js + decode models so the first AR tap is instant.
+            // Both are deferred so they never compete with first paint or menu interactivity.
+            const _afterPaint = () => {
+                const idle = window.requestIdleCallback || (cb => setTimeout(cb, 800));
+                idle(() => _startThumbUpgrades());
                 idle(() => window.XR?.backgroundPreload?.(items));
             };
-            if (document.readyState === 'complete') _scheduleARPreload();
-            else window.addEventListener('load', _scheduleARPreload, { once: true });
+            if (document.readyState === 'complete') _afterPaint();
+            else window.addEventListener('load', _afterPaint, { once: true });
 
             const initialLabel = window.__arCap === 'none' ? UI[window.__lang].view3D : UI[window.__lang].viewAR;
 
@@ -2718,17 +2764,7 @@
                         <p class="item-name" data-field="name" data-idx="${globalIdx}">${t(item, 'name')}</p>
                         <div class="item-left">
                             <div class="thumb-wrap">
-                                ${item.thumbnail_url && !item.thumb_3d
-                                    ? `<img class="thumb-img" src="${item.thumbnail_url}" alt="${t(item, 'name')}" loading="lazy">`
-                                    : `<model-viewer
-                                    data-src="${item.model || ''}"
-                                    ${item.thumbnail_url ? `poster="${item.thumbnail_url}"` : ''}
-                                    camera-controls
-                                    shadow-intensity="0"
-                                    interaction-prompt="none"
-                                    min-camera-orbit="auto 0deg auto"
-                                    max-camera-orbit="auto 85deg auto">
-                                </model-viewer>`}
+                                <img class="thumb-img" src="${item.thumbnail_url || ''}" data-model="${item.model || ''}" alt="${t(item, 'name')}" loading="lazy">
                                 <div class="thumb-vignette"></div>
                                 ${item.model ? '<span class="badge-3d">3D</span>' : ''}
                             </div>
@@ -2749,18 +2785,12 @@
                             <button class="ar-btn">${initialLabel}</button>
                         </div>`;
 
-                    const mv = card.querySelector('model-viewer');
-                    if (mv) {
-                        thumbObserver.observe(mv);
-                        let _px = 0, _py = 0;
-                        mv.addEventListener('pointerdown', e => { _px = e.clientX; _py = e.clientY; });
-                        mv.addEventListener('pointerup', e => {
-                            if (Math.abs(e.clientX - _px) < 6 && Math.abs(e.clientY - _py) < 6)
-                                openModal(globalIdx, menuItems);
-                        });
-                    } else {
-                        card.querySelector('.thumb-img')
-                            ?.addEventListener('click', () => openModal(globalIdx, menuItems));
+                    // Thumbnail starts as a poster <img>; it upgrades to live 3D on idle
+                    // (see _startThumbUpgrades). globalIdx is stashed for the upgrade's tap handler.
+                    const thumbImg = card.querySelector('.thumb-img');
+                    if (thumbImg) {
+                        thumbImg.dataset.globalIdx = globalIdx;
+                        thumbImg.addEventListener('click', () => openModal(globalIdx, menuItems));
                     }
 
                     card.querySelector('.item-right').addEventListener('click', () => openModal(globalIdx, menuItems));

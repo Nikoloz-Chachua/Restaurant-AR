@@ -8,8 +8,8 @@
     "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/druidi_balanced_30k_2k.glb",
     "model_usdz": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/druidi_balanced_30k_2k.usdz",
     "ar_scale": 1.5181,
-    "thumbnail_url": "",
-    "thumb_3d": false
+    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burger_poster.webp",
+    "thumb_3d": true
   },
   {
     "name": "Hot Dog",                "name_ka": "ჰოთ დოგი",
@@ -20,7 +20,7 @@
     "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/hot_dog_draco.glb",
     "model_usdz": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/hot_dog.usdz",
     "ar_scale": 0.9312,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/thumb_1780046740147.webp",
+    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/hot_dog_poster.webp",
     "thumb_3d": true
   },
   {
@@ -32,7 +32,7 @@
     "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/croissant_draco.glb",
     "model_usdz": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/croissant.usdz",
     "ar_scale": 0.90,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/thumb_1780046967707.webp",
+    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/croissant_poster.webp",
     "thumb_3d": true
   },
   {
@@ -44,7 +44,7 @@
     "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/donut_draco.glb",
     "model_usdz": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/donut.usdz",
     "ar_scale": 0.90,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/thumb_1780046956786.webp",
+    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/donut_poster.webp",
     "thumb_3d": true
   }
 ]
