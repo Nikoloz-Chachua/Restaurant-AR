@@ -2483,7 +2483,23 @@
                     const src = mv.dataset.pausedSrc;
                     delete mv.dataset.pausedSrc;
                     const r = mv.getBoundingClientRect();
-                    if (r.bottom > -100 && r.top < window.innerHeight + 100) mv.setAttribute('src', src);
+                    const inView = r.bottom > -100 && r.top < window.innerHeight + 100;
+                    if (inView) {
+                        // Visible: bring the live model straight back.
+                        mv.setAttribute('src', src);
+                    } else {
+                        // Off-screen: tear the live viewer down (frees its GPU context),
+                        // reveal the poster image so the tile never goes blank, clear the
+                        // upgraded flag and re-observe it so it upgrades again on scroll.
+                        const wrap = mv.closest('.thumb-wrap');
+                        const img  = wrap && wrap.querySelector('.thumb-img');
+                        mv.remove();
+                        if (img) {
+                            img.style.visibility = '';
+                            delete img.dataset.upgraded;
+                            _upgradeObserver.observe(img);
+                        }
+                    }
                 });
             }, 200);
             document.body.style.overflow = '';
