@@ -49,31 +49,41 @@
         :root { --t: 0.22s ease; }
 
         [data-theme="night"] {
-            --bg:          #0f0b07;
-            --card:        #1d1610;
-            --card2:       #261d13;
-            --border:      rgba(242,181,53,0.22);
-            --text:        #ede6d4;
-            --dim:         #8a7a62;
-            --accent:      #f2b535;
-            --accent-text: #0f0b07;
-            --thumb-bg:    #0a0806;
-            --modal-bg:    #0f0b07;
-            --modal-rgb:   15,11,7;
+            --bg:          #14100b;
+            --bg2:         #1e1711;
+            --glow:        rgba(231,177,90,0.22);
+            --glow2:       rgba(201,138,60,0.13);
+            --shadow:      rgba(0,0,0,0.55);
+            --card:        #211a12;
+            --card2:       #2b2218;
+            --border:      rgba(231,177,90,0.20);
+            --text:        #f1e7d4;
+            --dim:         #9a8a70;
+            --accent:      #e7b15a;
+            --accent2:     #c98a3c;
+            --accent-text: #14100b;
+            --thumb-bg:    #0d0a07;
+            --modal-bg:    #14100b;
+            --modal-rgb:   20,16,11;
         }
 
         [data-theme="day"] {
-            --bg:          #f2e8d2;
-            --card:        #f8f0de;
-            --card2:       #e8dcca;
-            --border:      rgba(155,98,8,0.22);
-            --text:        #1c1308;
+            --bg:          #f3e9d6;
+            --bg2:         #ead9bd;
+            --glow:        rgba(176,122,30,0.18);
+            --glow2:       rgba(154,100,24,0.11);
+            --shadow:      rgba(120,80,10,0.18);
+            --card:        #fbf4e4;
+            --card2:       #ecdcc0;
+            --border:      rgba(176,122,30,0.22);
+            --text:        #221a0e;
             --dim:         #6b5a3c;
-            --accent:      #c07808;
+            --accent:      #8c6014;
+            --accent2:     #86560f;
             --accent-text: #ffffff;
             --thumb-bg:    #c8b898;
-            --modal-bg:    #f2e8d2;
-            --modal-rgb:   242,232,210;
+            --modal-bg:    #f3e9d6;
+            --modal-rgb:   243,233,214;
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -88,15 +98,36 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: background var(--t), color var(--t);
+            transition: color var(--t);
             overflow-x: hidden;
+        }
+
+        /* Fixed background layer — painted once, never repaints on scroll.
+           A single layer holds the warm gradient + glow + framing vignette
+           + a tiny pre-baked grain tile (no live SVG filter, no extra
+           full-screen compositing layer). Kept lightweight for mobile paint. */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-color: var(--bg);
+            background-image:
+                url("./img/grain.png"),
+                radial-gradient(95% 55% at 50% -8%, var(--glow) 0%, transparent 60%),
+                radial-gradient(70% 50% at 85% 35%, var(--glow2) 0%, transparent 72%),
+                radial-gradient(140% 120% at 50% 40%, transparent 58%, var(--shadow) 130%),
+                linear-gradient(175deg, var(--bg) 0%, var(--bg2) 60%, var(--bg) 100%);
+            background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+            background-size: 64px 64px, auto, auto, auto, auto;
         }
 
         .header {
             width: 100%;
             max-width: 450px;
             text-align: center;
-            padding: 64px 0 24px;
+            padding: 72px 0 28px;
+            position: relative;
         }
 
         .header h1 {
@@ -105,7 +136,20 @@
             letter-spacing: 8px;
             color: var(--accent);
             line-height: 1;
+            text-shadow: 0 2px 16px var(--glow);
             transition: color var(--t);
+        }
+
+        /* Glowing divider under the hero title */
+        .header::after {
+            content: '';
+            display: block;
+            width: 72px;
+            height: 3px;
+            margin: 18px auto 0;
+            border-radius: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+            box-shadow: 0 0 14px var(--glow);
         }
 
         .tagline {
@@ -150,9 +194,11 @@
         }
 
         .menu-item {
-            background: var(--card);
+            position: relative;
+            background: linear-gradient(158deg, var(--card) 0%, var(--card2) 100%);
             border: 1px solid var(--border);
             border-radius: 20px;
+            box-shadow: 0 3px 10px var(--shadow);
             display: grid;
             grid-template-columns: 108px 1fr;
             grid-template-rows: auto 1fr;
@@ -160,11 +206,27 @@
             padding: 12px;
             column-gap: 12px;
             row-gap: 6px;
-            transition: background var(--t), border-color var(--t);
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color var(--t);
             contain: content;
             touch-action: manipulation;
         }
-        .menu-item:active { opacity: 0.75; transition: opacity 0.08s; }
+        /* Glowing accent edge on every card */
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--accent), var(--accent2));
+        }
+        .menu-item:active { transform: scale(0.985); box-shadow: 0 2px 6px var(--shadow); }
+        @media (hover: hover) {
+            .menu-item:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 22px var(--shadow);
+                border-color: var(--accent);
+            }
+        }
 
         .thumb-wrap {
             position: relative;
@@ -205,13 +267,15 @@
             position: absolute;
             bottom: 0;
             right: 0;
-            background: var(--accent);
+            background: linear-gradient(120deg, var(--accent), var(--accent2));
             color: var(--accent-text);
             font-family: 'Bebas Neue', sans-serif;
             font-size: 0.9rem;
             letter-spacing: 1.5px;
             padding: 2px 7px 3px;
             line-height: 1.4;
+            border-radius: 10px 0 13px 0;
+            box-shadow: 0 0 14px var(--glow);
             pointer-events: none;
             z-index: 3;
             transition: background var(--t), color var(--t);
@@ -252,11 +316,11 @@
         }
 
         .ar-btn {
-            background: var(--accent);
+            background: linear-gradient(120deg, var(--accent), var(--accent2));
             color: var(--accent-text);
             border: none;
-            border-radius: 9px;
-            padding: 7px 10px;
+            border-radius: 10px;
+            padding: 8px 10px;
             font-size: 0.63rem;
             font-weight: 800;
             font-family: 'Nunito', sans-serif;
@@ -267,7 +331,8 @@
             display: block;
             width: 100%;
             margin-top: 6px;
-            transition: background var(--t), opacity 0.15s;
+            box-shadow: 0 4px 14px var(--glow);
+            transition: background var(--t), opacity 0.15s, box-shadow 0.15s;
         }
         .ar-btn:active { opacity: 0.7; transition: opacity 0.08s; }
         .ar-btn:disabled { opacity: 0.45; cursor: wait; }
@@ -301,11 +366,54 @@
             transition: color var(--t), border-color var(--t);
         }
 
-        /* ── Modal ── */
+        /* ── Footer ── */
+        .site-footer {
+            width: 100%;
+            max-width: 450px;
+            margin-top: 48px;
+            padding: 28px 16px 8px;
+            border-top: 1px solid var(--border);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+        }
+        .site-footer.show { display: flex; }
+        .footer-logo {
+            height: 34px;
+            width: auto;
+            opacity: 0.92;
+        }
+        /* Show the logo variant that matches the active theme */
+        .footer-logo-light { display: none; }
+        [data-theme="day"] .footer-logo-dark  { display: none; }
+        [data-theme="day"] .footer-logo-light { display: block; }
+        .footer-email {
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--accent);
+            text-decoration: none;
+            transition: color var(--t), opacity 0.15s;
+        }
+        .footer-email:active { opacity: 0.6; }
+        @media (hover: hover) { .footer-email:hover { opacity: 0.75; } }
+        .footer-copy {
+            font-size: 0.66rem;
+            letter-spacing: 1px;
+            color: var(--dim);
+            transition: color var(--t);
+        }
+
+        /* ── Modal (3D view page) — a lit stage ── */
         #modal {
             position: fixed;
             inset: 0;
-            background: var(--modal-bg);
+            background:
+                radial-gradient(70% 48% at 50% 36%, var(--glow) 0%, transparent 62%),
+                radial-gradient(130% 100% at 50% 50%, var(--bg2) 0%, var(--modal-bg) 72%);
             z-index: 9999;
             display: none;
             flex-direction: column;
@@ -319,15 +427,19 @@
         /* Mobile: title above viewer */
         #modal-title {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(1.8rem, 6vw, 2.6rem);
+            font-size: clamp(2.2rem, 8vw, 3.2rem);
             letter-spacing: 4px;
+            background: linear-gradient(100deg, var(--accent), var(--accent2), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
             color: var(--accent);
+            text-shadow: 0 2px 18px var(--glow);
             text-align: center;
             width: 100%;
             padding: 0 24px;
             margin-top: 56px;
-            line-height: 1.2;
-            transition: color var(--t);
+            line-height: 1.1;
         }
 
         /* Viewer wrapper */
@@ -337,7 +449,18 @@
             width: 95vw;
             margin-top: 8px;
         }
-        #modal-viewer { width: 100%; height: 62vh; background: transparent; display: block; }
+        #modal-viewer { width: 100%; height: 62vh; background: transparent; display: block; position: relative; z-index: 1; }
+        /* Stage floor glow — grounds the model on a pool of light */
+        #modal-viewer-wrap::before {
+            content: '';
+            position: absolute;
+            left: 50%; bottom: 7%;
+            transform: translateX(-50%);
+            width: 66%; height: 16%;
+            background: radial-gradient(ellipse at center, var(--glow) 0%, transparent 72%);
+            pointer-events: none;
+            z-index: 0;
+        }
         .modal-vignette {
             position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
             background: radial-gradient(ellipse at center, transparent 38%, rgba(0,0,0,0.55) 100%);
@@ -350,12 +473,15 @@
 
         #modal-price {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(1.4rem, 5vw, 2rem);
+            font-size: clamp(1.6rem, 6vw, 2.3rem);
             letter-spacing: 3px;
+            background: linear-gradient(100deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
             color: var(--accent);
             text-align: center;
-            margin-top: 6px;
-            transition: color var(--t);
+            margin-top: 8px;
         }
         #modal-description {
             font-size: 0.75rem;
@@ -373,17 +499,21 @@
             position: absolute;
             top: 16px;
             right: 16px;
-            background: var(--card2);
+            background: rgba(var(--modal-rgb), 0.6);
             color: var(--text);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 10px 16px;
+            border: 1px solid var(--accent);
+            border-radius: 50px;
+            padding: 10px 20px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.78rem;
             font-family: 'Nunito', sans-serif;
-            font-weight: 700;
-            transition: background var(--t), color var(--t);
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 16px var(--glow);
+            transition: background var(--t), color var(--t), transform 0.12s;
         }
+        .close-btn:active { transform: scale(0.92); }
 
         /* ── Desktop: slide-up drawer (>=640px) ── */
         @media (min-width: 640px) {
@@ -453,22 +583,24 @@
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
-            border: 1px solid var(--border);
-            background: rgba(0,0,0,0.5);
-            color: var(--text);
-            font-size: 1.4rem;
+            border: 1px solid var(--accent);
+            background: rgba(var(--modal-rgb), 0.6);
+            color: var(--accent);
+            font-size: 1.5rem;
             line-height: 1;
             padding: 0;
             cursor: pointer;
             z-index: 10000;
+            box-shadow: 0 4px 18px var(--glow);
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: transform 0.12s;
         }
-        .nav-arrow:active { opacity: 0.65; }
+        .nav-arrow:active { transform: translateY(-50%) scale(0.9); }
         .left-arrow  { left: 10px; }
         .right-arrow { right: 10px; }
 
@@ -661,9 +793,10 @@
         }
         .cat-pill:active { opacity: 0.7; transition: opacity 0.08s; }
         .cat-pill.active {
-            background: var(--accent);
+            background: linear-gradient(120deg, var(--accent), var(--accent2));
             color: var(--accent-text);
-            border-color: var(--accent);
+            border-color: transparent;
+            box-shadow: 0 4px 16px var(--glow);
         }
 
         .cat-section { display: contents; }
@@ -982,22 +1115,24 @@
         /* ── Modal AR button ── */
         #modal-ar-btn {
             display: none;
-            background: var(--accent);
+            background: linear-gradient(120deg, var(--accent), var(--accent2));
             color: var(--accent-text);
             border: none;
-            border-radius: 12px;
-            padding: 14px 0;
+            border-radius: 14px;
+            padding: 15px 0;
             width: 100%;
             font-family: 'Nunito', sans-serif;
-            font-size: 0.82rem;
+            font-size: 0.85rem;
             font-weight: 800;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
             cursor: pointer;
-            margin-top: 14px;
-            transition: background var(--t), opacity 0.15s;
+            margin-top: 16px;
+            box-shadow: 0 6px 22px var(--glow);
+            transition: background var(--t), opacity 0.15s, transform 0.12s;
             touch-action: manipulation;
         }
+        #modal-ar-btn:active { transform: scale(0.97); }
         #modal-ar-btn:active  { opacity: 0.7; transition: opacity 0.08s; }
         #modal-ar-btn:disabled { opacity: 0.45; cursor: wait; }
 
@@ -1071,6 +1206,13 @@
     <div id="cat-filter" class="cat-filter"></div>
 
     <div class="menu-list" id="menu-list"></div>
+
+    <footer class="site-footer">
+        <img class="footer-logo footer-logo-dark"  src="./img/betareal-logo-dark.png"  alt="BetaReal" width="333" height="110" loading="lazy" decoding="async">
+        <img class="footer-logo footer-logo-light" src="./img/betareal-logo-light.png" alt="BetaReal" width="366" height="110" loading="lazy" decoding="async">
+        <a class="footer-email" href="mailto:betareal.ar@gmail.com">betareal.ar@gmail.com</a>
+        <p class="footer-copy">&copy; 2026 BetaReal &middot; Augmented Reality Menus</p>
+    </footer>
 
     <div id="modal">
         <button class="nav-arrow left-arrow"  id="modal-prev">&#10094;</button>
@@ -2356,7 +2498,7 @@
                         mv.remove();
                         if (img) {
                             img.style.visibility = '';
-                            img.dataset.upgraded = '';
+                            delete img.dataset.upgraded;
                             _upgradeObserver.observe(img);
                         }
                     }
@@ -3077,7 +3219,11 @@ document.getElementById('basket-items').addEventListener('click', e => {
             if (entry) _setQty(btn.dataset.key, entry.qty + parseInt(btn.dataset.delta));
         });
 
-        buildMenu();
+        // Reveal the footer only AFTER the menu is built. While menu-list is
+        // empty the footer would render high in the viewport, then get shoved
+        // ~700px down when the cards populate — a large CLS. Showing it after
+        // the build means it appears below the full menu (off-screen), no shift.
+        buildMenu().finally(() => document.querySelector('.site-footer')?.classList.add('show'));
     </script>
     <script>
         if ('serviceWorker' in navigator) {
