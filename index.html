@@ -373,12 +373,13 @@
             margin-top: 48px;
             padding: 28px 16px 8px;
             border-top: 1px solid var(--border);
-            display: flex;
+            display: none;
             flex-direction: column;
             align-items: center;
             gap: 10px;
             text-align: center;
         }
+        .site-footer.show { display: flex; }
         .footer-logo {
             height: 34px;
             width: auto;
@@ -3200,7 +3201,11 @@ document.getElementById('basket-items').addEventListener('click', e => {
             if (entry) _setQty(btn.dataset.key, entry.qty + parseInt(btn.dataset.delta));
         });
 
-        buildMenu();
+        // Reveal the footer only AFTER the menu is built. While menu-list is
+        // empty the footer would render high in the viewport, then get shoved
+        // ~700px down when the cards populate — a large CLS. Showing it after
+        // the build means it appears below the full menu (off-screen), no shift.
+        buildMenu().finally(() => document.querySelector('.site-footer')?.classList.add('show'));
     </script>
     <script>
         if ('serviceWorker' in navigator) {
