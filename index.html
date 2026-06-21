@@ -103,36 +103,23 @@
         }
 
         /* Fixed background layer — painted once, never repaints on scroll.
-           Top spotlight + soft warm glow blobs + bottom ember over a warm
-           vertical gradient with a framing vignette. */
+           A single layer holds the warm gradient + glow + framing vignette
+           + a tiny pre-baked grain tile (no live SVG filter, no extra
+           full-screen compositing layer). Kept lightweight for mobile paint. */
         body::before {
             content: '';
             position: fixed;
             inset: 0;
             z-index: -1;
-            background:
-                radial-gradient(90% 55% at 50% -6%, var(--glow) 0%, transparent 60%),
-                radial-gradient(38% 26% at 18% 24%, var(--glow) 0%, transparent 70%),
-                radial-gradient(42% 30% at 88% 46%, var(--glow2) 0%, transparent 72%),
-                radial-gradient(40% 28% at 12% 78%, var(--glow2) 0%, transparent 72%),
-                radial-gradient(80% 50% at 50% 108%, var(--glow) 0%, transparent 60%),
-                radial-gradient(140% 120% at 50% 40%, transparent 52%, var(--shadow) 130%),
+            background-color: var(--bg);
+            background-image:
+                url("./img/grain.png"),
+                radial-gradient(95% 55% at 50% -8%, var(--glow) 0%, transparent 60%),
+                radial-gradient(70% 50% at 85% 35%, var(--glow2) 0%, transparent 72%),
+                radial-gradient(140% 120% at 50% 40%, transparent 58%, var(--shadow) 130%),
                 linear-gradient(175deg, var(--bg) 0%, var(--bg2) 60%, var(--bg) 100%);
-            transition: background var(--t);
-        }
-
-        /* Fine grain / film-noise overlay — inline SVG, no network request.
-           Sits above the menu (tactile "printed paper" feel) but below the
-           3D modal (z 9999) so the viewer stage stays clean. Painted once. */
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            z-index: 5;
-            pointer-events: none;
-            opacity: 0.04;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-            background-size: 200px 200px;
+            background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+            background-size: 64px 64px, auto, auto, auto, auto;
         }
 
         .header {
@@ -153,7 +140,7 @@
             background-clip: text;
             -webkit-text-fill-color: transparent;
             color: var(--accent);
-            filter: drop-shadow(0 4px 24px var(--glow));
+            text-shadow: 0 2px 16px var(--glow);
         }
 
         /* Glowing divider under the hero title */
@@ -214,7 +201,7 @@
             background: linear-gradient(158deg, var(--card) 0%, var(--card2) 100%);
             border: 1px solid var(--border);
             border-radius: 20px;
-            box-shadow: 0 8px 26px var(--shadow);
+            box-shadow: 0 3px 10px var(--shadow);
             display: grid;
             grid-template-columns: 108px 1fr;
             grid-template-rows: auto 1fr;
@@ -235,11 +222,11 @@
             width: 3px;
             background: linear-gradient(180deg, var(--accent), var(--accent2));
         }
-        .menu-item:active { transform: scale(0.985); box-shadow: 0 4px 14px var(--shadow); }
+        .menu-item:active { transform: scale(0.985); box-shadow: 0 2px 6px var(--shadow); }
         @media (hover: hover) {
             .menu-item:hover {
                 transform: translateY(-3px);
-                box-shadow: 0 16px 34px var(--shadow);
+                box-shadow: 0 10px 22px var(--shadow);
                 border-color: var(--accent);
             }
         }
@@ -452,7 +439,7 @@
             background-clip: text;
             -webkit-text-fill-color: transparent;
             color: var(--accent);
-            filter: drop-shadow(0 3px 22px var(--glow));
+            text-shadow: 0 2px 18px var(--glow);
             text-align: center;
             width: 100%;
             padding: 0 24px;
