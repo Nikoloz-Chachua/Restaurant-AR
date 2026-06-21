@@ -132,15 +132,12 @@
 
         .header h1 {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(3.2rem, 13vw, 4.6rem);
-            letter-spacing: 6px;
-            line-height: 0.95;
-            background: linear-gradient(100deg, var(--accent) 0%, var(--accent2) 55%, var(--accent) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: clamp(2.8rem, 10vw, 3.8rem);
+            letter-spacing: 8px;
             color: var(--accent);
+            line-height: 1;
             text-shadow: 0 2px 16px var(--glow);
+            transition: color var(--t);
         }
 
         /* Glowing divider under the hero title */
@@ -351,13 +348,10 @@
 
         .price {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.3rem;
+            font-size: 1.15rem;
             letter-spacing: 1px;
-            background: linear-gradient(100deg, var(--accent), var(--accent2));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
             color: var(--accent);
+            transition: color var(--t);
         }
 
         .category-header {
