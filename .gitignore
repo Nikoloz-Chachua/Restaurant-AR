@@ -4,6 +4,9 @@ dist/
 coverage/
 .DS_Store
 *.log
+
+# Verification screenshot written by the run-restaurant-ar skill — throwaway
+screenshot.png
 .env*
 .claude/
 Userstemotmap3d/
