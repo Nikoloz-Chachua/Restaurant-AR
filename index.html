@@ -499,17 +499,21 @@
             position: absolute;
             top: 16px;
             right: 16px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background: rgba(var(--modal-rgb), 0.6);
             color: var(--text);
             border: 1px solid var(--accent);
-            border-radius: 50px;
-            padding: 10px 20px;
+            border-radius: 50%;
+            padding: 0;
             cursor: pointer;
-            font-size: 0.78rem;
+            font-size: 1.05rem;
             font-family: 'Nunito', sans-serif;
             font-weight: 800;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            line-height: 1;
             box-shadow: 0 4px 16px var(--glow);
             transition: background var(--t), color var(--t), transform 0.12s;
         }
@@ -1217,7 +1221,7 @@
     <div id="modal">
         <button class="nav-arrow left-arrow"  id="modal-prev">&#10094;</button>
         <button class="nav-arrow right-arrow" id="modal-next">&#10095;</button>
-        <button class="close-btn" id="close-btn">Close</button>
+        <button class="close-btn" id="close-btn" aria-label="Close">&#10005;</button>
         <div id="modal-title"></div>
         <div id="modal-viewer-wrap">
             <model-viewer id="modal-viewer"
@@ -2271,7 +2275,7 @@
             const _themeToggle = document.getElementById('theme-toggle');
             _themeToggle.innerHTML = theme === 'night' ? _SVG_SUN : _SVG_MOON;
             _themeToggle.setAttribute('aria-label', theme === 'night' ? u.themeDay : u.themeNight);
-            document.getElementById('close-btn').textContent     = u.close;
+            document.getElementById('close-btn').setAttribute('aria-label', u.close);
             document.getElementById('modal-tip').textContent     = u.tip;
             window.XR?.refreshHint?.();
             document.getElementById('xr-move-hint').textContent  = u.moveHint;
