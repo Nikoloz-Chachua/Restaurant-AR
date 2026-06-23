@@ -157,28 +157,15 @@
         <div class="kpi-grid">
             <div class="kpi accent"><div class="kpi-label" data-i18n="kpi_sessions">Sessions</div><div class="kpi-value" id="kv-sessions">—</div><div class="kpi-sub" data-i18n="kpi_sessions_sub">page loads in range</div></div>
             <div class="kpi"><div class="kpi-label" data-i18n="kpi_views">3D Views</div><div class="kpi-value" id="kv-views">—</div><div class="kpi-sub" data-i18n="kpi_views_sub">modal opens</div></div>
-            <div class="kpi"><div class="kpi-label" data-i18n="kpi_artaps">AR Taps</div><div class="kpi-value" id="kv-artaps">—</div><div class="kpi-sub" data-i18n="kpi_artaps_sub">VIEW ON TABLE tapped</div></div>
             <div class="kpi"><div class="kpi-label" data-i18n="kpi_arsuccess">AR Launches</div><div class="kpi-value" id="kv-arsuccess">—</div><div class="kpi-sub" data-i18n="kpi_arsuccess_sub">AR actually opened</div></div>
-            <div class="kpi"><div class="kpi-label" data-i18n="kpi_placed">Models Placed</div><div class="kpi-value" id="kv-placed">—</div><div class="kpi-sub" data-i18n="kpi_placed_sub">placed on real table</div></div>
             <div class="kpi accent"><div class="kpi-label" data-i18n="kpi_adds">Basket Adds</div><div class="kpi-value" id="kv-adds">—</div><div class="kpi-sub" data-i18n="kpi_adds_sub">items added to order</div></div>
             <div class="kpi accent"><div class="kpi-label" data-i18n="kpi_ar_basket">AR→Basket</div><div class="kpi-value" id="kv-ar-basket">—</div><div class="kpi-sub" data-i18n="kpi_ar_basket_sub">adds driven by AR</div></div>
             <div class="kpi"><div class="kpi-label" data-i18n="kpi_3d_basket">3D→Basket</div><div class="kpi-value" id="kv-3d-basket">—</div><div class="kpi-sub" data-i18n="kpi_3d_basket_sub">adds driven by 3D</div></div>
-            <div class="kpi"><div class="kpi-label" data-i18n="kpi_ar_rate">AR Launch Rate</div><div class="kpi-value" id="kv-ar-launch-rate">—</div><div class="kpi-sub" data-i18n="kpi_ar_rate_sub">of taps that launched</div></div>
             <div class="kpi"><div class="kpi-label" data-i18n="kpi_ar_dur">Avg AR Duration</div><div class="kpi-value" id="kv-ar-dur">—</div><div class="kpi-sub" data-i18n="kpi_ar_dur_sub">seconds per AR session</div></div>
-            <div class="kpi"><div class="kpi-label" data-i18n="kpi_modal_dur">Avg 3D View</div><div class="kpi-value" id="kv-modal-dur">—</div><div class="kpi-sub" data-i18n="kpi_modal_dur_sub">seconds studying a dish</div></div>
-            <div class="kpi"><div class="kpi-label" data-i18n="kpi_ar_devices">AR Devices</div><div class="kpi-value" id="kv-ar-devices">—</div><div class="kpi-sub" data-i18n="kpi_ar_devices_sub">% visitors with AR</div></div>
+            <div class="kpi accent"><div class="kpi-label" data-i18n="kpi_ar_devices">AR Devices</div><div class="kpi-value" id="kv-ar-devices">—</div><div class="kpi-sub" data-i18n="kpi_ar_devices_sub">% visitors with AR</div></div>
         </div>
 
         <div class="insight-row" id="insights"></div>
-
-        <!-- All Events Summary -->
-        <div class="section-label" data-i18n="sec_summary">All Events Summary</div>
-        <div class="charts-grid">
-            <div class="chart-box wide">
-                <div class="chart-title" data-i18n="ch_summary">Event counts — overview of all tracked actions</div>
-                <canvas id="ch-summary"></canvas>
-            </div>
-        </div>
 
         <!-- Activity -->
         <div class="section-label" data-i18n="sec_activity">Activity Over Time</div>
@@ -190,19 +177,6 @@
             <div class="chart-box wide">
                 <div class="chart-title" data-i18n="ch_hourly">Visits by Hour of Day (00–23)</div>
                 <canvas id="ch-hourly"></canvas>
-            </div>
-        </div>
-
-        <!-- Funnel & Attribution -->
-        <div class="section-label" data-i18n="sec_funnel">Conversion Funnel &amp; Attribution</div>
-        <div class="charts-grid">
-            <div class="chart-box">
-                <div class="chart-title" data-i18n="ch_funnel">AR Funnel — where users drop off</div>
-                <canvas id="ch-funnel"></canvas>
-            </div>
-            <div class="chart-box">
-                <div class="chart-title" data-i18n="ch_attr">Basket Add Attribution</div>
-                <canvas id="ch-attr"></canvas>
             </div>
         </div>
 
@@ -221,23 +195,6 @@
                 <div class="chart-title" data-i18n="ch_top_ar">Top Items — AR Success</div>
                 <canvas id="ch-top-ar"></canvas>
             </div>
-            <div class="chart-box">
-                <div class="chart-title" data-i18n="ch_top_duration">Longest 3D View Time (avg sec)</div>
-                <canvas id="ch-top-duration"></canvas>
-            </div>
-        </div>
-
-        <!-- Time Spent -->
-        <div class="section-label" data-i18n="sec_time">Time Spent per Item</div>
-        <div class="charts-grid">
-            <div class="chart-box">
-                <div class="chart-title" data-i18n="ch_ar_dur_item">Avg AR Session Duration per Item (sec)</div>
-                <canvas id="ch-ar-dur-item"></canvas>
-            </div>
-            <div class="chart-box">
-                <div class="chart-title" data-i18n="ch_3d_dur_item">Avg 3D View Duration per Item (sec)</div>
-                <canvas id="ch-3d-dur-item"></canvas>
-            </div>
         </div>
 
         <!-- User Behaviour -->
@@ -246,10 +203,6 @@
             <div class="chart-box">
                 <div class="chart-title" data-i18n="ch_cats">Category Interest (filter taps)</div>
                 <canvas id="ch-cats"></canvas>
-            </div>
-            <div class="chart-box">
-                <div class="chart-title" data-i18n="ch_hours">Peak Hours</div>
-                <canvas id="ch-hours"></canvas>
             </div>
             <div class="chart-box">
                 <div class="chart-title" data-i18n="ch_dow">Day of Week</div>
@@ -261,63 +214,8 @@
         <div class="section-label" data-i18n="sec_audience">Audience</div>
         <div class="charts-3">
             <div class="chart-box">
-                <div class="chart-title" data-i18n="ch_devices">Device AR Capability</div>
-                <canvas id="ch-devices"></canvas>
-            </div>
-            <div class="chart-box">
                 <div class="chart-title" data-i18n="ch_lang">Language</div>
                 <canvas id="ch-lang"></canvas>
-            </div>
-            <div class="chart-box">
-                <div class="chart-title" data-i18n="ch_ar_source">AR Source (card vs modal)</div>
-                <canvas id="ch-ar-source"></canvas>
-            </div>
-        </div>
-
-        <!-- Language & Theme -->
-        <div class="section-label" data-i18n="sec_lang_theme">Language &amp; Theme</div>
-        <div class="charts-3">
-            <div class="chart-box">
-                <div class="chart-title" data-i18n="ch_theme">Theme Preference</div>
-                <canvas id="ch-theme"></canvas>
-            </div>
-            <div class="chart-box">
-                <div class="chart-title" data-i18n="ch_lang_switch">Language Switches</div>
-                <canvas id="ch-lang-switch"></canvas>
-            </div>
-            <div class="chart-box">
-                <div class="chart-title" data-i18n="ch_theme_switch">Theme Switches</div>
-                <canvas id="ch-theme-switch"></canvas>
-            </div>
-        </div>
-
-        <!-- Device Breakdown -->
-        <div class="section-label" data-i18n="sec_devices">Device Breakdown</div>
-        <div class="charts-3">
-            <div class="chart-box">
-                <div class="chart-title" data-i18n="ch_platform">Platform (iOS / Android / Desktop)</div>
-                <canvas id="ch-platform"></canvas>
-            </div>
-            <div class="chart-box">
-                <div class="chart-title" data-i18n="ch_ar_capable">AR Capable vs No AR</div>
-                <canvas id="ch-ar-capable"></canvas>
-            </div>
-            <div class="chart-box">
-                <div class="chart-title" data-i18n="ch_ar_by_platform">AR Funnel by Platform</div>
-                <canvas id="ch-ar-platform"></canvas>
-            </div>
-        </div>
-
-        <!-- First Dish Explored -->
-        <div class="section-label" data-i18n="sec_first_dish">First Dish Explored per Session</div>
-        <div class="charts-grid">
-            <div class="chart-box">
-                <div class="chart-title" data-i18n="ch_first_3d">First Dish Opened in 3D (per session)</div>
-                <canvas id="ch-first-3d"></canvas>
-            </div>
-            <div class="chart-box">
-                <div class="chart-title" data-i18n="ch_first_ar">First Dish Tapped for AR (per session)</div>
-                <canvas id="ch-first-ar"></canvas>
             </div>
         </div>
 
@@ -328,35 +226,6 @@
             <table>
                 <thead id="th-upsell"></thead>
                 <tbody id="tb-upsell"></tbody>
-            </table>
-        </div>
-
-        <!-- AR Efficiency Table -->
-        <div class="section-label" data-i18n="sec_ar_eff">AR Efficiency by Item</div>
-        <div class="tbl-section">
-            <div class="tbl-title" data-i18n="sec_ar_eff_desc">How well each item converts in AR — sorted by Interest Score</div>
-            <table>
-                <thead id="th-efficiency"></thead>
-                <tbody id="tb-efficiency"></tbody>
-            </table>
-        </div>
-
-        <!-- 3D Engagement Table -->
-        <div class="section-label" data-i18n="sec_3d_eng">3D Modal Engagement by Item</div>
-        <div class="tbl-section">
-            <div class="tbl-title" data-i18n="sec_3d_eng_desc">How long people study each dish in the 3D viewer</div>
-            <table>
-                <thead id="th-3d"></thead>
-                <tbody id="tb-3d"></tbody>
-            </table>
-        </div>
-
-        <!-- Recent Events -->
-        <div class="section-label" data-i18n="sec_recent">Recent Events (last 50)</div>
-        <div class="tbl-section">
-            <table>
-                <thead id="th-recent"></thead>
-                <tbody id="tb-recent"></tbody>
             </table>
         </div>
 
@@ -755,6 +624,15 @@ const eventColors = {
 // ════════════════════════════════════════════════════════════════
 function renderAll(events) {
     events = applyHoursFilter(events);
+    // Restaurant view omits several dev-only KPIs/tables. Create hidden stubs for any
+    // missing write targets so the shared render code writes harmlessly instead of throwing.
+    // (Charts are already safe — mkChart no-ops when its canvas is absent.)
+    ['kv-sessions','kv-views','kv-artaps','kv-arsuccess','kv-placed','kv-adds',
+     'kv-ar-basket','kv-3d-basket','kv-ar-launch-rate','kv-ar-dur','kv-modal-dur','kv-ar-devices',
+     'insights','th-upsell','tb-upsell','th-efficiency','tb-efficiency','th-3d','tb-3d','th-recent','tb-recent']
+        .forEach(id => { if (!document.getElementById(id)) {
+            const s = document.createElement('div'); s.id = id; s.style.display = 'none'; document.body.appendChild(s);
+        }});
     const by           = groupBy(events, e => e.event);
     const sessions     = by.page_load       || [];
     const itemViews    = by.item_view       || [];
@@ -813,9 +691,6 @@ function renderAll(events) {
             { lk:'ins_most_viewed',  val: topView },
             { lk:'ins_most_ordered', val: topAdd },
             { lk:'ins_most_ar',      val: bestAR },
-            { lk:'ins_ar_abandon',   val: arAbandon + '%', note: t('ins_ar_abandon_note') },
-            { lk:'ins_basket_opens', val: fmtN(basketOpens.length) },
-            { lk:'ins_ar_fallback',  val: fmtN(arFallback.length), note: t('ins_ar_fallback_note') },
         ].map(i => `<div class="insight">
             <div class="insight-label">${t(i.lk)}</div>
             <div class="insight-value"><span>${i.val}</span>${i.note ? ' <span style="color:var(--dim);font-size:.72rem">' + i.note + '</span>' : ''}</div>
