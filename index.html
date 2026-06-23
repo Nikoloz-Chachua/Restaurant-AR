@@ -2139,6 +2139,16 @@
                   }));
             localStorage.setItem('bl-vid', _vid);
         }
+        // Coarse device class for analytics — combined with ar_cap this separates
+        // real iPhones / Androids / desktops (and AR-capable vs not). iPad is folded
+        // into 'ios' (it reports as MacIntel + touch points, same as the AR flow).
+        const _platform = (() => {
+            const _ua = navigator.userAgent;
+            if (/iPhone|iPad|iPod/i.test(_ua) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
+            if (/Android/i.test(_ua)) return 'android';
+            return 'desktop';
+        })();
         function track(event, itemIndex, extra) {
             const item = (itemIndex != null && window.__menuItems) ? window.__menuItems[itemIndex] : null;
             _supaInsert('events', {
@@ -2150,6 +2160,7 @@
                 category:    item ? item.category : null,
                 lang:        window.__lang || localStorage.getItem('bl-lang') || 'en',
                 ar_cap:      window.__arCap || localStorage.getItem('bl-ar-cap') || null,
+                platform:    _platform,
                 extra:       extra || null,
             });
         }
