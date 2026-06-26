@@ -4,7 +4,7 @@ const en = {
   brandTitle: 'Burger Lions',
   brandSub: 'Admin',
   navAnalytics: 'Analytics',
-  navDeveloperAnalytics: 'Developer Analytics',
+  navDeveloperAnalytics: 'Developer',
   navMenu: 'Menu Editor',
   navTheme: 'Theme Editor',
   viewMenu: 'View Menu',

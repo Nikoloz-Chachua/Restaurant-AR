@@ -31,7 +31,7 @@ function normalizePlan(value: unknown): PlanId {
 }
 
 function normalizeRole(value: unknown, plan: PlanId): RoleId {
-  if (value === 'creator' || plan === 'creator') return 'creator'
+  if (value === 'creator' || value === 'dev' || plan === 'creator') return 'creator'
   return 'client'
 }
 
@@ -65,7 +65,9 @@ export function usePlan(): PlanAccess {
         ...(data.user?.app_metadata ?? {}),
         ...(data.user?.user_metadata ?? {}),
       }
-      const plan = normalizePlan(metadata.plan)
+      const plan = metadata.role === 'creator' || metadata.role === 'dev'
+        ? 'creator'
+        : normalizePlan(metadata.plan)
       const role = normalizeRole(metadata.role, plan)
       if (mounted) setAccess(accessFor(role, plan, false))
     }
