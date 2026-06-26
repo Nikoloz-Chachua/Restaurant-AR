@@ -2,6 +2,8 @@
 import { useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/useLang'
+import { usePlan } from '@/lib/usePlan'
+import LockedCard from '@/components/LockedCard'
 
 // Only send messages to this exact origin — never '*'
 const ANALYTICS_ORIGIN = 'https://3darmenu.pages.dev'
@@ -10,6 +12,7 @@ export default function DashboardPage() {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const tokenRef  = useRef('')
   const [T] = useLang()
+  const plan = usePlan()
 
   useEffect(() => {
     createClient().auth.getSession()
@@ -56,6 +59,16 @@ export default function DashboardPage() {
           ANALYTICS_ORIGIN
         )
       })
+  }
+
+  if (!plan.loading && !plan.canUseAnalytics) {
+    return (
+      <LockedCard
+        title="Analytics requires Full or Premium"
+        description="Visitor analytics are available on the Full 450 and Premium 900 plans. Upgrade the account to see restaurant analytics here."
+        planLabel={plan.label}
+      />
+    )
   }
 
   return (

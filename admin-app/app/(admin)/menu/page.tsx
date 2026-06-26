@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/useLang'
+import { usePlan } from '@/lib/usePlan'
 import type { Object3D, Mesh, MeshStandardMaterial } from 'three'
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
@@ -66,9 +67,14 @@ const EMPTY_ITEM: Omit<MenuItem, 'id'> = {
   price: '', category_id: null, model: '', model_usdz: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '', thumb_3d: false,
 }
 
+function isActiveArItem(item: Pick<MenuItem, 'visible' | 'model'>) {
+  return item.visible && item.model.trim().length > 0
+}
+
 export default function MenuPage() {
   const supabase = createClient()
   const [T] = useLang()
+  const plan = usePlan()
   const [categories, setCategories] = useState<Category[]>([])
   const [items, setItems]           = useState<MenuItem[]>([])
   const [loading, setLoading]       = useState(true)
@@ -104,9 +110,19 @@ export default function MenuPage() {
     setLoading(false)
   }, [supabase])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { void Promise.resolve().then(load) }, [load])
 
   function flash(m: string) { setMsg(m); setTimeout(() => setMsg(''), 3000) }
+
+  const activeArItemCount = items.filter(isActiveArItem).length
+  const itemLimitLabel = plan.itemLimit === null ? 'Unlimited' : String(plan.itemLimit)
+  const planLimitReached = plan.itemLimit !== null && activeArItemCount >= plan.itemLimit
+
+  function activeCountWithForm() {
+    const existingItems = editItem ? items.filter(item => item.id !== editItem.id) : items
+    const formItem = { visible: itemForm.visible, model: itemForm.model }
+    return existingItems.filter(isActiveArItem).length + (isActiveArItem(formItem) ? 1 : 0)
+  }
 
   function openNewItem() {
     setEditItem(null)
@@ -123,6 +139,10 @@ export default function MenuPage() {
     setItemModal(true)
   }
   async function saveItem() {
+    if (plan.itemLimit !== null && activeCountWithForm() > plan.itemLimit) {
+      flash(`Plan limit reached: ${activeArItemCount} / ${plan.itemLimit} active AR items.`)
+      return
+    }
     setSaving(true)
     if (editItem) {
       await supabase.from('menu_items').update(itemForm).eq('id', editItem.id)
@@ -311,11 +331,23 @@ export default function MenuPage() {
         <p style={{ color: 'var(--dim)' }}>{T.loading}</p>
       ) : tab === 'items' ? (
         <>
-          <button onClick={openNewItem}
-                  className="mb-4 px-4 py-2 rounded-lg text-sm font-semibold"
-                  style={{ background: 'var(--gold)', color: '#0f0b07' }}>
-            {T.addItem}
-          </button>
+          <div className="flex flex-wrap items-center gap-3 mb-4">
+            <button onClick={openNewItem}
+                    className="px-4 py-2 rounded-lg text-sm font-semibold"
+                    style={{ background: 'var(--gold)', color: '#0f0b07' }}>
+              {T.addItem}
+            </button>
+            <span className="text-sm px-3 py-2 rounded-lg"
+                  style={{ background: 'var(--card)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
+              Active AR items: <span style={{ color: 'var(--text)' }}>{activeArItemCount} / {itemLimitLabel}</span>
+            </span>
+          </div>
+          {planLimitReached && plan.itemLimit !== null && (
+            <div className="mb-4 rounded-xl p-3 text-sm"
+                 style={{ background: 'rgba(242,181,53,0.08)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
+              This plan is at its active AR item limit. Hide an existing AR item or upgrade before making another modeled item visible.
+            </div>
+          )}
           <div className="table-scroll rounded-xl"
                style={{ border: '1px solid var(--border)' }}>
             <table className="w-full text-sm" style={{ minWidth: '600px' }}>
@@ -536,9 +568,23 @@ export default function MenuPage() {
             <Field label={T.visibility} className="col-span-2">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={itemForm.visible} style={{ width: 'auto' }}
-                       onChange={e => setItemForm(f => ({ ...f, visible: e.target.checked }))} />
+                       onChange={e => {
+                         const next = { ...itemForm, visible: e.target.checked }
+                         const existingItems = editItem ? items.filter(item => item.id !== editItem.id) : items
+                         const nextCount = existingItems.filter(isActiveArItem).length + (isActiveArItem(next) ? 1 : 0)
+                         if (plan.itemLimit !== null && nextCount > plan.itemLimit) {
+                           flash(`Plan limit reached: ${activeArItemCount} / ${plan.itemLimit} active AR items.`)
+                           return
+                         }
+                         setItemForm(next)
+                       }} />
                 <span className="text-sm" style={{ color: 'var(--dim)' }}>{T.visibleOnMenu}</span>
               </label>
+              {plan.itemLimit !== null && (
+                <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
+                  Active AR items count only visible items with a 3D model.
+                </p>
+              )}
             </Field>
           </div>
           <div className="flex justify-end gap-3 mt-6">
