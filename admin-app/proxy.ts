@@ -5,6 +5,7 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const isAuthPage = pathname === '/login'
   const isProtected = pathname.startsWith('/dashboard') ||
+                      pathname.startsWith('/dev-analytics') ||
                       pathname.startsWith('/menu') ||
                       pathname.startsWith('/theme') ||
                       pathname === '/'
