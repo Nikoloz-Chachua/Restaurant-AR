@@ -379,6 +379,18 @@ let _charts = {};
 let _loadGeneration = 0;
 let _hasLoadedData = false;
 
+function supabaseConfigFromParent(data) {
+    if (
+        data &&
+        typeof data.supabaseUrl === 'string' &&
+        typeof data.supabaseKey === 'string' &&
+        /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(data.supabaseUrl)
+    ) {
+        return { supabaseUrl: data.supabaseUrl, supabaseKey: data.supabaseKey };
+    }
+    return CFG;
+}
+
 function _refreshChartColors() {
     if (!Object.keys(_charts).length) return;
     const dim = _isLight ? '#8a7060' : '#7a6a50';
@@ -453,7 +465,8 @@ window.addEventListener('message', e => {
         try { localStorage.setItem('bl-analytics-lang', e.data.lang); } catch(ex) {}
     }
     if (e.data.token && typeof e.data.token === 'string') {
-        sb = supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, {
+        const cfg = supabaseConfigFromParent(e.data);
+        sb = supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey, {
             global: { headers: { Authorization: `Bearer ${e.data.token}` } }
         });
         loadData();
