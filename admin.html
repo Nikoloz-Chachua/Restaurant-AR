@@ -237,8 +237,8 @@
 // CONFIG
 // ════════════════════════════════════════════════════════════════
 const CFG = {
-    supabaseUrl: 'https://xctoxhaahxtcicfgnmme.supabase.co',
-    supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdG94aGFhaHh0Y2ljZmdubW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NDMyMDEsImV4cCI6MjA5NTMxOTIwMX0.VA2tQL6WT96ifBjON4NLaJa0BbzBGI0ipD7iB5fHjnQ',
+    supabaseUrl: 'https://lwdpegloznhpcecivhfy.supabase.co',
+    supabaseKey: 'sb_publishable_65dKKpb-lxOr8JTjdj7yxw_LZzcJp5h',
 };
 
 // ════════════════════════════════════════════════════════════════
@@ -433,6 +433,10 @@ const _ADMIN_ORIGINS = [
     'https://burger-lions-admin.vercel.app',
     'http://localhost:3000',
     'http://localhost:3001',
+    'http://localhost:3002',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',
+    'http://127.0.0.1:3002',
 ];
 window.addEventListener('message', e => {
     const originOk = _ADMIN_ORIGINS.includes(e.origin) || e.origin.endsWith('.vercel.app');

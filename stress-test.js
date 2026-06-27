@@ -1,8 +1,8 @@
 import http from 'k6/http';
 import { sleep, check } from 'k6';
 
-const SUPABASE_URL = 'https://xctoxhaahxtcicfgnmme.supabase.co';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdG94aGFhaHh0Y2ljZmdubW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NDMyMDEsImV4cCI6MjA5NTMxOTIwMX0.VA2tQL6WT96ifBjON4NLaJa0BbzBGI0ipD7iB5fHjnQ';
+const SUPABASE_URL = 'https://lwdpegloznhpcecivhfy.supabase.co';
+const ANON_KEY = 'sb_publishable_65dKKpb-lxOr8JTjdj7yxw_LZzcJp5h';
 
 export const options = {
   stages: [
