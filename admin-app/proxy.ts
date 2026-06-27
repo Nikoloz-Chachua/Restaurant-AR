@@ -5,6 +5,7 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const isAuthPage = pathname === '/login'
   const isProtected = pathname.startsWith('/dashboard') ||
+                      pathname.startsWith('/dev-analytics') ||
                       pathname.startsWith('/menu') ||
                       pathname.startsWith('/theme') ||
                       pathname === '/'
@@ -37,7 +38,7 @@ export async function proxy(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user && isProtected) return NextResponse.redirect(new URL('/login', request.url))
-    if (user && isAuthPage) return NextResponse.redirect(new URL('/dashboard', request.url))
+    if (user && isAuthPage) return NextResponse.redirect(new URL('/menu', request.url))
   } catch {
     // Supabase unreachable — send protected routes to login, never return 500
     if (isProtected) return NextResponse.redirect(new URL('/login', request.url))

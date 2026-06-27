@@ -5,10 +5,9 @@ import { useLang } from '@/lib/useLang'
 import { usePlan } from '@/lib/usePlan'
 import LockedCard from '@/components/LockedCard'
 
-// Only send messages to this exact origin — never '*'
 const ANALYTICS_ORIGIN = 'https://3darmenu.pages.dev'
 
-export default function DashboardPage() {
+export default function DeveloperAnalyticsPage() {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const tokenRef  = useRef('')
   const [T] = useLang()
@@ -61,11 +60,11 @@ export default function DashboardPage() {
       })
   }
 
-  if (!plan.loading && !plan.canUseAnalytics) {
+  if (!plan.loading && !plan.canUseDeveloperAnalytics) {
     return (
       <LockedCard
-        title="Analytics requires Full or Premium"
-        description="Visitor analytics are available on the Full 450 and Premium 900 plans. Upgrade the account to see restaurant analytics here."
+        title="Developer analytics are creator-only"
+        description="Technical diagnostics, all-event summaries, AR health, and deeper funnel data are available only to internal BetaReal creator accounts."
         planLabel={plan.label}
       />
     )
@@ -73,17 +72,19 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <h1 className="text-xl md:text-2xl font-bold mb-1 page-title" style={{ color: 'var(--gold)' }}>{T.analyticsTitle}</h1>
+      <h1 className="text-xl md:text-2xl font-bold mb-1 page-title" style={{ color: 'var(--gold)' }}>
+        {T.navDeveloperAnalytics}
+      </h1>
       <p className="text-sm mb-4 md:mb-6" style={{ color: 'var(--dim)' }}>
-        {T.analyticsDesc}
+        Internal technical analytics and diagnostics for the BetaReal team.
       </p>
       <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
         <iframe
           ref={iframeRef}
-          src="https://3darmenu.pages.dev/admin.html"
+          src="https://3darmenu.pages.dev/dev-analytics.html"
           className="w-full"
-          style={{ height: 'clamp(480px, calc(100dvh - 160px), 1200px)', border: 'none' }}
-          title="Analytics Dashboard"
+          style={{ height: 'clamp(560px, calc(100dvh - 160px), 1400px)', border: 'none' }}
+          title="Developer Analytics Dashboard"
           onLoad={sendInitialPrefs}
         />
       </div>

@@ -2,22 +2,79 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/useLang'
+import { usePlan } from '@/lib/usePlan'
+import type { Object3D, Mesh, MeshStandardMaterial } from 'three'
+import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
+
+// Convert a GLB File to a seated, scaled USDZ Blob entirely in the browser, using
+// the same three.js exporter model-viewer runs on-device — but ONCE, at upload
+// time, instead of on every iPhone tap. three is loaded lazily so it never weighs
+// down the rest of the admin panel.
+async function glbToUsdz(file: File, arScale: number): Promise<Blob> {
+  const [THREE, { GLTFLoader }, { USDZExporter }] = await Promise.all([
+    import('three'),
+    import('three/examples/jsm/loaders/GLTFLoader.js'),
+    import('three/examples/jsm/exporters/USDZExporter.js'),
+  ])
+  const buffer = await file.arrayBuffer()
+  const loader = new GLTFLoader()
+  const gltf = await new Promise<GLTF>((resolve, reject) =>
+    loader.parse(buffer, '', resolve, err => reject(err)),
+  )
+  const root = gltf.scene
+
+  // Quick Look renders metallic far shinier than the on-screen WebGL view; zero it
+  // so the iPhone model matches what people see in the menu.
+  root.traverse((n: Object3D) => {
+    const mesh = n as Mesh
+    if (!mesh.isMesh || !mesh.material) return
+    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+    mats.forEach(m => { const mat = m as MeshStandardMaterial; if ('metalness' in mat) mat.metalness = 0 })
+  })
+
+  // Bake ar_scale in, then seat the model so its bounding-box bottom sits at y=0.
+  // Quick Look drops the raw origin onto the surface, so centred models would sink
+  // halfway into the table without this.
+  //
+  // iPhone Quick Look plants models at true real-world size, which reads smaller than
+  // the auto-framed Android view. IOS_AR_BOOST scales the USDZ up so the iPhone AR size
+  // visually matches Android. Tune this one number if it's too big/small (re-upload to
+  // apply). Android is unaffected — it never uses the USDZ.
+  const IOS_AR_BOOST = 2.5
+  const scale = (arScale || 1.0) * IOS_AR_BOOST
+  root.scale.setScalar(scale)
+  root.updateMatrixWorld(true)
+  const box = new THREE.Box3().setFromObject(root)
+  if (isFinite(box.min.y)) {
+    root.position.y -= box.min.y
+    root.updateMatrixWorld(true)
+  }
+
+  const exporter = new USDZExporter()
+  const data = await exporter.parseAsync(root)
+  return new Blob([data as BlobPart], { type: 'model/vnd.usdz+zip' })
+}
 
 type Category = { id: number; name_en: string; name_ka: string; sort_order: number }
 type MenuItem = {
   id: number; name_en: string; name_ka: string
   description_en: string; description_ka: string
-  price: string; category_id: number | null; model: string
+  price: string; category_id: number | null; model: string; model_usdz: string
   sort_order: number; visible: boolean; ar_scale: number; thumbnail_url: string; thumb_3d: boolean
 }
 const EMPTY_ITEM: Omit<MenuItem, 'id'> = {
   name_en: '', name_ka: '', description_en: '', description_ka: '',
-  price: '', category_id: null, model: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '', thumb_3d: false,
+  price: '', category_id: null, model: '', model_usdz: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '', thumb_3d: false,
+}
+
+function isActiveArItem(item: Pick<MenuItem, 'visible' | 'model'>) {
+  return item.visible && item.model.trim().length > 0
 }
 
 export default function MenuPage() {
   const supabase = createClient()
   const [T] = useLang()
+  const plan = usePlan()
   const [categories, setCategories] = useState<Category[]>([])
   const [items, setItems]           = useState<MenuItem[]>([])
   const [loading, setLoading]       = useState(true)
@@ -53,9 +110,19 @@ export default function MenuPage() {
     setLoading(false)
   }, [supabase])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { void Promise.resolve().then(load) }, [load])
 
   function flash(m: string) { setMsg(m); setTimeout(() => setMsg(''), 3000) }
+
+  const activeArItemCount = items.filter(isActiveArItem).length
+  const itemLimitLabel = plan.itemLimit === null ? 'Unlimited' : String(plan.itemLimit)
+  const planLimitReached = plan.itemLimit !== null && activeArItemCount >= plan.itemLimit
+
+  function activeCountWithForm() {
+    const existingItems = editItem ? items.filter(item => item.id !== editItem.id) : items
+    const formItem = { visible: itemForm.visible, model: itemForm.model }
+    return existingItems.filter(isActiveArItem).length + (isActiveArItem(formItem) ? 1 : 0)
+  }
 
   function openNewItem() {
     setEditItem(null)
@@ -66,12 +133,16 @@ export default function MenuPage() {
     setEditItem(item)
     setItemForm({ name_en: item.name_en, name_ka: item.name_ka,
       description_en: item.description_en, description_ka: item.description_ka,
-      price: item.price, category_id: item.category_id, model: item.model,
+      price: item.price, category_id: item.category_id, model: item.model, model_usdz: item.model_usdz ?? '',
       sort_order: item.sort_order, visible: item.visible, ar_scale: item.ar_scale ?? 1.0,
       thumbnail_url: item.thumbnail_url ?? '', thumb_3d: item.thumb_3d ?? false })
     setItemModal(true)
   }
   async function saveItem() {
+    if (plan.itemLimit !== null && activeCountWithForm() > plan.itemLimit) {
+      flash(`Plan limit reached: ${activeArItemCount} / ${plan.itemLimit} active AR items.`)
+      return
+    }
     setSaving(true)
     if (editItem) {
       await supabase.from('menu_items').update(itemForm).eq('id', editItem.id)
@@ -192,8 +263,35 @@ export default function MenuPage() {
       })
       if (!upload.ok) throw new Error(`R2 upload failed: ${upload.status}`)
 
-      setItemForm(f => ({ ...f, model: publicUrl }))
+      setItemForm(f => ({ ...f, model: publicUrl, model_usdz: '' }))
       setUploadProgress(`✓ ${file.name}`)
+
+      // Step 3: convert GLB → USDZ in the browser for iOS Quick Look. Non-blocking:
+      // the GLB is already saved above, so if conversion fails the menu still works
+      // (iOS just falls back to the on-device path, same as before this feature).
+      try {
+        setUploadProgress(`✓ ${file.name} — building iPhone AR…`)
+        const usdzBlob = await glbToUsdz(file, itemForm.ar_scale)
+        const usdzName = file.name.replace(/\.glb$/i, '.usdz')
+        const pres = await fetch('/api/r2-presign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: usdzName }),
+        })
+        if (!pres.ok) throw new Error(`presign ${pres.status}`)
+        const { uploadUrl: usdzUrl, publicUrl: usdzPublic } = await pres.json()
+        const put = await fetch(usdzUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'model/vnd.usdz+zip' },
+          body: usdzBlob,
+        })
+        if (!put.ok) throw new Error(`R2 upload ${put.status}`)
+        setItemForm(f => ({ ...f, model_usdz: usdzPublic }))
+        setUploadProgress(`✓ ${file.name} (+ iPhone AR ✓)`)
+      } catch (e) {
+        console.warn('USDZ conversion skipped:', e)
+        setUploadProgress(`✓ ${file.name} (saved — iPhone AR conversion skipped)`)
+      }
     } catch (e) {
       setUploadProgress(`Upload failed: ${e instanceof Error ? e.message : String(e)}`)
     }
@@ -233,11 +331,23 @@ export default function MenuPage() {
         <p style={{ color: 'var(--dim)' }}>{T.loading}</p>
       ) : tab === 'items' ? (
         <>
-          <button onClick={openNewItem}
-                  className="mb-4 px-4 py-2 rounded-lg text-sm font-semibold"
-                  style={{ background: 'var(--gold)', color: '#0f0b07' }}>
-            {T.addItem}
-          </button>
+          <div className="flex flex-wrap items-center gap-3 mb-4">
+            <button onClick={openNewItem}
+                    className="px-4 py-2 rounded-lg text-sm font-semibold"
+                    style={{ background: 'var(--gold)', color: '#0f0b07' }}>
+              {T.addItem}
+            </button>
+            <span className="text-sm px-3 py-2 rounded-lg"
+                  style={{ background: 'var(--card)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
+              Active AR items: <span style={{ color: 'var(--text)' }}>{activeArItemCount} / {itemLimitLabel}</span>
+            </span>
+          </div>
+          {planLimitReached && plan.itemLimit !== null && (
+            <div className="mb-4 rounded-xl p-3 text-sm"
+                 style={{ background: 'rgba(242,181,53,0.08)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
+              This plan is at its active AR item limit. Hide an existing AR item or upgrade before making another modeled item visible.
+            </div>
+          )}
           <div className="table-scroll rounded-xl"
                style={{ border: '1px solid var(--border)' }}>
             <table className="w-full text-sm" style={{ minWidth: '600px' }}>
@@ -458,9 +568,23 @@ export default function MenuPage() {
             <Field label={T.visibility} className="col-span-2">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={itemForm.visible} style={{ width: 'auto' }}
-                       onChange={e => setItemForm(f => ({ ...f, visible: e.target.checked }))} />
+                       onChange={e => {
+                         const next = { ...itemForm, visible: e.target.checked }
+                         const existingItems = editItem ? items.filter(item => item.id !== editItem.id) : items
+                         const nextCount = existingItems.filter(isActiveArItem).length + (isActiveArItem(next) ? 1 : 0)
+                         if (plan.itemLimit !== null && nextCount > plan.itemLimit) {
+                           flash(`Plan limit reached: ${activeArItemCount} / ${plan.itemLimit} active AR items.`)
+                           return
+                         }
+                         setItemForm(next)
+                       }} />
                 <span className="text-sm" style={{ color: 'var(--dim)' }}>{T.visibleOnMenu}</span>
               </label>
+              {plan.itemLimit !== null && (
+                <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
+                  Active AR items count only visible items with a 3D model.
+                </p>
+              )}
             </Field>
           </div>
           <div className="flex justify-end gap-3 mt-6">

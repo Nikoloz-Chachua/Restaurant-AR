@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { translations, type Lang } from '@/lib/i18n'
+import { usePlan } from '@/lib/usePlan'
 
 const LIGHT: Record<string, string> = {
   '--bg':       '#f5f0e8',
@@ -35,6 +36,7 @@ interface Props {
 export default function Sidebar({ open, onClose }: Props) {
   const pathname = usePathname()
   const router   = useRouter()
+  const plan = usePlan()
 
   const [lang, setLang] = useState<Lang>('en')
   const [dark, setDark] = useState(true)
@@ -44,18 +46,21 @@ export default function Sidebar({ open, onClose }: Props) {
     const savedTheme = localStorage.getItem('bl-admin-theme')
     const resolvedLang = (savedLang === 'en' || savedLang === 'ka') ? savedLang : 'en'
     const resolvedDark = savedTheme !== 'light'
-    setLang(resolvedLang)
-    setDark(resolvedDark)
-    applyThemeVars(resolvedDark)
+    queueMicrotask(() => {
+      setLang(resolvedLang)
+      setDark(resolvedDark)
+      applyThemeVars(resolvedDark)
+    })
   }, [])
 
   const T = translations[lang]
 
   const NAV = [
     { href: '/menu',      label: T.navMenu,      icon: '🍔' },
-    { href: '/dashboard', label: T.navAnalytics, icon: '📊' },
-    { href: '/theme',     label: T.navTheme,     icon: '🎨' },
-  ]
+    plan.canUseAnalytics ? { href: '/dashboard', label: T.navAnalytics, icon: '📊' } : null,
+    plan.canUseDeveloperAnalytics ? { href: '/dev-analytics', label: T.navDeveloperAnalytics, icon: '🛠' } : null,
+    plan.canUseTheme ? { href: '/theme', label: T.navTheme, icon: '🎨' } : null,
+  ].filter((item): item is { href: string; label: string; icon: string } => Boolean(item))
 
   function broadcast(newLang: Lang, newDark: boolean) {
     window.dispatchEvent(new CustomEvent('bl-pref', { detail: { lang: newLang, dark: newDark } }))

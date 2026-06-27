@@ -7,7 +7,7 @@ export function useLang(): [Translations, Lang] {
 
   useEffect(() => {
     const saved = localStorage.getItem('bl-admin-lang')
-    if (saved === 'en' || saved === 'ka') setLang(saved)
+    if (saved === 'en' || saved === 'ka') queueMicrotask(() => setLang(saved))
 
     function onPref(e: Event) {
       const l = (e as CustomEvent<{ lang?: string }>).detail?.lang

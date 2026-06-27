@@ -3,6 +3,8 @@ import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/useLang'
 import type { Translations } from '@/lib/i18n'
+import { usePlan } from '@/lib/usePlan'
+import LockedCard from '@/components/LockedCard'
 
 type ThemeConfig = Record<string, string>
 
@@ -53,6 +55,7 @@ function toHex(v: string): string {
 export default function ThemePage() {
   const supabase = createClient()
   const [T] = useLang()
+  const plan = usePlan()
   const [config, setConfig]   = useState<ThemeConfig>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving]   = useState(false)
@@ -60,14 +63,18 @@ export default function ThemePage() {
   const [tab, setTab]         = useState<'night' | 'day' | 'fonts' | 'branding'>('night')
 
   const load = useCallback(async () => {
+    if (plan.loading || !plan.canUseTheme) {
+      setLoading(plan.loading)
+      return
+    }
     const { data } = await supabase.from('theme_config').select('key,value')
     const map: ThemeConfig = {}
     data?.forEach(r => { map[r.key] = r.value })
     setConfig(map)
     setLoading(false)
-  }, [supabase])
+  }, [plan.canUseTheme, plan.loading, supabase])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { void Promise.resolve().then(load) }, [load])
 
   function set(key: string, value: string) {
     setConfig(c => ({ ...c, [key]: value }))
@@ -96,6 +103,16 @@ export default function ThemePage() {
     { id: 'fonts',    label: T.tabFonts },
     { id: 'branding', label: T.tabBranding },
   ] as const
+
+  if (!plan.loading && !plan.canUseTheme) {
+    return (
+      <LockedCard
+        title="Theme customization requires Full or Premium"
+        description="Custom colors, fonts, and branding are available on the Full 450 and Premium 900 plans."
+        planLabel={plan.label}
+      />
+    )
+  }
 
   return (
     <div>
