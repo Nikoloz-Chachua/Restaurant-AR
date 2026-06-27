@@ -63,8 +63,8 @@ export default function DeveloperAnalyticsPage() {
   if (!plan.loading && !plan.canUseDeveloperAnalytics) {
     return (
       <LockedCard
-        title="Developer analytics are creator-only"
-        description="Technical diagnostics, all-event summaries, AR health, and deeper funnel data are available only to internal BetaReal creator accounts."
+        title="Developer analytics are super-admin only"
+        description="Technical diagnostics, all-event summaries, AR health, and deeper funnel data are available only to internal BetaReal super-admin accounts."
         planLabel={plan.label}
       />
     )
@@ -76,7 +76,7 @@ export default function DeveloperAnalyticsPage() {
         {T.navDeveloperAnalytics}
       </h1>
       <p className="text-sm mb-4 md:mb-6" style={{ color: 'var(--dim)' }}>
-        Internal technical analytics and diagnostics for the BetaReal team.
+        Internal technical analytics and diagnostics for BetaReal super admins.
       </p>
       <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
         <iframe

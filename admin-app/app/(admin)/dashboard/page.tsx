@@ -65,7 +65,7 @@ export default function DashboardPage() {
     return (
       <LockedCard
         title="Analytics requires Full or Premium"
-        description="Visitor analytics are available on the Full 450 and Premium 900 plans. Upgrade the account to see restaurant analytics here."
+        description="Visitor analytics are available on the full and premium plans. Upgrade the brand plan to see restaurant analytics here."
         planLabel={plan.label}
       />
     )

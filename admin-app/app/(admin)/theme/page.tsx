@@ -108,7 +108,7 @@ export default function ThemePage() {
     return (
       <LockedCard
         title="Theme customization requires Full or Premium"
-        description="Custom colors, fonts, and branding are available on the Full 450 and Premium 900 plans."
+        description="Custom colors, fonts, and branding are available on the full and premium plans."
         planLabel={plan.label}
       />
     )

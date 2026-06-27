@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/useLang'
 import { usePlan } from '@/lib/usePlan'
+import LockedCard from '@/components/LockedCard'
 import type { Object3D, Mesh, MeshStandardMaterial } from 'three'
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
@@ -296,6 +297,16 @@ export default function MenuPage() {
       setUploadProgress(`Upload failed: ${e instanceof Error ? e.message : String(e)}`)
     }
     setUploading(false)
+  }
+
+  if (!plan.loading && !plan.canUseMenu) {
+    return (
+      <LockedCard
+        title="No restaurant access"
+        description="This login is not mapped to a brand or branch yet. A BetaReal super admin must assign this user in brand_users or restaurant_users before they can manage a menu."
+        planLabel={plan.label}
+      />
+    )
   }
 
   return (
