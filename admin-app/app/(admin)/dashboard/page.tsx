@@ -7,6 +7,10 @@ import LockedCard from '@/components/LockedCard'
 
 // Only send messages to this exact origin — never '*'
 const ANALYTICS_ORIGIN = 'https://3darmenu.pages.dev'
+const SUPABASE_CONFIG = {
+  supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+}
 
 export default function DashboardPage() {
   const iframeRef = useRef<HTMLIFrameElement>(null)
@@ -24,7 +28,7 @@ export default function DashboardPage() {
     function relay(e: Event) {
       const { lang, dark } = (e as CustomEvent).detail
       iframeRef.current?.contentWindow?.postMessage(
-        { type: 'bl-pref', lang, dark },
+        { type: 'bl-pref', lang, dark, ...SUPABASE_CONFIG },
         ANALYTICS_ORIGIN
       )
     }
@@ -39,7 +43,7 @@ export default function DashboardPage() {
 
     if (token) {
       iframeRef.current?.contentWindow?.postMessage(
-        { type: 'bl-pref', lang, dark, token },
+        { type: 'bl-pref', lang, dark, token, ...SUPABASE_CONFIG },
         ANALYTICS_ORIGIN
       )
       return
@@ -49,13 +53,13 @@ export default function DashboardPage() {
       .then(({ data }) => {
         tokenRef.current = data?.session?.access_token ?? ''
         iframeRef.current?.contentWindow?.postMessage(
-          { type: 'bl-pref', lang, dark, token: tokenRef.current },
+          { type: 'bl-pref', lang, dark, token: tokenRef.current, ...SUPABASE_CONFIG },
           ANALYTICS_ORIGIN
         )
       })
       .catch(() => {
         iframeRef.current?.contentWindow?.postMessage(
-          { type: 'bl-pref', lang, dark },
+          { type: 'bl-pref', lang, dark, ...SUPABASE_CONFIG },
           ANALYTICS_ORIGIN
         )
       })
