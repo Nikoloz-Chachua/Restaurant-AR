@@ -377,6 +377,7 @@ let _isLight = false;
 let _lastEvents = null;
 let _charts = {};
 let _loadGeneration = 0;
+let _hasLoadedData = false;
 
 function _refreshChartColors() {
     if (!Object.keys(_charts).length) return;
@@ -544,6 +545,7 @@ function getDateRange() {
 }
 
 async function loadData() {
+    _hasLoadedData = true;
     const gen = ++_loadGeneration;
     const $loading = document.getElementById('loading');
     const $lu = document.getElementById('last-updated');
@@ -1100,7 +1102,14 @@ function renderAll(events) {
 // ── Boot
 document.getElementById('dash').style.display = 'block';
 applyLang(_lang);
-loadData();
+// When embedded in the authenticated Next.js admin panel, wait briefly for the
+// parent to post the Supabase access token before querying protected analytics.
+// This avoids a false red "Failed to load" caused by the anon key hitting RLS.
+if (window.parent !== window) {
+    setTimeout(() => { if (!_hasLoadedData) loadData(); }, 1500);
+} else {
+    loadData();
+}
 </script>
 </body>
 </html>

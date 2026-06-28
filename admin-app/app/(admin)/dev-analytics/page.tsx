@@ -5,7 +5,7 @@ import { useLang } from '@/lib/useLang'
 import { usePlan } from '@/lib/usePlan'
 import LockedCard from '@/components/LockedCard'
 
-const ANALYTICS_ORIGIN = 'https://3darmenu.pages.dev'
+const ANALYTICS_ORIGIN = 'https://restaurant-ar.pages.dev'
 
 export default function DeveloperAnalyticsPage() {
   const iframeRef = useRef<HTMLIFrameElement>(null)
@@ -81,7 +81,7 @@ export default function DeveloperAnalyticsPage() {
       <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
         <iframe
           ref={iframeRef}
-          src="https://3darmenu.pages.dev/dev-analytics.html"
+          src="https://restaurant-ar.pages.dev/dev-analytics.html"
           className="w-full"
           style={{ height: 'clamp(560px, calc(100dvh - 160px), 1400px)', border: 'none' }}
           title="Developer Analytics Dashboard"

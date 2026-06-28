@@ -6,7 +6,7 @@ import { usePlan } from '@/lib/usePlan'
 import LockedCard from '@/components/LockedCard'
 
 // Only send messages to this exact origin — never '*'
-const ANALYTICS_ORIGIN = 'https://3darmenu.pages.dev'
+const ANALYTICS_ORIGIN = 'https://restaurant-ar.pages.dev'
 
 export default function DashboardPage() {
   const iframeRef = useRef<HTMLIFrameElement>(null)
@@ -80,7 +80,7 @@ export default function DashboardPage() {
       <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
         <iframe
           ref={iframeRef}
-          src="https://3darmenu.pages.dev/admin.html"
+          src="https://restaurant-ar.pages.dev/admin.html"
           className="w-full"
           style={{ height: 'clamp(480px, calc(100dvh - 160px), 1200px)', border: 'none' }}
           title="Analytics Dashboard"
