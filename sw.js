@@ -7,6 +7,7 @@ const SUPABASE_ANON = 'sb_publishable_65dKKpb-lxOr8JTjdj7yxw_LZzcJp5h';
 const PRECACHE = [
     './',
     './aurora-cafe.html',
+    './aurora-cafe/',
     './foods/menu.json',
     './foods/aurora-cafe-menu.json',
     './img/betareal-logo-dark.png',

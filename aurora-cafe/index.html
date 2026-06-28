@@ -113,7 +113,7 @@
             z-index: -1;
             background-color: var(--bg);
             background-image:
-                url("./img/grain.png"),
+                url("../img/grain.png"),
                 radial-gradient(95% 55% at 50% -8%, var(--glow) 0%, transparent 60%),
                 radial-gradient(70% 50% at 85% 35%, var(--glow2) 0%, transparent 72%),
                 radial-gradient(140% 120% at 50% 40%, transparent 58%, var(--shadow) 130%),
@@ -1212,8 +1212,8 @@
     <div class="menu-list" id="menu-list"></div>
 
     <footer class="site-footer">
-        <img class="footer-logo footer-logo-dark"  src="./img/betareal-logo-dark.png"  alt="BetaReal" width="333" height="110" loading="lazy" decoding="async">
-        <img class="footer-logo footer-logo-light" src="./img/betareal-logo-light.png" alt="BetaReal" width="366" height="110" loading="lazy" decoding="async">
+        <img class="footer-logo footer-logo-dark"  src="../img/betareal-logo-dark.png"  alt="BetaReal" width="333" height="110" loading="lazy" decoding="async">
+        <img class="footer-logo footer-logo-light" src="../img/betareal-logo-light.png" alt="BetaReal" width="366" height="110" loading="lazy" decoding="async">
         <a class="footer-email" href="mailto:betareal.ar@gmail.com">betareal.ar@gmail.com</a>
         <p class="footer-copy">&copy; 2026 BetaReal &middot; Augmented Reality Menus</p>
     </footer>
@@ -2106,7 +2106,7 @@
         const IS_AURORA_DEMO = true;
         const DEMO_BRAND_SLUG = 'aurora-cafe';
         const DEMO_TENANT_SLUG = 'aurora-cafe-main';
-        const AURORA_MENU_URL = './foods/aurora-cafe-menu.json';
+        const AURORA_MENU_URL = '../foods/aurora-cafe-menu.json';
         // GET /rest/v1/<query> → resolves to the row array, or throws on non-2xx.
         async function _supaSelect(query) {
             const res = await fetch(`${_SUPA_URL}/rest/v1/${query}`, { headers: _supaHeaders });
@@ -3256,7 +3256,7 @@ document.getElementById('basket-items').addEventListener('click', e => {
                 location.reload();
             });
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
+                navigator.serviceWorker.register('../sw.js', { updateViaCache: 'none' }).then(reg => {
                     // Force-check for a new SW on every page load.
                     reg.update().catch(() => {});
                     reg.addEventListener('updatefound', () => {
