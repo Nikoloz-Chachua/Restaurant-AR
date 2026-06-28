@@ -21,7 +21,7 @@ const RESTAURANTS = [
     brand: 'aurora-cafe',
     plan: 'full',
     status: 'Dummy tenant',
-    menuUrl: 'https://3darmenu.pages.dev/aurora-cafe.html',
+    menuUrl: 'https://3darmenu.pages.dev/aurora-cafe/',
     analyticsUrl: '/dev-analytics',
     accent: '#5edac4',
     description: 'Second dummy restaurant for testing multi-restaurant monitoring.',
