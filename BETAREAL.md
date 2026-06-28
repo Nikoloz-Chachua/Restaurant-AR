@@ -67,7 +67,7 @@ Our long-term advantage — the "moat" — is a **data flywheel**: every restaur
 | **Funding** | Bootstrapped. ~₾300–400 spent on equipment, from CEO's leftover prize money from a previous accelerator. |
 | **Current #1 goal** | Acceptance into **2080 Ventures** and **GITA collaborative accelerator**. |
 | **Showcase / demo** | "Burger Lions" — built on a real nearby burger restaurant's menu; **not a client**, used as the demo dataset. |
-| **Live demo URL** | https://3darmenu.pages.dev |
+| **Live demo URL** | https://restaurant-ar.pages.dev |
 
 ---
 
@@ -123,7 +123,7 @@ Customer sits down
 Scans QR code on the table
       │
       ▼
-Browser opens 3darmenu.pages.dev  (no app, ~instant)
+Browser opens restaurant-ar.pages.dev  (no app, ~instant)
       │
       ▼
 Menu renders: categories, prices, live 3D thumbnails
@@ -158,11 +158,11 @@ We run **three** distinct front-ends:
 
 | Surface | What it is | Where it lives | Who uses it |
 |---|---|---|---|
-| **Customer menu app** | `index.html` — the WebAR menu | **Cloudflare Pages** → https://3darmenu.pages.dev | Restaurant guests |
+| **Customer menu app** | `index.html` — the WebAR menu | **Cloudflare Pages** → https://restaurant-ar.pages.dev | Restaurant guests |
 | **Admin panel** | `admin-app/` — Next.js app to manage menu + theme + view analytics | **Vercel** (George's account) | Restaurant staff / us |
 | **Analytics dashboard** | `admin.html` — Chart.js dashboard | Served from Cloudflare Pages, **embedded via iframe** inside the admin panel's Dashboard page | Restaurant owners / us |
 
-The admin panel's Dashboard page embeds `https://3darmenu.pages.dev/admin.html` in an iframe and securely passes the admin's language, theme, and Supabase access token via `postMessage` (locked to the exact origin, never `*`).
+The admin panel's Dashboard page embeds `https://restaurant-ar.pages.dev/admin.html` in an iframe and securely passes the admin's language, theme, and Supabase access token via `postMessage` (locked to the exact origin, never `*`).
 
 ---
 
@@ -677,7 +677,7 @@ Demo:             "Burger Lions" — real nearby burger place, used as demo (NOT
 Stage:            Pre-revenue, MVP live, validation in progress
 Team:             5 active founders (CS students, TSU); originally 6 (1 left amicably)
 Market:           Tbilisi → Georgia → international
-Live customer app:  https://3darmenu.pages.dev        (Cloudflare Pages, branch `cloudflare`)
+Live customer app:  https://restaurant-ar.pages.dev  (Cloudflare Pages, branch `cloudflare`)
 Admin panel:        Next.js 16 / React 19 on Vercel (George's account)
 Analytics:          admin.html (Chart.js), embedded in admin via iframe
 Database:           Supabase project xctoxhaahxtcicfgnmme ("Restaurant AR Claude version")

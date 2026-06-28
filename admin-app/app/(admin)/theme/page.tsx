@@ -194,9 +194,9 @@ export default function ThemePage() {
       <div className="mt-8 p-4 rounded-xl text-sm"
            style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
         <span style={{ color: 'var(--dim)' }}>{T.reloadHint}</span>
-        <a href="https://3darmenu.pages.dev" target="_blank" rel="noreferrer"
+        <a href="https://restaurant-ar.pages.dev" target="_blank" rel="noreferrer"
            style={{ color: 'var(--gold)' }}>
-          3darmenu.pages.dev ↗
+          restaurant-ar.pages.dev ↗
         </a>
       </div>
     </div>
