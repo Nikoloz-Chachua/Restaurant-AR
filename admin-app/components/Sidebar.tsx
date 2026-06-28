@@ -57,6 +57,7 @@ export default function Sidebar({ open, onClose }: Props) {
 
   const NAV = [
     plan.canUseMenu ? { href: '/menu', label: T.navMenu, icon: '🍔' } : null,
+    plan.canUseDeveloperAnalytics ? { href: '/restaurants', label: T.navRestaurants, icon: '🏬' } : null,
     plan.canUseAnalytics ? { href: '/dashboard', label: T.navAnalytics, icon: '📊' } : null,
     plan.canUseDeveloperAnalytics ? { href: '/dev-analytics', label: T.navDeveloperAnalytics, icon: '🛠' } : null,
     plan.canUseTheme ? { href: '/theme', label: T.navTheme, icon: '🎨' } : null,
