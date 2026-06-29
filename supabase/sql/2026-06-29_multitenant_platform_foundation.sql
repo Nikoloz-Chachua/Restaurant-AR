@@ -340,18 +340,18 @@ begin
   values
     (v_restaurant_id, 'site_name', trim(p_brand_name)),
     (v_restaurant_id, 'site_name_ka', trim(p_brand_name))
-  on conflict (restaurant_id, key) do update set value = excluded.value;
+  on conflict on constraint theme_config_pkey do update set value = excluded.value;
 
   if coalesce(p_primary_color, '') <> '' then
     insert into public.theme_config (restaurant_id, key, value)
     values (v_restaurant_id, 'night_accent', p_primary_color)
-    on conflict (restaurant_id, key) do update set value = excluded.value;
+    on conflict on constraint theme_config_pkey do update set value = excluded.value;
   end if;
 
   if coalesce(p_secondary_color, '') <> '' then
     insert into public.theme_config (restaurant_id, key, value)
     values (v_restaurant_id, 'day_accent', p_secondary_color)
-    on conflict (restaurant_id, key) do update set value = excluded.value;
+    on conflict on constraint theme_config_pkey do update set value = excluded.value;
   end if;
 
   return query
