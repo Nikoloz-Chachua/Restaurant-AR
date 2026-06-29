@@ -63,16 +63,16 @@ export default function ThemePage() {
   const [tab, setTab]         = useState<'night' | 'day' | 'fonts' | 'branding'>('night')
 
   const load = useCallback(async () => {
-    if (plan.loading || !plan.canUseTheme) {
+    if (plan.loading || !plan.canUseTheme || !plan.restaurantId) {
       setLoading(plan.loading)
       return
     }
-    const { data } = await supabase.from('theme_config').select('key,value')
+    const { data } = await supabase.from('theme_config').select('key,value').eq('restaurant_id', plan.restaurantId)
     const map: ThemeConfig = {}
     data?.forEach(r => { map[r.key] = r.value })
     setConfig(map)
     setLoading(false)
-  }, [plan.canUseTheme, plan.loading, supabase])
+  }, [plan.canUseTheme, plan.loading, plan.restaurantId, supabase])
 
   useEffect(() => { void Promise.resolve().then(load) }, [load])
 
@@ -82,8 +82,8 @@ export default function ThemePage() {
 
   async function save() {
     setSaving(true)
-    const rows = Object.entries(config).map(([key, value]) => ({ key, value }))
-    await supabase.from('theme_config').upsert(rows, { onConflict: 'key' })
+    const rows = Object.entries(config).map(([key, value]) => ({ key, value, restaurant_id: plan.restaurantId }))
+    await supabase.from('theme_config').upsert(rows, { onConflict: 'restaurant_id,key' })
     setSaving(false)
     setMsg(T.saved)
     setTimeout(() => setMsg(''), 4000)
@@ -91,7 +91,7 @@ export default function ThemePage() {
 
   async function reset() {
     if (!confirm(T.resetConfirm)) return
-    await supabase.from('theme_config').delete().neq('key', '__none__')
+    await supabase.from('theme_config').delete().eq('restaurant_id', plan.restaurantId).neq('key', '__none__')
     await load()
     setMsg(T.resetDone)
     setTimeout(() => setMsg(''), 3000)
@@ -114,12 +114,31 @@ export default function ThemePage() {
     )
   }
 
+  if (!plan.loading && !plan.restaurantId) {
+    return (
+      <div className="max-w-xl rounded-xl p-6" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+        <div className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--dim)' }}>
+          Tenant required
+        </div>
+        <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>
+          No restaurant is mapped to this account
+        </h1>
+        <p className="text-sm mt-2 leading-6" style={{ color: 'var(--dim)' }}>
+          Ask a super admin to add this user to a brand or restaurant before editing theme settings.
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div>
       <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
         <div>
           <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>{T.themeTitle}</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--dim)' }}>{T.themeDesc}</p>
+          <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
+            Tenant: <span style={{ color: 'var(--text)' }}>{plan.restaurantName}</span>
+          </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {msg && (

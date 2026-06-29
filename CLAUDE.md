@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Burger Lions** — a WebAR restaurant menu app. Customers browse a 16-item menu with live 3D thumbnails, then place dishes in Augmented Reality before ordering. No build step; all AR libraries load from CDN.
+**BetaReal / Restaurant-AR** — a shared multi-tenant WebAR restaurant menu platform. Burger Lions is tenant #1 and remains the live compatibility tenant; new restaurants should be created by database rows and served through the same customer template.
 
 ## Development Commands
 
@@ -19,7 +19,7 @@ npm run dev      # Serve static files at http://localhost:3000
 
 ### Pages
 
-**`index.html`** — the full menu app. Fetches live menu data from Supabase (`menu_items` + `categories` tables) as primary source, falls back to `foods/menu.json` only if Supabase is unreachable. Renders items across 5 categories (Burgers, Sides, Drinks, Desserts, Coffee) with lazy 3D thumbnails and a full 3D modal. AR button routing:
+**`index.html`** — the shared customer template. It resolves a restaurant from `location.hostname`, defaults the current `restaurant-ar.pages.dev` production URL to Burger Lions, then fetches live tenant data from Supabase (`restaurants`, `brands`, `menu_items`, `categories`, `theme_config`). It falls back to `foods/menu.json` only if Supabase is unreachable. AR button routing:
 
 | Device | AR capability | Result |
 |---|---|---|
@@ -34,7 +34,7 @@ On iOS, both model files (`food.glb`, `Druidi.glb`) are pre-loaded into hidden l
 
 ### Data
 
-**Primary source**: Supabase `menu_items` table (joined with `categories`). Admin changes in the Next.js admin panel immediately reflect on the live menu for new visitors (SW does not cache Supabase REST responses).
+**Primary source**: Supabase tenant tables. `brands.plan` controls product entitlements; `restaurants` identifies branches; `menu_items`, `categories`, and `theme_config` are scoped by `restaurant_id`; analytics `events` carry both `brand_id` and `restaurant_id`. Admin changes in the Next.js admin panel immediately reflect on the live menu for new visitors (SW does not cache Supabase REST responses).
 
 **`foods/menu.json`** — fallback only, used when Supabase is unreachable. Keep it roughly in sync but it is not the live source of truth.
 
@@ -42,9 +42,9 @@ On iOS, both model files (`food.glb`, `Druidi.glb`) are pre-loaded into hidden l
 
 - `food.glb` — generic food model (local, pre-cached by SW)
 - `Druidi.glb` — Druidi burger model (local, pre-cached by SW)
-- Supabase Storage `models` bucket — custom per-item GLBs uploaded via admin panel. These are pre-cached by the SW at install time by fetching the model URL list from the DB.
+- Cloudflare R2 — target storage for GLB, USDZ, thumbnails, and other heavy assets. R2 keys must be prefixed by restaurant slug, for example `burger-lions-main/item.glb`.
 
-All GLB files are served from either the project root or Supabase Storage public CDN. AR sessions show no name/price labels — clean, immersive model-only view.
+All new heavy assets are served from Cloudflare R2. AR sessions show no name/price labels — clean, immersive model-only view.
 
 ### WebXR carousel
 
@@ -66,7 +66,7 @@ How to bump: open `sw.js`, change `'bl-v13'` → `'bl-v14'` (then v15, v16, …)
 
 If you forget, users who visited before will keep seeing the old cached version until they hard-refresh. The service worker will NOT deliver your update automatically.
 
-Note: Supabase REST API calls (menu data, theme) are **never cached** by the SW — they always go to the network so admin changes are immediately visible. Only Supabase Storage GLBs (stable URLs) are cached.
+Note: Supabase REST API calls (tenant, menu data, theme) are **never cached** by the SW — they always go to the network so admin changes are immediately visible. Heavy R2 assets are cache-first by URL.
 
 Claude Code: this is your responsibility when committing on behalf of the user. Check whether any of the above files are in the diff before committing. If they are, bump the cache version in the same commit.
 
@@ -75,4 +75,4 @@ Claude Code: this is your responsibility when committing on behalf of the user. 
 - Three.js is loaded **lazily** on first AR tap (not on page load) to avoid blocking the menu.
 - Thumbnails are loaded **staggered** (150 ms apart) via IntersectionObserver to prevent competing WebGL context inits.
 - AR labels (name, price) are intentionally absent from all AR flows — AR is for immersive 3D viewing only.
-- SW pre-caches Supabase Storage GLBs at install time by calling the Supabase REST API with the anon key.
+- SW allows R2 assets to be cached by URL after first request. Tenant/menu/theme REST calls remain network-first.

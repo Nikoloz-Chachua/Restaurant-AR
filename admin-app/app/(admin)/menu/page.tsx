@@ -100,15 +100,19 @@ export default function MenuPage() {
   const thumbInputRef = useRef<HTMLInputElement>(null)
 
   const load = useCallback(async () => {
+    if (plan.loading || !plan.restaurantId) {
+      setLoading(plan.loading)
+      return
+    }
     setLoading(true)
     const [{ data: cats }, { data: its }] = await Promise.all([
-      supabase.from('categories').select('*').order('sort_order'),
-      supabase.from('menu_items').select('*').order('category_id').order('sort_order'),
+      supabase.from('categories').select('*').eq('restaurant_id', plan.restaurantId).order('sort_order'),
+      supabase.from('menu_items').select('*').eq('restaurant_id', plan.restaurantId).order('category_id').order('sort_order'),
     ])
     setCategories(cats || [])
     setItems(its || [])
     setLoading(false)
-  }, [supabase])
+  }, [plan.loading, plan.restaurantId, supabase])
 
   useEffect(() => { void Promise.resolve().then(load) }, [load])
 
@@ -145,16 +149,16 @@ export default function MenuPage() {
     }
     setSaving(true)
     if (editItem) {
-      await supabase.from('menu_items').update(itemForm).eq('id', editItem.id)
+      await supabase.from('menu_items').update(itemForm).eq('id', editItem.id).eq('restaurant_id', plan.restaurantId)
     } else {
-      await supabase.from('menu_items').insert(itemForm)
+      await supabase.from('menu_items').insert({ ...itemForm, restaurant_id: plan.restaurantId })
     }
     setSaving(false); setItemModal(false); setUploadProgress(''); setThumbProgress(''); await load()
     flash(editItem ? T.itemUpdated : T.itemAdded)
   }
   async function confirmDelete() {
     if (!deleteId) return
-    await supabase.from('menu_items').delete().eq('id', deleteId)
+    await supabase.from('menu_items').delete().eq('id', deleteId).eq('restaurant_id', plan.restaurantId)
     setDeleteId(null); await load(); flash(T.itemDeleted)
   }
 
@@ -171,21 +175,37 @@ export default function MenuPage() {
   async function saveCat() {
     setSaving(true)
     if (editCat) {
-      await supabase.from('categories').update(catForm).eq('id', editCat.id)
+      await supabase.from('categories').update(catForm).eq('id', editCat.id).eq('restaurant_id', plan.restaurantId)
     } else {
-      await supabase.from('categories').insert(catForm)
+      await supabase.from('categories').insert({ ...catForm, restaurant_id: plan.restaurantId })
     }
     setSaving(false); setCatModal(false); await load()
     flash(editCat ? T.catUpdated : T.catAdded)
   }
   async function confirmDeleteCat() {
     if (!deleteCatId) return
-    await supabase.from('categories').delete().eq('id', deleteCatId)
+    await supabase.from('categories').delete().eq('id', deleteCatId).eq('restaurant_id', plan.restaurantId)
     setDeleteCatId(null); await load(); flash(T.catDeleted)
   }
 
   const catName = (id: number | null) =>
     categories.find(c => c.id === id)?.name_en ?? '—'
+
+  if (!plan.loading && !plan.restaurantId) {
+    return (
+      <div className="max-w-xl rounded-xl p-6" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+        <div className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--dim)' }}>
+          Tenant required
+        </div>
+        <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>
+          No restaurant is mapped to this account
+        </h1>
+        <p className="text-sm mt-2 leading-6" style={{ color: 'var(--dim)' }}>
+          Ask a super admin to add this user to a brand or restaurant before editing menu content.
+        </p>
+      </div>
+    )
+  }
 
   async function toWebP(file: File): Promise<Blob> {
     return new Promise((resolve, reject) => {
@@ -219,19 +239,29 @@ export default function MenuPage() {
       setThumbUploading(false)
       return
     }
-    const filename = `thumb_${Date.now()}.webp`
-    const { error } = await supabase.storage.from('thumbnails').upload(filename, blob, {
-      contentType: 'image/webp',
-      upsert: false,
-    })
-    if (error) {
-      setThumbProgress(`Upload failed: ${error.message}`)
-      setThumbUploading(false)
-      return
+    try {
+      const filename = file.name.replace(/\.[^.]+$/i, '.webp')
+      const res = await fetch('/api/r2-presign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename, restaurantId: plan.restaurantId }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || `Server error ${res.status}`)
+      }
+      const { uploadUrl, publicUrl } = await res.json()
+      const upload = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'image/webp' },
+        body: blob,
+      })
+      if (!upload.ok) throw new Error(`R2 upload failed: ${upload.status}`)
+      setItemForm(f => ({ ...f, thumbnail_url: publicUrl }))
+      setThumbProgress(`✓ ${file.name}`)
+    } catch (e) {
+      setThumbProgress(`Upload failed: ${e instanceof Error ? e.message : String(e)}`)
     }
-    const { data: { publicUrl } } = supabase.storage.from('thumbnails').getPublicUrl(filename)
-    setItemForm(f => ({ ...f, thumbnail_url: publicUrl }))
-    setThumbProgress(`✓ ${file.name}`)
     setThumbUploading(false)
   }
 
@@ -247,7 +277,7 @@ export default function MenuPage() {
       const res = await fetch('/api/r2-presign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: file.name }),
+        body: JSON.stringify({ filename: file.name, restaurantId: plan.restaurantId }),
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
@@ -276,7 +306,7 @@ export default function MenuPage() {
         const pres = await fetch('/api/r2-presign', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ filename: usdzName }),
+          body: JSON.stringify({ filename: usdzName, restaurantId: plan.restaurantId }),
         })
         if (!pres.ok) throw new Error(`presign ${pres.status}`)
         const { uploadUrl: usdzUrl, publicUrl: usdzPublic } = await pres.json()
@@ -304,6 +334,9 @@ export default function MenuPage() {
         <div>
           <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>{T.menuTitle}</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--dim)' }}>{T.menuDesc}</p>
+          <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
+            Tenant: <span style={{ color: 'var(--text)' }}>{plan.restaurantName}</span>
+          </p>
         </div>
         {msg && (
           <span className="text-sm px-3 py-1.5 rounded-lg shrink-0"

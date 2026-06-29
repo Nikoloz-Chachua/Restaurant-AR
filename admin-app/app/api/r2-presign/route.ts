@@ -18,19 +18,43 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { filename } = await req.json()
+  const { filename, restaurantId } = await req.json()
   const lower = String(filename || '').toLowerCase()
   const isGlb  = lower.endsWith('.glb')
   const isUsdz = lower.endsWith('.usdz')
-  if (!filename || (!isGlb && !isUsdz)) {
-    return NextResponse.json({ error: 'Only .glb or .usdz files allowed' }, { status: 400 })
+  const isWebp = lower.endsWith('.webp')
+  if (!filename || (!isGlb && !isUsdz && !isWebp)) {
+    return NextResponse.json({ error: 'Only .glb, .usdz, or .webp files allowed' }, { status: 400 })
   }
 
   // Content-Type must match what the browser sends on the PUT, or R2 rejects the
   // presigned request. .usdz is Apple Quick Look's format (a zipped USD bundle).
-  const contentType = isUsdz ? 'model/vnd.usdz+zip' : 'model/gltf-binary'
+  const contentType = isUsdz ? 'model/vnd.usdz+zip' : isWebp ? 'image/webp' : 'model/gltf-binary'
 
-  const key = `${Date.now()}_${String(filename).replace(/[^a-zA-Z0-9._-]/g, '_')}`
+  const restaurantIdNumber = Number(restaurantId)
+  if (!Number.isInteger(restaurantIdNumber)) {
+    return NextResponse.json({ error: 'restaurantId is required' }, { status: 400 })
+  }
+
+  const { data: canManage, error: accessError } = await supabase.rpc('can_manage_restaurant', {
+    target_restaurant_id: restaurantIdNumber,
+  })
+  if (accessError || !canManage) {
+    return NextResponse.json({ error: 'Restaurant not found or not allowed' }, { status: 403 })
+  }
+
+  const { data: restaurant, error: restaurantError } = await supabase
+    .from('restaurants')
+    .select('id, slug')
+    .eq('id', restaurantIdNumber)
+    .maybeSingle()
+
+  if (restaurantError || !restaurant) {
+    return NextResponse.json({ error: 'Restaurant not found or not allowed' }, { status: 403 })
+  }
+
+  const cleanName = String(filename).replace(/[^a-zA-Z0-9._-]/g, '_')
+  const key = `${restaurant.slug}/${Date.now()}_${cleanName}`
 
   const uploadUrl = await getSignedUrl(
     r2,
