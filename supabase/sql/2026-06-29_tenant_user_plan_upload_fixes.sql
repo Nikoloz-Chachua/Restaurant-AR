@@ -78,8 +78,17 @@ where exists (select 1 from public.brand_users bu where bu.user_id = u.id)
    or exists (select 1 from public.restaurant_users ru where ru.user_id = u.id);
 
 -- 5) Keep grants/function access aligned after replacement.
-grant execute on function public.current_app_role() to anon, authenticated;
-grant execute on function public.is_super_admin() to anon, authenticated;
+grant execute on function public.current_app_role() to anon, authenticated, service_role;
+grant execute on function public.is_super_admin() to anon, authenticated, service_role;
+
+grant usage on schema public to anon, authenticated, service_role;
+grant select on public.brands, public.restaurants to anon, authenticated, service_role;
+grant select on public.brand_users, public.restaurant_users to authenticated, service_role;
+grant select, insert, update, delete on public.brands, public.restaurants, public.brand_users, public.restaurant_users to authenticated, service_role;
+grant select, insert, update, delete on public.categories, public.menu_items, public.theme_config to authenticated, service_role;
+grant insert on public.events to anon, authenticated, service_role;
+grant select on public.events to authenticated, service_role;
+grant usage, select on all sequences in schema public to anon, authenticated, service_role;
 
 notify pgrst, 'reload schema';
 
