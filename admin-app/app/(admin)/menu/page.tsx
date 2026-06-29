@@ -143,6 +143,10 @@ export default function MenuPage() {
     setItemModal(true)
   }
   async function saveItem() {
+    if (!plan.restaurantId) {
+      flash('No restaurant is mapped to this account.')
+      return
+    }
     if (plan.itemLimit !== null && activeCountWithForm() > plan.itemLimit) {
       flash(`Plan limit reached: ${activeArItemCount} / ${plan.itemLimit} active AR items.`)
       return
@@ -244,7 +248,7 @@ export default function MenuPage() {
       const res = await fetch('/api/r2-presign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename, restaurantId: plan.restaurantId }),
+        body: JSON.stringify({ filename, restaurantId: plan.restaurantId, restaurantSlug: plan.restaurantSlug }),
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
@@ -277,7 +281,7 @@ export default function MenuPage() {
       const res = await fetch('/api/r2-presign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: file.name, restaurantId: plan.restaurantId }),
+        body: JSON.stringify({ filename: file.name, restaurantId: plan.restaurantId, restaurantSlug: plan.restaurantSlug }),
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
@@ -306,7 +310,7 @@ export default function MenuPage() {
         const pres = await fetch('/api/r2-presign', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ filename: usdzName, restaurantId: plan.restaurantId }),
+          body: JSON.stringify({ filename: usdzName, restaurantId: plan.restaurantId, restaurantSlug: plan.restaurantSlug }),
         })
         if (!pres.ok) throw new Error(`presign ${pres.status}`)
         const { uploadUrl: usdzUrl, publicUrl: usdzPublic } = await pres.json()

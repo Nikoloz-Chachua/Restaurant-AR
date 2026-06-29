@@ -104,16 +104,6 @@ export default function ThemePage() {
     { id: 'branding', label: T.tabBranding },
   ] as const
 
-  if (!plan.loading && !plan.canUseTheme) {
-    return (
-      <LockedCard
-        title="Theme customization requires Full or Premium"
-        description="Custom colors, fonts, and branding are available on the Full 450 and Premium 900 plans."
-        planLabel={plan.label}
-      />
-    )
-  }
-
   if (!plan.loading && !plan.restaurantId) {
     return (
       <div className="max-w-xl rounded-xl p-6" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
@@ -127,6 +117,16 @@ export default function ThemePage() {
           Ask a super admin to add this user to a brand or restaurant before editing theme settings.
         </p>
       </div>
+    )
+  }
+
+  if (!plan.loading && !plan.canUseTheme) {
+    return (
+      <LockedCard
+        title="Theme customization requires Full or Premium"
+        description="Custom colors, fonts, and branding are available on the Full 450 and Premium 900 plans."
+        planLabel={plan.label}
+      />
     )
   }
 

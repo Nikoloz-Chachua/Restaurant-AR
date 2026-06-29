@@ -59,6 +59,8 @@ export default function TenantsPage() {
     primaryColor: '',
     secondaryColor: '',
     createStarterCategory: true,
+    adminEmail: '',
+    adminPassword: '',
   })
 
   const load = useCallback(async () => {
@@ -112,6 +114,8 @@ export default function TenantsPage() {
       primaryColor: '',
       secondaryColor: '',
       createStarterCategory: true,
+      adminEmail: '',
+      adminPassword: '',
     })
     await load()
   }
@@ -198,6 +202,23 @@ export default function TenantsPage() {
           </Field>
           <Field label="Secondary color">
             <input value={form.secondaryColor} onChange={e => update('secondaryColor', e.target.value)} placeholder="#c07808" />
+          </Field>
+          <Field label="Admin email">
+            <input
+              type="email"
+              value={form.adminEmail}
+              onChange={e => update('adminEmail', e.target.value)}
+              placeholder="owner@example.com"
+            />
+          </Field>
+          <Field label="Admin password">
+            <input
+              type="password"
+              value={form.adminPassword}
+              onChange={e => update('adminPassword', e.target.value)}
+              placeholder="At least 8 characters"
+              autoComplete="new-password"
+            />
           </Field>
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-3">

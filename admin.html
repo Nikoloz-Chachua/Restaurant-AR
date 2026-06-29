@@ -378,6 +378,7 @@ let _lastEvents = null;
 let _charts = {};
 let _loadGeneration = 0;
 let _hasLoadedData = false;
+let _tenantRestaurantId = null;
 
 function supabaseConfigFromParent(data) {
     if (
@@ -465,6 +466,7 @@ window.addEventListener('message', e => {
         try { localStorage.setItem('bl-analytics-lang', e.data.lang); } catch(ex) {}
     }
     if (e.data.token && typeof e.data.token === 'string') {
+        _tenantRestaurantId = Number.isInteger(Number(e.data.restaurantId)) ? Number(e.data.restaurantId) : null;
         const cfg = supabaseConfigFromParent(e.data);
         sb = supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey, {
             global: { headers: { Authorization: `Bearer ${e.data.token}` } }
@@ -567,12 +569,13 @@ async function loadData() {
         const { start, end } = getDateRange();
         let all = [], from = 0;
         while (true) {
-            const { data, error } = await sb.from('events')
+            let query = sb.from('events')
                 .select('*')
                 .gte('created_at', start)
                 .lte('created_at', end)
                 .order('created_at', { ascending: false })
-                .range(from, from + 999);
+            if (_tenantRestaurantId) query = query.eq('restaurant_id', _tenantRestaurantId);
+            const { data, error } = await query.range(from, from + 999);
             if (error) throw error;
             all = all.concat(data || []);
             if (!data || data.length < 1000) break;

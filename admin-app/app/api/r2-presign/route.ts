@@ -3,22 +3,22 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { createClient } from '@/lib/supabase/server'
 
-const r2 = new S3Client({
-  region: 'auto',
-  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
-  },
-  forcePathStyle: true,
-})
+function missingR2Env() {
+  return ['R2_ACCOUNT_ID', 'R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'R2_BUCKET_NAME', 'R2_PUBLIC_URL']
+    .filter(key => !process.env[key])
+}
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { filename, restaurantId } = await req.json()
+  const missing = missingR2Env()
+  if (missing.length) {
+    return NextResponse.json({ error: `R2 upload is not configured. Missing env vars: ${missing.join(', ')}` }, { status: 500 })
+  }
+
+  const { filename, restaurantId, restaurantSlug } = await req.json()
   const lower = String(filename || '').toLowerCase()
   const isGlb  = lower.endsWith('.glb')
   const isUsdz = lower.endsWith('.usdz')
@@ -34,6 +34,10 @@ export async function POST(req: NextRequest) {
   const restaurantIdNumber = Number(restaurantId)
   if (!Number.isInteger(restaurantIdNumber)) {
     return NextResponse.json({ error: 'restaurantId is required' }, { status: 400 })
+  }
+  const requestedSlug = String(restaurantSlug || '').trim().toLowerCase()
+  if (!requestedSlug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(requestedSlug)) {
+    return NextResponse.json({ error: 'restaurantSlug is required' }, { status: 400 })
   }
 
   const { data: canManage, error: accessError } = await supabase.rpc('can_manage_restaurant', {
@@ -52,9 +56,21 @@ export async function POST(req: NextRequest) {
   if (restaurantError || !restaurant) {
     return NextResponse.json({ error: 'Restaurant not found or not allowed' }, { status: 403 })
   }
+  if (restaurant.slug !== requestedSlug) {
+    return NextResponse.json({ error: 'Restaurant id/slug mismatch' }, { status: 403 })
+  }
 
   const cleanName = String(filename).replace(/[^a-zA-Z0-9._-]/g, '_')
   const key = `${restaurant.slug}/${Date.now()}_${cleanName}`
+  const r2 = new S3Client({
+    region: 'auto',
+    endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+    },
+    forcePathStyle: true,
+  })
 
   const uploadUrl = await getSignedUrl(
     r2,

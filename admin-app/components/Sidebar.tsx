@@ -55,13 +55,16 @@ export default function Sidebar({ open, onClose }: Props) {
 
   const T = translations[lang]
 
+  const tenantQuery = plan.restaurantSlug ? `?tenant=${encodeURIComponent(plan.restaurantSlug)}` : ''
+  const tenantHref = (href: string) => tenantQuery && href !== '/tenants' ? `${href}${tenantQuery}` : href
+
   const NAV = [
     plan.canManageTenants ? { href: '/tenants', label: 'Tenants', icon: '▦' } : null,
-    { href: '/menu',      label: T.navMenu,      icon: '🍔' },
-    plan.canUseAnalytics ? { href: '/dashboard', label: T.navAnalytics, icon: '📊' } : null,
-    plan.canUseDeveloperAnalytics ? { href: '/dev-analytics', label: T.navDeveloperAnalytics, icon: '🛠' } : null,
-    plan.canUseTheme ? { href: '/theme', label: T.navTheme, icon: '🎨' } : null,
-  ].filter((item): item is { href: string; label: string; icon: string } => Boolean(item))
+    { href: tenantHref('/menu'), match: '/menu', label: T.navMenu, icon: '🍔' },
+    plan.canUseAnalytics ? { href: tenantHref('/dashboard'), match: '/dashboard', label: T.navAnalytics, icon: '📊' } : null,
+    plan.canUseDeveloperAnalytics ? { href: tenantHref('/dev-analytics'), match: '/dev-analytics', label: T.navDeveloperAnalytics, icon: '🛠' } : null,
+    plan.canUseTheme ? { href: tenantHref('/theme'), match: '/theme', label: T.navTheme, icon: '🎨' } : null,
+  ].filter((item): item is { href: string; match?: string; label: string; icon: string } => Boolean(item))
 
   function broadcast(newLang: Lang, newDark: boolean) {
     window.dispatchEvent(new CustomEvent('bl-pref', { detail: { lang: newLang, dark: newDark } }))
@@ -124,8 +127,8 @@ export default function Sidebar({ open, onClose }: Props) {
 
       {/* Nav links */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {NAV.map(({ href, label, icon }) => {
-          const active = pathname.startsWith(href)
+        {NAV.map(({ href, match, label, icon }) => {
+          const active = pathname.startsWith(match ?? href.split('?')[0])
           return (
             <Link
               key={href}

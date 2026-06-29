@@ -39,7 +39,7 @@ export default function DashboardPage() {
 
     if (token) {
       iframeRef.current?.contentWindow?.postMessage(
-        { type: 'bl-pref', lang, dark, token },
+        { type: 'bl-pref', lang, dark, token, restaurantId: plan.restaurantId, brandId: plan.brandId },
         ANALYTICS_ORIGIN
       )
       return
@@ -49,7 +49,7 @@ export default function DashboardPage() {
       .then(({ data }) => {
         tokenRef.current = data?.session?.access_token ?? ''
         iframeRef.current?.contentWindow?.postMessage(
-          { type: 'bl-pref', lang, dark, token: tokenRef.current },
+          { type: 'bl-pref', lang, dark, token: tokenRef.current, restaurantId: plan.restaurantId, brandId: plan.brandId },
           ANALYTICS_ORIGIN
         )
       })
@@ -59,6 +59,22 @@ export default function DashboardPage() {
           ANALYTICS_ORIGIN
         )
       })
+  }
+
+  if (!plan.loading && !plan.restaurantId) {
+    return (
+      <div className="max-w-xl rounded-xl p-6" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+        <div className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--dim)' }}>
+          Tenant required
+        </div>
+        <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>
+          No restaurant is selected
+        </h1>
+        <p className="text-sm mt-2 leading-6" style={{ color: 'var(--dim)' }}>
+          Open a tenant from the Tenants page, or ask a super admin to add this user to a brand or restaurant.
+        </p>
+      </div>
+    )
   }
 
   if (!plan.loading && !plan.canUseAnalytics) {

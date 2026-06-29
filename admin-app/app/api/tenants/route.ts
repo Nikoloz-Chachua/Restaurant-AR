@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 
 type TenantRequest = {
@@ -10,6 +11,8 @@ type TenantRequest = {
   primaryColor?: string
   secondaryColor?: string
   createStarterCategory?: boolean
+  adminEmail?: string
+  adminPassword?: string
 }
 
 type TenantRpcRow = {
@@ -43,11 +46,28 @@ function tenantPreviewUrl(slug: string) {
   return url.toString()
 }
 
+function isPlatformRole(role: unknown) {
+  return ['super_admin', 'creator', 'dev'].includes(String(role))
+}
+
+function cleanEmail(value: unknown) {
+  return String(value ?? '').trim().toLowerCase()
+}
+
+function adminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!supabaseUrl || !serviceRoleKey) return null
+  return createSupabaseAdminClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+}
+
 export async function GET() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const role = user?.app_metadata?.role ?? user?.user_metadata?.role
-  if (!user || !['super_admin', 'creator', 'dev'].includes(String(role))) {
+  const role = user?.app_metadata?.role
+  if (!user || !isPlatformRole(role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -63,8 +83,8 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const role = user?.app_metadata?.role ?? user?.user_metadata?.role
-  if (!user || !['super_admin', 'creator', 'dev'].includes(String(role))) {
+  const role = user?.app_metadata?.role
+  if (!user || !isPlatformRole(role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -79,12 +99,20 @@ export async function POST(req: NextRequest) {
   const plan = body.plan === 'full' || body.plan === 'premium' ? body.plan : 'ar_menu'
   const primaryColor = isColor(body.primaryColor) ? body.primaryColor ?? '' : ''
   const secondaryColor = isColor(body.secondaryColor) ? body.secondaryColor ?? '' : ''
+  const adminEmail = cleanEmail(body.adminEmail)
+  const adminPassword = String(body.adminPassword ?? '')
 
   if (!brandName || !restaurantName) {
     return NextResponse.json({ error: 'Brand name and first branch name are required' }, { status: 400 })
   }
   if (!SLUG_RE.test(brandSlug) || !SLUG_RE.test(restaurantSlug)) {
     return NextResponse.json({ error: 'Slugs must use lowercase letters, numbers, and hyphens' }, { status: 400 })
+  }
+  if ((adminEmail || adminPassword) && (!adminEmail || adminPassword.length < 8)) {
+    return NextResponse.json({ error: 'Admin email and password of at least 8 characters are required together' }, { status: 400 })
+  }
+  if (adminEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail)) {
+    return NextResponse.json({ error: 'Admin email is not valid' }, { status: 400 })
   }
 
   const { data, error } = await supabase.rpc('create_platform_tenant', {
@@ -125,9 +153,91 @@ export async function POST(req: NextRequest) {
     brand_id: created.brand_id,
   }
 
+  let adminUser: { id: string; email: string } | null = null
+  if (adminEmail) {
+    const service = adminClient()
+    if (!service) {
+      return NextResponse.json({
+        error: 'Tenant created, but admin user was not linked because SUPABASE_SERVICE_ROLE_KEY is missing in admin-app env',
+        brand,
+        restaurant,
+        previewUrl: tenantPreviewUrl(restaurant.slug),
+      }, { status: 500 })
+    }
+
+    const { data: createdUser, error: createUserError } = await service.auth.admin.createUser({
+      email: adminEmail,
+      password: adminPassword,
+      email_confirm: true,
+      app_metadata: { role: 'brand_owner' },
+      user_metadata: {},
+    })
+    const duplicateUser = createUserError?.message?.toLowerCase().includes('already')
+    let userId = createdUser.user?.id ?? ''
+
+    if (createUserError && !duplicateUser) {
+      return NextResponse.json({
+        error: `Tenant created, but admin user creation failed: ${createUserError.message}`,
+        brand,
+        restaurant,
+        previewUrl: tenantPreviewUrl(restaurant.slug),
+      }, { status: 500 })
+    }
+
+    if (!userId) {
+      const { data: users, error: listError } = await service.auth.admin.listUsers({ page: 1, perPage: 1000 })
+      if (listError) {
+        return NextResponse.json({
+          error: `Tenant created, but existing admin user lookup failed: ${listError.message}`,
+          brand,
+          restaurant,
+          previewUrl: tenantPreviewUrl(restaurant.slug),
+        }, { status: 500 })
+      }
+      userId = users.users.find(existing => existing.email?.toLowerCase() === adminEmail)?.id ?? ''
+    }
+
+    if (!userId) {
+      return NextResponse.json({
+        error: 'Tenant created, but admin user could not be found or linked',
+        brand,
+        restaurant,
+        previewUrl: tenantPreviewUrl(restaurant.slug),
+      }, { status: 500 })
+    }
+
+    const { error: metadataError } = await service.auth.admin.updateUserById(userId, {
+      app_metadata: { role: 'brand_owner' },
+      user_metadata: {},
+    })
+    if (metadataError) {
+      return NextResponse.json({
+        error: `Tenant created, but admin metadata update failed: ${metadataError.message}`,
+        brand,
+        restaurant,
+        previewUrl: tenantPreviewUrl(restaurant.slug),
+      }, { status: 500 })
+    }
+
+    const [{ error: brandLinkError }, { error: restaurantLinkError }] = await Promise.all([
+      service.from('brand_users').upsert({ brand_id: brand.id, user_id: userId, role: 'brand_owner' }, { onConflict: 'brand_id,user_id' }),
+      service.from('restaurant_users').upsert({ restaurant_id: restaurant.id, user_id: userId, role: 'branch_staff' }, { onConflict: 'restaurant_id,user_id' }),
+    ])
+    if (brandLinkError || restaurantLinkError) {
+      return NextResponse.json({
+        error: `Tenant created, but admin link failed: ${brandLinkError?.message || restaurantLinkError?.message}`,
+        brand,
+        restaurant,
+        previewUrl: tenantPreviewUrl(restaurant.slug),
+      }, { status: 500 })
+    }
+    adminUser = { id: userId, email: adminEmail }
+  }
+
   return NextResponse.json({
     brand,
     restaurant,
+    adminUser,
     previewUrl: tenantPreviewUrl(restaurant.slug),
     note: 'Created database tenant. The live shared template opens it with ?tenant=<branch-slug>; wildcard domains/custom Vercel domains are separate infrastructure.',
   }, { status: 201 })
@@ -136,8 +246,8 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const role = user?.app_metadata?.role ?? user?.user_metadata?.role
-  if (!user || !['super_admin', 'creator', 'dev'].includes(String(role))) {
+  const role = user?.app_metadata?.role
+  if (!user || !isPlatformRole(role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
