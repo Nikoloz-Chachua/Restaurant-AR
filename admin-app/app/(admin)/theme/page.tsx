@@ -114,6 +114,22 @@ export default function ThemePage() {
     )
   }
 
+  if (!plan.loading && !plan.restaurantId) {
+    return (
+      <div className="max-w-xl rounded-xl p-6" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+        <div className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--dim)' }}>
+          Tenant required
+        </div>
+        <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>
+          No restaurant is mapped to this account
+        </h1>
+        <p className="text-sm mt-2 leading-6" style={{ color: 'var(--dim)' }}>
+          Ask a super admin to add this user to a brand or restaurant before editing theme settings.
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div>
       <div className="flex flex-wrap items-start justify-between gap-3 mb-6">

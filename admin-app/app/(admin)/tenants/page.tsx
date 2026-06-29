@@ -48,7 +48,7 @@ export default function TenantsPage() {
     plan: 'ar_menu' as Brand['plan'],
     primaryColor: '',
     secondaryColor: '',
-    starterMenu: 'burger_lions_style' as 'empty' | 'burger_lions_style',
+    createStarterCategory: true,
   })
 
   const load = useCallback(async () => {
@@ -101,7 +101,7 @@ export default function TenantsPage() {
       plan: 'ar_menu',
       primaryColor: '',
       secondaryColor: '',
-      starterMenu: 'burger_lions_style',
+      createStarterCategory: true,
     })
     await load()
   }
@@ -122,7 +122,7 @@ export default function TenantsPage() {
         <div>
           <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>Tenants</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--dim)' }}>
-            Create restaurants by database rows for the shared Burger Lions-style template.
+            Create restaurants by database rows for the shared WebAR template.
           </p>
         </div>
         {message && (
@@ -155,10 +155,13 @@ export default function TenantsPage() {
               <option value="premium">Premium 900</option>
             </select>
           </Field>
-          <Field label="Starter template">
-            <select value={form.starterMenu} onChange={e => update('starterMenu', e.target.value as 'empty' | 'burger_lions_style')}>
-              <option value="burger_lions_style">Burger Lions-style categories</option>
-              <option value="empty">Empty starter category</option>
+          <Field label="Starter content">
+            <select
+              value={form.createStarterCategory ? 'featured' : 'none'}
+              onChange={e => update('createStarterCategory', e.target.value === 'featured')}
+            >
+              <option value="featured">Shared template starter category</option>
+              <option value="none">No category yet</option>
             </select>
           </Field>
           <Field label="Primary color">

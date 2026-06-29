@@ -88,8 +88,8 @@ function accessFor(
     label: PLATFORM_PLAN_LABELS[platformPlan] ?? PLAN_LABELS[plan],
     brandId: tenant.brandId ?? null,
     restaurantId: tenant.restaurantId ?? null,
-    restaurantSlug: tenant.restaurantSlug ?? 'burger-lions-main',
-    restaurantName: tenant.restaurantName ?? 'Burger Lions Main',
+    restaurantSlug: tenant.restaurantSlug ?? '',
+    restaurantName: tenant.restaurantName ?? '',
   }
 }
 
@@ -147,10 +147,10 @@ export function usePlan(): PlanAccess {
           tenant = {
             brandId: brandUser.brand_id,
             restaurantId: restaurant?.id ?? null,
-            restaurantSlug: restaurant?.slug ?? 'burger-lions-main',
-            restaurantName: restaurant?.name ?? 'Burger Lions Main',
+            restaurantSlug: restaurant?.slug ?? '',
+            restaurantName: restaurant?.name ?? '',
           }
-        } else {
+        } else if (role === 'super_admin') {
           const { data: burgerLions } = await supabase
             .from('restaurants')
             .select('id, slug, name, brand_id, brands(plan)')

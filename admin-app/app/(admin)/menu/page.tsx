@@ -191,6 +191,22 @@ export default function MenuPage() {
   const catName = (id: number | null) =>
     categories.find(c => c.id === id)?.name_en ?? '—'
 
+  if (!plan.loading && !plan.restaurantId) {
+    return (
+      <div className="max-w-xl rounded-xl p-6" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+        <div className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--dim)' }}>
+          Tenant required
+        </div>
+        <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>
+          No restaurant is mapped to this account
+        </h1>
+        <p className="text-sm mt-2 leading-6" style={{ color: 'var(--dim)' }}>
+          Ask a super admin to add this user to a brand or restaurant before editing menu content.
+        </p>
+      </div>
+    )
+  }
+
   async function toWebP(file: File): Promise<Blob> {
     return new Promise((resolve, reject) => {
       const img = new Image()

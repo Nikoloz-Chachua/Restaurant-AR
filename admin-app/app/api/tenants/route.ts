@@ -9,7 +9,17 @@ type TenantRequest = {
   plan?: 'ar_menu' | 'full' | 'premium'
   primaryColor?: string
   secondaryColor?: string
-  starterMenu?: 'empty' | 'burger_lions_style'
+  createStarterCategory?: boolean
+}
+
+type TenantRpcRow = {
+  brand_id: number
+  brand_name: string
+  brand_slug: string
+  plan: 'ar_menu' | 'full' | 'premium'
+  restaurant_id: number
+  restaurant_name: string
+  restaurant_slug: string
 }
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
@@ -51,7 +61,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const body = await req.json() as TenantRequest
+  const body = await req.json().catch(() => null) as TenantRequest | null
+  if (!body) {
+    return NextResponse.json({ error: 'Invalid JSON request body' }, { status: 400 })
+  }
   const brandName = String(body.brandName ?? '').trim()
   const restaurantName = String(body.restaurantName ?? '').trim()
   const brandSlug = cleanSlug(String(body.brandSlug || brandName))
@@ -67,64 +80,42 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Slugs must use lowercase letters, numbers, and hyphens' }, { status: 400 })
   }
 
-  const { data: brand, error: brandError } = await supabase
-    .from('brands')
-    .insert({
-      name: brandName,
-      slug: brandSlug,
-      plan,
-      primary_color: primaryColor,
-      secondary_color: secondaryColor,
-    })
-    .select('id, name, slug, plan')
-    .single()
+  const { data, error } = await supabase.rpc('create_platform_tenant', {
+    p_brand_name: brandName,
+    p_brand_slug: brandSlug,
+    p_restaurant_name: restaurantName,
+    p_restaurant_slug: restaurantSlug,
+    p_plan: plan,
+    p_primary_color: primaryColor,
+    p_secondary_color: secondaryColor,
+    p_create_starter_category: body.createStarterCategory !== false,
+  }).single()
 
-  if (brandError) return NextResponse.json({ error: brandError.message }, { status: 400 })
-
-  const { data: restaurant, error: restaurantError } = await supabase
-    .from('restaurants')
-    .insert({
-      brand_id: brand.id,
-      name: restaurantName,
-      slug: restaurantSlug,
-      status: 'active',
-    })
-    .select('id, name, slug, brand_id')
-    .single()
-
-  if (restaurantError) {
-    await supabase.from('brands').delete().eq('id', brand.id)
-    return NextResponse.json({ error: restaurantError.message }, { status: 400 })
+  if (error) {
+    const duplicateSlug = error.code === '23505'
+    return NextResponse.json({
+      error: duplicateSlug
+        ? 'Brand slug, branch slug, or custom domain already exists'
+        : error.message || 'Tenant creation failed before any rows were committed',
+    }, { status: duplicateSlug ? 409 : 400 })
   }
 
-  const categoryRows = body.starterMenu === 'burger_lions_style'
-    ? [
-      { restaurant_id: restaurant.id, name_en: 'Burgers', name_ka: 'ბურგერები', sort_order: 1 },
-      { restaurant_id: restaurant.id, name_en: 'Sides', name_ka: 'გარნირი | სოუსები', sort_order: 2 },
-      { restaurant_id: restaurant.id, name_en: 'Desserts', name_ka: 'დესერტები', sort_order: 3 },
-    ]
-    : [
-      { restaurant_id: restaurant.id, name_en: 'Featured', name_ka: 'რჩეული', sort_order: 1 },
-    ]
-
-  const { error: categoriesError } = await supabase.from('categories').insert(categoryRows)
-  if (categoriesError) {
-    await supabase.from('restaurants').delete().eq('id', restaurant.id)
-    await supabase.from('brands').delete().eq('id', brand.id)
-    return NextResponse.json({ error: categoriesError.message }, { status: 400 })
+  const created = data as TenantRpcRow | null
+  if (!created) {
+    return NextResponse.json({ error: 'Tenant creation did not return a tenant row' }, { status: 500 })
   }
 
-  const themeRows = [
-    { restaurant_id: restaurant.id, key: 'site_name', value: brandName },
-    { restaurant_id: restaurant.id, key: 'site_name_ka', value: brandName },
-    ...(primaryColor ? [{ restaurant_id: restaurant.id, key: 'night_accent', value: primaryColor }] : []),
-    ...(secondaryColor ? [{ restaurant_id: restaurant.id, key: 'day_accent', value: secondaryColor }] : []),
-  ]
-  const { error: themeError } = await supabase.from('theme_config').upsert(themeRows, { onConflict: 'restaurant_id,key' })
-  if (themeError) {
-    await supabase.from('restaurants').delete().eq('id', restaurant.id)
-    await supabase.from('brands').delete().eq('id', brand.id)
-    return NextResponse.json({ error: themeError.message }, { status: 400 })
+  const brand = {
+    id: created.brand_id,
+    name: created.brand_name,
+    slug: created.brand_slug,
+    plan: created.plan,
+  }
+  const restaurant = {
+    id: created.restaurant_id,
+    name: created.restaurant_name,
+    slug: created.restaurant_slug,
+    brand_id: created.brand_id,
   }
 
   return NextResponse.json({

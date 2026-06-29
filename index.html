@@ -2123,11 +2123,12 @@
         async function _resolveTenant() {
             if (_tenant) return _tenant;
             const slug = _tenantSlugFromHost();
+            const isDefaultHost = slug === _DEFAULT_RESTAURANT_SLUG;
             const query = slug
                 ? `restaurants?select=id,slug,name,brand_id,brands(id,slug,name,plan)&slug=eq.${encodeURIComponent(slug)}&limit=1`
                 : `restaurants?select=id,slug,name,brand_id,brands(id,slug,name,plan)&custom_domain=eq.${encodeURIComponent(location.hostname.toLowerCase())}&limit=1`;
             let rows = await _supaSelect(query);
-            if ((!rows || !rows.length) && slug !== _DEFAULT_RESTAURANT_SLUG) {
+            if ((!rows || !rows.length) && isDefaultHost) {
                 rows = await _supaSelect(`restaurants?select=id,slug,name,brand_id,brands(id,slug,name,plan)&slug=eq.${_DEFAULT_RESTAURANT_SLUG}&limit=1`);
             }
             const restaurant = rows && rows[0];

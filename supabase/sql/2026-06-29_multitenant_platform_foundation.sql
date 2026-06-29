@@ -127,7 +127,16 @@ drop index if exists public.categories_name_en_key;
 drop index if exists public.menu_items_name_en_key;
 create unique index if not exists categories_restaurant_name_en_key on public.categories (restaurant_id, name_en);
 create unique index if not exists menu_items_restaurant_name_en_key on public.menu_items (restaurant_id, name_en);
-alter table public.theme_config add constraint theme_config_pkey primary key (restaurant_id, key);
+
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.table_constraints
+    where constraint_schema = 'public' and table_name = 'theme_config' and constraint_name = 'theme_config_pkey'
+  ) then
+    alter table public.theme_config add constraint theme_config_pkey primary key (restaurant_id, key);
+  end if;
+end $$;
 
 create index if not exists restaurants_brand_id_idx on public.restaurants (brand_id);
 create index if not exists restaurants_slug_idx on public.restaurants (slug);
@@ -271,6 +280,94 @@ create trigger events_fill_event_tenant
 before insert on public.events
 for each row execute function public.fill_event_tenant();
 
+create or replace function public.create_platform_tenant(
+  p_brand_name text,
+  p_brand_slug text,
+  p_restaurant_name text,
+  p_restaurant_slug text,
+  p_plan text default 'ar_menu',
+  p_primary_color text default '',
+  p_secondary_color text default '',
+  p_create_starter_category boolean default true
+)
+returns table (
+  brand_id bigint,
+  brand_name text,
+  brand_slug text,
+  plan text,
+  restaurant_id bigint,
+  restaurant_name text,
+  restaurant_slug text
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_brand_id bigint;
+  v_restaurant_id bigint;
+begin
+  if not public.is_super_admin() then
+    raise exception 'Only super admins can create tenants' using errcode = '42501';
+  end if;
+
+  if coalesce(trim(p_brand_name), '') = '' or coalesce(trim(p_restaurant_name), '') = '' then
+    raise exception 'Brand name and first branch name are required' using errcode = '22023';
+  end if;
+
+  if p_brand_slug !~ '^[a-z0-9]+(?:-[a-z0-9]+)*$' or p_restaurant_slug !~ '^[a-z0-9]+(?:-[a-z0-9]+)*$' then
+    raise exception 'Slugs must use lowercase letters, numbers, and hyphens' using errcode = '22023';
+  end if;
+
+  if p_plan not in ('ar_menu', 'full', 'premium') then
+    raise exception 'Plan must be ar_menu, full, or premium' using errcode = '22023';
+  end if;
+
+  insert into public.brands (name, slug, plan, primary_color, secondary_color)
+  values (trim(p_brand_name), p_brand_slug, p_plan, coalesce(p_primary_color, ''), coalesce(p_secondary_color, ''))
+  returning id into v_brand_id;
+
+  insert into public.restaurants (brand_id, name, slug, status)
+  values (v_brand_id, trim(p_restaurant_name), p_restaurant_slug, 'active')
+  returning id into v_restaurant_id;
+
+  if p_create_starter_category then
+    insert into public.categories (restaurant_id, name_en, name_ka, sort_order)
+    values (v_restaurant_id, 'Featured', 'რჩეული', 1);
+  end if;
+
+  insert into public.theme_config (restaurant_id, key, value)
+  values
+    (v_restaurant_id, 'site_name', trim(p_brand_name)),
+    (v_restaurant_id, 'site_name_ka', trim(p_brand_name))
+  on conflict (restaurant_id, key) do update set value = excluded.value;
+
+  if coalesce(p_primary_color, '') <> '' then
+    insert into public.theme_config (restaurant_id, key, value)
+    values (v_restaurant_id, 'night_accent', p_primary_color)
+    on conflict (restaurant_id, key) do update set value = excluded.value;
+  end if;
+
+  if coalesce(p_secondary_color, '') <> '' then
+    insert into public.theme_config (restaurant_id, key, value)
+    values (v_restaurant_id, 'day_accent', p_secondary_color)
+    on conflict (restaurant_id, key) do update set value = excluded.value;
+  end if;
+
+  return query
+  select
+    b.id,
+    b.name,
+    b.slug,
+    b.plan,
+    r.id,
+    r.name,
+    r.slug
+  from public.brands b
+  join public.restaurants r on r.brand_id = b.id
+  where b.id = v_brand_id and r.id = v_restaurant_id;
+end $$;
+
 alter table public.brands enable row level security;
 alter table public.restaurants enable row level security;
 alter table public.brand_users enable row level security;
@@ -368,12 +465,17 @@ for select using (public.can_access_brand(brand_id) or public.can_access_restaur
 grant select on public.brands, public.restaurants to anon, authenticated;
 grant select on public.brand_users, public.restaurant_users to authenticated;
 grant select, insert, update, delete on public.brands, public.restaurants, public.brand_users, public.restaurant_users to authenticated;
+grant select on public.categories, public.menu_items, public.theme_config to anon, authenticated;
+grant insert on public.events to anon, authenticated;
+grant select on public.events to authenticated;
+grant select, insert, update, delete on public.categories, public.menu_items, public.theme_config to authenticated;
 grant execute on function public.current_app_role() to anon, authenticated;
 grant execute on function public.is_super_admin() to anon, authenticated;
 grant execute on function public.can_access_brand(bigint) to authenticated;
 grant execute on function public.can_manage_brand(bigint) to authenticated;
 grant execute on function public.can_access_restaurant(bigint) to authenticated;
 grant execute on function public.can_manage_restaurant(bigint) to authenticated;
+grant execute on function public.create_platform_tenant(text, text, text, text, text, text, text, boolean) to authenticated;
 
 notify pgrst, 'reload schema';
 
