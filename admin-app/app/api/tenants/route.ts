@@ -23,6 +23,7 @@ type TenantRpcRow = {
 }
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+const CUSTOMER_APP_URL = (process.env.NEXT_PUBLIC_CUSTOMER_APP_URL || 'https://restaurant-ar.pages.dev').replace(/\/$/, '')
 
 function cleanSlug(value: string) {
   return value
@@ -34,6 +35,12 @@ function cleanSlug(value: string) {
 
 function isColor(value: unknown) {
   return typeof value === 'string' && (/^#[0-9a-fA-F]{6}$/.test(value) || value === '')
+}
+
+function tenantPreviewUrl(slug: string) {
+  const url = new URL(CUSTOMER_APP_URL)
+  url.searchParams.set('tenant', slug)
+  return url.toString()
 }
 
 export async function GET() {
@@ -121,7 +128,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     brand,
     restaurant,
-    previewUrl: `https://${restaurant.slug}.betareal.app`,
-    note: 'Wildcard Worker routing is external infrastructure; this API creates the database tenant for the shared template.',
+    previewUrl: tenantPreviewUrl(restaurant.slug),
+    note: 'Created database tenant. The live shared template opens it with ?tenant=<branch-slug>; wildcard domains/custom Vercel domains are separate infrastructure.',
   }, { status: 201 })
 }

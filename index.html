@@ -2112,7 +2112,16 @@
         }
         const _DEFAULT_RESTAURANT_SLUG = 'burger-lions-main';
         let _tenant = null;
+        function _tenantSlugFromUrl() {
+            const params = new URLSearchParams(location.search);
+            const requested = params.get('tenant') || params.get('restaurant') || params.get('slug');
+            if (!requested) return null;
+            const slug = requested.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+            return slug || null;
+        }
         function _tenantSlugFromHost() {
+            const urlSlug = _tenantSlugFromUrl();
+            if (urlSlug) return urlSlug;
             const host = location.hostname.toLowerCase();
             if (host === 'localhost' || host === '127.0.0.1' || host === 'restaurant-ar.pages.dev') {
                 return _DEFAULT_RESTAURANT_SLUG;

@@ -26,6 +26,12 @@ const PLAN_LABELS: Record<Brand['plan'], string> = {
   premium: 'Premium 900',
 }
 
+const CUSTOMER_APP_URL = (process.env.NEXT_PUBLIC_CUSTOMER_APP_URL || 'https://restaurant-ar.pages.dev').replace(/\/$/, '')
+
+function tenantPreviewUrl(slug: string) {
+  return `${CUSTOMER_APP_URL}/?tenant=${encodeURIComponent(slug)}`
+}
+
 function slugify(value: string) {
   return value
     .trim()
@@ -92,7 +98,7 @@ export default function TenantsPage() {
       setMessage(json.error || 'Tenant creation failed')
       return
     }
-    setMessage(`Created ${json.brand.name}. Future shared-template URL: ${json.previewUrl}`)
+    setMessage(`Created ${json.brand.name}. Live shared-template URL: ${json.previewUrl}`)
     setForm({
       brandName: '',
       brandSlug: '',
@@ -178,7 +184,7 @@ export default function TenantsPage() {
             {saving ? 'Creating...' : 'Create tenant'}
           </button>
           <span className="text-xs" style={{ color: 'var(--dim)' }}>
-            Creates DB rows only. Worker wildcard routing and custom domains are separate infrastructure.
+            Creates DB rows and gives a working shared-template URL. Custom domains/Vercel aliases are separate infrastructure.
           </span>
         </div>
       </section>
@@ -210,7 +216,11 @@ export default function TenantsPage() {
                       {(brand.restaurants ?? []).map(r => r.name).join(', ') || 'None'}
                     </td>
                     <td className="px-4 py-3 font-mono text-xs" style={{ color: 'var(--dim)' }}>
-                      {first ? `${first.slug}.betareal.app` : 'Pending first branch'}
+                      {first ? (
+                        <a href={tenantPreviewUrl(first.slug)} target="_blank" rel="noreferrer" style={{ color: 'var(--gold)' }}>
+                          {tenantPreviewUrl(first.slug)}
+                        </a>
+                      ) : 'Pending first branch'}
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-xs px-2 py-0.5 rounded-full"
