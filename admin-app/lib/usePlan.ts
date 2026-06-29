@@ -64,6 +64,13 @@ function legacyPlatformPlan(plan: PlanId): PlatformPlanId {
   return 'ar_menu'
 }
 
+function requestedRestaurantSlug() {
+  if (typeof window === 'undefined') return ''
+  const params = new URLSearchParams(window.location.search)
+  const requested = params.get('tenant') || params.get('restaurant') || params.get('restaurantSlug') || params.get('slug')
+  return requested?.trim().toLowerCase().replace(/[^a-z0-9-]/g, '') ?? ''
+}
+
 function accessFor(
   role: RoleId,
   plan: PlanId,
@@ -151,10 +158,11 @@ export function usePlan(): PlanAccess {
             restaurantName: restaurant?.name ?? '',
           }
         } else if (role === 'super_admin') {
+          const selectedSlug = requestedRestaurantSlug() || 'burger-lions-main'
           const { data: burgerLions } = await supabase
             .from('restaurants')
             .select('id, slug, name, brand_id, brands(plan)')
-            .eq('slug', 'burger-lions-main')
+            .eq('slug', selectedSlug)
             .maybeSingle()
           if (burgerLions) {
             const brand = (Array.isArray(burgerLions.brands) ? burgerLions.brands[0] : burgerLions.brands) as { plan?: string } | null

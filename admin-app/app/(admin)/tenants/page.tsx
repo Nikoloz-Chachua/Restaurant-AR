@@ -32,6 +32,10 @@ function tenantPreviewUrl(slug: string) {
   return `${CUSTOMER_APP_URL}/?tenant=${encodeURIComponent(slug)}`
 }
 
+function tenantAdminUrl(slug: string) {
+  return `/menu?tenant=${encodeURIComponent(slug)}`
+}
+
 function slugify(value: string) {
   return value
     .trim()
@@ -109,6 +113,25 @@ export default function TenantsPage() {
       secondaryColor: '',
       createStarterCategory: true,
     })
+    await load()
+  }
+
+  async function deleteTenant(brand: Brand) {
+    if (brand.slug === 'burger-lions') {
+      setMessage('Burger Lions is protected and cannot be deleted from this panel')
+      return
+    }
+    if (!window.confirm(`Delete ${brand.name}? This removes its restaurants, menu, categories, theme rows, and live tenant link.`)) return
+    setSaving(true)
+    setMessage('')
+    const res = await fetch(`/api/tenants?brandId=${brand.id}`, { method: 'DELETE' })
+    const json = await res.json().catch(() => ({}))
+    setSaving(false)
+    if (!res.ok) {
+      setMessage(json.error || 'Tenant deletion failed')
+      return
+    }
+    setMessage(`Deleted ${brand.name}`)
     await load()
   }
 
@@ -196,7 +219,7 @@ export default function TenantsPage() {
           <table className="w-full text-sm" style={{ minWidth: '760px' }}>
             <thead>
               <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
-                {['Brand', 'Plan', 'Branches', 'Shared-template URL', 'Status'].map(h => (
+                {['Brand', 'Plan', 'Branches', 'Shared-template URL', 'Status', 'Actions'].map(h => (
                   <th key={h} className="px-4 py-3 text-left font-medium" style={{ color: 'var(--dim)' }}>{h}</th>
                 ))}
               </tr>
@@ -208,12 +231,23 @@ export default function TenantsPage() {
                   <tr key={brand.id}
                       style={{ background: i % 2 ? 'var(--card)' : 'transparent', borderBottom: '1px solid var(--border)' }}>
                     <td className="px-4 py-3">
-                      <div className="font-medium">{brand.name}</div>
+                      {first ? (
+                        <a href={tenantAdminUrl(first.slug)} className="font-medium hover:underline" style={{ color: 'var(--text)' }}>
+                          {brand.name}
+                        </a>
+                      ) : <div className="font-medium">{brand.name}</div>}
                       <div className="text-xs mt-0.5" style={{ color: 'var(--dim)' }}>{brand.slug}</div>
                     </td>
                     <td className="px-4 py-3" style={{ color: 'var(--gold)' }}>{PLAN_LABELS[brand.plan]}</td>
                     <td className="px-4 py-3" style={{ color: 'var(--dim)' }}>
-                      {(brand.restaurants ?? []).map(r => r.name).join(', ') || 'None'}
+                      {(brand.restaurants ?? []).length ? (brand.restaurants ?? []).map((r, idx) => (
+                        <span key={r.id}>
+                          {idx > 0 ? ', ' : ''}
+                          <a href={tenantAdminUrl(r.slug)} className="hover:underline" style={{ color: 'var(--gold)' }}>
+                            {r.name}
+                          </a>
+                        </span>
+                      )) : 'None'}
                     </td>
                     <td className="px-4 py-3 font-mono text-xs" style={{ color: 'var(--dim)' }}>
                       {first ? (
@@ -228,6 +262,20 @@ export default function TenantsPage() {
                                      color: first?.status === 'active' ? 'var(--success)' : 'var(--danger)' }}>
                         {first?.status ?? 'none'}
                       </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => void deleteTenant(brand)}
+                        disabled={saving || brand.slug === 'burger-lions'}
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold"
+                        style={{
+                          border: '1px solid rgba(224,82,82,0.35)',
+                          color: brand.slug === 'burger-lions' ? 'var(--dim)' : 'var(--danger)',
+                          opacity: saving || brand.slug === 'burger-lions' ? 0.5 : 1,
+                        }}
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 )

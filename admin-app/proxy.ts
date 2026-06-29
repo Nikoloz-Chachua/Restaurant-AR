@@ -7,6 +7,7 @@ export async function proxy(request: NextRequest) {
   const isProtected = pathname.startsWith('/dashboard') ||
                       pathname.startsWith('/dev-analytics') ||
                       pathname.startsWith('/menu') ||
+                      pathname.startsWith('/tenants') ||
                       pathname.startsWith('/theme') ||
                       pathname === '/'
 

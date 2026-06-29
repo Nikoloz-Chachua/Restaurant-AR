@@ -132,3 +132,34 @@ export async function POST(req: NextRequest) {
     note: 'Created database tenant. The live shared template opens it with ?tenant=<branch-slug>; wildcard domains/custom Vercel domains are separate infrastructure.',
   }, { status: 201 })
 }
+
+export async function DELETE(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const role = user?.app_metadata?.role ?? user?.user_metadata?.role
+  if (!user || !['super_admin', 'creator', 'dev'].includes(String(role))) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  const brandId = Number(req.nextUrl.searchParams.get('brandId'))
+  if (!Number.isInteger(brandId) || brandId <= 0) {
+    return NextResponse.json({ error: 'Valid brandId is required' }, { status: 400 })
+  }
+
+  const { data: brand, error: loadError } = await supabase
+    .from('brands')
+    .select('id, name, slug')
+    .eq('id', brandId)
+    .maybeSingle()
+
+  if (loadError) return NextResponse.json({ error: loadError.message }, { status: 500 })
+  if (!brand) return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
+  if (brand.slug === 'burger-lions') {
+    return NextResponse.json({ error: 'Burger Lions is protected and cannot be deleted from this panel' }, { status: 400 })
+  }
+
+  const { error } = await supabase.from('brands').delete().eq('id', brandId)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  return NextResponse.json({ deleted: true, brand })
+}
