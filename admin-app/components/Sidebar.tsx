@@ -56,6 +56,7 @@ export default function Sidebar({ open, onClose }: Props) {
   const T = translations[lang]
 
   const NAV = [
+    plan.canManageTenants ? { href: '/tenants', label: 'Tenants', icon: '▦' } : null,
     { href: '/menu',      label: T.navMenu,      icon: '🍔' },
     plan.canUseAnalytics ? { href: '/dashboard', label: T.navAnalytics, icon: '📊' } : null,
     plan.canUseDeveloperAnalytics ? { href: '/dev-analytics', label: T.navDeveloperAnalytics, icon: '🛠' } : null,
@@ -169,7 +170,7 @@ export default function Sidebar({ open, onClose }: Props) {
       {/* Footer links */}
       <div className="px-3 pb-4 shrink-0">
         <a
-          href="https://3darmenu.pages.dev"
+          href="https://restaurant-ar.pages.dev"
           target="_blank"
           rel="noreferrer"
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm mb-1 transition-colors duration-150"

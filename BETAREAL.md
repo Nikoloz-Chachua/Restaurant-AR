@@ -67,7 +67,7 @@ Our long-term advantage — the "moat" — is a **data flywheel**: every restaur
 | **Funding** | Bootstrapped. ~₾300–400 spent on equipment, from CEO's leftover prize money from a previous accelerator. |
 | **Current #1 goal** | Acceptance into **2080 Ventures** and **GITA collaborative accelerator**. |
 | **Showcase / demo** | "Burger Lions" — built on a real nearby burger restaurant's menu; **not a client**, used as the demo dataset. |
-| **Live demo URL** | https://3darmenu.pages.dev |
+| **Live demo URL** | https://restaurant-ar.pages.dev |
 
 ---
 
@@ -123,7 +123,7 @@ Customer sits down
 Scans QR code on the table
       │
       ▼
-Browser opens 3darmenu.pages.dev  (no app, ~instant)
+Browser opens restaurant-ar.pages.dev  (no app, ~instant)
       │
       ▼
 Menu renders: categories, prices, live 3D thumbnails
@@ -158,11 +158,11 @@ We run **three** distinct front-ends:
 
 | Surface | What it is | Where it lives | Who uses it |
 |---|---|---|---|
-| **Customer menu app** | `index.html` — the WebAR menu | **Cloudflare Pages** → https://3darmenu.pages.dev | Restaurant guests |
+| **Customer menu app** | `index.html` — shared WebAR menu template | **Cloudflare Pages** → https://restaurant-ar.pages.dev | Restaurant guests |
 | **Admin panel** | `admin-app/` — Next.js app to manage menu + theme + view analytics | **Vercel** (George's account) | Restaurant staff / us |
 | **Analytics dashboard** | `admin.html` — Chart.js dashboard | Served from Cloudflare Pages, **embedded via iframe** inside the admin panel's Dashboard page | Restaurant owners / us |
 
-The admin panel's Dashboard page embeds `https://3darmenu.pages.dev/admin.html` in an iframe and securely passes the admin's language, theme, and Supabase access token via `postMessage` (locked to the exact origin, never `*`).
+The admin panel's Dashboard page embeds `https://restaurant-ar.pages.dev/admin.html` in an iframe and securely passes the admin's language, theme, and Supabase access token via `postMessage` (locked to the exact origin, never `*`). Tenant-scoped analytics should carry `brand_id` and `restaurant_id`.
 
 ---
 
@@ -181,7 +181,7 @@ The admin panel's Dashboard page embeds `https://3darmenu.pages.dev/admin.html` 
                 ▼                                   ▼
       ┌───────────────────────┐          ┌────────────────────────┐
       │  SUPABASE (Postgres)  │          │  CLOUDFLARE R2 (models) │
-      │  menu_items           │          │  + Supabase Storage     │
+      │  menu_items           │          │  + Cloudflare R2        │
       │  categories           │          │    (legacy models,      │
       │  theme_config         │          │     thumbnails as WebP) │
       │  events               │          └────────────────────────┘
@@ -218,7 +218,7 @@ The admin panel's Dashboard page embeds `https://3darmenu.pages.dev/admin.html` 
 - **Pages:**
   - `/login` — Supabase email+password sign-in.
   - `/dashboard` — analytics (embeds `admin.html` via iframe, passes prefs + token via `postMessage`).
-  - `/menu` — items + categories CRUD; GLB upload (presigned to R2), thumbnail upload (client-side WebP conversion → Supabase Storage), per-item `ar_scale`, `visible`, `sort_order`, `thumb_3d`.
+  - `/menu` — tenant-scoped items + categories CRUD; GLB/USDZ/thumbnail uploads are presigned to R2 with restaurant-slug-prefixed keys, per-item `ar_scale`, `visible`, `sort_order`, `thumb_3d`.
   - `/theme` — day/night color palettes, body/heading Google Fonts, branding name (writes `theme_config`).
 - **API route `/api/r2-presign`:** authenticates the user via Supabase, validates the file is `.glb`, then returns a short-lived (5 min) presigned **PUT** URL to Cloudflare R2 plus the resulting public URL. The browser uploads **directly to R2**, bypassing Next.js entirely (no request-size limit — this fixed an earlier 413 error).
 - **i18n:** the admin panel itself is bilingual (English/Georgian) via `lib/i18n.ts` + `lib/useLang.ts`.
@@ -246,7 +246,7 @@ The admin panel's Dashboard page embeds `https://3darmenu.pages.dev/admin.html` 
 | `description_en`, `description_ka` | text | Bilingual description |
 | `price` | text | Free-form (e.g., `"14 ₾"`) — stored as text, not numeric |
 | `category_id` | int (FK → categories) | |
-| `model` | text (URL) | Full URL to the GLB (R2 or Supabase Storage) |
+| `model` | text (URL) | Full URL to the GLB (R2 target storage) |
 | `thumbnail_url` | text (URL) | Optional uploaded WebP thumbnail |
 | `thumb_3d` | bool | If true, thumbnail shows live 3D instead of the image |
 | `ar_scale` | numeric | Per-item AR scale multiplier (default 1.0) |
@@ -275,8 +275,8 @@ The admin panel's Dashboard page embeds `https://3darmenu.pages.dev/admin.html` 
 | Asset | Where | Notes |
 |---|---|---|
 | **3D models (GLB)** | **Cloudflare R2** (going-forward standard) | Public bucket `pub-3c68559de18f4aee94d127e180937bdd.r2.dev`. Chosen for speed + high upload limit. Uploaded via presigned PUT from the admin panel. |
-| **Legacy 3D models** | Supabase Storage `models` bucket | Older items (hot dog, croissant, donut) still here. **Migrate to R2.** |
-| **Thumbnails** | Supabase Storage `thumbnails` bucket | Uploaded images are converted **client-side to WebP** (quality 0.88) before upload. |
+| **Legacy 3D models** | Historical Supabase Storage paths may exist | Do not add new heavy assets there. Migrate remaining legacy URLs to R2 as items are touched. |
+| **Thumbnails** | **Cloudflare R2** | Uploaded images are converted client-side to WebP (quality 0.88), then stored under the restaurant slug prefix. |
 
 **Decision (2026-06-09): R2 is the standard for models.** Migrate remaining Supabase-hosted models to R2 so there's one storage system to reason about.
 
@@ -332,7 +332,7 @@ This is a genuine product differentiator: **most QR menus give the restaurant ze
 > - **`main`** → Vercel → **admin app** (`admin-app/`).
 >
 > So: customer-app changes go on `cloudflare`; **admin-app changes must go on `main`** to actually deploy. A commit to one branch does **not** affect the other deploy.
-| Database, Auth, thumbnails, legacy models | **Supabase** | Temo (personal org) | Project `xctoxhaahxtcicfgnmme` |
+| Database, Auth | **Supabase** | Temo (personal org) | Shared project; tenant isolation must be enforced by RLS |
 | "Everything hosted via my device" | Local (Temo) | Temo | ⚠️ Single point of failure |
 
 **Admin app environment variables (Vercel):** `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL`, plus Supabase URL + anon key.
@@ -677,13 +677,13 @@ Demo:             "Burger Lions" — real nearby burger place, used as demo (NOT
 Stage:            Pre-revenue, MVP live, validation in progress
 Team:             5 active founders (CS students, TSU); originally 6 (1 left amicably)
 Market:           Tbilisi → Georgia → international
-Live customer app:  https://3darmenu.pages.dev        (Cloudflare Pages, branch `cloudflare`)
+Live customer app:  https://restaurant-ar.pages.dev        (Cloudflare Pages, branch `cloudflare`)
 Admin panel:        Next.js 16 / React 19 on Vercel (George's account)
 Analytics:          admin.html (Chart.js), embedded in admin via iframe
 Database:           Supabase project xctoxhaahxtcicfgnmme ("Restaurant AR Claude version")
 Tables:             menu_items, categories, theme_config, events  (+ Auth)
-Model storage:      Cloudflare R2 (standard) + legacy Supabase Storage (migrate)
-Thumbnails:         Supabase Storage, client-side WebP
+Model storage:      Cloudflare R2 with restaurant-slug key prefixes
+Thumbnails:         Cloudflare R2, client-side WebP
 SW cache version:   bl-v55  (BUMP on index.html / sw.js / menu.json / GLB changes)
 Production:         Lightbox photos → KIRI Engine → Blender → GLB → admin → R2  (~20 min/dish)
 Model sizes:        ~5.8–8.6 MB, no Draco (decoder download not worth it)

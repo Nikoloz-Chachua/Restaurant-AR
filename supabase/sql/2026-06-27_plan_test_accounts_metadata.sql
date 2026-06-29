@@ -4,25 +4,25 @@
 
 update auth.users
 set
-  raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role":"creator","plan":"creator"}'::jsonb,
+  raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role":"super_admin"}'::jsonb,
   raw_user_meta_data = coalesce(raw_user_meta_data, '{}'::jsonb) - 'role' - 'plan'
 where lower(email) = 'creator@betareal.test';
 
 update auth.users
 set
-  raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role":"client","plan":"basic300"}'::jsonb,
+  raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role":"brand_owner"}'::jsonb,
   raw_user_meta_data = coalesce(raw_user_meta_data, '{}'::jsonb) - 'role' - 'plan'
 where lower(email) = 'basic300@betareal.test';
 
 update auth.users
 set
-  raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role":"client","plan":"full450"}'::jsonb,
+  raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role":"brand_owner"}'::jsonb,
   raw_user_meta_data = coalesce(raw_user_meta_data, '{}'::jsonb) - 'role' - 'plan'
 where lower(email) = 'full450@betareal.test';
 
 update auth.users
 set
-  raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role":"client","plan":"premium900"}'::jsonb,
+  raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role":"brand_owner"}'::jsonb,
   raw_user_meta_data = coalesce(raw_user_meta_data, '{}'::jsonb) - 'role' - 'plan'
 where lower(email) = 'premium900@betareal.test';
 

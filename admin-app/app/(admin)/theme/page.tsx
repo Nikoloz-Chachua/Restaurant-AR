@@ -63,16 +63,16 @@ export default function ThemePage() {
   const [tab, setTab]         = useState<'night' | 'day' | 'fonts' | 'branding'>('night')
 
   const load = useCallback(async () => {
-    if (plan.loading || !plan.canUseTheme) {
+    if (plan.loading || !plan.canUseTheme || !plan.restaurantId) {
       setLoading(plan.loading)
       return
     }
-    const { data } = await supabase.from('theme_config').select('key,value')
+    const { data } = await supabase.from('theme_config').select('key,value').eq('restaurant_id', plan.restaurantId)
     const map: ThemeConfig = {}
     data?.forEach(r => { map[r.key] = r.value })
     setConfig(map)
     setLoading(false)
-  }, [plan.canUseTheme, plan.loading, supabase])
+  }, [plan.canUseTheme, plan.loading, plan.restaurantId, supabase])
 
   useEffect(() => { void Promise.resolve().then(load) }, [load])
 
@@ -82,8 +82,8 @@ export default function ThemePage() {
 
   async function save() {
     setSaving(true)
-    const rows = Object.entries(config).map(([key, value]) => ({ key, value }))
-    await supabase.from('theme_config').upsert(rows, { onConflict: 'key' })
+    const rows = Object.entries(config).map(([key, value]) => ({ key, value, restaurant_id: plan.restaurantId }))
+    await supabase.from('theme_config').upsert(rows, { onConflict: 'restaurant_id,key' })
     setSaving(false)
     setMsg(T.saved)
     setTimeout(() => setMsg(''), 4000)
@@ -91,7 +91,7 @@ export default function ThemePage() {
 
   async function reset() {
     if (!confirm(T.resetConfirm)) return
-    await supabase.from('theme_config').delete().neq('key', '__none__')
+    await supabase.from('theme_config').delete().eq('restaurant_id', plan.restaurantId).neq('key', '__none__')
     await load()
     setMsg(T.resetDone)
     setTimeout(() => setMsg(''), 3000)
@@ -120,6 +120,9 @@ export default function ThemePage() {
         <div>
           <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>{T.themeTitle}</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--dim)' }}>{T.themeDesc}</p>
+          <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
+            Tenant: <span style={{ color: 'var(--text)' }}>{plan.restaurantName}</span>
+          </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {msg && (
@@ -194,9 +197,9 @@ export default function ThemePage() {
       <div className="mt-8 p-4 rounded-xl text-sm"
            style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
         <span style={{ color: 'var(--dim)' }}>{T.reloadHint}</span>
-        <a href="https://3darmenu.pages.dev" target="_blank" rel="noreferrer"
+        <a href="https://restaurant-ar.pages.dev" target="_blank" rel="noreferrer"
            style={{ color: 'var(--gold)' }}>
-          3darmenu.pages.dev ↗
+          restaurant-ar.pages.dev ↗
         </a>
       </div>
     </div>
