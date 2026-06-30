@@ -44,3 +44,25 @@ The admin upload flow uses R2 only when these env vars are present. It does not 
 3. Create/manage an R2 API token with Object Read & Write for that bucket.
 4. Add Vercel Production env vars: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL`.
 5. `R2_PUBLIC_URL` requires enabling public `r2.dev` access or adding a custom public domain later.
+
+## Runtime layout
+
+Current customer sites are not separate hosted apps. They run from the single Cloudflare Pages shared template at `https://restaurant-ar.pages.dev`, with the active branch selected by `?tenant=<branch_slug>`.
+
+The admin runs separately on Vercel at `https://betareal-admin.vercel.app`. Uploaded models and logos go to the Cloudflare R2 bucket `betareal-assets`.
+
+Local dev runs the admin on `http://localhost:3000`; the public static template can be served from the repo root with `npm run dev` or another static server.
+
+Direct browser PUT uploads require R2 bucket CORS. In Cloudflare R2, add a CORS policy like:
+
+```json
+[
+  {
+    "AllowedOrigins": ["https://betareal-admin.vercel.app", "http://localhost:3000"],
+    "AllowedMethods": ["GET", "HEAD", "PUT"],
+    "AllowedHeaders": ["Content-Type"],
+    "ExposeHeaders": ["ETag"],
+    "MaxAgeSeconds": 3600
+  }
+]
+```

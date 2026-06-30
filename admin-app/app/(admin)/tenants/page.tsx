@@ -40,7 +40,29 @@ type CreatedTenantResponse = {
   error?: string
 }
 
-type StarterTemplateKey = 'burger_cafe' | 'empty'
+type StarterTemplateKey = 'burger_cafe_gold' | 'cream_cafe'
+type TenantForm = {
+  brandName: string
+  brandSlug: string
+  restaurantName: string
+  restaurantSlug: string
+  plan: Brand['plan']
+  templateKey: StarterTemplateKey
+  primaryColor: string
+  secondaryColor: string
+  createStarterCategory: boolean
+  adminEmail: string
+  adminPassword: string
+}
+type BranchForm = {
+  branchName: string
+  branchArea: string
+  branchSlug: string
+  templateKey: StarterTemplateKey
+  primaryColor: string
+  secondaryColor: string
+  createStarterCategory: boolean
+}
 
 const PLAN_LABELS: Record<Brand['plan'], string> = {
   ar_menu: 'AR Menu 300',
@@ -48,18 +70,29 @@ const PLAN_LABELS: Record<Brand['plan'], string> = {
   premium: 'Premium 900',
 }
 
-const STARTER_TEMPLATE_OPTIONS: { key: StarterTemplateKey; label: string; description: string; createStarterCategory: boolean }[] = [
+const STARTER_TEMPLATE_OPTIONS: {
+  key: StarterTemplateKey
+  label: string
+  description: string
+  primaryColor: string
+  secondaryColor: string
+  createStarterCategory: boolean
+}[] = [
   {
-    key: 'burger_cafe',
-    label: 'Burger / cafe starter',
-    description: 'Adds the shared starter Featured category.',
+    key: 'burger_cafe_gold',
+    label: 'Burger / cafe gold',
+    description: 'Dark burger-cafe look with gold accents and starter menu content.',
+    primaryColor: '#f2b535',
+    secondaryColor: '#c07808',
     createStarterCategory: true,
   },
   {
-    key: 'empty',
-    label: 'Clean empty menu',
-    description: 'Starts with no sample categories.',
-    createStarterCategory: false,
+    key: 'cream_cafe',
+    label: 'Cream cafe',
+    description: 'Light cream cafe palette with orange and green accents.',
+    primaryColor: '#d97706',
+    secondaryColor: '#2f7d57',
+    createStarterCategory: true,
   },
 ]
 
@@ -73,12 +106,21 @@ function tenantAdminUrl(slug: string) {
   return `/menu?tenant=${encodeURIComponent(slug)}`
 }
 
-function templateKeyFromStarter(createStarterCategory: boolean): StarterTemplateKey {
-  return createStarterCategory ? 'burger_cafe' : 'empty'
+function starterTemplate(templateKey: string) {
+  return STARTER_TEMPLATE_OPTIONS.find(option => option.key === templateKey) ?? STARTER_TEMPLATE_OPTIONS[0]
 }
 
-function starterFromTemplateKey(templateKey: string) {
-  return STARTER_TEMPLATE_OPTIONS.find(option => option.key === templateKey)?.createStarterCategory ?? true
+function emptyBranchForm(): BranchForm {
+  const template = starterTemplate('burger_cafe_gold')
+  return {
+    branchName: '',
+    branchArea: '',
+    branchSlug: '',
+    templateKey: template.key,
+    primaryColor: template.primaryColor,
+    secondaryColor: template.secondaryColor,
+    createStarterCategory: template.createStarterCategory,
+  }
 }
 
 function slugify(value: string) {
@@ -122,15 +164,16 @@ export default function TenantsPage() {
   const [logoStatus, setLogoStatus] = useState('')
   const logoInputRef = useRef<HTMLInputElement>(null)
   const [credentials, setCredentials] = useState<OneTimeCredentials | null>(null)
-  const [branchForm, setBranchForm] = useState<Record<number, { branchName: string; branchArea: string; branchSlug: string; createStarterCategory: boolean }>>({})
-  const [form, setForm] = useState({
+  const [branchForm, setBranchForm] = useState<Record<number, BranchForm>>({})
+  const [form, setForm] = useState<TenantForm>({
     brandName: '',
     brandSlug: '',
     restaurantName: '',
     restaurantSlug: '',
     plan: 'ar_menu' as Brand['plan'],
-    primaryColor: '',
-    secondaryColor: '',
+    templateKey: 'burger_cafe_gold',
+    primaryColor: '#f2b535',
+    secondaryColor: '#c07808',
     createStarterCategory: true,
     adminEmail: '',
     adminPassword: '',
@@ -154,6 +197,13 @@ export default function TenantsPage() {
   function update<K extends keyof typeof form>(key: K, value: typeof form[K]) {
     setForm(current => {
       const next = { ...current, [key]: value }
+      if (key === 'templateKey') {
+        const template = starterTemplate(String(value))
+        next.templateKey = template.key
+        next.primaryColor = template.primaryColor
+        next.secondaryColor = template.secondaryColor
+        next.createStarterCategory = template.createStarterCategory
+      }
       if (key === 'brandName' && !current.brandSlug) next.brandSlug = slugify(String(value))
       if ((key === 'brandName' || key === 'brandSlug') && !current.restaurantSlug) {
         next.restaurantSlug = `${slugify(key === 'brandSlug' ? String(value) : next.brandSlug)}-main`
@@ -164,11 +214,16 @@ export default function TenantsPage() {
   }
 
   async function uploadTenantLogo(file: File, restaurant: { id: number; slug: string }) {
-    if (!file.type.startsWith('image/')) {
-      throw new Error('Only image files are supported for logos')
+    if (file.type === 'image/svg+xml' || /\.svg$/i.test(file.name)) {
+      throw new Error('SVG logos are not supported here. Upload PNG, JPG, or WebP.')
+    }
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+      throw new Error('Only PNG, JPG, or WebP logos are supported')
     }
     setLogoStatus('Uploading logo...')
-    const blob = await imageToWebP(file)
+    const blob = await imageToWebP(file).catch(error => {
+      throw new Error(`Logo conversion failed: ${error instanceof Error ? error.message : String(error)}`)
+    })
     const filename = file.name.replace(/\.[^.]+$/i, '.webp')
     const presign = await fetch('/api/r2-presign', {
       method: 'POST',
@@ -177,20 +232,25 @@ export default function TenantsPage() {
     })
     if (!presign.ok) {
       const err = await presign.json().catch(() => ({}))
-      throw new Error(err.error || `Logo presign failed: ${presign.status}`)
+      throw new Error(`Logo presign failed: ${err.error || presign.status}`)
     }
     const { uploadUrl, publicUrl } = await presign.json()
-    const upload = await fetch(uploadUrl, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'image/webp' },
-      body: blob,
-    })
-    if (!upload.ok) throw new Error(`Logo upload failed: ${upload.status}`)
+    let upload: Response
+    try {
+      upload = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'image/webp' },
+        body: blob,
+      })
+    } catch (error) {
+      throw new Error(`R2 upload failed before the server responded: ${error instanceof Error ? error.message : String(error)}. Check R2 CORS for browser PUT from this admin origin.`)
+    }
+    if (!upload.ok) throw new Error(`R2 upload failed: HTTP ${upload.status} ${upload.statusText || ''}`.trim())
     const { error } = await supabase.from('theme_config').upsert(
       { restaurant_id: restaurant.id, key: 'logo_url', value: publicUrl },
       { onConflict: 'restaurant_id,key' },
     )
-    if (error) throw new Error(error.message)
+    if (error) throw new Error(`Theme save failed: ${error.message}`)
     setLogoStatus('Logo uploaded')
   }
 
@@ -215,8 +275,9 @@ export default function TenantsPage() {
         await uploadTenantLogo(logoFile, { id: json.restaurant.id, slug: json.restaurant.slug })
         logoNote = ' Logo added.'
       } catch (e) {
-        logoNote = ` Logo upload skipped: ${e instanceof Error ? e.message : String(e)}.`
-        setLogoStatus('Logo upload failed')
+        const reason = e instanceof Error ? e.message : String(e)
+        logoNote = ` Logo upload skipped: ${reason}.`
+        setLogoStatus(`Logo upload failed: ${reason}`)
       }
     }
     setSaving(false)
@@ -238,8 +299,9 @@ export default function TenantsPage() {
       restaurantName: '',
       restaurantSlug: '',
       plan: 'ar_menu',
-      primaryColor: '',
-      secondaryColor: '',
+      templateKey: 'burger_cafe_gold',
+      primaryColor: '#f2b535',
+      secondaryColor: '#c07808',
       createStarterCategory: true,
       adminEmail: '',
       adminPassword: '',
@@ -250,7 +312,7 @@ export default function TenantsPage() {
   }
 
   async function createBranch(brand: Brand) {
-    const current = branchForm[brand.id] ?? { branchName: '', branchArea: '', branchSlug: '', createStarterCategory: true }
+    const current = branchForm[brand.id] ?? emptyBranchForm()
     setSaving(true)
     setMessage('')
     const res = await fetch('/api/branches', {
@@ -267,15 +329,22 @@ export default function TenantsPage() {
     setMessage(`Created ${json.restaurant.name}. Admin URL: ${json.adminUrl}`)
     setBranchForm(forms => ({
       ...forms,
-      [brand.id]: { branchName: '', branchArea: '', branchSlug: '', createStarterCategory: true },
+      [brand.id]: emptyBranchForm(),
     }))
     await load()
   }
 
-  function updateBranchForm(brand: Brand, key: 'branchName' | 'branchArea' | 'branchSlug' | 'createStarterCategory', value: string | boolean) {
+  function updateBranchForm(brand: Brand, key: keyof BranchForm, value: string | boolean) {
     setBranchForm(forms => {
-      const current = forms[brand.id] ?? { branchName: '', branchArea: '', branchSlug: '', createStarterCategory: true }
+      const current = forms[brand.id] ?? emptyBranchForm()
       const next = { ...current, [key]: value }
+      if (key === 'templateKey') {
+        const template = starterTemplate(String(value))
+        next.templateKey = template.key
+        next.primaryColor = template.primaryColor
+        next.secondaryColor = template.secondaryColor
+        next.createStarterCategory = template.createStarterCategory
+      }
       if ((key === 'branchArea' || key === 'branchName') && !current.branchSlug) {
         const area = String(key === 'branchArea' ? value : next.branchArea || value)
         next.branchSlug = slugify(`${brand.slug}-${area}`)
@@ -392,15 +461,15 @@ export default function TenantsPage() {
           </Field>
           <Field label="Menu template">
             <select
-              value={templateKeyFromStarter(form.createStarterCategory)}
-              onChange={e => update('createStarterCategory', starterFromTemplateKey(e.target.value))}
+              value={form.templateKey}
+              onChange={e => update('templateKey', e.target.value as StarterTemplateKey)}
             >
               {STARTER_TEMPLATE_OPTIONS.map(option => (
                 <option key={option.key} value={option.key}>{option.label}</option>
               ))}
             </select>
             <div className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-              Optional shared starter content only; branch URLs and settings stay the same.
+              {starterTemplate(form.templateKey).description}
             </div>
           </Field>
           <Field label="Primary color">
@@ -431,7 +500,7 @@ export default function TenantsPage() {
               <input
                 ref={logoInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/png,image/jpeg,image/webp"
                 onChange={e => setLogoFile(e.target.files?.[0] ?? null)}
               />
               {logoFile && (
@@ -450,7 +519,7 @@ export default function TenantsPage() {
               )}
             </div>
             <div className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-              Optional. PNG, JPG, WebP, or SVG will be saved as a public WebP logo after tenant creation.
+              Optional. PNG, JPG, or WebP will be saved as a public WebP logo after tenant creation.
             </div>
             {logoStatus && (
               <div className="text-xs mt-1" style={{ color: logoStatus.includes('failed') ? 'var(--danger)' : 'var(--success)' }}>
@@ -557,7 +626,7 @@ export default function TenantsPage() {
                           <BranchCreator
                             brand={brand}
                             saving={saving}
-                            value={branchForm[brand.id] ?? { branchName: '', branchArea: '', branchSlug: '', createStarterCategory: true }}
+                            value={branchForm[brand.id] ?? emptyBranchForm()}
                             allowAnyPlan={access.canManageTenants}
                             onChange={updateBranchForm}
                             onCreate={() => void createBranch(brand)}
@@ -627,10 +696,10 @@ function BranchCreator({
   onCreate,
 }: {
   brand: Brand
-  value: { branchName: string; branchArea: string; branchSlug: string; createStarterCategory: boolean }
+  value: BranchForm
   allowAnyPlan: boolean
   saving: boolean
-  onChange: (brand: Brand, key: 'branchName' | 'branchArea' | 'branchSlug' | 'createStarterCategory', value: string | boolean) => void
+  onChange: (brand: Brand, key: keyof BranchForm, value: string | boolean) => void
   onCreate: () => void
 }) {
   const planAllowed = allowAnyPlan || brand.plan === 'premium'
@@ -661,8 +730,8 @@ function BranchCreator({
       <label className="block">
         <div className="text-xs mb-1 uppercase" style={{ color: 'var(--dim)' }}>Menu template</div>
         <select
-          value={templateKeyFromStarter(value.createStarterCategory)}
-          onChange={e => onChange(brand, 'createStarterCategory', starterFromTemplateKey(e.target.value))}
+          value={value.templateKey}
+          onChange={e => onChange(brand, 'templateKey', e.target.value)}
           disabled={disabled}
         >
           {STARTER_TEMPLATE_OPTIONS.map(option => (
@@ -670,9 +739,29 @@ function BranchCreator({
           ))}
         </select>
         <div className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-          Optional starter content for this branch.
+          {starterTemplate(value.templateKey).description}
         </div>
       </label>
+      <div className="grid grid-cols-2 gap-2">
+        <label className="block">
+          <div className="text-xs mb-1 uppercase" style={{ color: 'var(--dim)' }}>Primary</div>
+          <input
+            value={value.primaryColor}
+            onChange={e => onChange(brand, 'primaryColor', e.target.value)}
+            placeholder="#f2b535"
+            disabled={disabled}
+          />
+        </label>
+        <label className="block">
+          <div className="text-xs mb-1 uppercase" style={{ color: 'var(--dim)' }}>Secondary</div>
+          <input
+            value={value.secondaryColor}
+            onChange={e => onChange(brand, 'secondaryColor', e.target.value)}
+            placeholder="#c07808"
+            disabled={disabled}
+          />
+        </label>
+      </div>
       <button
         type="button"
         onClick={onCreate}
