@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 
 export type PlanId = 'creator' | 'basic300' | 'full450' | 'premium900'
 export type PlatformPlanId = 'ar_menu' | 'full' | 'premium'
-export type RoleId = 'super_admin' | 'brand_owner' | 'branch_staff'
+export type RoleId = 'super_admin' | 'brand_owner' | 'branch_manager' | 'branch_staff'
 
 export type PlanAccess = {
   role: RoleId
@@ -16,6 +16,8 @@ export type PlanAccess = {
   canUseTheme: boolean
   canUseDeveloperAnalytics: boolean
   canManageTenants: boolean
+  canManageBranches: boolean
+  canCreateBranches: boolean
   itemLimit: number | null
   label: string
   brandId: number | null
@@ -55,6 +57,7 @@ function normalizePlatformPlan(value: unknown): PlatformPlanId {
 
 function normalizeRole(value: unknown): RoleId {
   if (value === 'super_admin' || value === 'creator' || value === 'dev') return 'super_admin'
+  if (value === 'branch_manager') return 'branch_manager'
   if (value === 'branch_staff') return 'branch_staff'
   return 'brand_owner'
 }
@@ -89,17 +92,20 @@ function accessFor(
   const isSuperAdmin = role === 'super_admin'
   const hasTenantContext = Boolean(tenant.restaurantId)
   const hasFullAccess = hasTenantContext && (isSuperAdmin || platformPlan === 'full' || platformPlan === 'premium')
+  const canCreateBranches = isSuperAdmin || (role === 'brand_owner' && platformPlan === 'premium')
 
   return {
     role,
     plan,
     platformPlan,
     loading,
-    canUseMenu: true,
+    canUseMenu: !isSuperAdmin || hasTenantContext,
     canUseAnalytics: hasFullAccess,
     canUseTheme: hasFullAccess,
-    canUseDeveloperAnalytics: false,
+    canUseDeveloperAnalytics: isSuperAdmin,
     canManageTenants: isSuperAdmin,
+    canManageBranches: isSuperAdmin || role === 'brand_owner',
+    canCreateBranches,
     itemLimit: isSuperAdmin || platformPlan === 'premium' ? null : platformPlan === 'full' ? 7 : 5,
     label: PLATFORM_PLAN_LABELS[platformPlan] ?? PLAN_LABELS[plan],
     brandId: tenant.brandId ?? null,
@@ -168,7 +174,7 @@ export function usePlan(): PlanAccess {
           const restaurant = (Array.isArray(restaurantMemberships[0].restaurants) ? restaurantMemberships[0].restaurants[0] : restaurantMemberships[0].restaurants) as {
             id: number; slug: string; name: string; brand_id: number; brands?: { plan?: string } | { plan?: string }[]
           }
-          role = 'branch_staff'
+          role = normalizeRole(restaurantMemberships[0].role)
           await setTenantFromRestaurant(restaurant)
         } else if (!tenant.restaurantId && brandMemberships[0]) {
           const brandUser = brandMemberships[0]

@@ -34,3 +34,13 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Cloudflare R2 asset setup
+
+The admin upload flow uses R2 only when these env vars are present. It does not create buckets or delete assets automatically.
+
+1. Cloudflare Dashboard -> Storage & databases -> R2 Object Storage -> Create bucket.
+2. Suggested bucket name: `betareal-assets`.
+3. Create/manage an R2 API token with Object Read & Write for that bucket.
+4. Add Vercel Production env vars: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL`.
+5. `R2_PUBLIC_URL` requires enabling public `r2.dev` access or adding a custom public domain later.

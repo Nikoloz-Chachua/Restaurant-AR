@@ -13,6 +13,11 @@ export default function DashboardPage() {
   const tokenRef  = useRef('')
   const [T] = useLang()
   const plan = usePlan()
+  const analyticsSrc = `https://restaurant-ar.pages.dev/admin.html?${new URLSearchParams({
+    ...(plan.restaurantId ? { restaurantId: String(plan.restaurantId) } : {}),
+    ...(plan.brandId ? { brandId: String(plan.brandId) } : {}),
+    ...(plan.restaurantSlug ? { tenant: plan.restaurantSlug } : {}),
+  }).toString()}`
 
   useEffect(() => {
     createClient().auth.getSession()
@@ -96,7 +101,7 @@ export default function DashboardPage() {
       <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
         <iframe
           ref={iframeRef}
-          src="https://restaurant-ar.pages.dev/admin.html"
+          src={analyticsSrc}
           className="w-full"
           style={{ height: 'clamp(480px, calc(100dvh - 160px), 1200px)', border: 'none' }}
           title="Analytics Dashboard"

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 type TenantRequest = {
   brandName?: string
@@ -23,6 +23,23 @@ type TenantRpcRow = {
   restaurant_id: number
   restaurant_name: string
   restaurant_slug: string
+}
+
+type TenantBrand = {
+  id: number
+  name: string
+  slug: string
+  plan: 'ar_menu' | 'full' | 'premium'
+  created_at: string
+  restaurants?: {
+    id: number
+    name: string
+    slug: string
+    status: string
+    custom_domain: string | null
+    managerEmails?: string[]
+  }[]
+  adminEmails?: string[]
 }
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
@@ -54,12 +71,34 @@ function cleanEmail(value: unknown) {
   return String(value ?? '').trim().toLowerCase()
 }
 
-function adminClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!supabaseUrl || !serviceRoleKey) return null
-  return createSupabaseAdminClient(supabaseUrl, serviceRoleKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
+async function enrichTenantEmails(brands: TenantBrand[]) {
+  const service = createAdminClient()
+  if (!service || brands.length === 0) return brands
+
+  const [{ data: brandUsers }, { data: restaurantUsers }, { data: users }] = await Promise.all([
+    service.from('brand_users').select('brand_id, user_id, role'),
+    service.from('restaurant_users').select('restaurant_id, user_id, role'),
+    service.auth.admin.listUsers({ page: 1, perPage: 1000 }),
+  ])
+  const emailById = new Map(users?.users.map(user => [user.id, user.email ?? '']) ?? [])
+
+  return brands.map(brand => {
+    const adminEmails = (brandUsers ?? [])
+      .filter(row => Number(row.brand_id) === Number(brand.id))
+      .map(row => emailById.get(String(row.user_id)) ?? '')
+      .filter(Boolean)
+
+    return {
+      ...brand,
+      adminEmails,
+      restaurants: (brand.restaurants ?? []).map(restaurant => ({
+        ...restaurant,
+        managerEmails: (restaurantUsers ?? [])
+          .filter(row => Number(row.restaurant_id) === Number(restaurant.id))
+          .map(row => emailById.get(String(row.user_id)) ?? '')
+          .filter(Boolean),
+      })),
+    }
   })
 }
 
@@ -77,7 +116,8 @@ export async function GET() {
     .order('created_at', { ascending: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ brands: data ?? [] })
+  const brands = await enrichTenantEmails((data ?? []) as TenantBrand[])
+  return NextResponse.json({ brands })
 }
 
 export async function POST(req: NextRequest) {
@@ -155,7 +195,7 @@ export async function POST(req: NextRequest) {
 
   let adminUser: { id: string; email: string } | null = null
   if (adminEmail) {
-    const service = adminClient()
+    const service = createAdminClient()
     if (!service) {
       return NextResponse.json({
         error: 'Tenant created, but admin user was not linked because SUPABASE_SERVICE_ROLE_KEY is missing in admin-app env',
@@ -221,7 +261,7 @@ export async function POST(req: NextRequest) {
 
     const [{ error: brandLinkError }, { error: restaurantLinkError }] = await Promise.all([
       service.from('brand_users').upsert({ brand_id: brand.id, user_id: userId, role: 'brand_owner' }, { onConflict: 'brand_id,user_id' }),
-      service.from('restaurant_users').upsert({ restaurant_id: restaurant.id, user_id: userId, role: 'branch_staff' }, { onConflict: 'restaurant_id,user_id' }),
+      service.from('restaurant_users').upsert({ restaurant_id: restaurant.id, user_id: userId, role: 'branch_manager' }, { onConflict: 'restaurant_id,user_id' }),
     ])
     if (brandLinkError || restaurantLinkError) {
       return NextResponse.json({
@@ -238,7 +278,9 @@ export async function POST(req: NextRequest) {
     brand,
     restaurant,
     adminUser,
+    oneTimePassword: adminEmail ? adminPassword : null,
     previewUrl: tenantPreviewUrl(restaurant.slug),
+    credentialNote: adminEmail ? 'Password is shown once. Reset it if lost.' : null,
     note: 'Created database tenant. The live shared template opens it with ?tenant=<branch-slug>; wildcard domains/custom Vercel domains are separate infrastructure.',
   }, { status: 201 })
 }

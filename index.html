@@ -140,6 +140,17 @@
             transition: color var(--t);
         }
 
+        .tenant-logo {
+            display: none;
+            max-width: min(210px, 58vw);
+            max-height: 120px;
+            width: auto;
+            height: auto;
+            margin: 0 auto 18px;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 24px var(--shadow));
+        }
+
         /* Glowing divider under the hero title */
         .header::after {
             content: '';
@@ -1204,6 +1215,7 @@
     <button id="lang-toggle" aria-label="Toggle language">EN</button>
 
     <div class="header">
+        <img id="tenant-logo" class="tenant-logo" alt="" decoding="async">
         <h1>3D AR Menu</h1>
     </div>
 
@@ -2876,6 +2888,13 @@
                         el.textContent = (window.__lang === 'ka' && cfg.site_name_ka)
                             ? cfg.site_name_ka : (cfg.site_name || el.textContent);
                     });
+                }
+                const logo = document.getElementById('tenant-logo');
+                if (logo && cfg.logo_url) {
+                    logo.src = cfg.logo_url;
+                    logo.alt = cfg.site_name || tenant.restaurant_name || 'Restaurant logo';
+                    logo.style.display = 'block';
+                    logo.onerror = () => { logo.style.display = 'none'; };
                 }
             } catch (_) {}
         }

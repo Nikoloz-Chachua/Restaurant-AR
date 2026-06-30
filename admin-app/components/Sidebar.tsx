@@ -60,9 +60,10 @@ export default function Sidebar({ open, onClose }: Props) {
 
   const NAV = [
     plan.canManageTenants ? { href: '/tenants', label: 'Tenants', icon: '▦' } : null,
-    { href: tenantHref('/menu'), match: '/menu', label: T.navMenu, icon: '🍔' },
+    !plan.canManageTenants && plan.canManageBranches ? { href: '/tenants', label: 'Branches', icon: '▦' } : null,
+    plan.canUseMenu ? { href: tenantHref('/menu'), match: '/menu', label: T.navMenu, icon: '🍔' } : null,
     plan.canUseAnalytics ? { href: tenantHref('/dashboard'), match: '/dashboard', label: T.navAnalytics, icon: '📊' } : null,
-    plan.canUseDeveloperAnalytics ? { href: tenantHref('/dev-analytics'), match: '/dev-analytics', label: T.navDeveloperAnalytics, icon: '🛠' } : null,
+    plan.canUseDeveloperAnalytics ? { href: '/dev-analytics', match: '/dev-analytics', label: T.navDeveloperAnalytics, icon: '🛠' } : null,
     plan.canUseTheme ? { href: tenantHref('/theme'), match: '/theme', label: T.navTheme, icon: '🎨' } : null,
   ].filter((item): item is { href: string; match?: string; label: string; icon: string } => Boolean(item))
 

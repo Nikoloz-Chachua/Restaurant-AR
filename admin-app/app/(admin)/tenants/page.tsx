@@ -1,7 +1,8 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { usePlan } from '@/lib/usePlan'
 import LockedCard from '@/components/LockedCard'
+import { createClient } from '@/lib/supabase/client'
 
 type Restaurant = {
   id: number
@@ -9,6 +10,7 @@ type Restaurant = {
   slug: string
   status: string
   custom_domain: string | null
+  managerEmails?: string[]
 }
 
 type Brand = {
@@ -18,13 +20,48 @@ type Brand = {
   plan: 'ar_menu' | 'full' | 'premium'
   created_at: string
   restaurants?: Restaurant[]
+  adminEmails?: string[]
 }
+
+type OneTimeCredentials = {
+  brandName: string
+  restaurantName: string
+  adminEmail: string
+  initialPassword: string
+  previewUrl: string
+}
+
+type CreatedTenantResponse = {
+  brand?: { id: number; name: string; slug: string; plan: Brand['plan'] }
+  restaurant?: { id: number; name: string; slug: string; brand_id: number }
+  adminUser?: { id: string; email: string } | null
+  oneTimePassword?: string | null
+  previewUrl?: string
+  error?: string
+}
+
+type StarterTemplateKey = 'burger_cafe' | 'empty'
 
 const PLAN_LABELS: Record<Brand['plan'], string> = {
   ar_menu: 'AR Menu 300',
   full: 'Full 450',
   premium: 'Premium 900',
 }
+
+const STARTER_TEMPLATE_OPTIONS: { key: StarterTemplateKey; label: string; description: string; createStarterCategory: boolean }[] = [
+  {
+    key: 'burger_cafe',
+    label: 'Burger / cafe starter',
+    description: 'Adds the shared starter Featured category.',
+    createStarterCategory: true,
+  },
+  {
+    key: 'empty',
+    label: 'Clean empty menu',
+    description: 'Starts with no sample categories.',
+    createStarterCategory: false,
+  },
+]
 
 const CUSTOMER_APP_URL = (process.env.NEXT_PUBLIC_CUSTOMER_APP_URL || 'https://restaurant-ar.pages.dev').replace(/\/$/, '')
 
@@ -36,6 +73,14 @@ function tenantAdminUrl(slug: string) {
   return `/menu?tenant=${encodeURIComponent(slug)}`
 }
 
+function templateKeyFromStarter(createStarterCategory: boolean): StarterTemplateKey {
+  return createStarterCategory ? 'burger_cafe' : 'empty'
+}
+
+function starterFromTemplateKey(templateKey: string) {
+  return STARTER_TEMPLATE_OPTIONS.find(option => option.key === templateKey)?.createStarterCategory ?? true
+}
+
 function slugify(value: string) {
   return value
     .trim()
@@ -44,12 +89,40 @@ function slugify(value: string) {
     .replace(/^-+|-+$/g, '')
 }
 
+async function imageToWebP(file: File) {
+  const url = URL.createObjectURL(file)
+  return new Promise<Blob>((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      const maxSide = 900
+      const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight))
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.max(1, Math.round(img.naturalWidth * scale))
+      canvas.height = Math.max(1, Math.round(img.naturalHeight * scale))
+      canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Logo conversion failed')), 'image/webp', 0.9)
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(url)
+      reject(new Error('Could not load logo image'))
+    }
+    img.src = url
+  })
+}
+
 export default function TenantsPage() {
   const access = usePlan()
+  const supabase = createClient()
   const [brands, setBrands] = useState<Brand[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [logoStatus, setLogoStatus] = useState('')
+  const logoInputRef = useRef<HTMLInputElement>(null)
+  const [credentials, setCredentials] = useState<OneTimeCredentials | null>(null)
+  const [branchForm, setBranchForm] = useState<Record<number, { branchName: string; branchArea: string; branchSlug: string; createStarterCategory: boolean }>>({})
   const [form, setForm] = useState({
     brandName: '',
     brandSlug: '',
@@ -64,17 +137,17 @@ export default function TenantsPage() {
   })
 
   const load = useCallback(async () => {
-    if (!access.canManageTenants) {
+    if (!access.canManageBranches) {
       setLoading(access.loading)
       return
     }
     setLoading(true)
-    const res = await fetch('/api/tenants')
+    const res = await fetch(access.canManageTenants ? '/api/tenants' : '/api/branches')
     const json = await res.json().catch(() => ({}))
     if (res.ok) setBrands(json.brands ?? [])
     else setMessage(json.error || 'Could not load tenants')
     setLoading(false)
-  }, [access.canManageTenants, access.loading])
+  }, [access.canManageBranches, access.canManageTenants, access.loading])
 
   useEffect(() => { void Promise.resolve().then(load) }, [load])
 
@@ -90,21 +163,75 @@ export default function TenantsPage() {
     })
   }
 
+  async function uploadTenantLogo(file: File, restaurant: { id: number; slug: string }) {
+    if (!file.type.startsWith('image/')) {
+      throw new Error('Only image files are supported for logos')
+    }
+    setLogoStatus('Uploading logo...')
+    const blob = await imageToWebP(file)
+    const filename = file.name.replace(/\.[^.]+$/i, '.webp')
+    const presign = await fetch('/api/r2-presign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename, restaurantId: restaurant.id, restaurantSlug: restaurant.slug }),
+    })
+    if (!presign.ok) {
+      const err = await presign.json().catch(() => ({}))
+      throw new Error(err.error || `Logo presign failed: ${presign.status}`)
+    }
+    const { uploadUrl, publicUrl } = await presign.json()
+    const upload = await fetch(uploadUrl, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'image/webp' },
+      body: blob,
+    })
+    if (!upload.ok) throw new Error(`Logo upload failed: ${upload.status}`)
+    const { error } = await supabase.from('theme_config').upsert(
+      { restaurant_id: restaurant.id, key: 'logo_url', value: publicUrl },
+      { onConflict: 'restaurant_id,key' },
+    )
+    if (error) throw new Error(error.message)
+    setLogoStatus('Logo uploaded')
+  }
+
   async function createTenant() {
     setSaving(true)
     setMessage('')
+    setLogoStatus('')
     const res = await fetch('/api/tenants', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
     })
-    const json = await res.json().catch(() => ({}))
-    setSaving(false)
+    const json = await res.json().catch(() => ({})) as CreatedTenantResponse
     if (!res.ok) {
+      setSaving(false)
       setMessage(json.error || 'Tenant creation failed')
       return
     }
-    setMessage(`Created ${json.brand.name}. Live shared-template URL: ${json.previewUrl}`)
+    let logoNote = ''
+    if (logoFile && json.restaurant?.id && json.restaurant.slug) {
+      try {
+        await uploadTenantLogo(logoFile, { id: json.restaurant.id, slug: json.restaurant.slug })
+        logoNote = ' Logo added.'
+      } catch (e) {
+        logoNote = ` Logo upload skipped: ${e instanceof Error ? e.message : String(e)}.`
+        setLogoStatus('Logo upload failed')
+      }
+    }
+    setSaving(false)
+    setMessage(`Created ${json.brand?.name ?? 'tenant'}. Live shared-template URL: ${json.previewUrl}.${logoNote} Password is shown once. Reset it if lost.`)
+    if (json.adminUser?.email && json.oneTimePassword) {
+      setCredentials({
+        brandName: json.brand?.name ?? '',
+        restaurantName: json.restaurant?.name ?? '',
+        adminEmail: json.adminUser.email,
+        initialPassword: json.oneTimePassword,
+        previewUrl: json.previewUrl ?? '',
+      })
+    } else {
+      setCredentials(null)
+    }
     setForm({
       brandName: '',
       brandSlug: '',
@@ -117,7 +244,45 @@ export default function TenantsPage() {
       adminEmail: '',
       adminPassword: '',
     })
+    setLogoFile(null)
+    if (logoInputRef.current) logoInputRef.current.value = ''
     await load()
+  }
+
+  async function createBranch(brand: Brand) {
+    const current = branchForm[brand.id] ?? { branchName: '', branchArea: '', branchSlug: '', createStarterCategory: true }
+    setSaving(true)
+    setMessage('')
+    const res = await fetch('/api/branches', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ brandId: brand.id, ...current }),
+    })
+    const json = await res.json().catch(() => ({}))
+    setSaving(false)
+    if (!res.ok) {
+      setMessage(json.error || 'Branch creation failed')
+      return
+    }
+    setMessage(`Created ${json.restaurant.name}. Admin URL: ${json.adminUrl}`)
+    setBranchForm(forms => ({
+      ...forms,
+      [brand.id]: { branchName: '', branchArea: '', branchSlug: '', createStarterCategory: true },
+    }))
+    await load()
+  }
+
+  function updateBranchForm(brand: Brand, key: 'branchName' | 'branchArea' | 'branchSlug' | 'createStarterCategory', value: string | boolean) {
+    setBranchForm(forms => {
+      const current = forms[brand.id] ?? { branchName: '', branchArea: '', branchSlug: '', createStarterCategory: true }
+      const next = { ...current, [key]: value }
+      if ((key === 'branchArea' || key === 'branchName') && !current.branchSlug) {
+        const area = String(key === 'branchArea' ? value : next.branchArea || value)
+        next.branchSlug = slugify(`${brand.slug}-${area}`)
+      }
+      if (key === 'branchSlug') next.branchSlug = slugify(String(value))
+      return { ...forms, [brand.id]: next }
+    })
   }
 
   async function deleteTenant(brand: Brand) {
@@ -139,23 +304,30 @@ export default function TenantsPage() {
     await load()
   }
 
-  if (!access.loading && !access.canManageTenants) {
+  if (!access.loading && !access.canManageBranches) {
     return (
       <LockedCard
-        title="Tenant management is super-admin only"
-        description="Creating restaurants, managing plans, and cross-tenant access belong to the BetaReal team role."
+        title="Branch management is not available"
+        description="Only BetaReal super admins and Premium 900 brand owners can create or manage branches from this panel."
         planLabel={access.label}
       />
     )
   }
 
+  const pageTitle = access.canManageTenants ? 'Tenants' : 'Branches'
+  const canShowCreateTenant = access.canManageTenants
+
   return (
     <div>
       <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>Tenants</h1>
+          <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>{pageTitle}</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--dim)' }}>
-            Create restaurants by database rows for the shared WebAR template.
+            {access.canManageTenants
+              ? 'Create restaurants by database rows for the shared WebAR template.'
+              : access.canCreateBranches
+                ? 'Open existing branches or add new branches under your Premium 900 brand.'
+                : 'Open an existing branch to manage its menu, theme, and analytics.'}
           </p>
         </div>
         {message && (
@@ -166,6 +338,36 @@ export default function TenantsPage() {
         )}
       </div>
 
+      {credentials && (
+        <section className="mb-6 p-4 rounded-xl" style={{ background: 'rgba(242,181,53,0.08)', border: '1px solid var(--border)' }}>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-base font-semibold" style={{ color: 'var(--gold)' }}>Initial admin credentials</h2>
+              <p className="text-sm mt-1" style={{ color: 'var(--dim)' }}>
+                Password is shown once. Reset it if lost.
+              </p>
+              <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
+                Manual reset: Supabase Dashboard → Authentication → Users → select this user → Send password recovery or update password.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => void navigator.clipboard.writeText(`Email: ${credentials.adminEmail}\nPassword: ${credentials.initialPassword}\nURL: ${credentials.previewUrl}`)}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold"
+              style={{ background: 'var(--gold)', color: '#0f0b07' }}
+            >
+              Copy
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4 text-sm">
+            <Credential label="Tenant" value={`${credentials.brandName} / ${credentials.restaurantName}`} />
+            <Credential label="Admin email" value={credentials.adminEmail} />
+            <Credential label="Initial password" value={credentials.initialPassword} secret />
+          </div>
+        </section>
+      )}
+
+      {canShowCreateTenant && (
       <section className="mb-8 p-4 rounded-xl" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
         <h2 className="text-base font-semibold mb-4" style={{ color: 'var(--text)' }}>Create Tenant</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -188,14 +390,18 @@ export default function TenantsPage() {
               <option value="premium">Premium 900</option>
             </select>
           </Field>
-          <Field label="Starter content">
+          <Field label="Menu template">
             <select
-              value={form.createStarterCategory ? 'featured' : 'none'}
-              onChange={e => update('createStarterCategory', e.target.value === 'featured')}
+              value={templateKeyFromStarter(form.createStarterCategory)}
+              onChange={e => update('createStarterCategory', starterFromTemplateKey(e.target.value))}
             >
-              <option value="featured">Shared template starter category</option>
-              <option value="none">No category yet</option>
+              {STARTER_TEMPLATE_OPTIONS.map(option => (
+                <option key={option.key} value={option.key}>{option.label}</option>
+              ))}
             </select>
+            <div className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
+              Optional shared starter content only; branch URLs and settings stay the same.
+            </div>
           </Field>
           <Field label="Primary color">
             <input value={form.primaryColor} onChange={e => update('primaryColor', e.target.value)} placeholder="#f2b535" />
@@ -220,6 +426,38 @@ export default function TenantsPage() {
               autoComplete="new-password"
             />
           </Field>
+          <Field label="Add logo">
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                ref={logoInputRef}
+                type="file"
+                accept="image/*"
+                onChange={e => setLogoFile(e.target.files?.[0] ?? null)}
+              />
+              {logoFile && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLogoFile(null)
+                    setLogoStatus('')
+                    if (logoInputRef.current) logoInputRef.current.value = ''
+                  }}
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold"
+                  style={{ border: '1px solid var(--border)', color: 'var(--dim)' }}
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <div className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
+              Optional. PNG, JPG, WebP, or SVG will be saved as a public WebP logo after tenant creation.
+            </div>
+            {logoStatus && (
+              <div className="text-xs mt-1" style={{ color: logoStatus.includes('failed') ? 'var(--danger)' : 'var(--success)' }}>
+                {logoStatus}
+              </div>
+            )}
+          </Field>
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <button onClick={createTenant} disabled={saving}
@@ -232,15 +470,16 @@ export default function TenantsPage() {
           </span>
         </div>
       </section>
+      )}
 
       {loading ? (
         <p style={{ color: 'var(--dim)' }}>Loading...</p>
       ) : (
         <div className="table-scroll rounded-xl" style={{ border: '1px solid var(--border)' }}>
-          <table className="w-full text-sm" style={{ minWidth: '760px' }}>
+          <table className="w-full text-sm" style={{ minWidth: '980px' }}>
             <thead>
               <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
-                {['Brand', 'Plan', 'Branches', 'Shared-template URL', 'Status', 'Actions'].map(h => (
+                {['Brand', 'Plan', 'Admins', 'Branches / managers', 'Shared-template URL', 'Status', 'Actions'].map(h => (
                   <th key={h} className="px-4 py-3 text-left font-medium" style={{ color: 'var(--dim)' }}>{h}</th>
                 ))}
               </tr>
@@ -261,42 +500,84 @@ export default function TenantsPage() {
                     </td>
                     <td className="px-4 py-3" style={{ color: 'var(--gold)' }}>{PLAN_LABELS[brand.plan]}</td>
                     <td className="px-4 py-3" style={{ color: 'var(--dim)' }}>
-                      {(brand.restaurants ?? []).length ? (brand.restaurants ?? []).map((r, idx) => (
-                        <span key={r.id}>
-                          {idx > 0 ? ', ' : ''}
-                          <a href={tenantAdminUrl(r.slug)} className="hover:underline" style={{ color: 'var(--gold)' }}>
-                            {r.name}
-                          </a>
-                        </span>
-                      )) : 'None'}
+                      {(brand.adminEmails ?? []).length ? (
+                        <EmailList emails={brand.adminEmails ?? []} />
+                      ) : (
+                        <span className="text-xs">No linked admin</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3" style={{ color: 'var(--dim)' }}>
+                      {(brand.restaurants ?? []).length ? (
+                        <div className="space-y-2">
+                          {(brand.restaurants ?? []).map(r => (
+                            <div key={r.id}>
+                              <a href={tenantAdminUrl(r.slug)} className="hover:underline" style={{ color: 'var(--gold)' }}>
+                                {r.name}
+                              </a>
+                              <div className="text-xs font-mono" style={{ color: 'var(--dim)' }}>{r.slug}</div>
+                              <div className="text-xs" style={{ color: 'var(--dim)' }}>
+                                Branch managers: {(r.managerEmails ?? []).length ? <EmailList emails={r.managerEmails ?? []} /> : 'None'}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : 'None'}
                     </td>
                     <td className="px-4 py-3 font-mono text-xs" style={{ color: 'var(--dim)' }}>
-                      {first ? (
-                        <a href={tenantPreviewUrl(first.slug)} target="_blank" rel="noreferrer" style={{ color: 'var(--gold)' }}>
-                          {tenantPreviewUrl(first.slug)}
-                        </a>
+                      {(brand.restaurants ?? []).length ? (
+                        <div className="space-y-1">
+                          {(brand.restaurants ?? []).map(r => (
+                            <a key={r.id} href={tenantPreviewUrl(r.slug)} target="_blank" rel="noreferrer" className="block hover:underline" style={{ color: 'var(--gold)' }}>
+                              {tenantPreviewUrl(r.slug)}
+                            </a>
+                          ))}
+                        </div>
                       ) : 'Pending first branch'}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-xs px-2 py-0.5 rounded-full"
-                            style={{ background: first?.status === 'active' ? 'rgba(76,175,125,0.15)' : 'rgba(224,82,82,0.12)',
-                                     color: first?.status === 'active' ? 'var(--success)' : 'var(--danger)' }}>
-                        {first?.status ?? 'none'}
-                      </span>
+                      <div className="space-y-1">
+                        {(brand.restaurants ?? []).map(r => (
+                          <span key={r.id} className="block text-xs px-2 py-0.5 rounded-full w-fit"
+                                style={{ background: r.status === 'active' ? 'rgba(76,175,125,0.15)' : 'rgba(224,82,82,0.12)',
+                                         color: r.status === 'active' ? 'var(--success)' : 'var(--danger)' }}>
+                            {r.status}
+                          </span>
+                        ))}
+                        {!(brand.restaurants ?? []).length && (
+                          <span className="text-xs px-2 py-0.5 rounded-full"
+                                style={{ background: 'rgba(224,82,82,0.12)', color: 'var(--danger)' }}>
+                            none
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
-                      <button
-                        onClick={() => void deleteTenant(brand)}
-                        disabled={saving || brand.slug === 'burger-lions'}
-                        className="px-3 py-1.5 rounded-lg text-xs font-semibold"
-                        style={{
-                          border: '1px solid rgba(224,82,82,0.35)',
-                          color: brand.slug === 'burger-lions' ? 'var(--dim)' : 'var(--danger)',
-                          opacity: saving || brand.slug === 'burger-lions' ? 0.5 : 1,
-                        }}
-                      >
-                        Delete
-                      </button>
+                      <div className="space-y-3 min-w-56">
+                        {access.canCreateBranches && (
+                          <BranchCreator
+                            brand={brand}
+                            saving={saving}
+                            value={branchForm[brand.id] ?? { branchName: '', branchArea: '', branchSlug: '', createStarterCategory: true }}
+                            allowAnyPlan={access.canManageTenants}
+                            onChange={updateBranchForm}
+                            onCreate={() => void createBranch(brand)}
+                          />
+                        )}
+                        {access.canManageTenants && (
+                          <button
+                            onClick={() => void deleteTenant(brand)}
+                            disabled={saving || brand.slug === 'burger-lions'}
+                            className="px-3 py-1.5 rounded-lg text-xs font-semibold"
+                            style={{
+                              border: '1px solid rgba(224,82,82,0.35)',
+                              color: brand.slug === 'burger-lions' ? 'var(--dim)' : 'var(--danger)',
+                              opacity: saving || brand.slug === 'burger-lions' ? 0.5 : 1,
+                            }}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 )
@@ -315,5 +596,92 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <div className="text-xs mb-1 uppercase" style={{ color: 'var(--dim)' }}>{label}</div>
       {children}
     </label>
+  )
+}
+
+function Credential({ label, value, secret = false }: { label: string; value: string; secret?: boolean }) {
+  return (
+    <div className="p-3 rounded-lg" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+      <div className="text-xs uppercase mb-1" style={{ color: 'var(--dim)' }}>{label}</div>
+      <div className="font-mono text-xs break-all" style={{ color: secret ? 'var(--gold)' : 'var(--text)' }}>{value}</div>
+    </div>
+  )
+}
+
+function EmailList({ emails }: { emails: string[] }) {
+  return (
+    <span className="inline-flex flex-col gap-0.5">
+      {emails.map(email => (
+        <span key={email} className="font-mono text-xs break-all">{email}</span>
+      ))}
+    </span>
+  )
+}
+
+function BranchCreator({
+  brand,
+  value,
+  allowAnyPlan,
+  saving,
+  onChange,
+  onCreate,
+}: {
+  brand: Brand
+  value: { branchName: string; branchArea: string; branchSlug: string; createStarterCategory: boolean }
+  allowAnyPlan: boolean
+  saving: boolean
+  onChange: (brand: Brand, key: 'branchName' | 'branchArea' | 'branchSlug' | 'createStarterCategory', value: string | boolean) => void
+  onCreate: () => void
+}) {
+  const planAllowed = allowAnyPlan || brand.plan === 'premium'
+  const disabled = saving || !planAllowed
+
+  return (
+    <div className="space-y-2">
+      <div className="grid grid-cols-1 gap-2">
+        <input
+          value={value.branchName}
+          onChange={e => onChange(brand, 'branchName', e.target.value)}
+          placeholder="Branch name"
+          disabled={disabled}
+        />
+        <input
+          value={value.branchArea}
+          onChange={e => onChange(brand, 'branchArea', e.target.value)}
+          placeholder="Area, e.g. Saburtalo"
+          disabled={disabled}
+        />
+        <input
+          value={value.branchSlug}
+          onChange={e => onChange(brand, 'branchSlug', e.target.value)}
+          placeholder={`${brand.slug}-saburtalo`}
+          disabled={disabled}
+        />
+      </div>
+      <label className="block">
+        <div className="text-xs mb-1 uppercase" style={{ color: 'var(--dim)' }}>Menu template</div>
+        <select
+          value={templateKeyFromStarter(value.createStarterCategory)}
+          onChange={e => onChange(brand, 'createStarterCategory', starterFromTemplateKey(e.target.value))}
+          disabled={disabled}
+        >
+          {STARTER_TEMPLATE_OPTIONS.map(option => (
+            <option key={option.key} value={option.key}>{option.label}</option>
+          ))}
+        </select>
+        <div className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
+          Optional starter content for this branch.
+        </div>
+      </label>
+      <button
+        type="button"
+        onClick={onCreate}
+        disabled={disabled || !value.branchName.trim()}
+        className="px-3 py-1.5 rounded-lg text-xs font-semibold"
+        style={{ background: 'var(--gold)', color: '#0f0b07', opacity: disabled || !value.branchName.trim() ? 0.55 : 1 }}
+      >
+        {planAllowed ? 'Add branch' : 'Premium only'}
+      </button>
+    </div>
   )
 }
