@@ -170,13 +170,7 @@ export function usePlan(): PlanAccess {
           }
         }
 
-        if (!tenant.restaurantId && restaurantMemberships[0]?.restaurants) {
-          const restaurant = (Array.isArray(restaurantMemberships[0].restaurants) ? restaurantMemberships[0].restaurants[0] : restaurantMemberships[0].restaurants) as {
-            id: number; slug: string; name: string; brand_id: number; brands?: { plan?: string } | { plan?: string }[]
-          }
-          role = normalizeRole(restaurantMemberships[0].role)
-          await setTenantFromRestaurant(restaurant)
-        } else if (!tenant.restaurantId && brandMemberships[0]) {
+        if (!tenant.restaurantId && brandMemberships[0]) {
           const brandUser = brandMemberships[0]
           const brand = (Array.isArray(brandUser.brands) ? brandUser.brands[0] : brandUser.brands) as { plan?: string } | null
           const { data: restaurants } = await supabase
@@ -189,6 +183,12 @@ export function usePlan(): PlanAccess {
           role = 'brand_owner'
           platformPlan = normalizePlatformPlan(brand?.plan)
           if (restaurant) await setTenantFromRestaurant(restaurant)
+        } else if (!tenant.restaurantId && restaurantMemberships[0]?.restaurants) {
+          const restaurant = (Array.isArray(restaurantMemberships[0].restaurants) ? restaurantMemberships[0].restaurants[0] : restaurantMemberships[0].restaurants) as {
+            id: number; slug: string; name: string; brand_id: number; brands?: { plan?: string } | { plan?: string }[]
+          }
+          role = normalizeRole(restaurantMemberships[0].role)
+          await setTenantFromRestaurant(restaurant)
         }
       }
 
