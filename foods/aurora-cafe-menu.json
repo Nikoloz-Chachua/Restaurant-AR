@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Aurora Berry Pancakes",
+    "name_ka": "Aurora Berry Pancakes",
+    "category": "Brunch",
+    "category_ka": "Brunch",
+    "description": "Stacked pancakes with berry cream, roasted almonds, honey butter, and fresh mint.",
+    "description_ka": "Stacked pancakes with berry cream, roasted almonds, honey butter, and fresh mint.",
+    "price": "18 ₾",
+    "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/donut_draco.glb",
+    "model_usdz": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/donut.usdz",
+    "ar_scale": 0.9,
+    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/donut_poster.webp",
+    "thumb_3d": true
+  },
+  {
+    "name": "Garden Croissant Plate",
+    "name_ka": "Garden Croissant Plate",
+    "category": "Brunch",
+    "category_ka": "Brunch",
+    "description": "Warm croissant with herb cheese, greens, tomato jam, and a soft egg.",
+    "description_ka": "Warm croissant with herb cheese, greens, tomato jam, and a soft egg.",
+    "price": "16 ₾",
+    "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/croissant_draco.glb",
+    "model_usdz": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/croissant.usdz",
+    "ar_scale": 0.9,
+    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/croissant_poster.webp",
+    "thumb_3d": true
+  },
+  {
+    "name": "Sunset Hot Dog",
+    "name_ka": "Sunset Hot Dog",
+    "category": "Street Bites",
+    "category_ka": "Street Bites",
+    "description": "Toasted bun, smoked sausage, paprika onions, mustard cream, and pickled cucumber.",
+    "description_ka": "Toasted bun, smoked sausage, paprika onions, mustard cream, and pickled cucumber.",
+    "price": "13 ₾",
+    "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/hot_dog_draco.glb",
+    "model_usdz": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/hot_dog.usdz",
+    "ar_scale": 0.93,
+    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/hot_dog_poster.webp",
+    "thumb_3d": true
+  },
+  {
+    "name": "Midnight Burger",
+    "name_ka": "Midnight Burger",
+    "category": "Street Bites",
+    "category_ka": "Street Bites",
+    "description": "Charred beef, cheddar, black garlic sauce, onion jam, lettuce, and brioche.",
+    "description_ka": "Charred beef, cheddar, black garlic sauce, onion jam, lettuce, and brioche.",
+    "price": "24 ₾",
+    "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/druidi_balanced_30k_2k.glb",
+    "model_usdz": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/druidi_balanced_30k_2k.usdz",
+    "ar_scale": 1.52,
+    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burger_poster.webp",
+    "thumb_3d": true
+  },
+  {
+    "name": "Rose Donut",
+    "name_ka": "Rose Donut",
+    "category": "Desserts",
+    "category_ka": "Desserts",
+    "description": "Chocolate donut with rose glaze, banana cream, and toasted cocoa nibs.",
+    "description_ka": "Chocolate donut with rose glaze, banana cream, and toasted cocoa nibs.",
+    "price": "8 ₾",
+    "model": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/donut_draco.glb",
+    "model_usdz": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/donut.usdz",
+    "ar_scale": 0.9,
+    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/donut_poster.webp",
+    "thumb_3d": true
+  }
+]

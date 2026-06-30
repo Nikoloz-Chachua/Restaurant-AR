@@ -6,7 +6,10 @@ const SUPABASE_ANON = 'sb_publishable_65dKKpb-lxOr8JTjdj7yxw_LZzcJp5h';
 // Pre-cached on install — these are ready before the user taps anything
 const PRECACHE = [
     './',
+    './aurora-cafe.html',
+    './aurora-cafe/',
     './foods/menu.json',
+    './foods/aurora-cafe-menu.json',
     './img/betareal-logo-dark.png',
     './img/betareal-logo-light.png',
     './img/grain.png',
