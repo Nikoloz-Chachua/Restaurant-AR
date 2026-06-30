@@ -102,8 +102,16 @@ function tenantPreviewUrl(slug: string) {
   return `${CUSTOMER_APP_URL}/?tenant=${encodeURIComponent(slug)}`
 }
 
-function tenantAdminUrl(slug: string) {
+function tenantMenuUrl(slug: string) {
   return `/menu?tenant=${encodeURIComponent(slug)}`
+}
+
+function tenantThemeUrl(slug: string) {
+  return `/theme?tenant=${encodeURIComponent(slug)}`
+}
+
+function tenantAnalyticsUrl(slug: string) {
+  return `/dashboard?tenant=${encodeURIComponent(slug)}`
 }
 
 function starterTemplate(templateKey: string) {
@@ -561,7 +569,7 @@ export default function TenantsPage() {
                       style={{ background: i % 2 ? 'var(--card)' : 'transparent', borderBottom: '1px solid var(--border)' }}>
                     <td className="px-4 py-3">
                       {first ? (
-                        <a href={tenantAdminUrl(first.slug)} className="font-medium hover:underline" style={{ color: 'var(--text)' }}>
+                        <a href={tenantMenuUrl(first.slug)} className="font-medium hover:underline" style={{ color: 'var(--text)' }}>
                           {brand.name}
                         </a>
                       ) : <div className="font-medium">{brand.name}</div>}
@@ -580,11 +588,19 @@ export default function TenantsPage() {
                         <div className="space-y-2">
                           {(brand.restaurants ?? []).map(r => (
                             <div key={r.id}>
-                              <a href={tenantAdminUrl(r.slug)} className="hover:underline" style={{ color: 'var(--gold)' }}>
+                              <a href={tenantMenuUrl(r.slug)} className="hover:underline" style={{ color: 'var(--gold)' }}>
                                 {r.name}
                               </a>
                               <div className="text-xs font-mono" style={{ color: 'var(--dim)' }}>{r.slug}</div>
-                              <div className="text-xs" style={{ color: 'var(--dim)' }}>
+                              <div className="flex flex-wrap gap-1.5 mt-1">
+                                <BranchAction href={tenantMenuUrl(r.slug)} label="Menu editor" />
+                                <BranchAction href={tenantThemeUrl(r.slug)} label="Theme editor" />
+                                {(brand.plan !== 'ar_menu' || access.canManageTenants) && (
+                                  <BranchAction href={tenantAnalyticsUrl(r.slug)} label="Analytics" />
+                                )}
+                                <BranchAction href={tenantPreviewUrl(r.slug)} label="Public site" external />
+                              </div>
+                              <div className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
                                 Branch managers: {(r.managerEmails ?? []).length ? <EmailList emails={r.managerEmails ?? []} /> : 'None'}
                               </div>
                             </div>
@@ -684,6 +700,20 @@ function EmailList({ emails }: { emails: string[] }) {
         <span key={email} className="font-mono text-xs break-all">{email}</span>
       ))}
     </span>
+  )
+}
+
+function BranchAction({ href, label, external = false }: { href: string; label: string; external?: boolean }) {
+  return (
+    <a
+      href={href}
+      target={external ? '_blank' : undefined}
+      rel={external ? 'noreferrer' : undefined}
+      className="inline-flex items-center rounded-md px-2 py-1 text-[11px] font-semibold hover:underline"
+      style={{ background: 'rgba(242,181,53,0.10)', color: 'var(--gold)', border: '1px solid var(--border)' }}
+    >
+      {label}
+    </a>
   )
 }
 
