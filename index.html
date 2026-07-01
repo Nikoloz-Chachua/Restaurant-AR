@@ -377,6 +377,23 @@
             transition: color var(--t), border-color var(--t);
         }
 
+        /* Georgian text should feel clean, not forced through the condensed
+           Latin display font or huge tracking. */
+        html[lang="ka"] .category-header,
+        html[lang="ka"] .cat-pill,
+        html[lang="ka"] .tagline,
+        html[lang="ka"] .item-name,
+        html[lang="ka"] #modal-title,
+        html[lang="ka"] #modal-title-d {
+            font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            letter-spacing: 0.7px;
+        }
+        html[lang="ka"] .category-header {
+            font-size: 1.08rem;
+            font-weight: 900;
+            padding-top: 22px;
+        }
+
         /* ── Footer ── */
         .site-footer {
             width: 100%;
@@ -2328,14 +2345,47 @@
 
         // ── Language ───────────────────────────────────────────────────
         window.__lang = localStorage.getItem('bl-lang') || 'ka';
+        document.documentElement.lang = window.__lang;
+
+        const _CP1252_BYTES = {
+            '€':0x80,'‚':0x82,'ƒ':0x83,'„':0x84,'…':0x85,'†':0x86,'‡':0x87,'ˆ':0x88,'‰':0x89,'Š':0x8a,'‹':0x8b,'Œ':0x8c,'Ž':0x8e,
+            '‘':0x91,'’':0x92,'“':0x93,'”':0x94,'•':0x95,'–':0x96,'—':0x97,'˜':0x98,'™':0x99,'š':0x9a,'›':0x9b,'œ':0x9c,'ž':0x9e,'Ÿ':0x9f
+        };
+
+        function _fixMojibakeText(value) {
+            if (value == null) return value;
+            const s = String(value);
+            // Georgian UTF-8 accidentally decoded as Windows-1252 often appears as
+            // "áƒ...". Repair it defensively for old/dirty database rows.
+            if (!/[ÃÂáƒ]/.test(s)) return s;
+            try {
+                const bytes = [];
+                for (const ch of s) {
+                    const cp = ch.codePointAt(0);
+                    if (cp <= 0xff) bytes.push(cp);
+                    else if (_CP1252_BYTES[ch] != null) bytes.push(_CP1252_BYTES[ch]);
+                    else return s;
+                }
+                const decoded = new TextDecoder('utf-8', { fatal: false }).decode(new Uint8Array(bytes));
+                return /[\u10A0-\u10FF]/.test(decoded) ? decoded : s;
+            } catch (_) {
+                return s;
+            }
+        }
+
+        function _cleanText(value, fallback = '') {
+            const cleaned = _fixMojibakeText(value);
+            return cleaned == null || cleaned === '' ? fallback : cleaned;
+        }
 
         function t(item, field) {
             const ka = field + '_ka';
-            return (window.__lang === 'ka' && item[ka]) ? item[ka] : item[field];
+            return _cleanText((window.__lang === 'ka' && item[ka]) ? item[ka] : item[field]);
         }
 
         function applyLang(lang) {
             window.__lang = lang;
+            document.documentElement.lang = lang;
             localStorage.setItem('bl-lang', lang);
             const u = UI[lang];
             const theme = document.documentElement.getAttribute('data-theme');
@@ -2365,9 +2415,9 @@
             if (window.__categories) {
                 window.__categories.forEach(cat => {
                     const header = document.querySelector(`.category-header[data-cat-name="${CSS.escape(cat.name)}"]`);
-                    if (header) header.textContent = (lang === 'ka' && cat.name_ka) ? cat.name_ka : cat.name;
+                    if (header) header.textContent = _cleanText((lang === 'ka' && cat.name_ka) ? cat.name_ka : cat.name);
                     const pill = document.querySelector(`.cat-pill[data-cat="${CSS.escape(cat.name)}"]`);
-                    if (pill) pill.textContent = (lang === 'ka' && cat.name_ka) ? cat.name_ka : cat.name;
+                    if (pill) pill.textContent = _cleanText((lang === 'ka' && cat.name_ka) ? cat.name_ka : cat.name);
                 });
                 const allPill = document.querySelector('.cat-pill[data-cat=""]');
                 if (allPill) allPill.textContent = lang === 'ka' ? 'ყველა' : 'All';
@@ -2885,8 +2935,8 @@
                 // Branding
                 if (cfg.site_name || cfg.site_name_ka) {
                     document.querySelectorAll('[data-brand]').forEach(el => {
-                        el.textContent = (window.__lang === 'ka' && cfg.site_name_ka)
-                            ? cfg.site_name_ka : (cfg.site_name || el.textContent);
+                        el.textContent = _cleanText((window.__lang === 'ka' && cfg.site_name_ka)
+                            ? cfg.site_name_ka : (cfg.site_name || el.textContent));
                     });
                 }
                 const logo = document.getElementById('tenant-logo');
@@ -2923,13 +2973,13 @@
                     );
                     if (data && data.length) {
                         items = data.map(r => ({
-                            name:           r.name_en,
-                            name_ka:        r.name_ka,
-                            category:       r.categories?.name_en || 'Other',
-                            category_ka:    r.categories?.name_ka || 'სხვა',
-                            description:    r.description_en,
-                            description_ka: r.description_ka,
-                            price:          r.price,
+                            name:           _cleanText(r.name_en),
+                            name_ka:        _cleanText(r.name_ka),
+                            category:       _cleanText(r.categories?.name_en, 'Other'),
+                            category_ka:    _cleanText(r.categories?.name_ka, 'სხვა'),
+                            description:    _cleanText(r.description_en),
+                            description_ka: _cleanText(r.description_ka),
+                            price:          _cleanText(r.price),
                             model:          r.model,
                             model_usdz:     r.model_usdz || '',
                             ar_scale:       r.ar_scale ?? 1.0,
@@ -3005,7 +3055,7 @@
                 header.className = 'category-header';
                 header.dataset.catName   = cat.name;
                 header.dataset.catNameKa = cat.name_ka;
-                header.textContent = window.__lang === 'ka' ? cat.name_ka : cat.name;
+                header.textContent = _cleanText(window.__lang === 'ka' ? cat.name_ka : cat.name);
                 section.appendChild(header);
 
                 cat.items.forEach(({ item, globalIdx }, localIdx) => {
@@ -3075,7 +3125,7 @@
                 pill.dataset.cat    = cat.name;
                 pill.dataset.catKa  = cat.name_ka;
                 const label = window.__lang === 'ka' ? cat.name_ka : cat.name;
-                pill.textContent    = label;
+                pill.textContent    = _cleanText(label);
                 filterDiv.appendChild(pill);
             });
 
@@ -3104,7 +3154,7 @@
                         p.textContent = lang === 'ka' ? 'ყველა' : 'All';
                     } else {
                         const name = lang === 'ka' ? p.dataset.catKa : p.dataset.cat;
-                        p.textContent = name;
+                        p.textContent = _cleanText(name);
                     }
                 });
             };
