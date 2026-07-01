@@ -611,6 +611,17 @@
             transition: color var(--t);
         }
 
+        #modal-message {
+            display: none;
+            max-width: 340px;
+            margin: 10px auto 0;
+            color: var(--accent);
+            font-size: 0.82rem;
+            font-weight: 800;
+            line-height: 1.35;
+            letter-spacing: 0.5px;
+        }
+
         .nav-arrow {
             position: absolute;
             top: 50%;
@@ -1279,6 +1290,7 @@
                         </div>
                     </div>
                     <button id="modal-ar-btn"></button>
+                    <p id="modal-message"></p>
                     <p class="tip" id="modal-tip">Drag to rotate</p>
                 </div>
             </div>
@@ -1510,6 +1522,7 @@
             })).then(results => {
                 const failed = results.filter(r => r.status === 'rejected');
                 if (failed.length) console.warn('Model load failures:', failed.map(f => f.reason));
+                return failed;
             });
         }
 
@@ -2080,9 +2093,17 @@
                 MENU = items; N = MENU.length;
                 currentCenterMenu = Math.max(0, Math.min(itemIndex, N - 1));
 
-                await _setup();
-
-                await preloadModels();
+                try {
+                    await _setup();
+                    await preloadModels();
+                    const activeModel = MENU[currentCenterMenu]?.model;
+                    if (!activeModel || !modelGLTFs[activeModel]) {
+                        throw new Error('model-load-failed');
+                    }
+                } catch (e) {
+                    xrStarting = false;
+                    throw e;
+                }
 
                 initSlots();
 
@@ -2107,7 +2128,9 @@
                     localStorage.removeItem('bl-ar-cap');
                     localStorage.removeItem('bl-ar-cap-ts');
                     xrStarting = false;
-                    document.dispatchEvent(new CustomEvent('xr-session-end', { detail: { fallbackIdx: itemIndex } }));
+                    document.dispatchEvent(new CustomEvent('xr-session-end', {
+                        detail: { fallbackIdx: itemIndex, message: 'Could not start AR. Showing the 3D model instead.' }
+                    }));
                     return;
                 }
 
@@ -2306,6 +2329,11 @@
     readyDone:    '✓ Order Noted!',
     hideUI:       'HIDE UI',
     showUI:       'SHOW UI',
+    arNoUsdz:     'iPhone AR needs a USDZ model. Showing 3D instead.',
+    arNoModel:    '3D model is not available for this item.',
+    arModelMissing:'Could not load the 3D model. Showing 3D instead.',
+    arFailed:     'Could not start AR. Showing 3D instead.',
+    arUnsupported:'AR is not available on this device. Showing 3D instead.',
             },
             ka: {
                 tagline:   'გასინჯე ველური გემო',
@@ -2342,6 +2370,11 @@
     readyDone:    '✓ მიღებულია!',
     hideUI:       'UI დამალვა',
     showUI:       'UI ჩვენება',
+    arNoUsdz:     'iPhone-ზე AR-ს USDZ მოდელი სჭირდება. იხსნება 3D.',
+    arNoModel:    'ამ ნივთისთვის 3D მოდელი არ არის.',
+    arModelMissing:'3D მოდელი ვერ ჩაიტვირთა. იხსნება 3D.',
+    arFailed:     'AR ვერ გაეშვა. იხსნება 3D.',
+    arUnsupported:'ამ მოწყობილობაზე AR მიუწვდომელია. იხსნება 3D.',
             }
         };
 
@@ -2382,6 +2415,16 @@
 
         function _cleanBrandText(value) {
             return _cleanText(value).trim();
+        }
+
+        function _escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[ch]);
         }
 
         function _tenantBrandFallback() {
@@ -2433,8 +2476,7 @@
             document.getElementById('xr-move-hint').textContent  = u.moveHint;
             document.getElementById('xr-exit').textContent        = u.exitAR;
             document.getElementById('xr-place-again').textContent = u.placeAgain;
-            const btnText = window.__arCap === 'none' ? u.view3D : u.viewAR;
-            document.querySelectorAll('.ar-btn:not(:disabled)').forEach(b => { b.textContent = btnText; });
+            setARButtonsState(false);
             document.querySelectorAll('[data-field][data-idx]').forEach(el => {
                 const item = menuItems[parseInt(el.dataset.idx)];
                 if (item) el.textContent = t(item, el.dataset.field);
@@ -2457,7 +2499,7 @@
             }
             if (modal.classList.contains('active')) updateModal();
             const _mArBtn = document.getElementById('modal-ar-btn');
-            if (_mArBtn) _mArBtn.textContent = u.viewAR;
+            if (_mArBtn) _mArBtn.textContent = _arButtonLabel(modalItems[modalIndex]);
             // Basket
             document.getElementById('basket-bar-count') && _updateBasketBar();
             if (document.getElementById('basket-panel').style.display !== 'none') _renderBasketPanel();
@@ -2514,7 +2556,7 @@
                 const _fbItem  = _fbItems[e.detail.fallbackIdx];
                 const _fbIdx   = (_fbItem && menuItems) ? menuItems.indexOf(_fbItem) : null;
                 track('ar_fallback', _fbIdx >= 0 ? _fbIdx : null);
-                openModal(e.detail.fallbackIdx, _fbItems);
+                openModal(e.detail.fallbackIdx, _fbItems, e.detail.message || UI[window.__lang].arFailed);
             } else if (_arStartTime != null) {
                 track('ar_duration', null, { duration_ms: _arEndMs - _arStartTime });
             }
@@ -2529,6 +2571,7 @@
         let menuItems  = [];
         let modalItems = [];
         let modalIndex = 0;
+        let modalMessage = '';
 
         const modalQtyCtrl = document.getElementById('modal-qty-ctrl');
         modalQtyCtrl.querySelector('.qty-add-btn').addEventListener('click', e => { e.stopPropagation(); const k = modalQtyCtrl.dataset.idx; addToBasket(k, modalItems[modalIndex]); });
@@ -2580,21 +2623,26 @@
             if (!item) return;
             // model-viewer is lazy-loaded; ensure it's defined before setting the source so
             // the modal's 3D viewer renders (it's usually already loaded from thumbnail upgrades).
-            if (item.thumbnail_url) modalViewer.setAttribute('poster', item.thumbnail_url);
+            const posterUrl = _safeAssetUrl(item.thumbnail_url);
+            if (posterUrl) modalViewer.setAttribute('poster', posterUrl);
             else modalViewer.removeAttribute('poster');
-            _ensureModelViewer().then(() => { modalViewer.src = item.model || ''; });
+            _ensureModelViewer().then(() => { modalViewer.src = _safeAssetUrl(item.model) || ''; });
             modalTitle.textContent = t(item, 'name');
             document.getElementById('modal-title-d').textContent = t(item, 'name');
             modalPrice.textContent = item.price;
             document.getElementById('modal-description').textContent = t(item, 'description') || '';
+            const msgEl = document.getElementById('modal-message');
+            msgEl.textContent = modalMessage;
+            msgEl.style.display = modalMessage ? 'block' : 'none';
             const key = String(modalIndex);
             document.getElementById('modal-qty-ctrl').dataset.idx = key;
             _syncQtyCtrl(key);
         }
 
-        function openModal(localIdx, catItems) {
+        function openModal(localIdx, catItems, fallbackMessage = '') {
             modalItems = catItems || menuItems;
             modalIndex = localIdx;
+            modalMessage = fallbackMessage;
             const _viewItem = modalItems[localIdx];
             const _viewIdx  = (_viewItem && menuItems) ? menuItems.indexOf(_viewItem) : null;
             _modalOpenTime = Date.now();
@@ -2606,9 +2654,8 @@
             // Reset desktop drawer state
             document.getElementById('modal-drawer').classList.remove('expanded');
             modal.classList.remove('drawer-expanded');
-            const cap = window.__arCap;
-            modalArBtn.textContent  = UI[window.__lang].viewAR;
-            modalArBtn.style.display = (cap && cap !== 'none') ? '' : 'none';
+            modalArBtn.textContent  = _arButtonLabel(_viewItem);
+            modalArBtn.style.display = _canLikelyAR(_viewItem) ? '' : 'none';
             modal.style.display = 'flex';
             requestAnimationFrame(() => modal.classList.add('active'));
             document.body.style.overflow = 'hidden';
@@ -2684,13 +2731,78 @@
             return cap;
         }
 
+        function _modelUrl(item) {
+            return String(item?.model || '').trim();
+        }
+
+        function _usdzUrl(item) {
+            return String(item?.model_usdz || '').trim();
+        }
+
+        function _safeAssetUrl(value) {
+            const raw = String(value || '').trim();
+            if (!raw) return '';
+            try {
+                const url = new URL(raw, location.href);
+                return /^https?:$/.test(url.protocol) ? url.href : '';
+            } catch (_) {
+                return '';
+            }
+        }
+
+        function _canLikelyAR(item, cap = window.__arCap) {
+            if (cap === 'webxr') return !!_modelUrl(item);
+            if (cap === 'arkit') return !!_usdzUrl(item);
+            return false;
+        }
+
+        function _arButtonLabel(item) {
+            const u = UI[window.__lang];
+            return _canLikelyAR(item) ? u.viewAR : u.view3D;
+        }
+
         function setARButtonsState(loading) {
             const u = UI[window.__lang];
-            const label = loading ? u.loading : (window.__arCap === 'none' ? u.view3D : u.viewAR);
             document.querySelectorAll('.ar-btn').forEach(b => {
-                b.textContent = label;
+                const item = menuItems[parseInt(b.dataset.idx, 10)];
+                b.textContent = loading ? u.loading : _arButtonLabel(item);
                 b.disabled    = loading;
             });
+            if (modalArBtn) {
+                modalArBtn.textContent = loading ? u.loading : _arButtonLabel(modalItems[modalIndex]);
+                modalArBtn.disabled = loading;
+                modalArBtn.style.display = _canLikelyAR(modalItems[modalIndex]) ? '' : 'none';
+            }
+        }
+
+        async function _validateModelUrl(url) {
+            const href = _safeAssetUrl(url);
+            if (!href) return false;
+            async function probe(method, headers) {
+                const ctrl = new AbortController();
+                const timer = setTimeout(() => ctrl.abort(), 6000);
+                try {
+                    const res = await fetch(href, { method, headers, cache: 'no-store', mode: 'cors', signal: ctrl.signal });
+                    if (res.body) res.body.cancel().catch(() => {});
+                    return res.ok || res.status === 206;
+                } catch (_) {
+                    return false;
+                } finally {
+                    clearTimeout(timer);
+                }
+            }
+            if (await probe('HEAD')) return true;
+            return probe('GET', { Range: 'bytes=0-0' });
+        }
+
+        function _fallbackTo3D(localIdx, items, message) {
+            const _fbItems = items || _arCatItems || menuItems;
+            const _fbItem  = _fbItems[localIdx];
+            const _fbIdx   = (_fbItem && menuItems) ? menuItems.indexOf(_fbItem) : null;
+            track('ar_fallback', _fbIdx >= 0 ? _fbIdx : null);
+            setARButtonsState(false);
+            _arOpening = false;
+            openModal(localIdx, _fbItems, message || UI[window.__lang].arFailed);
         }
 
         // ── iOS AR launcher — hidden model-viewers pre-load so activateAR()
@@ -2742,9 +2854,7 @@
             // Fall back to 3D modal so the user gets content; they can retry AR once
             // the launcher has finished downloading the GLB and converting to USDZ.
             if (!launcher.loaded) {
-                setARButtonsState(false);
-                _arOpening = false;
-                openModal(localIdx, _arCatItems);
+                _fallbackTo3D(localIdx, _arCatItems, UI[window.__lang].arNoUsdz);
                 return;
             }
             function onARStatus(e) {
@@ -2754,10 +2864,7 @@
                 const _iosGIdx = _iosIdx >= 0 ? _iosIdx : null;
                 if (s === 'failed') {
                     launcher.removeEventListener('ar-status', onARStatus);
-                    track('ar_fallback', _iosGIdx);
-                    setARButtonsState(false);
-                    _arOpening = false;
-                    openModal(localIdx, _arCatItems);
+                    _fallbackTo3D(localIdx, _arCatItems, UI[window.__lang].arFailed);
                 } else if (s === 'session-started') {
                     launcher.removeEventListener('ar-status', onARStatus);
                     track('ar_success', _iosGIdx);
@@ -2774,11 +2881,16 @@
         // gesture. No model-viewer, no GLB download, no on-device conversion racing
         // the gesture — the file is already seated, scaled, and ready.
         function _launchQuickLook(usdzUrl, localIdx) {
+            const href = _safeAssetUrl(usdzUrl);
+            if (!href) {
+                _fallbackTo3D(localIdx, _arCatItems, UI[window.__lang].arNoUsdz);
+                return;
+            }
             const _item = _arCatItems ? _arCatItems[localIdx] : null;
             const _idx  = (_item && menuItems) ? menuItems.indexOf(_item) : null;
             const a = document.createElement('a');
             a.setAttribute('rel', 'ar');
-            a.href = usdzUrl;
+            a.href = href;
             // Quick Look only triggers from a click on an <a rel="ar"> that holds an <img>.
             a.appendChild(document.createElement('img'));
             document.body.appendChild(a);
@@ -2808,29 +2920,34 @@
             const item = _arCatItems[localIdx];
 
             if (!item) { setARButtonsState(false); _arOpening = false; return; }
+            const modelUrl = _modelUrl(item);
+            const usdzUrl = _usdzUrl(item);
 
             if (cap === 'webxr' && window.XR) {
+                if (!modelUrl) {
+                    _fallbackTo3D(localIdx, _arCatItems, UI[window.__lang].arNoModel);
+                    return;
+                }
+                if (!await _validateModelUrl(modelUrl)) {
+                    _fallbackTo3D(localIdx, _arCatItems, UI[window.__lang].arModelMissing);
+                    return;
+                }
                 try {
                     await window.XR.start(localIdx, _arCatItems);
                 } catch (err) {
                     console.error('XR start failed:', err);
-                    openModal(localIdx, _arCatItems);
-                    setARButtonsState(false);
-                    _arOpening = false;
+                    _fallbackTo3D(localIdx, _arCatItems, UI[window.__lang].arFailed);
                 }
             } else if (cap === 'arkit') {
-                if (item.model_usdz) {
+                if (usdzUrl) {
                     // Prebuilt USDZ (made at upload time) — hand it straight to Quick Look.
-                    _launchQuickLook(item.model_usdz, localIdx);
+                    _launchQuickLook(usdzUrl, localIdx);
                 } else {
-                    // Legacy items with no USDZ — fall back to on-device conversion.
-                    _launchIOSAR(_getARLauncher(item.model || 'food.glb', item.ar_scale), localIdx);
+                    _fallbackTo3D(localIdx, _arCatItems, UI[window.__lang].arNoUsdz);
                 }
             } else {
                 // No AR support (non-ARCore Android, desktop) — open 3D modal
-                openModal(localIdx, _arCatItems);
-                setARButtonsState(false);
-                _arOpening = false;
+                _fallbackTo3D(localIdx, _arCatItems, UI[window.__lang].arUnsupported);
             }
         }
 
@@ -3027,13 +3144,8 @@
 
             menuItems = items;
             window.__menuItems = items;
-            // iOS: pre-load one launcher per unique (model, ar_scale) pair so the
-            // USDZ is ready — and correctly scaled — before the user taps AR.
-            if (_isIOS) {
-                // Only legacy items (no prebuilt USDZ) need the heavy GLB launcher;
-                // USDZ items go straight to native Quick Look, no preload required.
-                items.forEach(item => { if (item.model && !item.model_usdz) _getARLauncher(item.model, item.ar_scale); });
-            }
+            // iOS native AR only launches with uploaded USDZ files. GLB-only tenant
+            // items stay in the in-page 3D viewer instead of racing on-device conversion.
             // Heavy 3D work — load model-viewer, upgrade posters to live 3D, preload
             // Three.js + decode models for AR — is deferred until the FIRST real user
             // interaction (scroll/tap), not just "on idle". Rendering live 3D is expensive
@@ -3054,8 +3166,6 @@
             _heavyEvents.forEach(ev => window.addEventListener(ev, _kickHeavy, { passive: true }));
             // Fallback for a genuinely idle visitor (past the audit window): bring it to life anyway.
             setTimeout(_kickHeavy, 10000);
-
-            const initialLabel = window.__arCap === 'none' ? UI[window.__lang].view3D : UI[window.__lang].viewAR;
 
             // Group by category, preserving order from JSON
             const categories = [];
@@ -3090,19 +3200,25 @@
                 cat.items.forEach(({ item, globalIdx }, localIdx) => {
                     const card = document.createElement('div');
                     card.className = 'menu-item';
+                    const thumbSrc = _safeAssetUrl(item.thumbnail_url);
+                    const modelSrc = _safeAssetUrl(item.model);
+                    const itemName = t(item, 'name');
+                    const itemNameHtml = _escapeHtml(itemName);
+                    const itemDescHtml = _escapeHtml(t(item, 'description'));
+                    const itemPriceHtml = _escapeHtml(item.price);
                     card.innerHTML = `
-                        <p class="item-name" data-field="name" data-idx="${globalIdx}">${t(item, 'name')}</p>
+                        <p class="item-name" data-field="name" data-idx="${globalIdx}">${itemNameHtml}</p>
                         <div class="item-left">
                             <div class="thumb-wrap">
-                                <img class="thumb-img"${item.thumbnail_url ? ` src="${item.thumbnail_url}"` : ''} data-model="${item.model || ''}" alt="${t(item, 'name')}" loading="lazy" onerror="this.style.visibility='hidden'">
+                                <img class="thumb-img"${thumbSrc ? ` src="${thumbSrc}"` : ''} data-model="${modelSrc}" alt="${itemNameHtml}" loading="lazy" onerror="this.style.visibility='hidden'">
                                 <div class="thumb-vignette"></div>
-                                ${item.model ? '<span class="badge-3d">3D</span>' : ''}
+                                ${modelSrc ? '<span class="badge-3d">3D</span>' : ''}
                             </div>
                         </div>
                         <div class="item-right">
-                            <p class="ingredients" data-field="description" data-idx="${globalIdx}">${t(item, 'description')}</p>
+                            <p class="ingredients" data-field="description" data-idx="${globalIdx}">${itemDescHtml}</p>
                             <div class="item-actions">
-                                <p class="price">${item.price}</p>
+                                <p class="price">${itemPriceHtml}</p>
                                 <div class="qty-ctrl" data-idx="${globalIdx}">
                                     <button class="qty-add-btn" aria-label="Add to basket"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
                                     <div class="qty-stepper">
@@ -3112,7 +3228,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button class="ar-btn">${initialLabel}</button>
+                            <button class="ar-btn" data-idx="${globalIdx}">${_arButtonLabel(item)}</button>
                         </div>`;
 
                     // Thumbnail starts as a poster <img>; it upgrades to live 3D on idle
@@ -3192,10 +3308,7 @@
 
             // Correct button labels once AR detection resolves (instant if cap was cached)
             arCapPromise.then(() => {
-                const u = UI[window.__lang];
-                const finalLabel = window.__arCap === 'none' ? u.view3D : u.viewAR;
-                if (finalLabel !== initialLabel)
-                    document.querySelectorAll('.ar-btn:not(:disabled)').forEach(b => { b.textContent = finalLabel; });
+                setARButtonsState(false);
             });
         }
 
