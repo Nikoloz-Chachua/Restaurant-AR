@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: '3D AR Menu Admin',
-  description: 'Admin panel for 3D AR Menu',
+  title: 'BetaReal Admin',
+  description: 'Admin panel for BetaReal restaurant menus',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

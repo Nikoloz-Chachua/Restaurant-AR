@@ -27,7 +27,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold" style={{ color: 'var(--gold)' }}>
-            3D AR Menu Admin
+            BetaReal Admin
           </h1>
           <p className="text-sm mt-1" style={{ color: 'var(--dim)' }}>
             Sign in to manage the restaurant

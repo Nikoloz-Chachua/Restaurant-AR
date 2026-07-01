@@ -61,10 +61,10 @@ export default function Sidebar({ open, onClose }: Props) {
   const NAV = [
     plan.canManageTenants ? { href: '/tenants', label: 'Tenants', icon: '▦' } : null,
     !plan.canManageTenants && plan.canManageBranches ? { href: '/tenants', label: 'Branches', icon: '▦' } : null,
-    plan.canUseMenu ? { href: tenantHref('/menu'), match: '/menu', label: T.navMenu, icon: '🍔' } : null,
-    plan.canUseAnalytics ? { href: tenantHref('/dashboard'), match: '/dashboard', label: T.navAnalytics, icon: '📊' } : null,
-    plan.canUseDeveloperAnalytics ? { href: '/dev-analytics', match: '/dev-analytics', label: T.navDeveloperAnalytics, icon: '🛠' } : null,
-    plan.canUseTheme ? { href: tenantHref('/theme'), match: '/theme', label: T.navTheme, icon: '🎨' } : null,
+    plan.canUseMenu ? { href: tenantHref('/menu'), match: '/menu', label: T.navMenu, icon: 'Menu' } : null,
+    plan.canUseAnalytics ? { href: tenantHref('/dashboard'), match: '/dashboard', label: T.navAnalytics, icon: 'Data' } : null,
+    plan.canUseDeveloperAnalytics ? { href: '/dev-analytics', match: '/dev-analytics', label: T.navDeveloperAnalytics, icon: 'Dev' } : null,
+    plan.canUseTheme ? { href: tenantHref('/theme'), match: '/theme', label: T.navTheme, icon: 'Theme' } : null,
   ].filter((item): item is { href: string; match?: string; label: string; icon: string } => Boolean(item))
 
   function broadcast(newLang: Lang, newDark: boolean) {
@@ -112,7 +112,7 @@ export default function Sidebar({ open, onClose }: Props) {
       >
         <div>
           <div className="font-bold text-base leading-tight" style={{ color: 'var(--gold)' }}>
-            🦁 {T.brandTitle}
+            {T.brandTitle}
           </div>
           <div className="text-xs mt-0.5" style={{ color: 'var(--dim)' }}>{T.brandSub}</div>
         </div>
@@ -144,8 +144,8 @@ export default function Sidebar({ open, onClose }: Props) {
               onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'var(--card2)' }}
               onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent' }}
             >
-              <span className="text-base">{icon}</span>
-              {label}
+              <span className="text-[10px] uppercase tracking-wide w-11 shrink-0" style={{ color: active ? 'var(--gold)' : 'var(--dim)' }}>{icon}</span>
+              <span>{label}</span>
             </Link>
           )
         })}
@@ -167,7 +167,7 @@ export default function Sidebar({ open, onClose }: Props) {
           style={{ background: 'var(--card2)', color: 'var(--gold)', border: '1px solid var(--border)' }}
           title="Switch theme"
         >
-          {dark ? '☀' : '🌙'}
+          {dark ? 'Light' : 'Dark'}
         </button>
       </div>
 
@@ -182,7 +182,7 @@ export default function Sidebar({ open, onClose }: Props) {
           onMouseEnter={e => e.currentTarget.style.background = 'var(--card2)'}
           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
         >
-          <span>🔗</span> {T.viewMenu}
+          <span className="text-[10px] uppercase tracking-wide w-11 shrink-0">Site</span> {T.viewMenu}
         </a>
         <button
           onClick={signOut}
@@ -197,7 +197,7 @@ export default function Sidebar({ open, onClose }: Props) {
             e.currentTarget.style.background = 'transparent'
           }}
         >
-          <span>🚪</span> {T.signOut}
+          <span className="text-[10px] uppercase tracking-wide w-11 shrink-0">Exit</span> {T.signOut}
         </button>
       </div>
     </aside>

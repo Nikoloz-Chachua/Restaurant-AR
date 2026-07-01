@@ -40,7 +40,7 @@ type CreatedTenantResponse = {
   error?: string
 }
 
-type StarterTemplateKey = 'burger_cafe_gold' | 'cream_cafe'
+type StarterTemplateKey = 'warm_gold' | 'cream_cafe'
 type TenantForm = {
   brandName: string
   brandSlug: string
@@ -79,9 +79,9 @@ const STARTER_TEMPLATE_OPTIONS: {
   createStarterCategory: boolean
 }[] = [
   {
-    key: 'burger_cafe_gold',
-    label: 'Burger / cafe gold',
-    description: 'Dark burger-cafe look with gold accents and starter menu content.',
+    key: 'warm_gold',
+    label: 'Warm gold restaurant',
+    description: 'Dark warm-gold restaurant look. Can be changed later in Theme Editor and Menu Editor.',
     primaryColor: '#f2b535',
     secondaryColor: '#c07808',
     createStarterCategory: true,
@@ -106,20 +106,12 @@ function tenantMenuUrl(slug: string) {
   return `/menu?tenant=${encodeURIComponent(slug)}`
 }
 
-function tenantThemeUrl(slug: string) {
-  return `/theme?tenant=${encodeURIComponent(slug)}`
-}
-
-function tenantAnalyticsUrl(slug: string) {
-  return `/dashboard?tenant=${encodeURIComponent(slug)}`
-}
-
 function starterTemplate(templateKey: string) {
   return STARTER_TEMPLATE_OPTIONS.find(option => option.key === templateKey) ?? STARTER_TEMPLATE_OPTIONS[0]
 }
 
 function emptyBranchForm(): BranchForm {
-  const template = starterTemplate('burger_cafe_gold')
+  const template = starterTemplate('warm_gold')
   return {
     branchName: '',
     branchArea: '',
@@ -179,7 +171,7 @@ export default function TenantsPage() {
     restaurantName: '',
     restaurantSlug: '',
     plan: 'ar_menu' as Brand['plan'],
-    templateKey: 'burger_cafe_gold',
+    templateKey: 'warm_gold',
     primaryColor: '#f2b535',
     secondaryColor: '#c07808',
     createStarterCategory: true,
@@ -307,7 +299,7 @@ export default function TenantsPage() {
       restaurantName: '',
       restaurantSlug: '',
       plan: 'ar_menu',
-      templateKey: 'burger_cafe_gold',
+      templateKey: 'warm_gold',
       primaryColor: '#f2b535',
       secondaryColor: '#c07808',
       createStarterCategory: true,
@@ -363,10 +355,6 @@ export default function TenantsPage() {
   }
 
   async function deleteTenant(brand: Brand) {
-    if (brand.slug === 'burger-lions') {
-      setMessage('Burger Lions is protected and cannot be deleted from this panel')
-      return
-    }
     if (!window.confirm(`Delete ${brand.name}? This removes its restaurants, menu, categories, theme rows, and live tenant link.`)) return
     setSaving(true)
     setMessage('')
@@ -401,7 +389,7 @@ export default function TenantsPage() {
           <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>{pageTitle}</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--dim)' }}>
             {access.canManageTenants
-              ? 'Create restaurants by database rows for the shared WebAR template.'
+              ? 'Create restaurant tenants and keep their menu/theme editable after launch.'
               : access.canCreateBranches
                 ? 'Open existing branches or add new branches under your Premium 900 brand.'
                 : 'Open an existing branch to manage its menu, theme, and analytics.'}
@@ -467,7 +455,7 @@ export default function TenantsPage() {
               <option value="premium">Premium 900</option>
             </select>
           </Field>
-          <Field label="Menu template">
+          <Field label="Starter template">
             <select
               value={form.templateKey}
               onChange={e => update('templateKey', e.target.value as StarterTemplateKey)}
@@ -543,7 +531,7 @@ export default function TenantsPage() {
             {saving ? 'Creating...' : 'Create tenant'}
           </button>
           <span className="text-xs" style={{ color: 'var(--dim)' }}>
-            Creates DB rows and gives a working shared-template URL. Custom domains/Vercel aliases are separate infrastructure.
+            Creates tenant rows and gives a working public menu URL. Template, colors, branding, and menu can be changed later.
           </span>
         </div>
       </section>
@@ -556,7 +544,7 @@ export default function TenantsPage() {
           <table className="w-full text-sm" style={{ minWidth: '980px' }}>
             <thead>
               <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
-                {['Brand', 'Plan', 'Admins', 'Branches / managers', 'Shared-template URL', 'Status', 'Actions'].map(h => (
+                {['Brand', 'Plan', 'Admins', 'Branches / managers', 'Status', 'Actions'].map(h => (
                   <th key={h} className="px-4 py-3 text-left font-medium" style={{ color: 'var(--dim)' }}>{h}</th>
                 ))}
               </tr>
@@ -588,18 +576,13 @@ export default function TenantsPage() {
                         <div className="space-y-2">
                           {(brand.restaurants ?? []).map(r => (
                             <div key={r.id}>
-                              <a href={tenantMenuUrl(r.slug)} className="hover:underline" style={{ color: 'var(--gold)' }}>
+                              <a href={tenantMenuUrl(r.slug)} className="hover:underline font-medium" style={{ color: 'var(--gold)' }}>
                                 {r.name}
                               </a>
-                              <div className="text-xs font-mono" style={{ color: 'var(--dim)' }}>{r.slug}</div>
-                              <div className="flex flex-wrap gap-1.5 mt-1">
-                                <BranchAction href={tenantMenuUrl(r.slug)} label="Menu editor" />
-                                <BranchAction href={tenantThemeUrl(r.slug)} label="Theme editor" />
-                                {(brand.plan !== 'ar_menu' || access.canManageTenants) && (
-                                  <BranchAction href={tenantAnalyticsUrl(r.slug)} label="Analytics" />
-                                )}
-                                <BranchAction href={tenantPreviewUrl(r.slug)} label="Public site" external />
-                              </div>
+                              <div className="text-xs font-mono mt-0.5" style={{ color: 'var(--dim)' }}>{r.slug}</div>
+                              <a href={tenantPreviewUrl(r.slug)} target="_blank" rel="noreferrer" className="block text-xs font-mono mt-1 break-all hover:underline" style={{ color: 'var(--gold)' }}>
+                                Web page: {tenantPreviewUrl(r.slug)}
+                              </a>
                               <div className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
                                 Branch managers: {(r.managerEmails ?? []).length ? <EmailList emails={r.managerEmails ?? []} /> : 'None'}
                               </div>
@@ -607,17 +590,6 @@ export default function TenantsPage() {
                           ))}
                         </div>
                       ) : 'None'}
-                    </td>
-                    <td className="px-4 py-3 font-mono text-xs" style={{ color: 'var(--dim)' }}>
-                      {(brand.restaurants ?? []).length ? (
-                        <div className="space-y-1">
-                          {(brand.restaurants ?? []).map(r => (
-                            <a key={r.id} href={tenantPreviewUrl(r.slug)} target="_blank" rel="noreferrer" className="block hover:underline" style={{ color: 'var(--gold)' }}>
-                              {tenantPreviewUrl(r.slug)}
-                            </a>
-                          ))}
-                        </div>
-                      ) : 'Pending first branch'}
                     </td>
                     <td className="px-4 py-3">
                       <div className="space-y-1">
@@ -651,12 +623,12 @@ export default function TenantsPage() {
                         {access.canManageTenants && (
                           <button
                             onClick={() => void deleteTenant(brand)}
-                            disabled={saving || brand.slug === 'burger-lions'}
+                            disabled={saving}
                             className="px-3 py-1.5 rounded-lg text-xs font-semibold"
                             style={{
                               border: '1px solid rgba(224,82,82,0.35)',
-                              color: brand.slug === 'burger-lions' ? 'var(--dim)' : 'var(--danger)',
-                              opacity: saving || brand.slug === 'burger-lions' ? 0.5 : 1,
+                              color: 'var(--danger)',
+                              opacity: saving ? 0.5 : 1,
                             }}
                           >
                             Delete
@@ -703,20 +675,6 @@ function EmailList({ emails }: { emails: string[] }) {
   )
 }
 
-function BranchAction({ href, label, external = false }: { href: string; label: string; external?: boolean }) {
-  return (
-    <a
-      href={href}
-      target={external ? '_blank' : undefined}
-      rel={external ? 'noreferrer' : undefined}
-      className="inline-flex items-center rounded-md px-2 py-1 text-[11px] font-semibold hover:underline"
-      style={{ background: 'rgba(242,181,53,0.10)', color: 'var(--gold)', border: '1px solid var(--border)' }}
-    >
-      {label}
-    </a>
-  )
-}
-
 function BranchCreator({
   brand,
   value,
@@ -758,7 +716,7 @@ function BranchCreator({
         />
       </div>
       <label className="block">
-        <div className="text-xs mb-1 uppercase" style={{ color: 'var(--dim)' }}>Menu template</div>
+        <div className="text-xs mb-1 uppercase" style={{ color: 'var(--dim)' }}>Starter template</div>
         <select
           value={value.templateKey}
           onChange={e => onChange(brand, 'templateKey', e.target.value)}

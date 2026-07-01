@@ -39,6 +39,33 @@ const GOOGLE_FONTS = [
   'Source Sans 3', 'Oswald', 'PT Serif', 'Merriweather',
 ]
 
+const TEMPLATE_PRESETS: { key: string; label: string; description: string; values: ThemeConfig }[] = [
+  {
+    key: 'warm_gold',
+    label: 'Warm gold restaurant',
+    description: 'Dark premium restaurant base with warm gold accents.',
+    values: {
+      night_bg: '#0f0b07', night_card: '#1d1610', night_card2: '#261d13', night_border: 'rgba(242,181,53,0.18)',
+      night_text: '#ede6d4', night_dim: '#8a7a62', night_accent: '#f2b535', night_accent_text: '#0f0b07', night_thumb_bg: '#17100a', night_modal_bg: '#120d08',
+      day_bg: '#f5f0e8', day_card: '#ffffff', day_card2: '#ede7d8', day_border: 'rgba(155,98,8,0.18)',
+      day_text: '#1c1308', day_dim: '#8a7060', day_accent: '#c07808', day_accent_text: '#ffffff', day_thumb_bg: '#fff8ec', day_modal_bg: '#fffaf2',
+      font_body: 'Nunito', font_heading: 'Bebas Neue', template_key: 'warm_gold',
+    },
+  },
+  {
+    key: 'cream_cafe',
+    label: 'Cream cafe',
+    description: 'Light cream cafe palette with orange and soft green accents.',
+    values: {
+      night_bg: '#1b1710', night_card: '#272016', night_card2: '#312719', night_border: 'rgba(217,119,6,0.24)',
+      night_text: '#fff3dc', night_dim: '#b69b78', night_accent: '#f59e0b', night_accent_text: '#1b1710', night_thumb_bg: '#241c12', night_modal_bg: '#17130d',
+      day_bg: '#fff8ed', day_card: '#ffffff', day_card2: '#f7ead4', day_border: 'rgba(47,125,87,0.22)',
+      day_text: '#2b1f14', day_dim: '#8b6f50', day_accent: '#d97706', day_accent_text: '#ffffff', day_thumb_bg: '#f0f7ee', day_modal_bg: '#fffaf1',
+      font_body: 'Nunito', font_heading: 'Playfair Display', template_key: 'cream_cafe',
+    },
+  },
+]
+
 function isColor(v: string) {
   return /^#[0-9a-fA-F]{3,8}$/.test(v) || v.startsWith('rgb')
 }
@@ -60,7 +87,7 @@ export default function ThemePage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving]   = useState(false)
   const [msg, setMsg]         = useState('')
-  const [tab, setTab]         = useState<'night' | 'day' | 'fonts' | 'branding'>('night')
+  const [tab, setTab]         = useState<'templates' | 'night' | 'day' | 'fonts' | 'branding'>('templates')
 
   const load = useCallback(async () => {
     if (plan.loading || !plan.canUseTheme || !plan.restaurantId) {
@@ -98,10 +125,11 @@ export default function ThemePage() {
   }
 
   const tabs = [
-    { id: 'night',    label: T.tabNight },
-    { id: 'day',      label: T.tabDay },
-    { id: 'fonts',    label: T.tabFonts },
-    { id: 'branding', label: T.tabBranding },
+    { id: 'templates', label: T.tabPresets },
+    { id: 'night',     label: T.tabNight },
+    { id: 'day',       label: T.tabDay },
+    { id: 'fonts',     label: T.tabFonts },
+    { id: 'branding',  label: T.tabBranding },
   ] as const
 
   if (!plan.loading && !plan.restaurantId) {
@@ -176,6 +204,28 @@ export default function ThemePage() {
         <p style={{ color: 'var(--dim)' }}>{T.loading}</p>
       ) : (
         <div className="grid grid-cols-1 gap-4 max-w-2xl">
+          {tab === 'templates' && (
+            <div className="grid grid-cols-1 gap-3">
+              {TEMPLATE_PRESETS.map(preset => (
+                <button
+                  key={preset.key}
+                  type="button"
+                  onClick={() => {
+                    setConfig(current => ({ ...current, ...preset.values }))
+                    setMsg(`${preset.label} loaded. Press Save Changes to publish it.`)
+                  }}
+                  className="text-left p-4 rounded-xl transition-colors"
+                  style={{ background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--text)' }}
+                >
+                  <div className="font-semibold" style={{ color: 'var(--gold)' }}>{preset.label}</div>
+                  <div className="text-sm mt-1" style={{ color: 'var(--dim)' }}>{preset.description}</div>
+                </button>
+              ))}
+              <div className="text-xs leading-5" style={{ color: 'var(--dim)' }}>
+                Templates are not locked. Load one, adjust colors/fonts/branding in the other tabs, then save.
+              </div>
+            </div>
+          )}
           {tab === 'night' && NIGHT_FIELDS.map(f => (
             <ColorRow key={f.key} label={T[f.tKey] as string} value={config[f.key] ?? ''}
                       onChange={v => set(f.key, v)} />

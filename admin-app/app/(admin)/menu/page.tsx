@@ -262,7 +262,7 @@ export default function MenuPage() {
       })
       if (!upload.ok) throw new Error(`R2 upload failed: ${upload.status}`)
       setItemForm(f => ({ ...f, thumbnail_url: publicUrl }))
-      setThumbProgress(`✓ ${file.name}`)
+      setThumbProgress(`Uploaded: ${file.name}`)
     } catch (e) {
       setThumbProgress(`Upload failed: ${e instanceof Error ? e.message : String(e)}`)
     }
@@ -298,13 +298,13 @@ export default function MenuPage() {
       if (!upload.ok) throw new Error(`R2 upload failed: ${upload.status}`)
 
       setItemForm(f => ({ ...f, model: publicUrl, model_usdz: '' }))
-      setUploadProgress(`✓ ${file.name}`)
+      setUploadProgress(`Uploaded: ${file.name}`)
 
       // Step 3: convert GLB → USDZ in the browser for iOS Quick Look. Non-blocking:
       // the GLB is already saved above, so if conversion fails the menu still works
       // (iOS just falls back to the on-device path, same as before this feature).
       try {
-        setUploadProgress(`✓ ${file.name} — building iPhone AR…`)
+        setUploadProgress(`Uploaded: ${file.name} — building iPhone AR…`)
         const usdzBlob = await glbToUsdz(file, itemForm.ar_scale)
         const usdzName = file.name.replace(/\.glb$/i, '.usdz')
         const pres = await fetch('/api/r2-presign', {
@@ -321,10 +321,10 @@ export default function MenuPage() {
         })
         if (!put.ok) throw new Error(`R2 upload ${put.status}`)
         setItemForm(f => ({ ...f, model_usdz: usdzPublic }))
-        setUploadProgress(`✓ ${file.name} (+ iPhone AR ✓)`)
+        setUploadProgress(`Uploaded: ${file.name} (+ iPhone AR ready)`)
       } catch (e) {
         console.warn('USDZ conversion skipped:', e)
-        setUploadProgress(`✓ ${file.name} (saved — iPhone AR conversion skipped)`)
+        setUploadProgress(`Uploaded: ${file.name} (saved — iPhone AR conversion skipped)`)
       }
     } catch (e) {
       setUploadProgress(`Upload failed: ${e instanceof Error ? e.message : String(e)}`)
@@ -538,7 +538,7 @@ export default function MenuPage() {
                 <div className="text-xs px-2 py-1.5 rounded truncate"
                      style={{ background: 'var(--card2)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
                   {uploadProgress
-                    ? <span style={{ color: uploadProgress.startsWith('✓') ? 'var(--success)' : 'var(--danger)' }}>{uploadProgress}</span>
+                    ? <span style={{ color: uploadProgress.startsWith('Uploaded:') ? 'var(--success)' : 'var(--danger)' }}>{uploadProgress}</span>
                     : itemForm.model
                       ? <span>{T.current}<span style={{ color: 'var(--text)' }}>{itemForm.model.startsWith('http') ? itemForm.model.split('/').pop() : itemForm.model}</span></span>
                       : <span style={{ color: 'var(--dim)' }}>{T.noModel}</span>
@@ -575,7 +575,7 @@ export default function MenuPage() {
                 <div className="text-xs px-2 py-1.5 rounded truncate"
                      style={{ background: 'var(--card2)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
                   {thumbProgress
-                    ? <span style={{ color: thumbProgress.startsWith('✓') ? 'var(--success)' : 'var(--danger)' }}>{thumbProgress}</span>
+                    ? <span style={{ color: thumbProgress.startsWith('Uploaded:') ? 'var(--success)' : 'var(--danger)' }}>{thumbProgress}</span>
                     : itemForm.thumbnail_url
                       ? <span>{T.current}<span style={{ color: 'var(--text)' }}>{itemForm.thumbnail_url.split('/').pop()}</span></span>
                       : <span style={{ color: 'var(--dim)' }}>{T.noThumbnail}</span>

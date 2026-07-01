@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D AR Menu</title>
+    <title>Restaurant Menu</title>
     <script>
         // ── KILLSWITCH ────────────────────────────────────────────────
         // One-shot cleanup for anyone who still has an old service worker
@@ -28,8 +28,8 @@
             } catch (_) {}
         })();
     </script>
-    <meta name="description" content="3D AR Menu. View dishes in Augmented Reality before you order.">
-    <meta property="og:title" content="3D AR Menu">
+    <meta name="description" content="Restaurant menu. View dishes in Augmented Reality before you order.">
+    <meta property="og:title" content="Restaurant Menu">
     <meta property="og:description" content="Browse our menu and place dishes on your table in Augmented Reality.">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev" crossorigin>
@@ -1190,7 +1190,7 @@
             'display:flex;flex-direction:column;align-items:center;justify-content:center;' +
             'padding:40px 32px;text-align:center;font-family:Nunito,sans-serif;';
         ov.innerHTML =
-            '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:2.8rem;letter-spacing:10px;color:#f2b535;line-height:1;">3D AR Menu</div>' +
+            '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:2.8rem;letter-spacing:10px;color:#f2b535;line-height:1;">Restaurant Menu</div>' +
             '<div style="font-size:0.62rem;letter-spacing:4px;text-transform:uppercase;color:#8a7a62;margin-top:6px;font-weight:700;">გასინჯე ველური გემო</div>' +
             '<div style="margin-top:44px;background:#1d1610;border:1px solid rgba(242,181,53,0.22);border-radius:20px;padding:28px 24px;max-width:320px;">' +
                 '<div style="color:#f2b535;font-family:\'Bebas Neue\',sans-serif;font-size:1.5rem;letter-spacing:2px;margin-bottom:12px;">Safari-ში გახსენი AR-ისთვის</div>' +
@@ -1233,7 +1233,7 @@
 
     <div class="header">
         <img id="tenant-logo" class="tenant-logo" alt="" decoding="async">
-        <h1>3D AR Menu</h1>
+        <h1 id="brand-title" data-brand>Restaurant Menu</h1>
     </div>
 
     <div id="cat-filter" class="cat-filter"></div>
@@ -2139,7 +2139,7 @@
             if (!res.ok) throw new Error('supabase ' + res.status);
             return res.json();
         }
-        const _DEFAULT_RESTAURANT_SLUG = 'burger-lions-main';
+        const _DEFAULT_RESTAURANT_SLUG = ''; // empty = no restaurant is hardcoded into the shared template
         let _tenant = null;
         function _tenantSlugFromUrl() {
             const params = new URLSearchParams(location.search);
@@ -2152,7 +2152,7 @@
             const urlSlug = _tenantSlugFromUrl();
             if (urlSlug) return urlSlug;
             const host = location.hostname.toLowerCase();
-            if (host === 'localhost' || host === '127.0.0.1' || host === 'restaurant-ar.pages.dev') {
+            if ((host === 'localhost' || host === '127.0.0.1' || host === 'restaurant-ar.pages.dev') && _DEFAULT_RESTAURANT_SLUG) {
                 return _DEFAULT_RESTAURANT_SLUG;
             }
             if (host.endsWith('.betareal.app')) return host.replace(/\.betareal\.app$/, '');
@@ -2161,7 +2161,7 @@
         async function _resolveTenant() {
             if (_tenant) return _tenant;
             const slug = _tenantSlugFromHost();
-            const isDefaultHost = slug === _DEFAULT_RESTAURANT_SLUG;
+            const isDefaultHost = Boolean(_DEFAULT_RESTAURANT_SLUG) && slug === _DEFAULT_RESTAURANT_SLUG;
             const query = slug
                 ? `restaurants?select=id,slug,name,brand_id,brands(id,slug,name,plan)&slug=eq.${encodeURIComponent(slug)}&limit=1`
                 : `restaurants?select=id,slug,name,brand_id,brands(id,slug,name,plan)&custom_domain=eq.${encodeURIComponent(location.hostname.toLowerCase())}&limit=1`;
@@ -2180,6 +2180,12 @@
                 brand
             };
             window.__tenant = _tenant;
+            const tenantTitle = _cleanText(brand?.name || restaurant.name || 'Restaurant Menu');
+            const titleEl = document.getElementById('brand-title');
+            if (titleEl) titleEl.textContent = tenantTitle;
+            document.title = `${tenantTitle} · Menu`;
+            const ogTitle = document.querySelector('meta[property="og:title"]');
+            if (ogTitle) ogTitle.setAttribute('content', `${tenantTitle} · Menu`);
             return _tenant;
         }
         // POST /rest/v1/<table> — fire-and-forget insert (analytics). Never throws.
@@ -2953,7 +2959,7 @@
             const fallback = [
                 { name: 'Jalapeno Burger', name_ka: 'ჰალაპენიუ ბურგერი', category: 'Burgers', category_ka: 'ბურგერები', description: '300g beef, 4 layers cheddar cheese, 2 layers bacon, caramelized jalapeno with bacon, special sauce, burger bun.', description_ka: 'ხორცი 300 გრ, ყველი ჩედარი 4 ფენა, ბეკონი 2 ფენა, კარამელიზირებული ჰალაპენიო ბეკონით, სპეც სოუსი.', price: '27.5 ₾', model: 'Druidi.glb' },
                 { name: 'Druid',           name_ka: 'დრუიდი',             category: 'Burgers', category_ka: 'ბურგერები', description: '600g beef, 5 layers cheddar cheese, 4 layers bacon, special sauce, pickles, iceberg lettuce, burger bun.',         description_ka: 'ხორცი 600 გრ, ყველი ჩედარი 5 ფენა, ბეკონი 4 ფენა, სპეც სოუსი, მჟავე კიტრი, აისბერგი.',               price: '32.8 ₾', model: 'Druidi.glb' },
-                { name: 'Lion Sauce Extra',name_ka: 'ლომების სოუსი ექსტრა', category: 'Sides', category_ka: 'გარნირი | სოუსები', description: 'Fries, cheese sauce, jalapeno, beef, bacon, onion, parmesan, cheddar and iceberg.',                         description_ka: 'ფრი, ყველის სოუსი, ჰალაპენიო, საქონლის ხორცი, ბეკონი, ხახვი, პარმეზანი, ჩედარი და აისბერგი.',       price: '23.8 ₾', model: 'Druidi.glb' },
+                { name: 'Signature Sauce Extra',name_ka: 'საფირმო სოუსი ექსტრა', category: 'Sides', category_ka: 'გარნირი | სოუსები', description: 'Fries, cheese sauce, jalapeno, beef, bacon, onion, parmesan, cheddar and iceberg.',                         description_ka: 'ფრი, ყველის სოუსი, ჰალაპენიო, საქონლის ხორცი, ბეკონი, ხახვი, პარმეზანი, ჩედარი და აისბერგი.',       price: '23.8 ₾', model: 'Druidi.glb' },
                 { name: 'Coca Cola',       name_ka: 'კოკა კოლა',          category: 'Drinks',  category_ka: 'სასმელები',  description: 'Coca-Cola 0.33L',                                                                                                 description_ka: 'კოკა-კოლა 0.33ლ',                                                                                        price: '3.5 ₾',  model: 'food.glb'   },
                 { name: 'Tiramisu',        name_ka: 'ტირამისუ',            category: 'Desserts',category_ka: 'ტკბილეული', description: 'Classic tiramisu dessert.',                                                                                       description_ka: 'კლასიკური ტირამისუ.',                                                                                    price: '10 ₾',   model: 'food.glb'   },
             ];

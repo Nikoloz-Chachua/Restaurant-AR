@@ -43,7 +43,7 @@ type BrandRow = {
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const CUSTOMER_APP_URL = (process.env.NEXT_PUBLIC_CUSTOMER_APP_URL || 'https://restaurant-ar.pages.dev').replace(/\/$/, '')
 const TEMPLATE_PRESETS = {
-  burger_cafe_gold: {
+  warm_gold: {
     primaryColor: '#f2b535',
     secondaryColor: '#c07808',
     createStarterCategory: true,
@@ -116,7 +116,7 @@ function isColor(value: unknown) {
 }
 
 function templatePreset(key: unknown) {
-  return key === 'cream_cafe' ? TEMPLATE_PRESETS.cream_cafe : TEMPLATE_PRESETS.burger_cafe_gold
+  return key === 'cream_cafe' ? TEMPLATE_PRESETS.cream_cafe : TEMPLATE_PRESETS.warm_gold
 }
 
 function hexToRgb(hex: string) {
@@ -242,7 +242,7 @@ export async function POST(req: NextRequest) {
   if (!branchName) {
     return NextResponse.json({ error: 'Branch name is required' }, { status: 400 })
   }
-  const templateKey = body.templateKey === 'cream_cafe' ? 'cream_cafe' : 'burger_cafe_gold'
+  const templateKey = body.templateKey === 'cream_cafe' ? 'cream_cafe' : 'warm_gold'
   const preset = templatePreset(templateKey)
   const primaryColor = isColor(body.primaryColor) ? String(body.primaryColor) : preset.primaryColor
   const secondaryColor = isColor(body.secondaryColor) ? String(body.secondaryColor) : preset.secondaryColor

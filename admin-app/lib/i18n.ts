@@ -1,7 +1,7 @@
 export type Lang = 'en' | 'ka'
 
 const en = {
-  brandTitle: '3D AR Menu',
+  brandTitle: 'BetaReal',
   brandSub: 'Admin',
   navAnalytics: 'Analytics',
   navDeveloperAnalytics: 'Developer',
@@ -56,7 +56,7 @@ const en = {
   current: 'Current: ',
   thumbnailLabel: 'Thumbnail Image',
   uploadThumb: '↑ Upload image',
-  clearThumb: '✕ Clear',
+  clearThumb: 'Clear',
   noThumbnail: 'No thumbnail uploaded',
   thumb3dLabel: 'Also load 3D model in thumbnail',
   thumb3dHint: 'Off = photo only (saves bandwidth). On = photo shows while 3D loads.',
@@ -73,10 +73,11 @@ const en = {
 
   themeTitle: 'Theme Editor',
   themeDesc: 'Color, font, and branding changes go live instantly',
-  tabNight: '🌙 Night Theme',
-  tabDay: '☀️ Day Theme',
-  tabFonts: '🔤 Fonts',
-  tabBranding: '✏️ Branding',
+  tabNight: 'Night Theme',
+  tabDay: 'Day Theme',
+  tabFonts: 'Fonts',
+  tabBranding: 'Branding',
+  tabPresets: 'Templates',
   reset: 'Reset',
   saveChanges: 'Save Changes',
   saved: 'Saved! Changes are live on the menu.',
@@ -104,7 +105,7 @@ const en = {
 }
 
 const ka: typeof en = {
-  brandTitle: 'ბურგერ ლომები',
+  brandTitle: 'BetaReal',
   brandSub: 'ადმინი',
   navAnalytics: 'ანალიტიკა',
   navDeveloperAnalytics: 'დევ ანალიტიკა',
@@ -159,7 +160,7 @@ const ka: typeof en = {
   current: 'მიმდინარე: ',
   thumbnailLabel: 'მინიატურის სურათი',
   uploadThumb: '↑ სურათის ატვირთვა',
-  clearThumb: '✕ გასუფთავება',
+  clearThumb: 'გასუფთავება',
   noThumbnail: 'მინიატურა არ არის ატვირთული',
   thumb3dLabel: 'მინიატურაში 3D მოდელიც ჩაიტვირთოს',
   thumb3dHint: 'გამოთიშვა = მხოლოდ სურათი (ზოგავს ბენდვიდს). ჩართვა = სურათი 3D-ს ჩატვირთვამდე.',
@@ -176,10 +177,11 @@ const ka: typeof en = {
 
   themeTitle: 'თემის რედაქტორი',
   themeDesc: 'ფერი, შრიფტი და ბრენდინგი მყისიერად იცვლება',
-  tabNight: '🌙 ღამის თემა',
-  tabDay: '☀️ დღის თემა',
-  tabFonts: '🔤 შრიფტები',
-  tabBranding: '✏️ ბრენდინგი',
+  tabNight: 'ღამის თემა',
+  tabDay: 'დღის თემა',
+  tabFonts: 'შრიფტები',
+  tabBranding: 'ბრენდინგი',
+  tabPresets: 'შაბლონები',
   reset: 'გადაყენება',
   saveChanges: 'ცვლილებების შენახვა',
   saved: 'შენახულია! ცვლილებები მენიუზე გავრცელდა.',

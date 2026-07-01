@@ -46,7 +46,7 @@ type TenantBrand = {
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const CUSTOMER_APP_URL = (process.env.NEXT_PUBLIC_CUSTOMER_APP_URL || 'https://restaurant-ar.pages.dev').replace(/\/$/, '')
 const TEMPLATE_PRESETS = {
-  burger_cafe_gold: {
+  warm_gold: {
     primaryColor: '#f2b535',
     secondaryColor: '#c07808',
     createStarterCategory: true,
@@ -115,7 +115,7 @@ function isColor(value: unknown) {
 }
 
 function templatePreset(key: unknown) {
-  return key === 'cream_cafe' ? TEMPLATE_PRESETS.cream_cafe : TEMPLATE_PRESETS.burger_cafe_gold
+  return key === 'cream_cafe' ? TEMPLATE_PRESETS.cream_cafe : TEMPLATE_PRESETS.warm_gold
 }
 
 async function upsertTenantTheme(
@@ -234,7 +234,7 @@ export async function POST(req: NextRequest) {
   const brandSlug = cleanSlug(String(body.brandSlug || brandName))
   const restaurantSlug = cleanSlug(String(body.restaurantSlug || `${brandSlug}-main`))
   const plan = body.plan === 'full' || body.plan === 'premium' ? body.plan : 'ar_menu'
-  const templateKey = body.templateKey === 'cream_cafe' ? 'cream_cafe' : 'burger_cafe_gold'
+  const templateKey = body.templateKey === 'cream_cafe' ? 'cream_cafe' : 'warm_gold'
   const preset = templatePreset(templateKey)
   const primaryColor = isColor(body.primaryColor) && body.primaryColor ? body.primaryColor : preset.primaryColor
   const secondaryColor = isColor(body.secondaryColor) && body.secondaryColor ? body.secondaryColor : preset.secondaryColor
@@ -415,10 +415,7 @@ export async function DELETE(req: NextRequest) {
 
   if (loadError) return NextResponse.json({ error: loadError.message }, { status: 500 })
   if (!brand) return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
-  if (brand.slug === 'burger-lions') {
-    return NextResponse.json({ error: 'Burger Lions is protected and cannot be deleted from this panel' }, { status: 400 })
-  }
-
+  
   const { error } = await supabase.from('brands').delete().eq('id', brandId)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
