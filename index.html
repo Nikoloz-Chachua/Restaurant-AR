@@ -1511,7 +1511,7 @@
 
         // ── Models ────────────────────────────────────────────────────
         function preloadModels() {
-            const paths = [...new Set(MENU.map(m => m.model).filter(Boolean))];
+            const paths = [...new Set(MENU.map(m => _safeAssetUrl(m.model) || m.model).filter(Boolean))];
             return Promise.allSettled(paths.map(p => {
                 if (modelGLTFs[p]) return Promise.resolve();
                 if (_modelLoadPromises[p]) return _modelLoadPromises[p];
@@ -1527,7 +1527,8 @@
         }
 
         function cloneModel(menuIdx) {
-            const gltf = modelGLTFs[MENU[menuIdx].model || 'food.glb'];
+            const modelUrl = _safeAssetUrl(MENU[menuIdx].model) || MENU[menuIdx].model || 'food.glb';
+            const gltf = modelGLTFs[modelUrl];
             if (!gltf) return null;
             const obj = gltf.scene.clone(true);
             obj.traverse(n => { if (n.isMesh && n.material) n.material = n.material.clone(); });
@@ -1800,10 +1801,11 @@
         const _preloadDone = new Promise(res => { _resolvePreload = res; });
 
         async function _makeSeatedBlob(modelUrl, arScale) {
-            const gltf = modelGLTFs[modelUrl];
+            const safeModelUrl = _safeAssetUrl(modelUrl) || modelUrl;
+            const gltf = modelGLTFs[safeModelUrl];
             if (!gltf || !GLTFExporter) return null;
             const scale    = arScale || 1.0;
-            const cacheKey = scale !== 1.0 ? `${modelUrl}::${scale}` : modelUrl;
+            const cacheKey = scale !== 1.0 ? `${safeModelUrl}::${scale}` : safeModelUrl;
             if (_iosSeatedBlobs[cacheKey]) return _iosSeatedBlobs[cacheKey];
             // Clone, apply ar_scale, seat so bottom sits at y=0
             const root = gltf.scene.clone(true);
@@ -2096,7 +2098,7 @@
                 try {
                     await _setup();
                     await preloadModels();
-                    const activeModel = MENU[currentCenterMenu]?.model;
+                    const activeModel = _safeAssetUrl(MENU[currentCenterMenu]?.model) || MENU[currentCenterMenu]?.model;
                     if (!activeModel || !modelGLTFs[activeModel]) {
                         throw new Error('model-load-failed');
                     }
@@ -2655,7 +2657,7 @@
             document.getElementById('modal-drawer').classList.remove('expanded');
             modal.classList.remove('drawer-expanded');
             modalArBtn.textContent  = _arButtonLabel(_viewItem);
-            modalArBtn.style.display = _canLikelyAR(_viewItem) ? '' : 'none';
+            modalArBtn.style.display = (_hasModel(_viewItem) || _canLikelyAR(_viewItem)) ? 'block' : 'none';
             modal.style.display = 'flex';
             requestAnimationFrame(() => modal.classList.add('active'));
             document.body.style.overflow = 'hidden';
@@ -2714,7 +2716,10 @@
         async function detectAR() {
             const cached = localStorage.getItem('bl-ar-cap');
             const ts = parseInt(localStorage.getItem('bl-ar-cap-ts') || '0');
-            if (cached && (Date.now() - ts < 7 * 24 * 60 * 60 * 1000)) { window.__arCap = cached; return cached; }
+            if (cached && cached !== 'none' && (Date.now() - ts < 7 * 24 * 60 * 60 * 1000)) {
+                window.__arCap = cached;
+                return cached;
+            }
 
             const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
                           (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -2750,8 +2755,16 @@
             }
         }
 
+        function _safeModelUrl(item) {
+            return _safeAssetUrl(_modelUrl(item));
+        }
+
+        function _hasModel(item) {
+            return !!_safeModelUrl(item);
+        }
+
         function _canLikelyAR(item, cap = window.__arCap) {
-            if (cap === 'webxr') return !!_modelUrl(item);
+            if (cap === 'webxr') return _hasModel(item);
             if (cap === 'arkit') return !!_usdzUrl(item);
             return false;
         }
@@ -2769,9 +2782,10 @@
                 b.disabled    = loading;
             });
             if (modalArBtn) {
-                modalArBtn.textContent = loading ? u.loading : _arButtonLabel(modalItems[modalIndex]);
+                const item = modalItems[modalIndex];
+                modalArBtn.textContent = loading ? u.loading : _arButtonLabel(item);
                 modalArBtn.disabled = loading;
-                modalArBtn.style.display = _canLikelyAR(modalItems[modalIndex]) ? '' : 'none';
+                modalArBtn.style.display = (_hasModel(item) || _canLikelyAR(item)) ? 'block' : 'none';
             }
         }
 
@@ -2920,7 +2934,7 @@
             const item = _arCatItems[localIdx];
 
             if (!item) { setARButtonsState(false); _arOpening = false; return; }
-            const modelUrl = _modelUrl(item);
+            const modelUrl = _safeModelUrl(item);
             const usdzUrl = _usdzUrl(item);
 
             if (cap === 'webxr' && window.XR) {
@@ -3105,7 +3119,7 @@
             ];
 
             const cachedCap = localStorage.getItem('bl-ar-cap');
-            if (cachedCap) window.__arCap = cachedCap;
+            if (cachedCap && cachedCap !== 'none') window.__arCap = cachedCap;
             // Start detection in background — don't block menu render on it
             const arCapPromise = detectAR();
 
