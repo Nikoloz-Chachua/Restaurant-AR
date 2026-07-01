@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { usePlan } from '@/lib/usePlan'
 import LockedCard from '@/components/LockedCard'
 import { createClient } from '@/lib/supabase/client'
+import { TEMPLATE_PRESETS, type StarterTemplateKey } from '@/lib/themePresets'
 
 type Restaurant = {
   id: number
@@ -40,7 +41,6 @@ type CreatedTenantResponse = {
   error?: string
 }
 
-type StarterTemplateKey = 'warm_gold' | 'cream_cafe'
 type TenantForm = {
   brandName: string
   brandSlug: string
@@ -70,31 +70,7 @@ const PLAN_LABELS: Record<Brand['plan'], string> = {
   premium: 'Premium 900',
 }
 
-const STARTER_TEMPLATE_OPTIONS: {
-  key: StarterTemplateKey
-  label: string
-  description: string
-  primaryColor: string
-  secondaryColor: string
-  createStarterCategory: boolean
-}[] = [
-  {
-    key: 'warm_gold',
-    label: 'Warm gold restaurant',
-    description: 'Dark warm-gold restaurant look. Can be changed later in Theme Editor and Menu Editor.',
-    primaryColor: '#f2b535',
-    secondaryColor: '#c07808',
-    createStarterCategory: true,
-  },
-  {
-    key: 'cream_cafe',
-    label: 'Cream cafe',
-    description: 'Light cream cafe palette with orange and green accents.',
-    primaryColor: '#d97706',
-    secondaryColor: '#2f7d57',
-    createStarterCategory: true,
-  },
-]
+const STARTER_TEMPLATE_OPTIONS = TEMPLATE_PRESETS
 
 const CUSTOMER_APP_URL = (process.env.NEXT_PUBLIC_CUSTOMER_APP_URL || 'https://restaurant-ar.pages.dev').replace(/\/$/, '')
 
@@ -464,8 +440,11 @@ export default function TenantsPage() {
                 <option key={option.key} value={option.key}>{option.label}</option>
               ))}
             </select>
-            <div className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-              {starterTemplate(form.templateKey).description}
+            <div className="mt-2 flex items-center gap-3">
+              <TemplateSwatch templateKey={form.templateKey} />
+              <div className="text-xs leading-5" style={{ color: 'var(--dim)' }}>
+                {starterTemplate(form.templateKey).description}
+              </div>
             </div>
           </Field>
           <Field label="Primary color">
@@ -656,6 +635,32 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   )
 }
 
+function TemplateSwatch({ templateKey, compact = false }: { templateKey: string; compact?: boolean }) {
+  const values = starterTemplate(templateKey).values
+  return (
+    <span
+      className={`relative block shrink-0 overflow-hidden rounded-lg ${compact ? 'h-10 w-14' : 'h-14 w-20'}`}
+      style={{
+        background: values.day_bg_image ?? `linear-gradient(135deg, ${values.day_bg}, ${values.day_bg2 ?? values.day_bg})`,
+        border: `1px solid ${values.day_border ?? 'var(--border)'}`,
+      }}
+      aria-hidden="true"
+    >
+      <span
+        className={`absolute rounded-md ${compact ? 'left-1.5 top-1.5 h-6 w-8' : 'left-2 top-2 h-8 w-11'}`}
+        style={{
+          background: values.day_card_bg ?? `linear-gradient(135deg, ${values.day_card}, ${values.day_card2 ?? values.day_card})`,
+          boxShadow: values.day_item_shadow ?? '0 4px 12px rgba(0,0,0,0.12)',
+        }}
+      />
+      <span
+        className={`absolute rounded-full ${compact ? 'bottom-1.5 right-1.5 h-2.5 w-6' : 'bottom-2 right-2 h-4 w-9'}`}
+        style={{ background: values.day_cta_bg ?? values.day_accent }}
+      />
+    </span>
+  )
+}
+
 function Credential({ label, value, secret = false }: { label: string; value: string; secret?: boolean }) {
   return (
     <div className="p-3 rounded-lg" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
@@ -726,8 +731,11 @@ function BranchCreator({
             <option key={option.key} value={option.key}>{option.label}</option>
           ))}
         </select>
-        <div className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-          {starterTemplate(value.templateKey).description}
+        <div className="mt-2 flex items-center gap-2">
+          <TemplateSwatch templateKey={value.templateKey} compact />
+          <div className="text-xs leading-5" style={{ color: 'var(--dim)' }}>
+            {starterTemplate(value.templateKey).description}
+          </div>
         </div>
       </label>
       <div className="grid grid-cols-2 gap-2">

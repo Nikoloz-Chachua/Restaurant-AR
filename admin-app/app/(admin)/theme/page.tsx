@@ -5,8 +5,7 @@ import { useLang } from '@/lib/useLang'
 import type { Translations } from '@/lib/i18n'
 import { usePlan } from '@/lib/usePlan'
 import LockedCard from '@/components/LockedCard'
-
-type ThemeConfig = Record<string, string>
+import { TEMPLATE_PRESETS, type ThemeConfig } from '@/lib/themePresets'
 
 const NIGHT_FIELDS: { key: string; tKey: keyof Translations }[] = [
   { key: 'night_bg',          tKey: 'colorBg' },
@@ -37,33 +36,6 @@ const GOOGLE_FONTS = [
   'Nunito', 'Bebas Neue', 'Inter', 'Roboto', 'Lato', 'Poppins',
   'Playfair Display', 'Montserrat', 'Raleway', 'Open Sans',
   'Source Sans 3', 'Oswald', 'PT Serif', 'Merriweather',
-]
-
-const TEMPLATE_PRESETS: { key: string; label: string; description: string; values: ThemeConfig }[] = [
-  {
-    key: 'warm_gold',
-    label: 'Warm gold restaurant',
-    description: 'Dark premium restaurant base with warm gold accents.',
-    values: {
-      night_bg: '#0f0b07', night_card: '#1d1610', night_card2: '#261d13', night_border: 'rgba(242,181,53,0.18)',
-      night_text: '#ede6d4', night_dim: '#8a7a62', night_accent: '#f2b535', night_accent_text: '#0f0b07', night_thumb_bg: '#17100a', night_modal_bg: '#120d08',
-      day_bg: '#f5f0e8', day_card: '#ffffff', day_card2: '#ede7d8', day_border: 'rgba(155,98,8,0.18)',
-      day_text: '#1c1308', day_dim: '#8a7060', day_accent: '#c07808', day_accent_text: '#ffffff', day_thumb_bg: '#fff8ec', day_modal_bg: '#fffaf2',
-      font_body: 'Nunito', font_heading: 'Bebas Neue', template_key: 'warm_gold',
-    },
-  },
-  {
-    key: 'cream_cafe',
-    label: 'Cream cafe',
-    description: 'Light cream cafe palette with orange and soft green accents.',
-    values: {
-      night_bg: '#1b1710', night_card: '#272016', night_card2: '#312719', night_border: 'rgba(217,119,6,0.24)',
-      night_text: '#fff3dc', night_dim: '#b69b78', night_accent: '#f59e0b', night_accent_text: '#1b1710', night_thumb_bg: '#241c12', night_modal_bg: '#17130d',
-      day_bg: '#fff8ed', day_card: '#ffffff', day_card2: '#f7ead4', day_border: 'rgba(47,125,87,0.22)',
-      day_text: '#2b1f14', day_dim: '#8b6f50', day_accent: '#d97706', day_accent_text: '#ffffff', day_thumb_bg: '#f0f7ee', day_modal_bg: '#fffaf1',
-      font_body: 'Nunito', font_heading: 'Playfair Display', template_key: 'cream_cafe',
-    },
-  },
 ]
 
 function isColor(v: string) {
@@ -217,8 +189,13 @@ export default function ThemePage() {
                   className="text-left p-4 rounded-xl transition-colors"
                   style={{ background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--text)' }}
                 >
-                  <div className="font-semibold" style={{ color: 'var(--gold)' }}>{preset.label}</div>
-                  <div className="text-sm mt-1" style={{ color: 'var(--dim)' }}>{preset.description}</div>
+                  <div className="flex items-center gap-3">
+                    <TemplateSwatch values={preset.values} />
+                    <div className="min-w-0">
+                      <div className="font-semibold" style={{ color: 'var(--gold)' }}>{preset.label}</div>
+                      <div className="text-sm mt-1" style={{ color: 'var(--dim)' }}>{preset.description}</div>
+                    </div>
+                  </div>
                 </button>
               ))}
               <div className="text-xs leading-5" style={{ color: 'var(--dim)' }}>
@@ -290,6 +267,31 @@ function ColorRow({ label, value, onChange }: { label: string; value: string; on
       <div className="w-10 h-8 rounded-md border shrink-0"
            style={{ background: value, borderColor: 'var(--border)' }} />
     </div>
+  )
+}
+
+function TemplateSwatch({ values }: { values: ThemeConfig }) {
+  return (
+    <span
+      className="relative block h-14 w-20 shrink-0 overflow-hidden rounded-lg"
+      style={{
+        background: values.day_bg_image ?? `linear-gradient(135deg, ${values.day_bg}, ${values.day_bg2 ?? values.day_bg})`,
+        border: `1px solid ${values.day_border ?? 'var(--border)'}`,
+      }}
+      aria-hidden="true"
+    >
+      <span
+        className="absolute left-2 top-2 h-8 w-11 rounded-md"
+        style={{
+          background: values.day_card_bg ?? `linear-gradient(135deg, ${values.day_card}, ${values.day_card2 ?? values.day_card})`,
+          boxShadow: values.day_item_shadow ?? '0 4px 12px rgba(0,0,0,0.12)',
+        }}
+      />
+      <span
+        className="absolute bottom-2 right-2 h-4 w-9 rounded-full"
+        style={{ background: values.day_cta_bg ?? values.day_accent }}
+      />
+    </span>
   )
 }
 

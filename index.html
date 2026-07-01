@@ -65,6 +65,32 @@
             --thumb-bg:    #0d0a07;
             --modal-bg:    #14100b;
             --modal-rgb:   20,16,11;
+            --bg-image:
+                url("./img/grain.png"),
+                radial-gradient(95% 55% at 50% -8%, var(--glow) 0%, transparent 60%),
+                radial-gradient(70% 50% at 85% 35%, var(--glow2) 0%, transparent 72%),
+                radial-gradient(140% 120% at 50% 40%, transparent 58%, var(--shadow) 130%),
+                linear-gradient(175deg, var(--bg) 0%, var(--bg2) 60%, var(--bg) 100%);
+            --bg-size: 64px 64px, auto, auto, auto, auto;
+            --bg-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+            --card-bg: linear-gradient(158deg, var(--card) 0%, var(--card2) 100%);
+            --card-blur: 0px;
+            --card-radius: 20px;
+            --item-shadow: 0 3px 10px var(--shadow);
+            --item-hover-shadow: 0 10px 22px var(--shadow);
+            --accent-edge: linear-gradient(180deg, var(--accent), var(--accent2));
+            --stage-bg: var(--thumb-bg);
+            --thumb-vignette: radial-gradient(ellipse at center, transparent 32%, var(--card) 100%);
+            --pill-bg: var(--card);
+            --pill-active-bg: linear-gradient(120deg, var(--accent), var(--accent2));
+            --cta-bg: linear-gradient(120deg, var(--accent), var(--accent2));
+            --cta-shadow: 0 4px 14px var(--glow);
+            --hero-color: var(--accent);
+            --hero-shadow: 0 2px 16px var(--glow);
+            --divider-bg: linear-gradient(90deg, transparent, var(--accent2), transparent);
+            --modal-bg-image:
+                radial-gradient(70% 48% at 50% 36%, var(--glow) 0%, transparent 62%),
+                radial-gradient(130% 100% at 50% 50%, var(--bg2) 0%, var(--modal-bg) 72%);
         }
 
         [data-theme="day"] {
@@ -84,6 +110,32 @@
             --thumb-bg:    #c8b898;
             --modal-bg:    #f3e9d6;
             --modal-rgb:   243,233,214;
+            --bg-image:
+                url("./img/grain.png"),
+                radial-gradient(95% 55% at 50% -8%, var(--glow) 0%, transparent 60%),
+                radial-gradient(70% 50% at 85% 35%, var(--glow2) 0%, transparent 72%),
+                radial-gradient(140% 120% at 50% 40%, transparent 58%, var(--shadow) 130%),
+                linear-gradient(175deg, var(--bg) 0%, var(--bg2) 60%, var(--bg) 100%);
+            --bg-size: 64px 64px, auto, auto, auto, auto;
+            --bg-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+            --card-bg: linear-gradient(158deg, var(--card) 0%, var(--card2) 100%);
+            --card-blur: 0px;
+            --card-radius: 20px;
+            --item-shadow: 0 3px 10px var(--shadow);
+            --item-hover-shadow: 0 10px 22px var(--shadow);
+            --accent-edge: linear-gradient(180deg, var(--accent), var(--accent2));
+            --stage-bg: var(--thumb-bg);
+            --thumb-vignette: radial-gradient(ellipse at center, transparent 32%, var(--card) 100%);
+            --pill-bg: var(--card);
+            --pill-active-bg: linear-gradient(120deg, var(--accent), var(--accent2));
+            --cta-bg: linear-gradient(120deg, var(--accent), var(--accent2));
+            --cta-shadow: 0 4px 14px var(--glow);
+            --hero-color: var(--accent);
+            --hero-shadow: 0 2px 16px var(--glow);
+            --divider-bg: linear-gradient(90deg, transparent, var(--accent2), transparent);
+            --modal-bg-image:
+                radial-gradient(70% 48% at 50% 36%, var(--glow) 0%, transparent 62%),
+                radial-gradient(130% 100% at 50% 50%, var(--bg2) 0%, var(--modal-bg) 72%);
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -112,21 +164,16 @@
             inset: 0;
             z-index: -1;
             background-color: var(--bg);
-            background-image:
-                url("./img/grain.png"),
-                radial-gradient(95% 55% at 50% -8%, var(--glow) 0%, transparent 60%),
-                radial-gradient(70% 50% at 85% 35%, var(--glow2) 0%, transparent 72%),
-                radial-gradient(140% 120% at 50% 40%, transparent 58%, var(--shadow) 130%),
-                linear-gradient(175deg, var(--bg) 0%, var(--bg2) 60%, var(--bg) 100%);
-            background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-            background-size: 64px 64px, auto, auto, auto, auto;
+            background-image: var(--bg-image);
+            background-repeat: var(--bg-repeat);
+            background-size: var(--bg-size);
         }
 
         .header {
             width: 100%;
             max-width: 450px;
             text-align: center;
-            padding: 72px 0 28px;
+            padding: 56px 0 22px;
             position: relative;
         }
 
@@ -134,9 +181,9 @@
             font-family: 'Bebas Neue', sans-serif;
             font-size: clamp(2.8rem, 10vw, 3.8rem);
             letter-spacing: 8px;
-            color: var(--accent);
+            color: var(--hero-color);
             line-height: 1;
-            text-shadow: 0 2px 16px var(--glow);
+            text-shadow: var(--hero-shadow);
             transition: color var(--t);
         }
 
@@ -159,7 +206,7 @@
             height: 3px;
             margin: 18px auto 0;
             border-radius: 3px;
-            background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+            background: var(--divider-bg);
             box-shadow: 0 0 14px var(--glow);
         }
 
@@ -206,10 +253,10 @@
 
         .menu-item {
             position: relative;
-            background: linear-gradient(158deg, var(--card) 0%, var(--card2) 100%);
+            background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 20px;
-            box-shadow: 0 3px 10px var(--shadow);
+            border-radius: var(--card-radius);
+            box-shadow: var(--item-shadow);
             display: grid;
             grid-template-columns: 108px 1fr;
             grid-template-rows: auto 1fr;
@@ -221,6 +268,8 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease, border-color var(--t);
             contain: content;
             touch-action: manipulation;
+            backdrop-filter: blur(var(--card-blur));
+            -webkit-backdrop-filter: blur(var(--card-blur));
         }
         /* Glowing accent edge on every card */
         .menu-item::before {
@@ -228,13 +277,13 @@
             position: absolute;
             left: 0; top: 0; bottom: 0;
             width: 3px;
-            background: linear-gradient(180deg, var(--accent), var(--accent2));
+            background: var(--accent-edge);
         }
         .menu-item:active { transform: scale(0.985); box-shadow: 0 2px 6px var(--shadow); }
         @media (hover: hover) {
             .menu-item:hover {
                 transform: translateY(-3px);
-                box-shadow: 0 10px 22px var(--shadow);
+                box-shadow: var(--item-hover-shadow);
                 border-color: var(--accent);
             }
         }
@@ -246,7 +295,7 @@
             min-height: 108px;
             border-radius: 14px;
             overflow: hidden;
-            background: var(--thumb-bg);
+            background: var(--stage-bg);
             border: 1px solid var(--border);
             transition: background var(--t), border-color var(--t);
         }
@@ -254,7 +303,7 @@
             position: absolute;
             inset: 0;
             pointer-events: none;
-            background: radial-gradient(ellipse at center, transparent 32%, var(--card) 100%);
+            background: var(--thumb-vignette);
             opacity: 0.6;
         }
         .thumb-wrap model-viewer {
@@ -278,7 +327,7 @@
             position: absolute;
             bottom: 0;
             right: 0;
-            background: linear-gradient(120deg, var(--accent), var(--accent2));
+            background: var(--cta-bg);
             color: var(--accent-text);
             font-family: 'Bebas Neue', sans-serif;
             font-size: 0.9rem;
@@ -327,7 +376,7 @@
         }
 
         .ar-btn {
-            background: linear-gradient(120deg, var(--accent), var(--accent2));
+            background: var(--cta-bg);
             color: var(--accent-text);
             border: none;
             border-radius: 10px;
@@ -341,8 +390,9 @@
             text-transform: uppercase;
             display: block;
             width: 100%;
+            min-height: 44px;
             margin-top: 6px;
-            box-shadow: 0 4px 14px var(--glow);
+            box-shadow: var(--cta-shadow);
             transition: background var(--t), opacity 0.15s, box-shadow 0.15s;
         }
         .ar-btn:active { opacity: 0.7; transition: opacity 0.08s; }
@@ -439,9 +489,7 @@
         #modal {
             position: fixed;
             inset: 0;
-            background:
-                radial-gradient(70% 48% at 50% 36%, var(--glow) 0%, transparent 62%),
-                radial-gradient(130% 100% at 50% 50%, var(--bg2) 0%, var(--modal-bg) 72%);
+            background: var(--modal-bg-image);
             z-index: 9999;
             display: none;
             flex-direction: column;
@@ -813,17 +861,19 @@
             display: flex;
             gap: 8px;
             overflow-x: auto;
-            padding: 0 0 4px;
+            padding: 0 0 8px;
+            margin-bottom: 2px;
             scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
         }
         .cat-filter::-webkit-scrollbar { display: none; }
 
         .cat-pill {
-            background: var(--card);
+            background: var(--pill-bg);
             border: 1px solid var(--border);
             border-radius: 50px;
             padding: 8px 14px;
+            min-height: 40px;
             font-family: 'Nunito', sans-serif;
             font-size: 0.72rem;
             font-weight: 700;
@@ -836,13 +886,48 @@
         }
         .cat-pill:active { opacity: 0.7; transition: opacity 0.08s; }
         .cat-pill.active {
-            background: linear-gradient(120deg, var(--accent), var(--accent2));
+            background: var(--pill-active-bg);
             color: var(--accent-text);
             border-color: transparent;
-            box-shadow: 0 4px 16px var(--glow);
+            box-shadow: var(--cta-shadow);
         }
 
         .cat-section { display: contents; }
+
+        [data-template="fresh_glass"] {
+            --card-blur: 14px;
+            --card-radius: 22px;
+        }
+        [data-template="fresh_glass"] .menu-item {
+            box-shadow: 0 14px 34px var(--shadow);
+        }
+        [data-template="fresh_glass"] .menu-item::before {
+            width: 100%;
+            height: 1px;
+            right: 0;
+            bottom: auto;
+            background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+        }
+        [data-template="minimal_sushi"] {
+            --card-radius: 14px;
+        }
+        [data-template="minimal_sushi"] .menu-item::before {
+            width: 2px;
+        }
+        [data-template="minimal_sushi"] .ar-btn,
+        [data-template="minimal_sushi"] .cat-pill.active,
+        [data-template="urban_night"] .ar-btn,
+        [data-template="urban_night"] .cat-pill.active,
+        [data-template="elegant_black"] .ar-btn,
+        [data-template="elegant_black"] .cat-pill.active {
+            box-shadow: 0 7px 20px var(--glow);
+        }
+        [data-template="mediterranean_air"] .thumb-wrap,
+        [data-template="soft_cafe"] .thumb-wrap {
+            background:
+                radial-gradient(90% 70% at 50% 20%, var(--glow2), transparent 72%),
+                var(--thumb-bg);
+        }
 
         /* ── Quantity stepper (add-to-basket control) ── */
         .qty-ctrl { flex-shrink: 0; }
@@ -918,7 +1003,7 @@
         #basket-bar {
             position: fixed;
             bottom: 0; left: 0; right: 0;
-            background: var(--accent);
+            background: var(--cta-bg);
             color: var(--accent-text);
             padding: 15px 24px;
             display: flex;
@@ -1158,7 +1243,7 @@
         /* ── Modal AR button ── */
         #modal-ar-btn {
             display: none;
-            background: linear-gradient(120deg, var(--accent), var(--accent2));
+            background: var(--cta-bg);
             color: var(--accent-text);
             border: none;
             border-radius: 14px;
@@ -1171,7 +1256,7 @@
             text-transform: uppercase;
             cursor: pointer;
             margin-top: 16px;
-            box-shadow: 0 6px 22px var(--glow);
+            box-shadow: var(--cta-shadow);
             transition: background var(--t), opacity 0.15s, transform 0.12s;
             touch-action: manipulation;
         }
@@ -3056,9 +3141,18 @@
                 const cfg = Object.fromEntries(data.map(r => [r.key, r.value]));
                 _themeConfig = cfg;
                 const varMap = {
-                    bg: '--bg', card: '--card', card2: '--card2', border: '--border',
-                    text: '--text', dim: '--dim', accent: '--accent',
-                    accent_text: '--accent-text', thumb_bg: '--thumb-bg', modal_bg: '--modal-bg'
+                    bg: '--bg', bg2: '--bg2', card: '--card', card2: '--card2', border: '--border',
+                    text: '--text', dim: '--dim', accent: '--accent', accent2: '--accent2',
+                    accent_text: '--accent-text', thumb_bg: '--thumb-bg', modal_bg: '--modal-bg',
+                    glow: '--glow', glow2: '--glow2', shadow: '--shadow',
+                    bg_image: '--bg-image', bg_size: '--bg-size', bg_repeat: '--bg-repeat',
+                    card_bg: '--card-bg', card_blur: '--card-blur', card_radius: '--card-radius',
+                    item_shadow: '--item-shadow', item_hover_shadow: '--item-hover-shadow',
+                    accent_edge: '--accent-edge', stage_bg: '--stage-bg', thumb_vignette: '--thumb-vignette',
+                    pill_bg: '--pill-bg', pill_active_bg: '--pill-active-bg',
+                    cta_bg: '--cta-bg', cta_shadow: '--cta-shadow',
+                    hero_color: '--hero-color', hero_shadow: '--hero-shadow', divider_bg: '--divider-bg',
+                    modal_bg_image: '--modal-bg-image'
                 };
                 // Clear any inline CSS-variable overrides a previous version may have set
                 // directly on <html> (inline styles beat attribute-selector rules and would
@@ -3081,6 +3175,9 @@
                     document.head.appendChild(styleEl);
                 }
                 styleEl.textContent = css;
+                document.documentElement.dataset.template = /^[a-z0-9_-]+$/.test(cfg.template_key || '')
+                    ? cfg.template_key
+                    : '';
                 // Font overrides
                 if (cfg.font_body) {
                     const link = document.createElement('link');
@@ -3111,11 +3208,11 @@
 
         async function buildMenu() {
             const fallback = [
-                { name: 'Jalapeno Burger', name_ka: 'ჰალაპენიუ ბურგერი', category: 'Burgers', category_ka: 'ბურგერები', description: '300g beef, 4 layers cheddar cheese, 2 layers bacon, caramelized jalapeno with bacon, special sauce, burger bun.', description_ka: 'ხორცი 300 გრ, ყველი ჩედარი 4 ფენა, ბეკონი 2 ფენა, კარამელიზირებული ჰალაპენიო ბეკონით, სპეც სოუსი.', price: '27.5 ₾', model: 'Druidi.glb' },
-                { name: 'Druid',           name_ka: 'დრუიდი',             category: 'Burgers', category_ka: 'ბურგერები', description: '600g beef, 5 layers cheddar cheese, 4 layers bacon, special sauce, pickles, iceberg lettuce, burger bun.',         description_ka: 'ხორცი 600 გრ, ყველი ჩედარი 5 ფენა, ბეკონი 4 ფენა, სპეც სოუსი, მჟავე კიტრი, აისბერგი.',               price: '32.8 ₾', model: 'Druidi.glb' },
-                { name: 'Signature Sauce Extra',name_ka: 'საფირმო სოუსი ექსტრა', category: 'Sides', category_ka: 'გარნირი | სოუსები', description: 'Fries, cheese sauce, jalapeno, beef, bacon, onion, parmesan, cheddar and iceberg.',                         description_ka: 'ფრი, ყველის სოუსი, ჰალაპენიო, საქონლის ხორცი, ბეკონი, ხახვი, პარმეზანი, ჩედარი და აისბერგი.',       price: '23.8 ₾', model: 'Druidi.glb' },
-                { name: 'Coca Cola',       name_ka: 'კოკა კოლა',          category: 'Drinks',  category_ka: 'სასმელები',  description: 'Coca-Cola 0.33L',                                                                                                 description_ka: 'კოკა-კოლა 0.33ლ',                                                                                        price: '3.5 ₾',  model: 'food.glb'   },
-                { name: 'Tiramisu',        name_ka: 'ტირამისუ',            category: 'Desserts',category_ka: 'ტკბილეული', description: 'Classic tiramisu dessert.',                                                                                       description_ka: 'კლასიკური ტირამისუ.',                                                                                    price: '10 ₾',   model: 'food.glb'   },
+                { name: 'Seasonal Bowl',       name_ka: 'სეზონური ბოული',     category: 'Mains',    category_ka: 'მთავარი კერძები', description: 'Fresh grains, roasted vegetables, herbs, and house dressing.', description_ka: 'მარცვლეული, შემწვარი ბოსტნეული, მწვანილი და საფირმო დრესინგი.', price: '24 ₾', model: 'food.glb' },
+                { name: 'Signature Plate',     name_ka: 'საფირმო თეფში',      category: 'Mains',    category_ka: 'მთავარი კერძები', description: 'A balanced plate built around the kitchen signature.',          description_ka: 'დაბალანსებული თეფში სამზარეულოს საფირმო გემოთი.',               price: '29 ₾', model: 'Druidi.glb' },
+                { name: 'Crisp Side',          name_ka: 'ხრაშუნა გარნირი',    category: 'Sides',    category_ka: 'გარნირი',         description: 'Crisp seasonal side with a bright dipping sauce.',              description_ka: 'ხრაშუნა სეზონური გარნირი მსუბუქი სოუსით.',                      price: '12 ₾', model: 'food.glb' },
+                { name: 'House Drink',         name_ka: 'საფირმო სასმელი',    category: 'Drinks',   category_ka: 'სასმელები',       description: 'Refreshing house drink served cold.',                           description_ka: 'გამაგრილებელი საფირმო სასმელი.',                                price: '7 ₾',  model: 'food.glb' },
+                { name: 'Classic Dessert',     name_ka: 'კლასიკური დესერტი',  category: 'Desserts', category_ka: 'დესერტები',       description: 'A simple sweet finish for the table.',                          description_ka: 'მარტივი ტკბილი დასასრული სუფრისთვის.',                          price: '11 ₾', model: 'food.glb' },
             ];
 
             const cachedCap = localStorage.getItem('bl-ar-cap');

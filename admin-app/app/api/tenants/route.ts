@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { themePreset, themePresetValuesWithAccents } from '@/lib/themePresets'
 
 type TenantRequest = {
   brandName?: string
@@ -45,63 +46,6 @@ type TenantBrand = {
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const CUSTOMER_APP_URL = (process.env.NEXT_PUBLIC_CUSTOMER_APP_URL || 'https://restaurant-ar.pages.dev').replace(/\/$/, '')
-const TEMPLATE_PRESETS = {
-  warm_gold: {
-    primaryColor: '#f2b535',
-    secondaryColor: '#c07808',
-    createStarterCategory: true,
-    theme: {
-      night_bg: '#0f0b07',
-      night_card: '#1d1610',
-      night_card2: '#261d13',
-      night_border: 'rgba(242,181,53,0.18)',
-      night_text: '#ede6d4',
-      night_dim: '#8a7a62',
-      night_accent: '#f2b535',
-      night_accent_text: '#0f0b07',
-      night_thumb_bg: '#17100a',
-      night_modal_bg: '#120d08',
-      day_bg: '#f5f0e8',
-      day_card: '#ffffff',
-      day_card2: '#ede7d8',
-      day_border: 'rgba(155,98,8,0.18)',
-      day_text: '#1c1308',
-      day_dim: '#8a7060',
-      day_accent: '#c07808',
-      day_accent_text: '#ffffff',
-      day_thumb_bg: '#fff8ec',
-      day_modal_bg: '#fffaf2',
-    },
-  },
-  cream_cafe: {
-    primaryColor: '#d97706',
-    secondaryColor: '#2f7d57',
-    createStarterCategory: true,
-    theme: {
-      night_bg: '#1b1710',
-      night_card: '#272016',
-      night_card2: '#312719',
-      night_border: 'rgba(217,119,6,0.24)',
-      night_text: '#fff3dc',
-      night_dim: '#b69b78',
-      night_accent: '#f59e0b',
-      night_accent_text: '#1b1710',
-      night_thumb_bg: '#241c12',
-      night_modal_bg: '#17130d',
-      day_bg: '#fff8ed',
-      day_card: '#ffffff',
-      day_card2: '#f7ead4',
-      day_border: 'rgba(47,125,87,0.22)',
-      day_text: '#2b1f14',
-      day_dim: '#8b6f50',
-      day_accent: '#d97706',
-      day_accent_text: '#ffffff',
-      day_thumb_bg: '#f0f7ee',
-      day_modal_bg: '#fffaf1',
-    },
-  },
-} as const
-
 function cleanSlug(value: string) {
   return value
     .trim()
@@ -114,10 +58,6 @@ function isColor(value: unknown) {
   return typeof value === 'string' && (/^#[0-9a-fA-F]{6}$/.test(value) || value === '')
 }
 
-function templatePreset(key: unknown) {
-  return key === 'cream_cafe' ? TEMPLATE_PRESETS.cream_cafe : TEMPLATE_PRESETS.warm_gold
-}
-
 async function upsertTenantTheme(
   restaurantId: number,
   siteName: string,
@@ -128,13 +68,9 @@ async function upsertTenantTheme(
 ) {
   const service = createAdminClient()
   if (!service) return 'SUPABASE_SERVICE_ROLE_KEY is missing; tenant theme_config preset was not saved'
-  const preset = templatePreset(templateKey)
+  const preset = themePreset(templateKey)
   const rows = {
-    ...preset.theme,
-    night_accent: primaryColor || preset.primaryColor,
-    day_accent: primaryColor || preset.primaryColor,
-    night_border: `rgba(${secondaryColor ? hexToRgb(secondaryColor) : '192,120,8'},0.22)`,
-    day_border: `rgba(${secondaryColor ? hexToRgb(secondaryColor) : '47,125,87'},0.22)`,
+    ...themePresetValuesWithAccents(preset, primaryColor, secondaryColor),
     site_name: siteName,
     site_name_ka: siteNameKa,
     template_key: templateKey,
@@ -146,12 +82,6 @@ async function upsertTenantTheme(
       { onConflict: 'restaurant_id,key' },
     )
   return error?.message ?? ''
-}
-
-function hexToRgb(hex: string) {
-  const clean = hex.replace('#', '')
-  const int = Number.parseInt(clean, 16)
-  return `${(int >> 16) & 255},${(int >> 8) & 255},${int & 255}`
 }
 
 function tenantPreviewUrl(slug: string) {
@@ -234,8 +164,8 @@ export async function POST(req: NextRequest) {
   const brandSlug = cleanSlug(String(body.brandSlug || brandName))
   const restaurantSlug = cleanSlug(String(body.restaurantSlug || `${brandSlug}-main`))
   const plan = body.plan === 'full' || body.plan === 'premium' ? body.plan : 'ar_menu'
-  const templateKey = body.templateKey === 'cream_cafe' ? 'cream_cafe' : 'warm_gold'
-  const preset = templatePreset(templateKey)
+  const preset = themePreset(body.templateKey)
+  const templateKey = preset.key
   const primaryColor = isColor(body.primaryColor) && body.primaryColor ? body.primaryColor : preset.primaryColor
   const secondaryColor = isColor(body.secondaryColor) && body.secondaryColor ? body.secondaryColor : preset.secondaryColor
   const adminEmail = cleanEmail(body.adminEmail)
