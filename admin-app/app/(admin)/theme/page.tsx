@@ -51,6 +51,13 @@ function toHex(v: string): string {
   return '#000000'
 }
 
+// Pull the plain URL out of a CSS `url("…")` background-image value (empty if it's a
+// gradient, `none`, or unset — so the picker only previews an actual uploaded image).
+function bgImageUrl(v?: string): string {
+  const m = /url\(["']?([^"')]+)["']?\)/.exec(v || '')
+  return m ? m[1] : ''
+}
+
 // Logo / hero images are converted to WebP client-side, then uploaded straight to R2
 // via the presigned PUT (same path as menu thumbnails). Images are allowed for clients;
 // only GLB/USDZ models are super-admin-only.
@@ -79,7 +86,7 @@ export default function ThemePage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving]   = useState(false)
   const [msg, setMsg]         = useState('')
-  const [tab, setTab]         = useState<'templates' | 'night' | 'day' | 'fonts' | 'branding'>('templates')
+  const [tab, setTab]         = useState<'templates' | 'night' | 'day' | 'background' | 'fonts' | 'branding'>('templates')
 
   const load = useCallback(async () => {
     if (plan.loading || !plan.canUseTheme || !plan.restaurantId) {
@@ -101,23 +108,44 @@ export default function ThemePage() {
     setConfig(c => ({ ...c, [key]: value }))
   }
 
+  async function putImageToR2(file: File): Promise<string> {
+    if (!file.type.startsWith('image/')) throw new Error('Only image files are supported')
+    const blob = await toWebP(file)
+    const filename = file.name.replace(/\.[^.]+$/i, '.webp')
+    const res = await fetch('/api/r2-presign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename, restaurantId: plan.restaurantId, restaurantSlug: plan.restaurantSlug }),
+    })
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `Server error ${res.status}`)
+    const { uploadUrl, publicUrl } = await res.json()
+    const up = await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': 'image/webp' }, body: blob })
+    if (!up.ok) throw new Error(`R2 upload failed: ${up.status}`)
+    return publicUrl as string
+  }
+
   async function uploadImage(key: string, file: File) {
-    if (!file.type.startsWith('image/')) { setMsg('Only image files are supported'); return }
     setUploadingKey(key)
     try {
-      const blob = await toWebP(file)
-      const filename = file.name.replace(/\.[^.]+$/i, '.webp')
-      const res = await fetch('/api/r2-presign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename, restaurantId: plan.restaurantId, restaurantSlug: plan.restaurantSlug }),
-      })
-      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `Server error ${res.status}`)
-      const { uploadUrl, publicUrl } = await res.json()
-      const up = await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': 'image/webp' }, body: blob })
-      if (!up.ok) throw new Error(`R2 upload failed: ${up.status}`)
-      set(key, publicUrl)
+      set(key, await putImageToR2(file))
       setMsg('Image uploaded. Press Save Changes to publish it.')
+    } catch (e) {
+      setMsg(`Upload failed: ${e instanceof Error ? e.message : String(e)}`)
+    }
+    setUploadingKey('')
+  }
+
+  // Background images set the CSS background-image token (url(...)) plus cover/no-repeat,
+  // so an uploaded photo fills the whole menu backdrop.
+  async function uploadBgImage(mode: 'night' | 'day', file: File) {
+    const key = `${mode}_bg_image`
+    setUploadingKey(key)
+    try {
+      const url = await putImageToR2(file)
+      set(key, `url("${url}")`)
+      set(`${mode}_bg_size`, 'cover')
+      set(`${mode}_bg_repeat`, 'no-repeat')
+      setMsg('Background image uploaded. Press Save Changes to publish it.')
     } catch (e) {
       setMsg(`Upload failed: ${e instanceof Error ? e.message : String(e)}`)
     }
@@ -145,6 +173,7 @@ export default function ThemePage() {
     { id: 'templates', label: T.tabPresets },
     { id: 'night',     label: T.tabNight },
     { id: 'day',       label: T.tabDay },
+    { id: 'background', label: T.tabBackground },
     { id: 'fonts',     label: T.tabFonts },
     { id: 'branding',  label: T.tabBranding },
   ] as const
@@ -256,6 +285,31 @@ export default function ThemePage() {
             <ColorRow key={f.key} label={T[f.tKey] as string} value={config[f.key] ?? ''}
                       onChange={v => set(f.key, v)} />
           ))}
+          {tab === 'background' && (
+            <>
+              <div className="p-4 rounded-xl text-sm leading-6"
+                   style={{ background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--dim)' }}>
+                {T.bgHint}
+              </div>
+              {(['night', 'day'] as const).map(mode => (
+                <div key={mode} className="p-3 rounded-xl"
+                     style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+                  <div className="text-xs mb-3 uppercase tracking-widest" style={{ color: 'var(--gold)' }}>
+                    {mode === 'night' ? T.tabNight : T.tabDay}
+                  </div>
+                  <ColorRow label={T.bgColor} value={config[`${mode}_bg`] ?? ''}
+                            onChange={v => { set(`${mode}_bg`, v); set(`${mode}_bg_image`, 'none') }} />
+                  <div className="mt-3">
+                    <ImageUploadRow label={T.bgImageLabel} hint="" value={bgImageUrl(config[`${mode}_bg_image`])}
+                                    uploading={uploadingKey === `${mode}_bg_image`}
+                                    uploadLabel={T.uploadThumb} clearLabel={T.bgClearImage}
+                                    onPick={f => uploadBgImage(mode, f)}
+                                    onClear={() => set(`${mode}_bg_image`, 'none')} />
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
           {tab === 'fonts' && (
             <>
               <FontRow label={T.fontBody} preview={T.fontPreview} value={config.font_body ?? 'Nunito'}
