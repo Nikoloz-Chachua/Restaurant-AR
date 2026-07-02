@@ -3715,6 +3715,7 @@
                     );
                     if (data && data.length) {
                         items = data.map(r => ({
+                            id:             r.id,          // stable DB id — needed by the Show-to-waiter QR payload
                             name:           _cleanText(r.name_en),
                             name_ka:        _cleanText(r.name_ka),
                             category:       _cleanText(r.categories?.name_en, 'Other'),
