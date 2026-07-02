@@ -942,8 +942,19 @@
             text-align: center;
             overflow: hidden;
         }
-        /* The default header/brand title is replaced by the hero for this template. */
-        [data-template="monday_greens"] .header { display: none; }
+        /* The default text title is replaced by branded Monday Greens logos. */
+        [data-template="monday_greens"] .header {
+            display: flex;
+            justify-content: center;
+            padding: 34px 18px 10px;
+            margin-bottom: 8px;
+        }
+        [data-template="monday_greens"] .header h1 { display: none; }
+        [data-template="monday_greens"] .tenant-logo {
+            display: block;
+            max-width: min(300px, 64vw);
+            filter: drop-shadow(0 8px 18px rgba(0,0,0,0.08));
+        }
         [data-template="monday_greens"] .mg-hero-photo {
             position: absolute; inset: 0; z-index: 0;
             background-color: #063236; /* fallback while the photo loads / if unset */
@@ -3301,8 +3312,9 @@
                     document.documentElement.style.setProperty('--hero-image', `url("${heroImg}")`);
                 }
                 const heroLogo = document.getElementById('mg-hero-logo');
-                if (heroLogo && logoUrl) {
-                    heroLogo.src = logoUrl;
+                const heroLogoUrl = _safeAssetUrl(cfg.hero_logo_url) || logoUrl;
+                if (heroLogo && heroLogoUrl) {
+                    heroLogo.src = heroLogoUrl;
                     heroLogo.alt = cfg.site_name || tenant.restaurant_name || '';
                     heroLogo.onerror = () => { heroLogo.style.display = 'none'; };
                 }
