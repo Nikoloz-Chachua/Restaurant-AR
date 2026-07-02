@@ -3347,6 +3347,10 @@
                             thumb_3d:       r.thumb_3d ?? false,
                             is_3d:          r.is_3d !== false,
                         }));
+                    } else {
+                        // A real resolved tenant with no menu items should stay empty.
+                        // Do not leak the fallback Burger Lions/demo menu into new client sites.
+                        items = [];
                     }
                 } catch (_) {}
             }
