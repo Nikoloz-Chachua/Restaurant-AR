@@ -352,10 +352,17 @@ export default function ThemePage() {
       <div className="mt-8 p-4 rounded-xl text-sm"
            style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
         <span style={{ color: 'var(--dim)' }}>{T.reloadHint}</span>
-        <a href="https://restaurant-ar.pages.dev" target="_blank" rel="noreferrer"
-           style={{ color: 'var(--gold)' }}>
-          restaurant-ar.pages.dev ↗
-        </a>
+        {(() => {
+          // Link to THIS tenant's live menu (base + ?tenant=<slug>), matching how the
+          // customer app resolves tenants — not a bare, tenant-less URL.
+          const base = (process.env.NEXT_PUBLIC_CUSTOMER_APP_URL || 'https://restaurant-ar.pages.dev').replace(/\/$/, '')
+          const url = plan.restaurantSlug ? `${base}/?tenant=${encodeURIComponent(plan.restaurantSlug)}` : base
+          return (
+            <a href={url} target="_blank" rel="noreferrer" style={{ color: 'var(--gold)' }}>
+              {url.replace(/^https?:\/\//, '')} ↗
+            </a>
+          )
+        })()}
       </div>
     </div>
   )
