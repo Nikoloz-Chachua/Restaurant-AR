@@ -63,6 +63,9 @@ export default function LoginPage() {
                            opacity: loading ? 0.6 : 1 }}>
             {loading ? 'Signing in…' : 'Sign In'}
           </button>
+          <a href="/reset-password" className="block text-center text-xs hover:underline" style={{ color: 'var(--dim)' }}>
+            Forgot password?
+          </a>
         </form>
       </div>
     </div>

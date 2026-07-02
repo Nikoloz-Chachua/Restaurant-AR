@@ -41,6 +41,28 @@ type CreatedTenantResponse = {
   error?: string
 }
 
+type AccountLogEntry = {
+  id: string
+  email: string
+  appRole: string
+  brandMemberships: {
+    role: string
+    brandId: number
+    name: string
+    slug: string
+  }[]
+  restaurantMemberships: {
+    role: string
+    restaurantId: number
+    name: string
+    slug: string
+    brandName: string
+    brandSlug: string
+  }[]
+  createdAt: string | null
+  lastSignInAt: string | null
+}
+
 type TenantForm = {
   brandName: string
   brandSlug: string
@@ -136,6 +158,9 @@ export default function TenantsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [accountLog, setAccountLog] = useState<AccountLogEntry[]>([])
+  const [accountLogLoading, setAccountLogLoading] = useState(false)
+  const [resettingEmail, setResettingEmail] = useState('')
   const [logoFile, setLogoFile] = useState<File | null>(null)
   const [logoStatus, setLogoStatus] = useState('')
   const logoInputRef = useRef<HTMLInputElement>(null)
@@ -169,6 +194,21 @@ export default function TenantsPage() {
   }, [access.canManageBranches, access.canManageTenants, access.loading])
 
   useEffect(() => { void Promise.resolve().then(load) }, [load])
+
+  const loadAccountLog = useCallback(async () => {
+    if (!access.canManageTenants) {
+      setAccountLog([])
+      return
+    }
+    setAccountLogLoading(true)
+    const res = await fetch('/api/account-log')
+    const json = await res.json().catch(() => ({}))
+    if (res.ok) setAccountLog(json.accounts ?? [])
+    else setMessage(json.error || 'Could not load account log')
+    setAccountLogLoading(false)
+  }, [access.canManageTenants])
+
+  useEffect(() => { void Promise.resolve().then(loadAccountLog) }, [loadAccountLog])
 
   function update<K extends keyof typeof form>(key: K, value: typeof form[K]) {
     setForm(current => {
@@ -285,6 +325,7 @@ export default function TenantsPage() {
     setLogoFile(null)
     if (logoInputRef.current) logoInputRef.current.value = ''
     await load()
+    await loadAccountLog()
   }
 
   async function createBranch(brand: Brand) {
@@ -308,6 +349,23 @@ export default function TenantsPage() {
       [brand.id]: emptyBranchForm(),
     }))
     await load()
+  }
+
+  async function sendPasswordReset(email: string) {
+    setResettingEmail(email)
+    setMessage('')
+    const res = await fetch('/api/account-log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+    const json = await res.json().catch(() => ({}))
+    setResettingEmail('')
+    if (!res.ok) {
+      setMessage(json.error || 'Password reset email failed')
+      return
+    }
+    setMessage(`Password reset email sent to ${email}`)
   }
 
   function updateBranchForm(brand: Brand, key: keyof BranchForm, value: string | boolean) {
@@ -385,10 +443,10 @@ export default function TenantsPage() {
             <div>
               <h2 className="text-base font-semibold" style={{ color: 'var(--gold)' }}>Initial admin credentials</h2>
               <p className="text-sm mt-1" style={{ color: 'var(--dim)' }}>
-                Password is shown once. Reset it if lost.
+                Password is shown once and is not stored by BetaReal. Reset it if lost.
               </p>
               <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-                Manual reset: Supabase Dashboard → Authentication → Users → select this user → Send password recovery or update password.
+                You can send future reset emails from the Account Log below.
               </p>
             </div>
             <button
@@ -510,10 +568,19 @@ export default function TenantsPage() {
             {saving ? 'Creating...' : 'Create tenant'}
           </button>
           <span className="text-xs" style={{ color: 'var(--dim)' }}>
-            Creates tenant rows and gives a working public menu URL. Template, colors, branding, and menu can be changed later.
+            Creates tenant rows and gives a working public menu URL. Passwords are only sent to Supabase Auth and are not stored.
           </span>
         </div>
       </section>
+      )}
+
+      {access.canManageTenants && (
+        <AccountLog
+          accounts={accountLog}
+          loading={accountLogLoading}
+          resettingEmail={resettingEmail}
+          onReset={email => void sendPasswordReset(email)}
+        />
       )}
 
       {loading ? (
@@ -624,6 +691,107 @@ export default function TenantsPage() {
       )}
     </div>
   )
+}
+
+function AccountLog({
+  accounts,
+  loading,
+  resettingEmail,
+  onReset,
+}: {
+  accounts: AccountLogEntry[]
+  loading: boolean
+  resettingEmail: string
+  onReset: (email: string) => void
+}) {
+  return (
+    <section className="mb-8">
+      <div className="flex flex-wrap items-end justify-between gap-3 mb-3">
+        <div>
+          <h2 className="text-base font-semibold" style={{ color: 'var(--text)' }}>Account Log</h2>
+          <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
+            Passwords are not stored. Send a reset email if an admin forgets access.
+          </p>
+        </div>
+      </div>
+      <div className="table-scroll rounded-xl" style={{ border: '1px solid var(--border)' }}>
+        <table className="w-full text-xs" style={{ minWidth: '1080px' }}>
+          <thead>
+            <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
+              {['Email', 'App role', 'Brand / tenant', 'Restaurant / branch', 'Created', 'Last sign-in', 'Reset'].map(h => (
+                <th key={h} className="px-3 py-2 text-left font-medium" style={{ color: 'var(--dim)' }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td className="px-3 py-3" colSpan={7} style={{ color: 'var(--dim)' }}>Loading account log...</td>
+              </tr>
+            ) : accounts.length ? accounts.map((account, i) => (
+              <tr
+                key={account.id}
+                style={{ background: i % 2 ? 'var(--card)' : 'transparent', borderBottom: '1px solid var(--border)' }}
+              >
+                <td className="px-3 py-2 font-mono break-all" style={{ color: 'var(--text)' }}>{account.email}</td>
+                <td className="px-3 py-2" style={{ color: 'var(--gold)' }}>{account.appRole || 'none'}</td>
+                <td className="px-3 py-2" style={{ color: 'var(--dim)' }}>
+                  {account.brandMemberships.length ? (
+                    <div className="space-y-1">
+                      {account.brandMemberships.map(membership => (
+                        <div key={`${account.id}-brand-${membership.brandId}`}>
+                          <span style={{ color: 'var(--text)' }}>{membership.name || membership.slug || membership.brandId}</span>
+                          <span className="font-mono"> / {membership.slug || 'no-slug'}</span>
+                          <div>{membership.role}</div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : 'None'}
+                </td>
+                <td className="px-3 py-2" style={{ color: 'var(--dim)' }}>
+                  {account.restaurantMemberships.length ? (
+                    <div className="space-y-1">
+                      {account.restaurantMemberships.map(membership => (
+                        <div key={`${account.id}-restaurant-${membership.restaurantId}`}>
+                          <span style={{ color: 'var(--text)' }}>{membership.name || membership.slug || membership.restaurantId}</span>
+                          <span className="font-mono"> / {membership.slug || 'no-slug'}</span>
+                          <div>{membership.role}</div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : 'None'}
+                </td>
+                <td className="px-3 py-2 font-mono" style={{ color: 'var(--dim)' }}>{formatDate(account.createdAt)}</td>
+                <td className="px-3 py-2 font-mono" style={{ color: 'var(--dim)' }}>{formatDate(account.lastSignInAt)}</td>
+                <td className="px-3 py-2">
+                  <button
+                    type="button"
+                    onClick={() => onReset(account.email)}
+                    disabled={resettingEmail === account.email}
+                    className="px-3 py-1.5 rounded-lg font-semibold"
+                    style={{ border: '1px solid var(--border)', color: 'var(--gold)', opacity: resettingEmail === account.email ? 0.6 : 1 }}
+                  >
+                    {resettingEmail === account.email ? 'Sending...' : 'Send reset'}
+                  </button>
+                </td>
+              </tr>
+            )) : (
+              <tr>
+                <td className="px-3 py-3" colSpan={7} style={{ color: 'var(--dim)' }}>No auth accounts found.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  )
+}
+
+function formatDate(value: string | null) {
+  if (!value) return 'Never'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return date.toLocaleString()
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
