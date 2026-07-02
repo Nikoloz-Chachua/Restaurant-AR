@@ -3,57 +3,6 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/useLang'
 import { usePlan } from '@/lib/usePlan'
-import type { Object3D, Mesh, MeshStandardMaterial } from 'three'
-import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
-
-// Convert a GLB File to a seated, scaled USDZ Blob entirely in the browser, using
-// the same three.js exporter model-viewer runs on-device — but ONCE, at upload
-// time, instead of on every iPhone tap. three is loaded lazily so it never weighs
-// down the rest of the admin panel.
-async function glbToUsdz(file: File, arScale: number): Promise<Blob> {
-  const [THREE, { GLTFLoader }, { USDZExporter }] = await Promise.all([
-    import('three'),
-    import('three/examples/jsm/loaders/GLTFLoader.js'),
-    import('three/examples/jsm/exporters/USDZExporter.js'),
-  ])
-  const buffer = await file.arrayBuffer()
-  const loader = new GLTFLoader()
-  const gltf = await new Promise<GLTF>((resolve, reject) =>
-    loader.parse(buffer, '', resolve, err => reject(err)),
-  )
-  const root = gltf.scene
-
-  // Quick Look renders metallic far shinier than the on-screen WebGL view; zero it
-  // so the iPhone model matches what people see in the menu.
-  root.traverse((n: Object3D) => {
-    const mesh = n as Mesh
-    if (!mesh.isMesh || !mesh.material) return
-    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-    mats.forEach(m => { const mat = m as MeshStandardMaterial; if ('metalness' in mat) mat.metalness = 0 })
-  })
-
-  // Bake ar_scale in, then seat the model so its bounding-box bottom sits at y=0.
-  // Quick Look drops the raw origin onto the surface, so centred models would sink
-  // halfway into the table without this.
-  //
-  // iPhone Quick Look plants models at true real-world size, which reads smaller than
-  // the auto-framed Android view. IOS_AR_BOOST scales the USDZ up so the iPhone AR size
-  // visually matches Android. Tune this one number if it's too big/small (re-upload to
-  // apply). Android is unaffected — it never uses the USDZ.
-  const IOS_AR_BOOST = 2.5
-  const scale = (arScale || 1.0) * IOS_AR_BOOST
-  root.scale.setScalar(scale)
-  root.updateMatrixWorld(true)
-  const box = new THREE.Box3().setFromObject(root)
-  if (isFinite(box.min.y)) {
-    root.position.y -= box.min.y
-    root.updateMatrixWorld(true)
-  }
-
-  const exporter = new USDZExporter()
-  const data = await exporter.parseAsync(root)
-  return new Blob([data as BlobPart], { type: 'model/vnd.usdz+zip' })
-}
 
 type Category = { id: number; name_en: string; name_ka: string; sort_order: number }
 type MenuItem = {
@@ -94,7 +43,8 @@ export default function MenuPage() {
   const [msg, setMsg] = useState('')
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState('')
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const glbInputRef = useRef<HTMLInputElement>(null)
+  const usdzInputRef = useRef<HTMLInputElement>(null)
   const [thumbUploading, setThumbUploading] = useState(false)
   const [thumbProgress, setThumbProgress] = useState('')
   const thumbInputRef = useRef<HTMLInputElement>(null)
@@ -130,7 +80,7 @@ export default function MenuPage() {
 
   function openNewItem() {
     setEditItem(null)
-    setItemForm({ ...EMPTY_ITEM, category_id: categories[0]?.id ?? null })
+    setItemForm({ ...EMPTY_ITEM, category_id: categories[0]?.id ?? null, is_3d: plan.canUploadModels })
     setItemModal(true)
   }
   function openEditItem(item: MenuItem) {
@@ -269,15 +219,15 @@ export default function MenuPage() {
     setThumbUploading(false)
   }
 
-  async function uploadGLB(file: File) {
-    if (!file.name.toLowerCase().endsWith('.glb')) {
-      setUploadProgress('Only .glb files are supported')
+  async function uploadModel(file: File, kind: 'glb' | 'usdz') {
+    const extension = `.${kind}`
+    if (!file.name.toLowerCase().endsWith(extension)) {
+      setUploadProgress(`Only ${extension} files are supported`)
       return
     }
     setUploading(true)
     setUploadProgress(T.uploading)
     try {
-      // Step 1: get a presigned URL from the server (no file data sent here)
       const res = await fetch('/api/r2-presign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -289,43 +239,15 @@ export default function MenuPage() {
       }
       const { uploadUrl, publicUrl } = await res.json()
 
-      // Step 2: upload directly to R2 — bypasses Next.js entirely, no size limit
       const upload = await fetch(uploadUrl, {
         method: 'PUT',
-        headers: { 'Content-Type': 'model/gltf-binary' },
+        headers: { 'Content-Type': kind === 'usdz' ? 'model/vnd.usdz+zip' : 'model/gltf-binary' },
         body: file,
       })
       if (!upload.ok) throw new Error(`R2 upload failed: ${upload.status}`)
 
-      setItemForm(f => ({ ...f, model: publicUrl, model_usdz: '' }))
+      setItemForm(f => kind === 'usdz' ? { ...f, model_usdz: publicUrl } : { ...f, model: publicUrl })
       setUploadProgress(`Uploaded: ${file.name}`)
-
-      // Step 3: convert GLB → USDZ in the browser for iOS Quick Look. Non-blocking:
-      // the GLB is already saved above, so if conversion fails the menu still works
-      // (iOS just falls back to the on-device path, same as before this feature).
-      try {
-        setUploadProgress(`Uploaded: ${file.name} — building iPhone AR…`)
-        const usdzBlob = await glbToUsdz(file, itemForm.ar_scale)
-        const usdzName = file.name.replace(/\.glb$/i, '.usdz')
-        const pres = await fetch('/api/r2-presign', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ filename: usdzName, restaurantId: plan.restaurantId, restaurantSlug: plan.restaurantSlug }),
-        })
-        if (!pres.ok) throw new Error(`presign ${pres.status}`)
-        const { uploadUrl: usdzUrl, publicUrl: usdzPublic } = await pres.json()
-        const put = await fetch(usdzUrl, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'model/vnd.usdz+zip' },
-          body: usdzBlob,
-        })
-        if (!put.ok) throw new Error(`R2 upload ${put.status}`)
-        setItemForm(f => ({ ...f, model_usdz: usdzPublic }))
-        setUploadProgress(`Uploaded: ${file.name} (+ iPhone AR ready)`)
-      } catch (e) {
-        console.warn('USDZ conversion skipped:', e)
-        setUploadProgress(`Uploaded: ${file.name} (saved — iPhone AR conversion skipped)`)
-      }
     } catch (e) {
       setUploadProgress(`Upload failed: ${e instanceof Error ? e.message : String(e)}`)
     }
@@ -412,7 +334,11 @@ export default function MenuPage() {
                       {item.price}
                     </td>
                     <td className="px-4 py-3" style={{ color: 'var(--dim)', fontSize: '0.75rem' }}>
-                      {item.model}
+                      {plan.canUploadModels
+                        ? item.model
+                        : item.model
+                          ? T.modelManagedByUs
+                          : '—'}
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-xs px-2 py-0.5 rounded-full"
@@ -522,47 +448,64 @@ export default function MenuPage() {
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name_en}</option>)}
               </select>
             </Field>
-            <Field label={T.is3dLabel} className="col-span-2">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={itemForm.is_3d} style={{ width: 'auto' }}
-                       onChange={e => setItemForm(f => ({ ...f, is_3d: e.target.checked }))} />
-                <span className="text-sm" style={{ color: 'var(--dim)' }}>{T.is3dHint}</span>
-              </label>
-            </Field>
-            {itemForm.is_3d && (
+            {plan.canUploadModels && (
+              <Field label={T.is3dLabel} className="col-span-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={itemForm.is_3d} style={{ width: 'auto' }}
+                         onChange={e => setItemForm(f => ({ ...f, is_3d: e.target.checked }))} />
+                  <span className="text-sm" style={{ color: 'var(--dim)' }}>{T.is3dHint}</span>
+                </label>
+              </Field>
+            )}
+            {plan.canUploadModels && itemForm.is_3d && (
               <Field label={T.model3d} className="col-span-2">
-                {plan.canUploadModels ? (
-                  <div className="space-y-2">
-                    <div className="flex gap-2">
-                      <button type="button" disabled={uploading}
-                              onClick={() => fileInputRef.current?.click()}
-                              className="px-3 py-1.5 rounded text-xs font-medium"
-                              style={{ background: 'var(--card2)', color: 'var(--gold)',
-                                       border: '1px solid var(--border)', opacity: uploading ? 0.5 : 1 }}>
-                        {uploading ? T.uploading : T.uploadGlb}
-                      </button>
-                      <input ref={fileInputRef} type="file" accept=".glb" style={{ display: 'none' }}
-                             onChange={e => { const f = e.target.files?.[0]; if (f) uploadGLB(f); e.target.value = '' }} />
+                <div className="space-y-2">
+                  <p className="text-xs leading-5" style={{ color: 'var(--dim)' }}>
+                    {T.usdzRequiredHint}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" disabled={uploading}
+                            onClick={() => glbInputRef.current?.click()}
+                            className="px-3 py-1.5 rounded text-xs font-medium"
+                            style={{ background: 'var(--card2)', color: 'var(--gold)',
+                                     border: '1px solid var(--border)', opacity: uploading ? 0.5 : 1 }}>
+                      {uploading ? T.uploading : T.uploadGlb}
+                    </button>
+                    <input ref={glbInputRef} type="file" accept=".glb" style={{ display: 'none' }}
+                           onChange={e => { const f = e.target.files?.[0]; if (f) uploadModel(f, 'glb'); e.target.value = '' }} />
+                    <button type="button" disabled={uploading}
+                            onClick={() => usdzInputRef.current?.click()}
+                            className="px-3 py-1.5 rounded text-xs font-medium"
+                            style={{ background: 'var(--card2)', color: 'var(--gold)',
+                                     border: '1px solid var(--border)', opacity: uploading ? 0.5 : 1 }}>
+                      {uploading ? T.uploading : T.uploadUsdz}
+                    </button>
+                    <input ref={usdzInputRef} type="file" accept=".usdz" style={{ display: 'none' }}
+                           onChange={e => { const f = e.target.files?.[0]; if (f) uploadModel(f, 'usdz'); e.target.value = '' }} />
+                  </div>
+                  <div className="grid gap-2 md:grid-cols-2">
+                    <div className="text-xs px-2 py-1.5 rounded truncate"
+                         style={{ background: 'var(--card2)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
+                      {itemForm.model
+                        ? <span>GLB {T.current}<span style={{ color: 'var(--text)' }}>{itemForm.model.startsWith('http') ? itemForm.model.split('/').pop() : itemForm.model}</span></span>
+                        : <span style={{ color: 'var(--dim)' }}>GLB: {T.noModel}</span>
+                      }
                     </div>
                     <div className="text-xs px-2 py-1.5 rounded truncate"
                          style={{ background: 'var(--card2)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
-                      {uploadProgress
-                        ? <span style={{ color: uploadProgress.startsWith('Uploaded:') ? 'var(--success)' : 'var(--danger)' }}>{uploadProgress}</span>
-                        : itemForm.model
-                          ? <span>{T.current}<span style={{ color: 'var(--text)' }}>{itemForm.model.startsWith('http') ? itemForm.model.split('/').pop() : itemForm.model}</span></span>
-                          : <span style={{ color: 'var(--dim)' }}>{T.noModel}</span>
+                      {itemForm.model_usdz
+                        ? <span>USDZ {T.current}<span style={{ color: 'var(--text)' }}>{itemForm.model_usdz.startsWith('http') ? itemForm.model_usdz.split('/').pop() : itemForm.model_usdz}</span></span>
+                        : <span style={{ color: 'var(--dim)' }}>USDZ: {T.noModel}</span>
                       }
                     </div>
                   </div>
-                ) : (
-                  <div className="text-xs px-2 py-1.5 rounded"
-                       style={{ background: 'var(--card2)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
-                    {itemForm.model
-                      ? <span>{T.current}<span style={{ color: 'var(--text)' }}>{itemForm.model.startsWith('http') ? itemForm.model.split('/').pop() : itemForm.model}</span></span>
-                      : <span>{T.modelManagedByUs}</span>
-                    }
-                  </div>
-                )}
+                  {uploadProgress && (
+                    <div className="text-xs px-2 py-1.5 rounded"
+                         style={{ background: 'var(--card2)', color: uploadProgress.startsWith('Uploaded:') ? 'var(--success)' : 'var(--danger)', border: '1px solid var(--border)' }}>
+                      {uploadProgress}
+                    </div>
+                  )}
+                </div>
               </Field>
             )}
             <Field label={T.thumbnailLabel} className="col-span-2">
@@ -602,7 +545,7 @@ export default function MenuPage() {
                 </div>
               </div>
             </Field>
-            {itemForm.thumbnail_url && (
+            {plan.canUploadModels && itemForm.thumbnail_url && (
               <Field label={T.thumb3dLabel} className="col-span-2">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={itemForm.thumb_3d} style={{ width: 'auto' }}
@@ -615,12 +558,14 @@ export default function MenuPage() {
               <input type="number" value={itemForm.sort_order}
                      onChange={e => setItemForm(f => ({ ...f, sort_order: Number(e.target.value) }))} />
             </Field>
-            <Field label={T.arScale}>
-              <input type="number" min="0.01" max="10" step="0.05"
-                     value={itemForm.ar_scale}
-                     onChange={e => setItemForm(f => ({ ...f, ar_scale: Number(e.target.value) }))} />
-              <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>{T.arScaleHint}</p>
-            </Field>
+            {plan.canUploadModels && (
+              <Field label={T.arScale}>
+                <input type="number" min="0.01" max="10" step="0.05"
+                       value={itemForm.ar_scale}
+                       onChange={e => setItemForm(f => ({ ...f, ar_scale: Number(e.target.value) }))} />
+                <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>{T.arScaleHint}</p>
+              </Field>
+            )}
             <Field label={T.visibility} className="col-span-2">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={itemForm.visible} style={{ width: 'auto' }}
