@@ -2687,13 +2687,19 @@
         const _SVG_SUN  = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
         const _SVG_MOON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
 
-        function applyTheme(theme) {
+        // persist=true only for an explicit user toggle, so localStorage['bl-theme'] is a
+        // true "the visitor chose this" flag. The initial default and any tenant/template
+        // default are applied WITHOUT persisting, so they never masquerade as a user choice.
+        function applyTheme(theme, persist = true) {
             html.setAttribute('data-theme', theme);
             themeBtn.innerHTML    = theme === 'night' ? _SVG_SUN : _SVG_MOON;
             themeBtn.setAttribute('aria-label', theme === 'night' ? UI[window.__lang].themeDay : UI[window.__lang].themeNight);
-            localStorage.setItem('bl-theme', theme);
+            if (persist) localStorage.setItem('bl-theme', theme);
         }
-        applyTheme(localStorage.getItem('bl-theme') || 'night');
+        // Whether the visitor has an explicit saved preference (captured before we apply a
+        // default). Used by applyRemoteTheme to decide if a template default may take over.
+        const _userChoseTheme = !!localStorage.getItem('bl-theme');
+        applyTheme(localStorage.getItem('bl-theme') || 'night', false);
         themeBtn.addEventListener('click', () => {
             const _from = html.getAttribute('data-theme'), _to = _from === 'night' ? 'day' : 'night';
             track('theme_change', null, { from: _from, to: _to });
@@ -3265,6 +3271,12 @@
                 document.documentElement.dataset.template = /^[a-z0-9_-]+$/.test(cfg.template_key || '')
                     ? cfg.template_key
                     : '';
+                // A template/tenant can declare a default theme (e.g. Monday Greens ships
+                // light). Honor it only when the visitor hasn't explicitly picked a theme,
+                // and don't persist it — an explicit toggle still wins and sticks.
+                if (!_userChoseTheme && (cfg.default_theme === 'day' || cfg.default_theme === 'night')) {
+                    applyTheme(cfg.default_theme, false);
+                }
                 // Font overrides
                 if (cfg.font_body) {
                     const link = document.createElement('link');

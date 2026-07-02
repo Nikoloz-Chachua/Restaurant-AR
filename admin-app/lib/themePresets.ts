@@ -383,6 +383,7 @@ export const TEMPLATE_PRESETS: ThemePreset[] = [
       day_glow: 'rgba(94,255,228,0.90)', day_glow2: 'rgba(6,140,150,0.18)', day_shadow: 'rgba(6,58,66,0.18)',
       ...TEMPLATE_VISUAL_TOKENS.monday_greens,
       font_body: 'Nunito', font_heading: 'Fraunces', template_key: 'monday_greens',
+      default_theme: 'day',
     },
   },
 ]
