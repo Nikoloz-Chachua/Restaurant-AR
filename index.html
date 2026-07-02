@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant Menu</title>
+    <link id="app-favicon" rel="icon" type="image/svg+xml" href="./img/betareal-favicon.svg">
     <script>
         // ── KILLSWITCH ────────────────────────────────────────────────
         // One-shot cleanup for anyone who still has an old service worker
@@ -2356,6 +2357,10 @@
         const _SUPA_URL = 'https://lwdpegloznhpcecivhfy.supabase.co';
         const _SUPA_KEY = 'sb_publishable_65dKKpb-lxOr8JTjdj7yxw_LZzcJp5h';
         const _supaHeaders = { 'apikey': _SUPA_KEY, 'Authorization': 'Bearer ' + _SUPA_KEY };
+        const _FAVICON_BY_TENANT_SLUG = {
+            'monday-greens': './img/monday-greens-favicon.svg'
+        };
+        const _DEFAULT_FAVICON = './img/betareal-favicon.svg';
         // GET /rest/v1/<query> → resolves to the row array, or throws on non-2xx.
         async function _supaSelect(query) {
             const res = await fetch(`${_SUPA_URL}/rest/v1/${query}`, { headers: _supaHeaders });
@@ -2386,6 +2391,12 @@
             }
             return null;
         }
+        function _applyTenantFavicon(tenantOrSlug) {
+            const slug = (typeof tenantOrSlug === 'string' ? tenantOrSlug : tenantOrSlug?.restaurant_slug) || '';
+            const link = document.getElementById('app-favicon') || document.querySelector('link[rel~="icon"]');
+            if (link) link.href = _FAVICON_BY_TENANT_SLUG[slug] || _DEFAULT_FAVICON;
+        }
+        _applyTenantFavicon(_tenantSlugFromHost());
         async function _resolveTenant() {
             if (_tenant) return _tenant;
             const slug = _tenantSlugFromHost();
@@ -2408,6 +2419,7 @@
                 brand
             };
             window.__tenant = _tenant;
+            _applyTenantFavicon(_tenant);
             _applyBrandTitle();
             return _tenant;
         }

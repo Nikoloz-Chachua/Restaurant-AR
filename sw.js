@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bl-v95';
+const CACHE_NAME = 'bl-v96';
 
 const SUPABASE_URL  = 'https://lwdpegloznhpcecivhfy.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_65dKKpb-lxOr8JTjdj7yxw_LZzcJp5h';
@@ -10,9 +10,11 @@ const PRECACHE = [
     './aurora-cafe/',
     './foods/menu.json',
     './foods/aurora-cafe-menu.json',
+    './img/betareal-favicon.svg',
     './img/betareal-logo-dark.png',
     './img/betareal-logo-light.png',
     './img/grain.png',
+    './img/monday-greens-favicon.svg',
 ];
 
 // NOTE: models are intentionally NOT mass-precached on install anymore.
