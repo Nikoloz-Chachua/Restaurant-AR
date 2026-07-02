@@ -929,6 +929,74 @@
                 var(--thumb-bg);
         }
 
+        /* ── Monday Greens template: full-bleed hero photo + logo ── */
+        .mg-hero { display: none; }
+        [data-template="monday_greens"] .mg-hero {
+            position: relative;
+            width: 100%;
+            min-height: 100svh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+        /* The default header/brand title is replaced by the hero for this template. */
+        [data-template="monday_greens"] .header { display: none; }
+        [data-template="monday_greens"] .mg-hero-photo {
+            position: absolute; inset: 0; z-index: 0;
+            background-color: #063236; /* fallback while the photo loads / if unset */
+            background-image: var(--hero-image, none);
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+        }
+        [data-template="monday_greens"] .mg-hero-veil {
+            position: absolute; inset: 0; z-index: 1;
+            background:
+                radial-gradient(66% 40% at 50% 46%, rgba(0,0,0,0.40) 0%, transparent 70%),
+                linear-gradient(to bottom, rgba(0,0,0,0.16) 0%, transparent 20%, transparent 68%, var(--bg) 100%);
+        }
+        [data-theme="day"] [data-template="monday_greens"] .mg-hero-veil,
+        [data-template="monday_greens"][data-theme="day"] .mg-hero-veil {
+            background:
+                radial-gradient(62% 36% at 50% 46%, rgba(0,0,0,0.28) 0%, transparent 72%),
+                linear-gradient(to bottom, transparent 90%, var(--bg) 100%);
+        }
+        [data-template="monday_greens"] .mg-hero-logo {
+            position: relative; z-index: 2;
+            width: clamp(240px, 74vw, 540px);
+            max-width: calc(100% - 48px);
+            height: auto;
+            filter: drop-shadow(0 2px 9px rgba(0,0,0,0.6)) drop-shadow(0 10px 40px rgba(0,0,0,0.45));
+            animation: mg-hero-rise 0.9s cubic-bezier(0.2,0.7,0.2,1) both;
+        }
+        /* No logo set → hide the <img> (its alt text would otherwise show). */
+        [data-template="monday_greens"] .mg-hero-logo:not([src]) { display: none; }
+        @keyframes mg-hero-rise {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        [data-template="monday_greens"] .mg-hero-scroll {
+            position: absolute; z-index: 2;
+            bottom: max(26px, env(safe-area-inset-bottom, 26px));
+            left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            color: rgba(255,255,255,0.82);
+            font-size: 0.62rem; font-weight: 800; letter-spacing: 3px;
+            text-transform: uppercase; text-decoration: none;
+        }
+        [data-template="monday_greens"] .mg-hero-scroll svg {
+            width: 22px; height: 22px; animation: mg-nudge 1.8s ease-in-out infinite;
+        }
+        @keyframes mg-nudge {
+            0%, 100% { transform: translateY(0); opacity: 0.7; }
+            50%      { transform: translateY(5px); opacity: 1; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            [data-template="monday_greens"] .mg-hero-logo,
+            [data-template="monday_greens"] .mg-hero-scroll svg { animation: none; }
+        }
+
         /* ── Quantity stepper (add-to-basket control) ── */
         .qty-ctrl { flex-shrink: 0; }
 
@@ -1326,6 +1394,19 @@
 
     <button id="theme-toggle" aria-label="Toggle theme">Day</button>
     <button id="lang-toggle" aria-label="Toggle language">EN</button>
+
+    <!-- Monday Greens template hero — shown only when data-template="monday_greens".
+         Photo from theme_config.hero_image_url (--hero-image), logo from logo_url.
+         Degrades to a gradient + the standard header when either is unset. -->
+    <section class="mg-hero" aria-hidden="true">
+        <div class="mg-hero-photo"></div>
+        <div class="mg-hero-veil"></div>
+        <img id="mg-hero-logo" class="mg-hero-logo" alt="" decoding="async">
+        <a class="mg-hero-scroll" href="#cat-filter" aria-label="Menu">
+            <span>Menu</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </a>
+    </section>
 
     <div class="header">
         <img id="tenant-logo" class="tenant-logo" alt="" decoding="async">
@@ -3041,6 +3122,12 @@
                 if (usdzUrl) {
                     // Prebuilt USDZ (made at upload time) — hand it straight to Quick Look.
                     _launchQuickLook(usdzUrl, localIdx);
+                } else if (modelUrl) {
+                    // No prebuilt USDZ (legacy item, or upload-time conversion was skipped):
+                    // still give iPhone users AR via on-device seated conversion, instead of
+                    // dropping straight to the 3D modal. Falls back to 3D on its own if the
+                    // model hasn't finished loading. (Ported from the single-tenant app.)
+                    _launchIOSAR(_getARLauncher(modelUrl, item.ar_scale), localIdx);
                 } else {
                     _fallbackTo3D(localIdx, _arCatItems, UI[window.__lang].arNoUsdz);
                 }
@@ -3196,12 +3283,24 @@
                 }
                 // Branding
                 _applyBrandTitle();
+                const logoUrl = _safeAssetUrl(cfg.logo_url);
                 const logo = document.getElementById('tenant-logo');
-                if (logo && cfg.logo_url) {
-                    logo.src = cfg.logo_url;
+                if (logo && logoUrl) {
+                    logo.src = logoUrl;
                     logo.alt = cfg.site_name || tenant.restaurant_name || 'Restaurant logo';
                     logo.style.display = 'block';
                     logo.onerror = () => { logo.style.display = 'none'; };
+                }
+                // Monday Greens template hero: photo → --hero-image, logo → hero <img>.
+                const heroImg = _safeAssetUrl(cfg.hero_image_url);
+                if (heroImg) {
+                    document.documentElement.style.setProperty('--hero-image', `url("${heroImg}")`);
+                }
+                const heroLogo = document.getElementById('mg-hero-logo');
+                if (heroLogo && logoUrl) {
+                    heroLogo.src = logoUrl;
+                    heroLogo.alt = cfg.site_name || tenant.restaurant_name || '';
+                    heroLogo.onerror = () => { heroLogo.style.display = 'none'; };
                 }
             } catch (_) {}
         }
@@ -3242,6 +3341,7 @@
                             ar_scale:       r.ar_scale ?? 1.0,
                             thumbnail_url:  r.thumbnail_url || '',
                             thumb_3d:       r.thumb_3d ?? false,
+                            is_3d:          r.is_3d !== false,
                         }));
                     }
                 } catch (_) {}
@@ -3255,8 +3355,9 @@
 
             menuItems = items;
             window.__menuItems = items;
-            // iOS native AR only launches with uploaded USDZ files. GLB-only tenant
-            // items stay in the in-page 3D viewer instead of racing on-device conversion.
+            // iOS native AR prefers the uploaded USDZ (seated + scaled at upload time).
+            // GLB-only items still get iOS AR via on-device seated conversion as a fallback
+            // (see openAR's arkit branch), so no iPhone item is left without AR.
             // Heavy 3D work — load model-viewer, upgrade posters to live 3D, preload
             // Three.js + decode models for AR — is deferred until the FIRST real user
             // interaction (scroll/tap), not just "on idle". Rendering live 3D is expensive
@@ -3312,7 +3413,10 @@
                     const card = document.createElement('div');
                     card.className = 'menu-item';
                     const thumbSrc = _safeAssetUrl(item.thumbnail_url);
-                    const modelSrc = _safeAssetUrl(item.model);
+                    // A non-3D item (is_3d === false) or an item with no model renders as a
+                    // plain photo card: no 3D badge, no live-3D thumbnail upgrade, no AR button.
+                    const has3d = item.is_3d !== false && !!_safeAssetUrl(item.model);
+                    const modelSrc = has3d ? _safeAssetUrl(item.model) : '';
                     const itemName = t(item, 'name');
                     const itemNameHtml = _escapeHtml(itemName);
                     const itemDescHtml = _escapeHtml(t(item, 'description'));
@@ -3339,7 +3443,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button class="ar-btn" data-idx="${globalIdx}">${_arButtonLabel(item)}</button>
+                            ${has3d ? `<button class="ar-btn" data-idx="${globalIdx}">${_arButtonLabel(item)}</button>` : ''}
                         </div>`;
 
                     // Thumbnail starts as a poster <img>; it upgrades to live 3D on idle
@@ -3347,12 +3451,16 @@
                     const thumbImg = card.querySelector('.thumb-img');
                     if (thumbImg) {
                         thumbImg.dataset.globalIdx = globalIdx;
-                        thumbImg.addEventListener('click', () => openModal(globalIdx, menuItems));
+                        if (has3d) thumbImg.addEventListener('click', () => openModal(globalIdx, menuItems));
                     }
 
-                    card.querySelector('.item-right').addEventListener('click', () => openModal(globalIdx, menuItems));
-                    card.querySelector('.item-name').addEventListener('click', () => openModal(globalIdx, menuItems));
-                    card.querySelector('.ar-btn').addEventListener('click', e => { e.stopPropagation(); openAR(globalIdx, menuItems); });
+                    // 3D preview + AR are only wired for 3D items. Non-3D items stay plain
+                    // photo cards; their basket controls below still work.
+                    if (has3d) {
+                        card.querySelector('.item-right').addEventListener('click', () => openModal(globalIdx, menuItems));
+                        card.querySelector('.item-name').addEventListener('click', () => openModal(globalIdx, menuItems));
+                        card.querySelector('.ar-btn')?.addEventListener('click', e => { e.stopPropagation(); openAR(globalIdx, menuItems); });
+                    }
                     const qCtrl = card.querySelector('.qty-ctrl');
                     qCtrl.querySelector('.qty-add-btn').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
                     qCtrl.querySelector('.qty-dec').addEventListener('click', e => { e.stopPropagation(); const en = _basket.get(String(globalIdx)); if (en) _setQty(String(globalIdx), en.qty - 1); });
