@@ -134,3 +134,33 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ sent: true, email })
 }
+
+export async function DELETE(req: NextRequest) {
+  const user = await requireSuperAdmin()
+  if (!user) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+  const service = createAdminClient()
+  if (!service) {
+    return NextResponse.json({ error: 'SUPABASE_SERVICE_ROLE_KEY is required for account removal' }, { status: 500 })
+  }
+
+  const body = await req.json().catch(() => null) as { userId?: unknown } | null
+  const userId = String(body?.userId ?? '').trim()
+  if (!userId) {
+    return NextResponse.json({ error: 'User id is required' }, { status: 400 })
+  }
+  if (userId === user.id) {
+    return NextResponse.json({ error: 'You cannot remove your own super-admin account while signed in.' }, { status: 400 })
+  }
+
+  const { error: brandUsersError } = await service.from('brand_users').delete().eq('user_id', userId)
+  if (brandUsersError) return NextResponse.json({ error: brandUsersError.message }, { status: 500 })
+
+  const { error: restaurantUsersError } = await service.from('restaurant_users').delete().eq('user_id', userId)
+  if (restaurantUsersError) return NextResponse.json({ error: restaurantUsersError.message }, { status: 500 })
+
+  const { error: deleteUserError } = await service.auth.admin.deleteUser(userId)
+  if (deleteUserError) return NextResponse.json({ error: deleteUserError.message }, { status: 500 })
+
+  return NextResponse.json({ removed: true, userId })
+}

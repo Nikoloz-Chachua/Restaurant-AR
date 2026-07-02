@@ -161,6 +161,7 @@ export default function TenantsPage() {
   const [accountLog, setAccountLog] = useState<AccountLogEntry[]>([])
   const [accountLogLoading, setAccountLogLoading] = useState(false)
   const [resettingEmail, setResettingEmail] = useState('')
+  const [removingAccountId, setRemovingAccountId] = useState('')
   const [logoFile, setLogoFile] = useState<File | null>(null)
   const [logoStatus, setLogoStatus] = useState('')
   const logoInputRef = useRef<HTMLInputElement>(null)
@@ -366,6 +367,26 @@ export default function TenantsPage() {
       return
     }
     setMessage(`Password reset email sent to ${email}`)
+  }
+
+  async function removeAccount(account: AccountLogEntry) {
+    if (!window.confirm(`Remove account ${account.email}? This permanently deletes the Supabase Auth user and BetaReal membership mappings.`)) return
+    setRemovingAccountId(account.id)
+    setMessage('')
+    const res = await fetch('/api/account-log', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: account.id }),
+    })
+    const json = await res.json().catch(() => ({}))
+    setRemovingAccountId('')
+    if (!res.ok) {
+      setMessage(json.error || 'Account removal failed')
+      return
+    }
+    setMessage(`Removed account ${account.email}`)
+    await loadAccountLog()
+    await load()
   }
 
   function updateBranchForm(brand: Brand, key: keyof BranchForm, value: string | boolean) {
@@ -579,7 +600,9 @@ export default function TenantsPage() {
           accounts={accountLog}
           loading={accountLogLoading}
           resettingEmail={resettingEmail}
+          removingAccountId={removingAccountId}
           onReset={email => void sendPasswordReset(email)}
+          onRemove={account => void removeAccount(account)}
         />
       )}
 
@@ -697,12 +720,16 @@ function AccountLog({
   accounts,
   loading,
   resettingEmail,
+  removingAccountId,
   onReset,
+  onRemove,
 }: {
   accounts: AccountLogEntry[]
   loading: boolean
   resettingEmail: string
+  removingAccountId: string
   onReset: (email: string) => void
+  onRemove: (account: AccountLogEntry) => void
 }) {
   return (
     <section className="mb-8">
@@ -718,7 +745,7 @@ function AccountLog({
         <table className="w-full text-xs" style={{ minWidth: '1080px' }}>
           <thead>
             <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
-              {['Email', 'App role', 'Brand / tenant', 'Restaurant / branch', 'Created', 'Last sign-in', 'Reset'].map(h => (
+              {['Email', 'App role', 'Brand / tenant', 'Restaurant / branch', 'Created', 'Last sign-in', 'Actions'].map(h => (
                 <th key={h} className="px-3 py-2 text-left font-medium" style={{ color: 'var(--dim)' }}>{h}</th>
               ))}
             </tr>
@@ -764,15 +791,26 @@ function AccountLog({
                 <td className="px-3 py-2 font-mono" style={{ color: 'var(--dim)' }}>{formatDate(account.createdAt)}</td>
                 <td className="px-3 py-2 font-mono" style={{ color: 'var(--dim)' }}>{formatDate(account.lastSignInAt)}</td>
                 <td className="px-3 py-2">
-                  <button
-                    type="button"
-                    onClick={() => onReset(account.email)}
-                    disabled={resettingEmail === account.email}
-                    className="px-3 py-1.5 rounded-lg font-semibold"
-                    style={{ border: '1px solid var(--border)', color: 'var(--gold)', opacity: resettingEmail === account.email ? 0.6 : 1 }}
-                  >
-                    {resettingEmail === account.email ? 'Sending...' : 'Send reset'}
-                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onReset(account.email)}
+                      disabled={resettingEmail === account.email || removingAccountId === account.id}
+                      className="px-3 py-1.5 rounded-lg font-semibold"
+                      style={{ border: '1px solid var(--border)', color: 'var(--gold)', opacity: resettingEmail === account.email ? 0.6 : 1 }}
+                    >
+                      {resettingEmail === account.email ? 'Sending...' : 'Send reset'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onRemove(account)}
+                      disabled={removingAccountId === account.id || resettingEmail === account.email}
+                      className="px-3 py-1.5 rounded-lg font-semibold"
+                      style={{ border: '1px solid rgba(224,82,82,0.35)', color: 'var(--danger)', opacity: removingAccountId === account.id ? 0.6 : 1 }}
+                    >
+                      {removingAccountId === account.id ? 'Removing...' : 'Remove account'}
+                    </button>
+                  </div>
                 </td>
               </tr>
             )) : (

@@ -32,6 +32,7 @@ export default function MenuPage() {
   const [itemModal, setItemModal]   = useState(false)
   const [editItem, setEditItem]     = useState<MenuItem | null>(null)
   const [itemForm, setItemForm]     = useState<Omit<MenuItem, 'id'>>(EMPTY_ITEM)
+  const [sortOrderTouched, setSortOrderTouched] = useState(false)
   const [saving, setSaving]         = useState(false)
   const [deleteId, setDeleteId]     = useState<number | null>(null)
 
@@ -78,13 +79,27 @@ export default function MenuPage() {
     return existingItems.filter(isActiveArItem).length + (isActiveArItem(formItem) ? 1 : 0)
   }
 
+  function nextSortOrderForCategory(categoryId: number | null) {
+    const categoryItems = items.filter(item => item.category_id === categoryId)
+    const maxSortOrder = categoryItems.reduce((max, item) => Math.max(max, Number(item.sort_order) || 0), 0)
+    return maxSortOrder + 1
+  }
+
   function openNewItem() {
+    const categoryId = categories[0]?.id ?? null
     setEditItem(null)
-    setItemForm({ ...EMPTY_ITEM, category_id: categories[0]?.id ?? null, is_3d: plan.canUploadModels })
+    setSortOrderTouched(false)
+    setItemForm({
+      ...EMPTY_ITEM,
+      category_id: categoryId,
+      sort_order: nextSortOrderForCategory(categoryId),
+      is_3d: plan.canUploadModels,
+    })
     setItemModal(true)
   }
   function openEditItem(item: MenuItem) {
     setEditItem(item)
+    setSortOrderTouched(true)
     setItemForm({ name_en: item.name_en, name_ka: item.name_ka,
       description_en: item.description_en, description_ka: item.description_ka,
       price: item.price, category_id: item.category_id, model: item.model, model_usdz: item.model_usdz ?? '',
@@ -102,10 +117,13 @@ export default function MenuPage() {
       return
     }
     setSaving(true)
+    const payload = editItem || sortOrderTouched
+      ? itemForm
+      : { ...itemForm, sort_order: nextSortOrderForCategory(itemForm.category_id) }
     if (editItem) {
-      await supabase.from('menu_items').update(itemForm).eq('id', editItem.id).eq('restaurant_id', plan.restaurantId)
+      await supabase.from('menu_items').update(payload).eq('id', editItem.id).eq('restaurant_id', plan.restaurantId)
     } else {
-      await supabase.from('menu_items').insert({ ...itemForm, restaurant_id: plan.restaurantId })
+      await supabase.from('menu_items').insert({ ...payload, restaurant_id: plan.restaurantId })
     }
     setSaving(false); setItemModal(false); setUploadProgress(''); setThumbProgress(''); await load()
     flash(editItem ? T.itemUpdated : T.itemAdded)
@@ -444,9 +462,45 @@ export default function MenuPage() {
             </Field>
             <Field label={T.categoryLabel}>
               <select value={itemForm.category_id ?? ''}
-                      onChange={e => setItemForm(f => ({ ...f, category_id: Number(e.target.value) }))}>
+                      onChange={e => {
+                        const categoryId = e.target.value ? Number(e.target.value) : null
+                        setItemForm(f => ({
+                          ...f,
+                          category_id: categoryId,
+                          sort_order: editItem || sortOrderTouched ? f.sort_order : nextSortOrderForCategory(categoryId),
+                        }))
+                      }}>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name_en}</option>)}
               </select>
+            </Field>
+            <Field label="Text-only item" className="col-span-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={!itemForm.is_3d && !itemForm.thumbnail_url && !itemForm.model && !itemForm.model_usdz}
+                  style={{ width: 'auto' }}
+                  onChange={e => {
+                    if (e.target.checked) {
+                      setItemForm(f => ({
+                        ...f,
+                        is_3d: false,
+                        model: '',
+                        model_usdz: '',
+                        thumbnail_url: '',
+                        thumb_3d: false,
+                      }))
+                    } else {
+                      setItemForm(f => ({ ...f, is_3d: plan.canUploadModels }))
+                    }
+                  }}
+                />
+                <span className="text-sm" style={{ color: 'var(--dim)' }}>
+                  Text-only item / no photo needed
+                </span>
+              </label>
+              <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
+                Use for simple known items like drinks. It saves without thumbnail, GLB, or USDZ files.
+              </p>
             </Field>
             {plan.canUploadModels && (
               <Field label={T.is3dLabel} className="col-span-2">
@@ -543,6 +597,9 @@ export default function MenuPage() {
                       : <span style={{ color: 'var(--dim)' }}>{T.noThumbnail}</span>
                   }
                 </div>
+                <p className="text-xs" style={{ color: 'var(--dim)' }}>
+                  Optional. Leave empty for a text-only item.
+                </p>
               </div>
             </Field>
             {plan.canUploadModels && itemForm.thumbnail_url && (
@@ -556,7 +613,10 @@ export default function MenuPage() {
             )}
             <Field label={T.sortOrder}>
               <input type="number" value={itemForm.sort_order}
-                     onChange={e => setItemForm(f => ({ ...f, sort_order: Number(e.target.value) }))} />
+                     onChange={e => {
+                       setSortOrderTouched(true)
+                       setItemForm(f => ({ ...f, sort_order: Number(e.target.value) }))
+                     }} />
             </Field>
             {plan.canUploadModels && (
               <Field label={T.arScale}>
