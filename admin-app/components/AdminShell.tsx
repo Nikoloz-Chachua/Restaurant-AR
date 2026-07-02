@@ -6,7 +6,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen md:h-screen md:overflow-hidden">
       {/* Mobile backdrop */}
       {open && (
         <div
@@ -18,7 +18,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
       <Sidebar open={open} onClose={() => setOpen(false)} />
 
-      <div className="flex flex-col flex-1 min-w-0">
+      <div className="flex flex-col flex-1 min-w-0 md:h-screen">
         {/* Mobile top bar */}
         <header
           className="md:hidden sticky top-0 z-30 flex items-center gap-3 px-4 py-3 shrink-0"
@@ -37,7 +37,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         </header>
 
         <main
-          className="flex-1 overflow-auto p-4 md:p-8 page-content"
+          className="flex-1 min-h-0 overflow-auto p-4 md:p-8 page-content"
           style={{ background: 'var(--bg)' }}
         >
           {children}

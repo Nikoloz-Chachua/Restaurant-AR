@@ -46,6 +46,7 @@ export default function MenuPage() {
   const [uploadProgress, setUploadProgress] = useState('')
   const glbInputRef = useRef<HTMLInputElement>(null)
   const usdzInputRef = useRef<HTMLInputElement>(null)
+  const itemFormPanelRef = useRef<HTMLDivElement>(null)
   const [thumbUploading, setThumbUploading] = useState(false)
   const [thumbProgress, setThumbProgress] = useState('')
   const thumbInputRef = useRef<HTMLInputElement>(null)
@@ -66,6 +67,13 @@ export default function MenuPage() {
   }, [plan.loading, plan.restaurantId, supabase])
 
   useEffect(() => { void Promise.resolve().then(load) }, [load])
+
+  useEffect(() => {
+    if (!itemModal) return
+    requestAnimationFrame(() => {
+      itemFormPanelRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+    })
+  }, [itemModal, editItem])
 
   function flash(m: string) { setMsg(m); setTimeout(() => setMsg(''), 3000) }
 
@@ -441,7 +449,12 @@ export default function MenuPage() {
       )}
 
       {itemModal && (
-        <Modal title={editItem ? T.editItemTitle : T.addItemTitle} onClose={() => setItemModal(false)}>
+        <Modal
+          title={editItem ? T.editItemTitle : T.addItemTitle}
+          onClose={() => setItemModal(false)}
+          panelRef={itemFormPanelRef}
+          placement="top"
+        >
           <div className="grid grid-cols-2 gap-4">
             <Field label={T.nameEn}>
               <input value={itemForm.name_en} onChange={e => setItemForm(f => ({ ...f, name_en: e.target.value }))} />
@@ -731,11 +744,27 @@ export default function MenuPage() {
   )
 }
 
-function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+function Modal({
+  title,
+  onClose,
+  children,
+  panelRef,
+  placement = 'center',
+}: {
+  title: string
+  onClose: () => void
+  children: React.ReactNode
+  panelRef?: React.Ref<HTMLDivElement>
+  placement?: 'center' | 'top'
+}) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    <div className={[
+      'fixed inset-0 z-50 flex overflow-y-auto p-4',
+      placement === 'top' ? 'items-start justify-center md:pt-8' : 'items-center justify-center',
+    ].join(' ')}
          style={{ background: 'rgba(0,0,0,0.7)' }} onClick={onClose}>
-      <div className="w-full max-w-xl rounded-2xl p-6 max-h-[90vh] overflow-y-auto"
+      <div ref={panelRef}
+           className="w-full max-w-xl rounded-2xl p-6 max-h-[90vh] overflow-y-auto"
            style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
            onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">

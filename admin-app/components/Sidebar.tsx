@@ -96,9 +96,9 @@ export default function Sidebar({ open, onClose }: Props) {
   return (
     <aside
       className={[
-        'flex flex-col w-56 shrink-0 min-h-screen',
-        // Mobile: fixed overlay; desktop: static in flex flow
-        'fixed inset-y-0 left-0 z-50 md:static md:z-auto',
+        'flex flex-col w-56 shrink-0 h-screen max-h-screen',
+        // Mobile: fixed overlay; desktop: sticky while the main pane scrolls
+        'fixed inset-y-0 left-0 z-50 md:sticky md:top-0 md:z-auto',
         // Slide in/out on mobile; always visible on desktop
         'transition-transform duration-300 ease-in-out',
         open ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
@@ -127,7 +127,7 @@ export default function Sidebar({ open, onClose }: Props) {
       </div>
 
       {/* Nav links */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 min-h-0 px-3 py-4 space-y-1 overflow-y-auto">
         {NAV.map(({ href, match, label, icon }) => {
           const active = pathname.startsWith(match ?? href.split('?')[0])
           return (
