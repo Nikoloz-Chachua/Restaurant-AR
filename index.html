@@ -2348,6 +2348,10 @@
                 return _DEFAULT_RESTAURANT_SLUG;
             }
             if (host.endsWith('.betareal.app')) return host.replace(/\.betareal\.app$/, '');
+            if (host.endsWith('.betareal.ge')) {
+                const subdomain = host.replace(/\.betareal\.ge$/, '');
+                if (subdomain && subdomain !== 'www') return subdomain;
+            }
             return null;
         }
         async function _resolveTenant() {
