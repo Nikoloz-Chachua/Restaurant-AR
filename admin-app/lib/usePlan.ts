@@ -15,6 +15,7 @@ export type PlanAccess = {
   canUseAnalytics: boolean
   canUseTheme: boolean
   canUseDeveloperAnalytics: boolean
+  canUploadModels: boolean
   canManageTenants: boolean
   canManageBranches: boolean
   canCreateBranches: boolean
@@ -103,6 +104,9 @@ function accessFor(
     canUseAnalytics: hasFullAccess,
     canUseTheme: hasFullAccess,
     canUseDeveloperAnalytics: isSuperAdmin,
+    // Only BetaReal (super_admin) uploads GLB/USDZ models — clients never see the
+    // model upload control. Clients can still manage their own photo thumbnails.
+    canUploadModels: isSuperAdmin,
     canManageTenants: isSuperAdmin,
     canManageBranches: isSuperAdmin || role === 'brand_owner',
     canCreateBranches,

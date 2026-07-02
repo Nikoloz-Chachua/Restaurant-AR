@@ -51,6 +51,26 @@ function toHex(v: string): string {
   return '#000000'
 }
 
+// Logo / hero images are converted to WebP client-side, then uploaded straight to R2
+// via the presigned PUT (same path as menu thumbnails). Images are allowed for clients;
+// only GLB/USDZ models are super-admin-only.
+async function toWebP(file: File): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      const canvas = document.createElement('canvas')
+      canvas.width = img.naturalWidth
+      canvas.height = img.naturalHeight
+      canvas.getContext('2d')!.drawImage(img, 0, 0)
+      canvas.toBlob(b => b ? resolve(b) : reject(new Error('Conversion failed')), 'image/webp', 0.9)
+    }
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not load image')) }
+    img.src = url
+  })
+}
+
 export default function ThemePage() {
   const supabase = createClient()
   const [T] = useLang()
@@ -75,8 +95,33 @@ export default function ThemePage() {
 
   useEffect(() => { void Promise.resolve().then(load) }, [load])
 
+  const [uploadingKey, setUploadingKey] = useState('')
+
   function set(key: string, value: string) {
     setConfig(c => ({ ...c, [key]: value }))
+  }
+
+  async function uploadImage(key: string, file: File) {
+    if (!file.type.startsWith('image/')) { setMsg('Only image files are supported'); return }
+    setUploadingKey(key)
+    try {
+      const blob = await toWebP(file)
+      const filename = file.name.replace(/\.[^.]+$/i, '.webp')
+      const res = await fetch('/api/r2-presign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename, restaurantId: plan.restaurantId, restaurantSlug: plan.restaurantSlug }),
+      })
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `Server error ${res.status}`)
+      const { uploadUrl, publicUrl } = await res.json()
+      const up = await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': 'image/webp' }, body: blob })
+      if (!up.ok) throw new Error(`R2 upload failed: ${up.status}`)
+      set(key, publicUrl)
+      setMsg('Image uploaded. Press Save Changes to publish it.')
+    } catch (e) {
+      setMsg(`Upload failed: ${e instanceof Error ? e.message : String(e)}`)
+    }
+    setUploadingKey('')
   }
 
   async function save() {
@@ -232,6 +277,12 @@ export default function ThemePage() {
                         onChange={v => set('site_name', v)} />
               <BrandRow label={T.brandNameKa} value={config.site_name_ka ?? ''}
                         onChange={v => set('site_name_ka', v)} />
+              <ImageUploadRow label={T.brandLogo} hint={T.brandLogoHint} value={config.logo_url ?? ''}
+                              uploading={uploadingKey === 'logo_url'} uploadLabel={T.uploadThumb} clearLabel={T.clearThumb}
+                              onPick={f => uploadImage('logo_url', f)} onClear={() => set('logo_url', '')} />
+              <ImageUploadRow label={T.brandHero} hint={T.brandHeroHint} value={config.hero_image_url ?? ''}
+                              uploading={uploadingKey === 'hero_image_url'} uploadLabel={T.uploadThumb} clearLabel={T.clearThumb}
+                              onPick={f => uploadImage('hero_image_url', f)} onClear={() => set('hero_image_url', '')} />
             </>
           )}
         </div>
@@ -313,6 +364,36 @@ function FontRow({ label, value, preview, onChange }: { label: string; value: st
       <div className="mt-2 text-lg" style={{ fontFamily: `'${value}', sans-serif`, color: 'var(--text)' }}>
         {preview}{value}
       </div>
+    </div>
+  )
+}
+
+function ImageUploadRow({ label, hint, value, uploading, uploadLabel, clearLabel, onPick, onClear }: {
+  label: string; hint: string; value: string; uploading: boolean; uploadLabel: string; clearLabel: string
+  onPick: (f: File) => void; onClear: () => void
+}) {
+  return (
+    <div className="p-3 rounded-xl" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+      <div className="text-xs mb-2 uppercase tracking-widest" style={{ color: 'var(--dim)' }}>{label}</div>
+      <div className="flex items-center gap-3 flex-wrap">
+        <label className="px-3 py-1.5 rounded text-xs font-medium cursor-pointer"
+               style={{ background: 'var(--card2)', color: 'var(--gold)', border: '1px solid var(--border)', opacity: uploading ? 0.5 : 1 }}>
+          {uploading ? '…' : uploadLabel}
+          <input type="file" accept="image/*" style={{ display: 'none' }} disabled={uploading}
+                 onChange={e => { const f = e.target.files?.[0]; if (f) onPick(f); e.target.value = '' }} />
+        </label>
+        {value && (
+          <>
+            <button type="button" onClick={onClear} className="px-3 py-1.5 rounded text-xs font-medium"
+                    style={{ background: 'rgba(224,82,82,0.1)', color: 'var(--danger)', border: '1px solid rgba(224,82,82,0.25)' }}>
+              {clearLabel}
+            </button>
+            <img src={value} alt="preview"
+                 style={{ height: 40, maxWidth: 120, objectFit: 'contain', borderRadius: 6, border: '1px solid var(--border)' }} />
+          </>
+        )}
+      </div>
+      <p className="text-xs mt-2" style={{ color: 'var(--dim)' }}>{hint}</p>
     </div>
   )
 }

@@ -45,6 +45,9 @@ const en = {
   priceLabel: 'Price (e.g. 27.5 ₾)',
   categoryLabel: 'Category',
   model3d: '3D Model',
+  is3dLabel: '3D / AR item',
+  is3dHint: 'This item has a 3D model (shows the 3D badge + AR button). Turn off for plain items like drinks or sides.',
+  modelManagedByUs: 'The 3D model for this item is produced and uploaded by BetaReal.',
   sortOrder: 'Sort Order',
   arScale: 'AR Scale',
   arScaleHint: '1.0 = default (25cm). If model looks 2× too big → set 0.5. Too small → set 2.0.',
@@ -101,6 +104,10 @@ const en = {
   fontPreview: 'The quick brown fox — ',
   brandNameEn: 'Restaurant name (English)',
   brandNameKa: 'Restaurant name (Georgian)',
+  brandLogo: 'Logo',
+  brandLogoHint: 'Shown in the menu header (and the hero, on the Monday Greens template).',
+  brandHero: 'Hero image',
+  brandHeroHint: 'Full-screen background photo for the Monday Greens template hero.',
   reloadHint: 'After saving, reload the menu to see changes: ',
 }
 
@@ -149,6 +156,9 @@ const ka: typeof en = {
   priceLabel: 'ფასი (მაგ. 27.5 ₾)',
   categoryLabel: 'კატეგორია',
   model3d: '3D მოდელი',
+  is3dLabel: '3D / AR კერძი',
+  is3dHint: 'ამ კერძს აქვს 3D მოდელი (ჩანს 3D ნიშანი და AR ღილაკი). გამორთეთ ჩვეულებრივი კერძებისთვის, როგორიცაა სასმელები ან გარნირი.',
+  modelManagedByUs: 'ამ კერძის 3D მოდელს ქმნის და ტვირთავს BetaReal.',
   sortOrder: 'დალაგების რიგი',
   arScale: 'AR მასშტაბი',
   arScaleHint: '1.0 = ნაგულისხმევი (25სმ). თუ მოდელი 2×-ით დიდია → 0.5. პატარაა → 2.0.',
@@ -205,6 +215,10 @@ const ka: typeof en = {
   fontPreview: 'სწრაფი ყავისფერი მელია — ',
   brandNameEn: 'რესტორნის სახელი (ინგლისური)',
   brandNameKa: 'რესტორნის სახელი (ქართული)',
+  brandLogo: 'ლოგო',
+  brandLogoHint: 'ჩანს მენიუს ზედა ნაწილში (და ჰერო სექციაში Monday Greens-ის შაბლონზე).',
+  brandHero: 'ჰერო სურათი',
+  brandHeroHint: 'სრულ ეკრანზე ფონური ფოტო Monday Greens-ის შაბლონის ჰერო სექციისთვის.',
   reloadHint: 'შენახვის შემდეგ განაახლე მენიუ ცვლილებების სანახავად: ',
 }
 

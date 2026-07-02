@@ -27,6 +27,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Only .glb, .usdz, or .webp files allowed' }, { status: 400 })
   }
 
+  // Model files (GLB/USDZ) are BetaReal-only. Clients (brand_owner / branch_staff)
+  // may upload item photo thumbnails (WebP) but never 3D models — those are produced
+  // and uploaded by us via the super-admin panel. Enforced server-side so the rule
+  // holds even if the client UI is bypassed.
+  if (isGlb || isUsdz) {
+    const { data: isSuperAdmin, error: roleError } = await supabase.rpc('is_super_admin')
+    if (roleError || !isSuperAdmin) {
+      return NextResponse.json({ error: 'Only BetaReal admins can upload 3D models' }, { status: 403 })
+    }
+  }
+
   // Content-Type must match what the browser sends on the PUT, or R2 rejects the
   // presigned request. .usdz is Apple Quick Look's format (a zipped USD bundle).
   const contentType = isUsdz ? 'model/vnd.usdz+zip' : isWebp ? 'image/webp' : 'model/gltf-binary'

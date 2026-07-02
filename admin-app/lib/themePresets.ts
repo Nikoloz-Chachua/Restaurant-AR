@@ -9,6 +9,7 @@ export type StarterTemplateKey =
   | 'minimal_sushi'
   | 'mediterranean_air'
   | 'elegant_black'
+  | 'monday_greens'
 
 export type ThemePreset = {
   key: StarterTemplateKey
@@ -197,6 +198,28 @@ const TEMPLATE_VISUAL_TOKENS: Record<StarterTemplateKey, ThemeConfig> = {
     day_item_shadow: '0 4px 14px rgba(38,30,20,0.12)', day_item_hover_shadow: '0 12px 26px rgba(38,30,20,0.16)',
     day_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(143,116,68,0.11) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #ece6da 0%, #fbf8f2 72%)',
   },
+  monday_greens: {
+    night_bg_image: 'radial-gradient(85% 52% at 50% -8%, rgba(37,194,101,0.22) 0%, transparent 60%), radial-gradient(70% 50% at 88% 30%, rgba(59,130,246,0.16) 0%, transparent 72%), linear-gradient(178deg, #07160e 0%, #0c2216 55%, #07160e 100%)',
+    night_bg_size: 'auto, auto, auto', night_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    night_card_bg: 'linear-gradient(158deg, #0e2116 0%, #132c1d 100%)', night_card_radius: '18px', night_card_blur: '0px',
+    night_stage_bg: 'radial-gradient(85% 68% at 50% 18%, rgba(37,194,101,0.16), transparent 72%), #0a1d13',
+    night_pill_bg: 'rgba(14,33,22,0.92)', night_pill_active_bg: 'linear-gradient(120deg, #25c265, #3b82f6)',
+    night_cta_bg: 'linear-gradient(120deg, #25c265, #3b82f6)', night_cta_shadow: '0 7px 20px rgba(37,194,101,0.24)',
+    night_hero_color: '#25c265', night_hero_shadow: '0 2px 18px rgba(37,194,101,0.24)', night_divider_bg: 'linear-gradient(90deg, transparent, #3b82f6, transparent)',
+    night_accent_edge: 'linear-gradient(180deg, #25c265, #3b82f6)', night_thumb_vignette: 'radial-gradient(ellipse at center, transparent 34%, rgba(14,33,22,0.80) 100%)',
+    night_item_shadow: '0 4px 14px rgba(0,0,0,0.5)', night_item_hover_shadow: '0 12px 26px rgba(0,0,0,0.56)',
+    night_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(37,194,101,0.18) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #0c2216 0%, #07160e 72%)',
+    day_bg_image: 'radial-gradient(90% 50% at 50% -10%, rgba(94,255,228,0.30) 0%, transparent 60%), radial-gradient(72% 48% at 86% 30%, rgba(6,140,150,0.14) 0%, transparent 72%), linear-gradient(178deg, #daf0f3 0%, #bfe7ec 58%, #eafafb 100%)',
+    day_bg_size: 'auto, auto, auto', day_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    day_card_bg: 'linear-gradient(158deg, #ffffff 0%, #ecf8f8 100%)', day_card_radius: '18px', day_card_blur: '0px',
+    day_stage_bg: 'radial-gradient(85% 68% at 50% 18%, rgba(6,140,150,0.12), transparent 72%), #e4f4f4',
+    day_pill_bg: 'rgba(255,255,255,0.86)', day_pill_active_bg: 'linear-gradient(120deg, #057d2b, #046b25)',
+    day_cta_bg: 'linear-gradient(120deg, #057d2b, #046b25)', day_cta_shadow: '0 7px 20px rgba(5,125,43,0.18)',
+    day_hero_color: '#057d2b', day_hero_shadow: '0 2px 14px rgba(5,125,43,0.16)', day_divider_bg: 'linear-gradient(90deg, transparent, #046b25, transparent)',
+    day_accent_edge: 'linear-gradient(180deg, #057d2b, #046b25)', day_thumb_vignette: 'radial-gradient(ellipse at center, transparent 36%, rgba(228,244,244,0.80) 100%)',
+    day_item_shadow: '0 4px 14px rgba(6,58,66,0.14)', day_item_hover_shadow: '0 12px 26px rgba(6,58,66,0.18)',
+    day_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(6,140,150,0.13) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #bfe7ec 0%, #eafafb 72%)',
+  },
 }
 
 export const TEMPLATE_PRESETS: ThemePreset[] = [
@@ -342,6 +365,24 @@ export const TEMPLATE_PRESETS: ThemePreset[] = [
       day_glow: 'rgba(143,116,68,0.14)', day_glow2: 'rgba(23,20,17,0.06)', day_shadow: 'rgba(38,30,20,0.14)',
       ...TEMPLATE_VISUAL_TOKENS.elegant_black,
       font_body: 'Lato', font_heading: 'Playfair Display', template_key: 'elegant_black',
+    },
+  },
+  {
+    key: 'monday_greens',
+    label: 'Monday Greens',
+    description: 'Fresh green + blue look with a full-bleed hero photo and logo — for cafes, brunch, and healthy/green menus.',
+    primaryColor: '#25c265',
+    secondaryColor: '#3b82f6',
+    createStarterCategory: true,
+    values: {
+      night_bg: '#07160e', night_bg2: '#0c2216', night_card: '#0e2116', night_card2: '#132c1d', night_border: 'rgba(37,194,101,0.22)',
+      night_text: '#eafff1', night_dim: '#8ab89b', night_accent: '#25c265', night_accent2: '#3b82f6', night_accent_text: '#04231a', night_thumb_bg: '#061710', night_modal_bg: '#07160e',
+      night_glow: 'rgba(37,194,101,0.30)', night_glow2: 'rgba(59,130,246,0.24)', night_shadow: 'rgba(0,0,0,0.55)',
+      day_bg: '#daf0f3', day_bg2: '#bfe7ec', day_card: '#ffffff', day_card2: '#ecf8f8', day_border: 'rgba(5,110,70,0.18)',
+      day_text: '#0c2a2b', day_dim: '#52797a', day_accent: '#057d2b', day_accent2: '#046b25', day_accent_text: '#ffffff', day_thumb_bg: '#e4f4f4', day_modal_bg: '#daf0f3',
+      day_glow: 'rgba(94,255,228,0.90)', day_glow2: 'rgba(6,140,150,0.18)', day_shadow: 'rgba(6,58,66,0.18)',
+      ...TEMPLATE_VISUAL_TOKENS.monday_greens,
+      font_body: 'Nunito', font_heading: 'Fraunces', template_key: 'monday_greens',
     },
   },
 ]

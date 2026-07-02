@@ -60,15 +60,15 @@ type MenuItem = {
   id: number; name_en: string; name_ka: string
   description_en: string; description_ka: string
   price: string; category_id: number | null; model: string; model_usdz: string
-  sort_order: number; visible: boolean; ar_scale: number; thumbnail_url: string; thumb_3d: boolean
+  sort_order: number; visible: boolean; ar_scale: number; thumbnail_url: string; thumb_3d: boolean; is_3d: boolean
 }
 const EMPTY_ITEM: Omit<MenuItem, 'id'> = {
   name_en: '', name_ka: '', description_en: '', description_ka: '',
-  price: '', category_id: null, model: '', model_usdz: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '', thumb_3d: false,
+  price: '', category_id: null, model: '', model_usdz: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '', thumb_3d: false, is_3d: true,
 }
 
-function isActiveArItem(item: Pick<MenuItem, 'visible' | 'model'>) {
-  return item.visible && item.model.trim().length > 0
+function isActiveArItem(item: Pick<MenuItem, 'visible' | 'model' | 'is_3d'>) {
+  return item.visible && item.is_3d && item.model.trim().length > 0
 }
 
 export default function MenuPage() {
@@ -124,7 +124,7 @@ export default function MenuPage() {
 
   function activeCountWithForm() {
     const existingItems = editItem ? items.filter(item => item.id !== editItem.id) : items
-    const formItem = { visible: itemForm.visible, model: itemForm.model }
+    const formItem = { visible: itemForm.visible, model: itemForm.model, is_3d: itemForm.is_3d }
     return existingItems.filter(isActiveArItem).length + (isActiveArItem(formItem) ? 1 : 0)
   }
 
@@ -139,7 +139,7 @@ export default function MenuPage() {
       description_en: item.description_en, description_ka: item.description_ka,
       price: item.price, category_id: item.category_id, model: item.model, model_usdz: item.model_usdz ?? '',
       sort_order: item.sort_order, visible: item.visible, ar_scale: item.ar_scale ?? 1.0,
-      thumbnail_url: item.thumbnail_url ?? '', thumb_3d: item.thumb_3d ?? false })
+      thumbnail_url: item.thumbnail_url ?? '', thumb_3d: item.thumb_3d ?? false, is_3d: item.is_3d ?? true })
     setItemModal(true)
   }
   async function saveItem() {
@@ -522,30 +522,49 @@ export default function MenuPage() {
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name_en}</option>)}
               </select>
             </Field>
-            <Field label={T.model3d} className="col-span-2">
-              <div className="space-y-2">
-                <div className="flex gap-2">
-                  <button type="button" disabled={uploading}
-                          onClick={() => fileInputRef.current?.click()}
-                          className="px-3 py-1.5 rounded text-xs font-medium"
-                          style={{ background: 'var(--card2)', color: 'var(--gold)',
-                                   border: '1px solid var(--border)', opacity: uploading ? 0.5 : 1 }}>
-                    {uploading ? T.uploading : T.uploadGlb}
-                  </button>
-                  <input ref={fileInputRef} type="file" accept=".glb" style={{ display: 'none' }}
-                         onChange={e => { const f = e.target.files?.[0]; if (f) uploadGLB(f); e.target.value = '' }} />
-                </div>
-                <div className="text-xs px-2 py-1.5 rounded truncate"
-                     style={{ background: 'var(--card2)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
-                  {uploadProgress
-                    ? <span style={{ color: uploadProgress.startsWith('Uploaded:') ? 'var(--success)' : 'var(--danger)' }}>{uploadProgress}</span>
-                    : itemForm.model
-                      ? <span>{T.current}<span style={{ color: 'var(--text)' }}>{itemForm.model.startsWith('http') ? itemForm.model.split('/').pop() : itemForm.model}</span></span>
-                      : <span style={{ color: 'var(--dim)' }}>{T.noModel}</span>
-                  }
-                </div>
-              </div>
+            <Field label={T.is3dLabel} className="col-span-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={itemForm.is_3d} style={{ width: 'auto' }}
+                       onChange={e => setItemForm(f => ({ ...f, is_3d: e.target.checked }))} />
+                <span className="text-sm" style={{ color: 'var(--dim)' }}>{T.is3dHint}</span>
+              </label>
             </Field>
+            {itemForm.is_3d && (
+              <Field label={T.model3d} className="col-span-2">
+                {plan.canUploadModels ? (
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <button type="button" disabled={uploading}
+                              onClick={() => fileInputRef.current?.click()}
+                              className="px-3 py-1.5 rounded text-xs font-medium"
+                              style={{ background: 'var(--card2)', color: 'var(--gold)',
+                                       border: '1px solid var(--border)', opacity: uploading ? 0.5 : 1 }}>
+                        {uploading ? T.uploading : T.uploadGlb}
+                      </button>
+                      <input ref={fileInputRef} type="file" accept=".glb" style={{ display: 'none' }}
+                             onChange={e => { const f = e.target.files?.[0]; if (f) uploadGLB(f); e.target.value = '' }} />
+                    </div>
+                    <div className="text-xs px-2 py-1.5 rounded truncate"
+                         style={{ background: 'var(--card2)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
+                      {uploadProgress
+                        ? <span style={{ color: uploadProgress.startsWith('Uploaded:') ? 'var(--success)' : 'var(--danger)' }}>{uploadProgress}</span>
+                        : itemForm.model
+                          ? <span>{T.current}<span style={{ color: 'var(--text)' }}>{itemForm.model.startsWith('http') ? itemForm.model.split('/').pop() : itemForm.model}</span></span>
+                          : <span style={{ color: 'var(--dim)' }}>{T.noModel}</span>
+                      }
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-xs px-2 py-1.5 rounded"
+                       style={{ background: 'var(--card2)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
+                    {itemForm.model
+                      ? <span>{T.current}<span style={{ color: 'var(--text)' }}>{itemForm.model.startsWith('http') ? itemForm.model.split('/').pop() : itemForm.model}</span></span>
+                      : <span>{T.modelManagedByUs}</span>
+                    }
+                  </div>
+                )}
+              </Field>
+            )}
             <Field label={T.thumbnailLabel} className="col-span-2">
               <div className="space-y-2">
                 <div className="flex gap-2 items-center">
