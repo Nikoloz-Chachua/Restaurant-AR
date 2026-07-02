@@ -41,6 +41,11 @@ type CreatedTenantResponse = {
   error?: string
 }
 
+type PlanUpdateResponse = {
+  brand?: Pick<Brand, 'id' | 'name' | 'slug' | 'plan' | 'created_at'>
+  error?: string
+}
+
 type AccountLogEntry = {
   id: string
   email: string
@@ -91,6 +96,12 @@ const PLAN_LABELS: Record<Brand['plan'], string> = {
   full: 'Full 450',
   premium: 'Premium 900',
 }
+
+const PLAN_OPTIONS: { value: Brand['plan']; label: string; hint: string }[] = [
+  { value: 'ar_menu', label: '300 GEL / AR Menu', hint: 'Menu, AR models, up to 5 items' },
+  { value: 'full', label: '450 GEL / Full', hint: 'Theme and analytics, up to 7 items' },
+  { value: 'premium', label: '900 GEL / Premium', hint: 'Unlimited items and branches' },
+]
 
 const STARTER_TEMPLATE_OPTIONS = TEMPLATE_PRESETS
 
@@ -157,6 +168,8 @@ export default function TenantsPage() {
   const [brands, setBrands] = useState<Brand[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [planDrafts, setPlanDrafts] = useState<Record<number, Brand['plan']>>({})
+  const [updatingPlanBrandId, setUpdatingPlanBrandId] = useState<number | null>(null)
   const [message, setMessage] = useState('')
   const [accountLog, setAccountLog] = useState<AccountLogEntry[]>([])
   const [accountLogLoading, setAccountLogLoading] = useState(false)
@@ -189,7 +202,18 @@ export default function TenantsPage() {
     setLoading(true)
     const res = await fetch(access.canManageTenants ? '/api/tenants' : '/api/branches')
     const json = await res.json().catch(() => ({}))
-    if (res.ok) setBrands(json.brands ?? [])
+    if (res.ok) {
+      const nextBrands = (json.brands ?? []) as Brand[]
+      setBrands(nextBrands)
+      setPlanDrafts(current => ({
+        ...Object.fromEntries(nextBrands.map(brand => [brand.id, brand.plan])),
+        ...Object.fromEntries(
+          nextBrands
+            .filter(brand => current[brand.id] && current[brand.id] !== brand.plan)
+            .map(brand => [brand.id, current[brand.id]]),
+        ),
+      }))
+    }
     else setMessage(json.error || 'Could not load tenants')
     setLoading(false)
   }, [access.canManageBranches, access.canManageTenants, access.loading])
@@ -349,6 +373,32 @@ export default function TenantsPage() {
       ...forms,
       [brand.id]: emptyBranchForm(),
     }))
+    await load()
+  }
+
+  async function updateTenantPlan(brand: Brand) {
+    const nextPlan = planDrafts[brand.id] ?? brand.plan
+    if (nextPlan === brand.plan) return
+
+    setUpdatingPlanBrandId(brand.id)
+    setMessage('')
+    const res = await fetch('/api/tenants', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ brandId: brand.id, plan: nextPlan }),
+    })
+    const json = await res.json().catch(() => ({})) as PlanUpdateResponse
+    setUpdatingPlanBrandId(null)
+    if (!res.ok || !json.brand) {
+      setMessage(json.error || 'Plan update failed')
+      return
+    }
+
+    setBrands(current => current.map(item => (
+      item.id === brand.id ? { ...item, plan: json.brand!.plan } : item
+    )))
+    setPlanDrafts(current => ({ ...current, [brand.id]: json.brand!.plan }))
+    setMessage(`Updated ${json.brand.name} to ${PLAN_LABELS[json.brand.plan]}`)
     await load()
   }
 
@@ -632,7 +682,19 @@ export default function TenantsPage() {
                       ) : <div className="font-medium">{brand.name}</div>}
                       <div className="text-xs mt-0.5" style={{ color: 'var(--dim)' }}>{brand.slug}</div>
                     </td>
-                    <td className="px-4 py-3" style={{ color: 'var(--gold)' }}>{PLAN_LABELS[brand.plan]}</td>
+                    <td className="px-4 py-3">
+                      {access.canManageTenants ? (
+                        <PlanEditor
+                          brand={brand}
+                          value={planDrafts[brand.id] ?? brand.plan}
+                          saving={updatingPlanBrandId === brand.id}
+                          onChange={plan => setPlanDrafts(current => ({ ...current, [brand.id]: plan }))}
+                          onSave={() => void updateTenantPlan(brand)}
+                        />
+                      ) : (
+                        <span style={{ color: 'var(--gold)' }}>{PLAN_LABELS[brand.plan]}</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3" style={{ color: 'var(--dim)' }}>
                       {(brand.adminEmails ?? []).length ? (
                         <EmailList emails={brand.adminEmails ?? []} />
@@ -883,6 +945,55 @@ function EmailList({ emails }: { emails: string[] }) {
         <span key={email} className="font-mono text-xs break-all">{email}</span>
       ))}
     </span>
+  )
+}
+
+function PlanEditor({
+  brand,
+  value,
+  saving,
+  onChange,
+  onSave,
+}: {
+  brand: Brand
+  value: Brand['plan']
+  saving: boolean
+  onChange: (plan: Brand['plan']) => void
+  onSave: () => void
+}) {
+  const selected = PLAN_OPTIONS.find(option => option.value === value) ?? PLAN_OPTIONS[0]
+  const changed = value !== brand.plan
+
+  return (
+    <div className="space-y-2 min-w-48">
+      <select
+        value={value}
+        onChange={e => onChange(e.target.value as Brand['plan'])}
+        disabled={saving}
+        aria-label={`Plan for ${brand.name}`}
+      >
+        {PLAN_OPTIONS.map(option => (
+          <option key={option.value} value={option.value}>{option.label}</option>
+        ))}
+      </select>
+      <div className="text-xs leading-5" style={{ color: 'var(--dim)' }}>
+        {selected.hint}
+      </div>
+      <button
+        type="button"
+        onClick={onSave}
+        disabled={saving || !changed}
+        className="px-3 py-1.5 rounded-lg text-xs font-semibold"
+        style={{
+          background: changed ? 'var(--gold)' : 'transparent',
+          border: changed ? '1px solid var(--gold)' : '1px solid var(--border)',
+          color: changed ? '#0f0b07' : 'var(--dim)',
+          opacity: saving || !changed ? 0.6 : 1,
+        }}
+      >
+        {saving ? 'Saving...' : changed ? 'Save plan' : PLAN_LABELS[brand.plan]}
+      </button>
+    </div>
   )
 }
 

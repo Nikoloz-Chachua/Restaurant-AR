@@ -3,12 +3,14 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { themePreset, themePresetValuesWithAccents } from '@/lib/themePresets'
 
+type TenantPlan = 'ar_menu' | 'full' | 'premium'
+
 type TenantRequest = {
   brandName?: string
   brandSlug?: string
   restaurantName?: string
   restaurantSlug?: string
-  plan?: 'ar_menu' | 'full' | 'premium'
+  plan?: TenantPlan
   templateKey?: string
   primaryColor?: string
   secondaryColor?: string
@@ -17,11 +19,17 @@ type TenantRequest = {
   adminPassword?: string
 }
 
+type TenantPlanUpdateRequest = {
+  brandId?: number | string
+  brandSlug?: string
+  plan?: TenantPlan
+}
+
 type TenantRpcRow = {
   brand_id: number
   brand_name: string
   brand_slug: string
-  plan: 'ar_menu' | 'full' | 'premium'
+  plan: TenantPlan
   restaurant_id: number
   restaurant_name: string
   restaurant_slug: string
@@ -31,7 +39,7 @@ type TenantBrand = {
   id: number
   name: string
   slug: string
-  plan: 'ar_menu' | 'full' | 'premium'
+  plan: TenantPlan
   created_at: string
   restaurants?: {
     id: number
@@ -92,6 +100,10 @@ function tenantPreviewUrl(slug: string) {
 
 function isPlatformRole(role: unknown) {
   return ['super_admin', 'creator', 'dev'].includes(String(role))
+}
+
+function isTenantPlan(value: unknown): value is TenantPlan {
+  return value === 'ar_menu' || value === 'full' || value === 'premium'
 }
 
 function cleanEmail(value: unknown) {
@@ -322,6 +334,46 @@ export async function POST(req: NextRequest) {
       ? `Created database tenant, but theme preset save failed: ${themeWarning}`
       : 'Created database tenant. The live shared template opens it with ?tenant=<branch-slug>; wildcard domains/custom Vercel domains are separate infrastructure.',
   }, { status: 201 })
+}
+
+export async function PATCH(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const role = user?.app_metadata?.role
+  if (!user || !isPlatformRole(role)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  const body = await req.json().catch(() => null) as TenantPlanUpdateRequest | null
+  if (!body) {
+    return NextResponse.json({ error: 'Invalid JSON request body' }, { status: 400 })
+  }
+
+  const brandId = Number(body.brandId)
+  const brandSlug = cleanSlug(String(body.brandSlug ?? ''))
+  const plan = body.plan
+
+  if (!isTenantPlan(plan)) {
+    return NextResponse.json({ error: 'Plan must be AR Menu 300, Full 450, or Premium 900' }, { status: 400 })
+  }
+  if ((!Number.isInteger(brandId) || brandId <= 0) && !brandSlug) {
+    return NextResponse.json({ error: 'Valid brandId or brandSlug is required' }, { status: 400 })
+  }
+
+  let query = supabase
+    .from('brands')
+    .update({ plan, updated_at: new Date().toISOString() })
+    .select('id, name, slug, plan, created_at')
+
+  query = Number.isInteger(brandId) && brandId > 0
+    ? query.eq('id', brandId)
+    : query.eq('slug', brandSlug)
+
+  const { data: brand, error } = await query.maybeSingle()
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (!brand) return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
+
+  return NextResponse.json({ brand })
 }
 
 export async function DELETE(req: NextRequest) {
