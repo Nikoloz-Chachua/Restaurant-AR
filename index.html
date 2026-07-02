@@ -153,6 +153,14 @@
             transition: color var(--t);
             overflow-x: hidden;
         }
+        html:not([data-template]) body,
+        html[data-template=""] body {
+            opacity: 0;
+        }
+        html[data-template] body {
+            opacity: 1;
+            transition: color var(--t), opacity 0.12s ease;
+        }
 
         /* Fixed background layer — painted once, never repaints on scroll.
            A single layer holds the warm gradient + glow + framing vignette
@@ -933,7 +941,9 @@
         .mg-hero { display: none; }
         [data-template="monday_greens"] .mg-hero {
             position: relative;
-            width: 100%;
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
             min-height: 100svh;
             display: flex;
             flex-direction: column;
@@ -946,13 +956,18 @@
         [data-template="monday_greens"] .header {
             display: flex;
             justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: none;
             padding: 34px 18px 10px;
-            margin-bottom: 8px;
+            margin: 0 auto 8px;
         }
+        [data-template="monday_greens"] .header::after { display: none; }
         [data-template="monday_greens"] .header h1 { display: none; }
         [data-template="monday_greens"] .tenant-logo {
             display: block;
             max-width: min(300px, 64vw);
+            margin: 0 auto;
             filter: drop-shadow(0 8px 18px rgba(0,0,0,0.08));
         }
         [data-template="monday_greens"] .mg-hero-photo {
@@ -1268,6 +1283,12 @@
         /* ── Responsive: desktop grid layout ── */
         @media (min-width: 640px) {
             body { padding: 0 32px 64px; }
+            [data-template="monday_greens"] body { padding-left: 0; padding-right: 0; }
+            [data-template="monday_greens"] .cat-filter,
+            [data-template="monday_greens"] .menu-list,
+            [data-template="monday_greens"] .site-footer {
+                width: calc(100% - 64px);
+            }
 
             .header, .cat-filter { max-width: 880px; }
             .cat-filter { justify-content: center; }
