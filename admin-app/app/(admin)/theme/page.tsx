@@ -7,6 +7,8 @@ import { usePlan } from '@/lib/usePlan'
 import LockedCard from '@/components/LockedCard'
 import { TEMPLATE_PRESETS, type ThemeConfig } from '@/lib/themePresets'
 
+const BRANDING_KEYS = ['site_name', 'site_name_ka', 'logo_url', 'hero_logo_url', 'hero_image_url']
+
 const NIGHT_FIELDS: { key: string; tKey: keyof Translations }[] = [
   { key: 'night_bg',          tKey: 'colorBg' },
   { key: 'night_card',        tKey: 'colorCard' },
@@ -58,6 +60,19 @@ function bgImageUrl(v?: string): string {
   return m ? m[1] : ''
 }
 
+function currentTemplateDefaults(config: ThemeConfig, restaurantSlug?: string | null): ThemeConfig {
+  const templateKey = config.template_key
+  const preset = TEMPLATE_PRESETS.find(item => item.key === templateKey)
+    ?? (restaurantSlug === 'monday-greens' ? TEMPLATE_PRESETS.find(item => item.key === 'monday_greens') : undefined)
+    ?? TEMPLATE_PRESETS[0]
+  const preservedBranding = Object.fromEntries(
+    BRANDING_KEYS
+      .filter(key => Object.prototype.hasOwnProperty.call(config, key))
+      .map(key => [key, config[key]]),
+  )
+  return { ...preset.values, ...preservedBranding, template_key: preset.key }
+}
+
 // Logo / hero images are converted to WebP client-side, then uploaded straight to R2
 // via the presigned PUT (same path as menu thumbnails). Images are allowed for clients;
 // only GLB/USDZ models are super-admin-only.
@@ -106,6 +121,20 @@ export default function ThemePage() {
 
   function set(key: string, value: string) {
     setConfig(c => ({ ...c, [key]: value }))
+  }
+
+  function setColor(key: string, value: string) {
+    setConfig(current => {
+      const next = { ...current, [key]: value }
+      if ((key === 'night_bg' || key === 'day_bg') && value.trim()) {
+        const prefix = key === 'night_bg' ? 'night' : 'day'
+        next[`${prefix}_bg2`] = value
+        next[`${prefix}_bg_image`] = 'linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%)'
+        next[`${prefix}_bg_size`] = 'auto'
+        next[`${prefix}_bg_repeat`] = 'no-repeat'
+      }
+      return next
+    })
   }
 
   async function uploadImage(key: string, file: File) {
@@ -170,8 +199,15 @@ export default function ThemePage() {
 
   async function reset() {
     if (!confirm(T.resetConfirm)) return
-    await supabase.from('theme_config').delete().eq('restaurant_id', plan.restaurantId).neq('key', '__none__')
-    await load()
+    const next = currentTemplateDefaults(config, plan.restaurantSlug)
+    const rows = Object.entries(next).map(([key, value]) => ({ key, value, restaurant_id: plan.restaurantId }))
+    const { error } = await supabase.from('theme_config').upsert(rows, { onConflict: 'restaurant_id,key' })
+    if (error) {
+      setMsg(`Reset failed: ${error.message}`)
+      setTimeout(() => setMsg(''), 5000)
+      return
+    }
+    setConfig(next)
     setMsg(T.resetDone)
     setTimeout(() => setMsg(''), 3000)
   }
@@ -286,11 +322,11 @@ export default function ThemePage() {
           )}
           {tab === 'night' && NIGHT_FIELDS.map(f => (
             <ColorRow key={f.key} label={T[f.tKey] as string} value={config[f.key] ?? ''}
-                      onChange={v => set(f.key, v)} />
+                      onChange={v => setColor(f.key, v)} />
           ))}
           {tab === 'day' && DAY_FIELDS.map(f => (
             <ColorRow key={f.key} label={T[f.tKey] as string} value={config[f.key] ?? ''}
-                      onChange={v => set(f.key, v)} />
+                      onChange={v => setColor(f.key, v)} />
           ))}
           {tab === 'background' && (
             <>
@@ -305,7 +341,7 @@ export default function ThemePage() {
                     {mode === 'night' ? T.tabNight : T.tabDay}
                   </div>
                   <ColorRow label={T.bgColor} value={config[`${mode}_bg`] ?? ''}
-                            onChange={v => { set(`${mode}_bg`, v); set(`${mode}_bg_image`, 'none') }} />
+                            onChange={v => setColor(`${mode}_bg`, v)} />
                   <div className="mt-3">
                     <ImageUploadRow label={T.bgImageLabel} hint="" value={bgImageUrl(config[`${mode}_bg_image`])}
                                     uploading={uploadingKey === `${mode}_bg_image`}

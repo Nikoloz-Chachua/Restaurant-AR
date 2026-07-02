@@ -978,6 +978,11 @@
         [data-template="minimal_sushi"] .menu-item::before {
             width: 2px;
         }
+        [data-template="monday_greens"] {
+            --bg-image: linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%);
+            --bg-size: auto;
+            --bg-repeat: no-repeat;
+        }
         [data-template="minimal_sushi"] .ar-btn,
         [data-template="minimal_sushi"] .cat-pill.active,
         [data-template="urban_night"] .ar-btn,
@@ -3532,13 +3537,18 @@
                 // directly on <html> (inline styles beat attribute-selector rules and would
                 // prevent the theme toggle from changing colours).
                 Object.values(varMap).forEach(v => document.documentElement.style.removeProperty(v));
+                const templateKey = /^[a-z0-9_-]+$/.test(cfg.template_key || '')
+                    ? cfg.template_key
+                    : '';
                 // Inject a <style> block that overrides both themes regardless of which is active
                 let css = '[data-theme="night"] {';
                 Object.entries(varMap).forEach(([k, cssVar]) => {
+                    if (templateKey === 'monday_greens' && ['bg_image', 'bg_size', 'bg_repeat'].includes(k)) return;
                     if (cfg[`night_${k}`]) css += `${cssVar}:${cfg[`night_${k}`]};`;
                 });
                 css += '} [data-theme="day"] {';
                 Object.entries(varMap).forEach(([k, cssVar]) => {
+                    if (templateKey === 'monday_greens' && ['bg_image', 'bg_size', 'bg_repeat'].includes(k)) return;
                     if (cfg[`day_${k}`]) css += `${cssVar}:${cfg[`day_${k}`]};`;
                 });
                 css += '}';
@@ -3549,9 +3559,7 @@
                     document.head.appendChild(styleEl);
                 }
                 styleEl.textContent = css;
-                document.documentElement.dataset.template = /^[a-z0-9_-]+$/.test(cfg.template_key || '')
-                    ? cfg.template_key
-                    : '';
+                document.documentElement.dataset.template = templateKey;
                 // Template/tenant default theme: an explicit `default_theme` token wins;
                 // otherwise Monday Greens tenants default to light. Applied only when the
                 // visitor hasn't toggled the theme themselves, and never persisted (an
@@ -3559,7 +3567,7 @@
                 // already handles the no-flash case for listed tenants.
                 const _tplDefaultTheme =
                     (cfg.default_theme === 'day' || cfg.default_theme === 'night') ? cfg.default_theme
-                    : (cfg.template_key === 'monday_greens' ? 'day' : null);
+                    : (templateKey === 'monday_greens' ? 'day' : null);
                 if (!_userChoseTheme && _tplDefaultTheme) {
                     applyTheme(_tplDefaultTheme, false);
                 }
