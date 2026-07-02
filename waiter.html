@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ka">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="robots" content="noindex,nofollow">
+    <title>Order · BetaReal</title>
+    <!--
+      Waiter ticket view. Standalone, READ-ONLY: it decodes a basket that the
+      customer's phone packed into the URL fragment (#…), then re-fetches the
+      LIVE menu from Supabase and resolves item ids -> current name/price. It
+      never writes to the database, needs no login, and does NOT register the
+      customer service worker. Prices always come from the live menu, so the
+      QR can never carry a stale or spoofed price.
+    -->
+    <style>
+        :root {
+            --bg:      #0f1012;
+            --card:    #17181b;
+            --line:    rgba(255,255,255,0.09);
+            --text:    #f4f4f5;
+            --muted:   #9a9aa2;
+            --accent:  #f0c040;
+            --danger:  #ff6b6b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        html, body {
+            background: var(--bg); color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100%;
+        }
+        body { padding: 20px 16px calc(28px + env(safe-area-inset-bottom)); }
+        .wrap { max-width: 480px; margin: 0 auto; }
+
+        header { text-align: center; margin-bottom: 18px; }
+        .brand { font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+        .rname { font-size: 1.4rem; font-weight: 800; margin-top: 4px; }
+        .meta  { font-size: 0.82rem; color: var(--muted); margin-top: 6px; }
+
+        .ticket {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .line {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--line);
+        }
+        .line:last-child { border-bottom: none; }
+        .qty {
+            flex: 0 0 auto;
+            min-width: 34px; height: 34px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--accent); color: #111;
+            font-weight: 800; font-size: 0.95rem;
+            border-radius: 9px;
+            padding: 0 8px;
+        }
+        .name { flex: 1 1 auto; }
+        .name .primary { font-size: 1rem; font-weight: 600; line-height: 1.25; }
+        .name .secondary { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+        .name .unit { font-size: 0.78rem; color: var(--muted); margin-top: 3px; }
+        .line-total { flex: 0 0 auto; font-size: 1rem; font-weight: 700; white-space: nowrap; }
+        .line.missing .name .primary { color: var(--danger); }
+
+        .totals {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px;
+            margin-top: 2px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            margin-top: 12px;
+        }
+        .totals .t-label { font-size: 0.95rem; color: var(--muted); font-weight: 600; }
+        .totals .t-count { font-size: 0.78rem; color: var(--muted); display: block; margin-top: 2px; }
+        .totals .t-value { font-size: 1.5rem; font-weight: 800; }
+
+        .state {
+            text-align: center; padding: 60px 20px; color: var(--muted);
+            font-size: 0.95rem; line-height: 1.5;
+        }
+        .state.error { color: var(--danger); }
+        .spin {
+            width: 26px; height: 26px; margin: 0 auto 14px;
+            border: 3px solid var(--line); border-top-color: var(--accent);
+            border-radius: 50%; animation: sp 0.8s linear infinite;
+        }
+        @keyframes sp { to { transform: rotate(360deg); } }
+        .foot { text-align: center; font-size: 0.72rem; color: var(--muted); margin-top: 20px; letter-spacing: 0.03em; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div id="root"><div class="state"><div class="spin"></div>Loading order…</div></div>
+        <div class="foot">Read-only · prices from live menu</div>
+    </div>
+
+    <script>
+    (function () {
+        'use strict';
+
+        var SUPA_URL = 'https://lwdpegloznhpcecivhfy.supabase.co';
+        var SUPA_KEY = 'sb_publishable_65dKKpb-lxOr8JTjdj7yxw_LZzcJp5h';
+        var HEADERS  = { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY };
+
+        var root = document.getElementById('root');
+
+        function esc(s) {
+            return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+            });
+        }
+        function showState(msg, isError) {
+            root.innerHTML = '<div class="state' + (isError ? ' error' : '') + '">' + esc(msg) + '</div>';
+        }
+        function parsePrice(v) { return parseFloat(String(v).replace(/[^\d.]/g, '')) || 0; }
+        function fmt(n) { return (Math.round(n * 10) / 10) + ' ₾'; }
+
+        // base64url -> original UTF-8 string (mirror of the packer in index.html)
+        function decodePayload(hash) {
+            var b64 = hash.replace(/-/g, '+').replace(/_/g, '/');
+            while (b64.length % 4) b64 += '=';
+            return decodeURIComponent(escape(atob(b64)));
+        }
+
+        async function supa(query) {
+            var res = await fetch(SUPA_URL + '/rest/v1/' + query, { headers: HEADERS });
+            if (!res.ok) throw new Error('rest ' + res.status);
+            return res.json();
+        }
+
+        function localName(row) {
+            var ka = row && row.name_ka, en = row && row.name_en;
+            return { primary: ka || en || '—', secondary: (ka && en && ka !== en) ? en : '' };
+        }
+
+        async function run() {
+            var raw = (location.hash || '').replace(/^#/, '');
+            if (!raw) { showState('No order in this link. Ask the guest to tap “Show to waiter” again.', true); return; }
+
+            var payload;
+            try { payload = JSON.parse(decodePayload(raw)); }
+            catch (e) { showState('This order link is corrupted or incomplete.', true); return; }
+
+            var items = Array.isArray(payload && payload.it) ? payload.it : [];
+            var slug  = payload && payload.r;
+            if (!slug || !items.length) { showState('This order is empty.', true); return; }
+
+            // Resolve the restaurant, then fetch the exact items by id (scoped to it).
+            var rest, rows;
+            try {
+                var restList = await supa('restaurants?select=id,name,brand_id,brands(name)&slug=eq.' +
+                    encodeURIComponent(slug) + '&limit=1');
+                rest = restList[0];
+                if (!rest) { showState('Restaurant not found for this order.', true); return; }
+
+                var ids = items.map(function (p) { return p[0]; })
+                               .filter(Boolean)
+                               .map(function (id) { return encodeURIComponent(id); });
+                rows = await supa('menu_items?select=id,name_en,name_ka,price&restaurant_id=eq.' +
+                    rest.id + '&id=in.(' + ids.join(',') + ')');
+            } catch (e) {
+                showState('Could not reach the menu. Check the connection and rescan.', true); return;
+            }
+
+            var byId = {};
+            rows.forEach(function (r) { byId[r.id] = r; });
+
+            var html = '';
+            var total = 0, count = 0, missing = 0;
+
+            items.forEach(function (pair) {
+                var id  = pair[0];
+                var qty = Math.max(1, parseInt(pair[1], 10) || 1);
+                var row = byId[id];
+                count += qty;
+
+                if (!row) {
+                    missing++;
+                    html += '<div class="line missing">' +
+                        '<span class="qty">' + qty + '×</span>' +
+                        '<span class="name"><span class="primary">Item no longer on the menu</span>' +
+                        '<span class="secondary">' + esc(id).slice(0, 8) + '…</span></span>' +
+                        '<span class="line-total">—</span></div>';
+                    return;
+                }
+                var unit = parsePrice(row.price);
+                var lineTotal = unit * qty;
+                total += lineTotal;
+                var nm = localName(row);
+                html += '<div class="line">' +
+                    '<span class="qty">' + qty + '×</span>' +
+                    '<span class="name"><span class="primary">' + esc(nm.primary) + '</span>' +
+                    (nm.secondary ? '<span class="secondary">' + esc(nm.secondary) + '</span>' : '') +
+                    '<span class="unit">' + fmt(unit) + ' each</span></span>' +
+                    '<span class="line-total">' + fmt(lineTotal) + '</span></div>';
+            });
+
+            var when = payload.ts ? new Date(payload.ts) : null;
+            var whenStr = when && !isNaN(when) ?
+                when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+            var brandName = (rest.brands && rest.brands.name) || '';
+
+            var head =
+                '<header>' +
+                    (brandName ? '<div class="brand">' + esc(brandName) + '</div>' : '<div class="brand">BetaReal</div>') +
+                    '<div class="rname">' + esc(rest.name || slug) + '</div>' +
+                    '<div class="meta">Guest order' + (whenStr ? ' · placed ' + esc(whenStr) : '') +
+                        (missing ? ' · ' + missing + ' item(s) changed' : '') + '</div>' +
+                '</header>';
+
+            var totals =
+                '<div class="totals"><span class="t-label">Total' +
+                    '<span class="t-count">' + count + ' item(s)</span></span>' +
+                    '<span class="t-value">' + fmt(total) + '</span></div>';
+
+            root.innerHTML = head + '<div class="ticket">' + html + '</div>' + totals;
+        }
+
+        run();
+    })();
+    </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bl-v99';
+const CACHE_NAME = 'bl-v100';
 
 const SUPABASE_URL  = 'https://lwdpegloznhpcecivhfy.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_65dKKpb-lxOr8JTjdj7yxw_LZzcJp5h';
@@ -8,6 +8,8 @@ const PRECACHE = [
     './',
     './aurora-cafe.html',
     './aurora-cafe/',
+    './waiter.html',
+    './vendor/qrcode.js',
     './foods/menu.json',
     './foods/aurora-cafe-menu.json',
     './img/betareal-favicon.svg',
