@@ -2947,7 +2947,8 @@
             themeBtn.setAttribute('aria-label', theme === 'night' ? UI[window.__lang].themeDay : UI[window.__lang].themeNight);
             localStorage.setItem('bl-theme', theme);
         }
-        applyTheme(localStorage.getItem('bl-theme') || 'night');
+        const _DEFAULT_THEME_BY_TENANT_SLUG = { 'rhythm-main': 'day' };
+        applyTheme(localStorage.getItem('bl-theme') || _DEFAULT_THEME_BY_TENANT_SLUG[_tenantSlugFromHost()] || 'night');
         themeBtn.addEventListener('click', () => {
             const _from = html.getAttribute('data-theme'), _to = _from === 'night' ? 'day' : 'night';
             track('theme_change', null, { from: _from, to: _to });
