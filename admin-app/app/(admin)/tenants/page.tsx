@@ -12,6 +12,7 @@ type Restaurant = {
   status: string
   custom_domain: string | null
   managerEmails?: string[]
+  managerCredentials?: AccountCredential[]
 }
 
 type Brand = {
@@ -22,6 +23,12 @@ type Brand = {
   created_at: string
   restaurants?: Restaurant[]
   adminEmails?: string[]
+  adminCredentials?: AccountCredential[]
+}
+
+type AccountCredential = {
+  email: string
+  storedInitialPassword: string | null
 }
 
 type OneTimeCredentials = {
@@ -66,6 +73,7 @@ type AccountLogEntry = {
   }[]
   createdAt: string | null
   lastSignInAt: string | null
+  storedInitialPassword: string | null
 }
 
 type TenantForm = {
@@ -90,6 +98,10 @@ type BranchForm = {
   secondaryColor: string
   createStarterCategory: boolean
 }
+type AdminLinkForm = {
+  email: string
+  password: string
+}
 
 const PLAN_LABELS: Record<Brand['plan'], string> = {
   ar_menu: 'AR Menu 300',
@@ -106,9 +118,32 @@ const PLAN_OPTIONS: { value: Brand['plan']; label: string; hint: string }[] = [
 const STARTER_TEMPLATE_OPTIONS = TEMPLATE_PRESETS
 
 const CUSTOMER_APP_URL = (process.env.NEXT_PUBLIC_CUSTOMER_APP_URL || 'https://restaurant-ar.pages.dev').replace(/\/$/, '')
+const TENANT_DOMAIN_BASE = (process.env.NEXT_PUBLIC_TENANT_DOMAIN_BASE || 'betareal.ge').replace(/^https?:\/\//, '').replace(/\/$/, '')
 
-function tenantPreviewUrl(slug: string) {
+function pagesTenantUrl(slug: string) {
   return `${CUSTOMER_APP_URL}/?tenant=${encodeURIComponent(slug)}`
+}
+
+function cleanDomain(value: string) {
+  return value.trim().replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/\/$/, '').toLowerCase()
+}
+
+function shouldUseCleanTenantDomain(slug: string, status?: string) {
+  if (status && status !== 'active') return false
+  if (!TENANT_DOMAIN_BASE || TENANT_DOMAIN_BASE.includes('localhost')) return false
+  return !/(^|-)dev($|-)|(^|-)local($|-)|(^|-)private($|-)|(^|-)staging($|-)|(^|-)test($|-)/.test(slug)
+}
+
+function tenantPreviewUrl(restaurant: Pick<Restaurant, 'slug' | 'status' | 'custom_domain'> | string) {
+  const slug = typeof restaurant === 'string' ? restaurant : restaurant.slug
+  const customDomain = typeof restaurant === 'string' ? '' : cleanDomain(restaurant.custom_domain ?? '')
+  if (customDomain && !customDomain.includes('pages.dev') && !customDomain.includes('localhost')) {
+    return `https://${customDomain}/`
+  }
+  if (shouldUseCleanTenantDomain(slug, typeof restaurant === 'string' ? undefined : restaurant.status)) {
+    return `https://${slug}.${TENANT_DOMAIN_BASE}/`
+  }
+  return pagesTenantUrl(slug)
 }
 
 function tenantMenuUrl(slug: string) {
@@ -180,6 +215,8 @@ export default function TenantsPage() {
   const logoInputRef = useRef<HTMLInputElement>(null)
   const [credentials, setCredentials] = useState<OneTimeCredentials | null>(null)
   const [branchForm, setBranchForm] = useState<Record<number, BranchForm>>({})
+  const [adminLinkForms, setAdminLinkForms] = useState<Record<string, AdminLinkForm>>({})
+  const [linkingKey, setLinkingKey] = useState('')
   const [form, setForm] = useState<TenantForm>({
     brandName: '',
     brandSlug: '',
@@ -322,7 +359,7 @@ export default function TenantsPage() {
       }
     }
     setSaving(false)
-    setMessage(`Created ${json.brand?.name ?? 'tenant'}. Live shared-template URL: ${json.previewUrl}.${logoNote} Password is shown once. Reset it if lost.`)
+    setMessage(`Created ${json.brand?.name ?? 'tenant'}. Public URL: ${json.previewUrl}.${logoNote} Temporary password visibility is stored for super admins when the password table exists.`)
     if (json.adminUser?.email && json.oneTimePassword) {
       setCredentials({
         brandName: json.brand?.name ?? '',
@@ -459,6 +496,71 @@ export default function TenantsPage() {
     })
   }
 
+  function adminLinkKey(brand: Brand, restaurant: Restaurant) {
+    return `${brand.id}:${restaurant.id}`
+  }
+
+  function adminLinkForm(brand: Brand, restaurant: Restaurant) {
+    return adminLinkForms[adminLinkKey(brand, restaurant)] ?? { email: '', password: '' }
+  }
+
+  function updateAdminLinkForm(brand: Brand, restaurant: Restaurant, key: keyof AdminLinkForm, value: string) {
+    const formKey = adminLinkKey(brand, restaurant)
+    setAdminLinkForms(forms => ({
+      ...forms,
+      [formKey]: { ...(forms[formKey] ?? { email: '', password: '' }), [key]: value },
+    }))
+  }
+
+  async function linkAdmin(brand: Brand, restaurant: Restaurant) {
+    const formKey = adminLinkKey(brand, restaurant)
+    const current = adminLinkForm(brand, restaurant)
+    setLinkingKey(formKey)
+    setMessage('')
+    const res = await fetch('/api/admin-links', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'link',
+        brandId: brand.id,
+        restaurantId: restaurant.id,
+        email: current.email,
+        password: current.password,
+      }),
+    })
+    const json = await res.json().catch(() => ({}))
+    setLinkingKey('')
+    if (!res.ok) {
+      setMessage(json.error || 'Admin link failed')
+      return
+    }
+    setMessage(`${json.email} linked to ${brand.name} / ${restaurant.name}${json.warning ? `. ${json.warning}` : ''}`)
+    setAdminLinkForms(forms => ({ ...forms, [formKey]: { email: '', password: '' } }))
+    await load()
+    await loadAccountLog()
+  }
+
+  async function unlinkAdmin(brand: Brand, restaurant: Restaurant, email: string) {
+    if (!window.confirm(`Unlink ${email} from ${brand.name} / ${restaurant.name}?`)) return
+    const formKey = adminLinkKey(brand, restaurant)
+    setLinkingKey(formKey)
+    setMessage('')
+    const res = await fetch('/api/admin-links', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'unlink', brandId: brand.id, restaurantId: restaurant.id, email }),
+    })
+    const json = await res.json().catch(() => ({}))
+    setLinkingKey('')
+    if (!res.ok) {
+      setMessage(json.error || 'Admin unlink failed')
+      return
+    }
+    setMessage(`${email} unlinked from ${brand.name} / ${restaurant.name}`)
+    await load()
+    await loadAccountLog()
+  }
+
   async function deleteTenant(brand: Brand) {
     if (!window.confirm(`Delete ${brand.name}? This removes its restaurants, menu, categories, theme rows, and live tenant link.`)) return
     setSaving(true)
@@ -514,10 +616,10 @@ export default function TenantsPage() {
             <div>
               <h2 className="text-base font-semibold" style={{ color: 'var(--gold)' }}>Initial admin credentials</h2>
               <p className="text-sm mt-1" style={{ color: 'var(--dim)' }}>
-                Password is shown once and is not stored by BetaReal. Reset it if lost.
+                Temporary password visibility: this stored initial password is visible to super admins only.
               </p>
               <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-                You can send future reset emails from the Account Log below.
+                Old Supabase Auth passwords cannot be recovered; older accounts show Unknown unless an initial password was captured.
               </p>
             </div>
             <button
@@ -592,7 +694,7 @@ export default function TenantsPage() {
           </Field>
           <Field label="Admin password">
             <input
-              type="password"
+              type="text"
               value={form.adminPassword}
               onChange={e => update('adminPassword', e.target.value)}
               placeholder="At least 8 characters"
@@ -639,7 +741,7 @@ export default function TenantsPage() {
             {saving ? 'Creating...' : 'Create tenant'}
           </button>
           <span className="text-xs" style={{ color: 'var(--dim)' }}>
-            Creates tenant rows and gives a working public menu URL. Passwords are only sent to Supabase Auth and are not stored.
+            Creates tenant rows and gives a working public menu URL. Temporary password visibility stores the initial password for super admins only.
           </span>
         </div>
       </section>
@@ -696,7 +798,9 @@ export default function TenantsPage() {
                       )}
                     </td>
                     <td className="px-4 py-3" style={{ color: 'var(--dim)' }}>
-                      {(brand.adminEmails ?? []).length ? (
+                      {(brand.adminCredentials ?? []).length ? (
+                        <CredentialList credentials={brand.adminCredentials ?? []} />
+                      ) : (brand.adminEmails ?? []).length ? (
                         <EmailList emails={brand.adminEmails ?? []} />
                       ) : (
                         <span className="text-xs">No linked admin</span>
@@ -711,12 +815,28 @@ export default function TenantsPage() {
                                 {r.name}
                               </a>
                               <div className="text-xs font-mono mt-0.5" style={{ color: 'var(--dim)' }}>{r.slug}</div>
-                              <a href={tenantPreviewUrl(r.slug)} target="_blank" rel="noreferrer" className="block text-xs font-mono mt-1 break-all hover:underline" style={{ color: 'var(--gold)' }}>
-                                Web page: {tenantPreviewUrl(r.slug)}
+                              <a href={tenantPreviewUrl(r)} target="_blank" rel="noreferrer" className="block text-xs font-mono mt-1 break-all hover:underline" style={{ color: 'var(--gold)' }}>
+                                Web page: {tenantPreviewUrl(r)}
                               </a>
                               <div className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-                                Branch managers: {(r.managerEmails ?? []).length ? <EmailList emails={r.managerEmails ?? []} /> : 'None'}
+                                Branch managers: {(r.managerCredentials ?? []).length ? (
+                                  <CredentialList
+                                    credentials={r.managerCredentials ?? []}
+                                    onUnlink={email => void unlinkAdmin(brand, r, email)}
+                                    disabled={linkingKey === adminLinkKey(brand, r)}
+                                  />
+                                ) : (r.managerEmails ?? []).length ? <EmailList emails={r.managerEmails ?? []} /> : 'None'}
                               </div>
+                              {access.canManageTenants && (
+                                <AdminLinkEditor
+                                  brand={brand}
+                                  restaurant={r}
+                                  value={adminLinkForm(brand, r)}
+                                  saving={linkingKey === adminLinkKey(brand, r)}
+                                  onChange={updateAdminLinkForm}
+                                  onLink={() => void linkAdmin(brand, r)}
+                                />
+                              )}
                             </div>
                           ))}
                         </div>
@@ -799,15 +919,15 @@ function AccountLog({
         <div>
           <h2 className="text-base font-semibold" style={{ color: 'var(--text)' }}>Account Log</h2>
           <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-            Passwords are not stored. Send a reset email if an admin forgets access.
+            Temporary password visibility shows stored initial passwords only; old Supabase Auth passwords remain unrecoverable.
           </p>
         </div>
       </div>
       <div className="table-scroll rounded-xl" style={{ border: '1px solid var(--border)' }}>
-        <table className="w-full text-xs" style={{ minWidth: '1080px' }}>
+        <table className="w-full text-xs" style={{ minWidth: '1240px' }}>
           <thead>
             <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
-              {['Email', 'App role', 'Brand / tenant', 'Restaurant / branch', 'Created', 'Last sign-in', 'Actions'].map(h => (
+              {['Email', 'App role', 'Brand / tenant', 'Restaurant / branch', 'Temporary password visibility', 'Created', 'Last sign-in', 'Actions'].map(h => (
                 <th key={h} className="px-3 py-2 text-left font-medium" style={{ color: 'var(--dim)' }}>{h}</th>
               ))}
             </tr>
@@ -815,7 +935,7 @@ function AccountLog({
           <tbody>
             {loading ? (
               <tr>
-                <td className="px-3 py-3" colSpan={7} style={{ color: 'var(--dim)' }}>Loading account log...</td>
+                <td className="px-3 py-3" colSpan={8} style={{ color: 'var(--dim)' }}>Loading account log...</td>
               </tr>
             ) : accounts.length ? accounts.map((account, i) => (
               <tr
@@ -850,6 +970,12 @@ function AccountLog({
                     </div>
                   ) : 'None'}
                 </td>
+                <td className="px-3 py-2">
+                  <div className="text-[11px] uppercase" style={{ color: 'var(--dim)' }}>stored initial password</div>
+                  <div className="font-mono break-all" style={{ color: account.storedInitialPassword ? 'var(--gold)' : 'var(--dim)' }}>
+                    {account.storedInitialPassword || 'Unknown'}
+                  </div>
+                </td>
                 <td className="px-3 py-2 font-mono" style={{ color: 'var(--dim)' }}>{formatDate(account.createdAt)}</td>
                 <td className="px-3 py-2 font-mono" style={{ color: 'var(--dim)' }}>{formatDate(account.lastSignInAt)}</td>
                 <td className="px-3 py-2">
@@ -877,7 +1003,7 @@ function AccountLog({
               </tr>
             )) : (
               <tr>
-                <td className="px-3 py-3" colSpan={7} style={{ color: 'var(--dim)' }}>No auth accounts found.</td>
+                <td className="px-3 py-3" colSpan={8} style={{ color: 'var(--dim)' }}>No auth accounts found.</td>
               </tr>
             )}
           </tbody>
@@ -945,6 +1071,88 @@ function EmailList({ emails }: { emails: string[] }) {
         <span key={email} className="font-mono text-xs break-all">{email}</span>
       ))}
     </span>
+  )
+}
+
+function CredentialList({
+  credentials,
+  onUnlink,
+  disabled = false,
+}: {
+  credentials: AccountCredential[]
+  onUnlink?: (email: string) => void
+  disabled?: boolean
+}) {
+  return (
+    <span className="inline-flex flex-col gap-1">
+      {credentials.map(credential => (
+        <span key={credential.email} className="block">
+          <span className="font-mono text-xs break-all" style={{ color: 'var(--text)' }}>{credential.email}</span>
+          <span className="block font-mono text-[11px] break-all" style={{ color: credential.storedInitialPassword ? 'var(--gold)' : 'var(--dim)' }}>
+            stored initial password: {credential.storedInitialPassword || 'Unknown'}
+          </span>
+          {onUnlink && (
+            <button
+              type="button"
+              onClick={() => onUnlink(credential.email)}
+              disabled={disabled}
+              className="mt-1 px-2 py-1 rounded text-[11px] font-semibold"
+              style={{ border: '1px solid rgba(224,82,82,0.35)', color: 'var(--danger)', opacity: disabled ? 0.55 : 1 }}
+            >
+              Unlink
+            </button>
+          )}
+        </span>
+      ))}
+    </span>
+  )
+}
+
+function AdminLinkEditor({
+  brand,
+  restaurant,
+  value,
+  saving,
+  onChange,
+  onLink,
+}: {
+  brand: Brand
+  restaurant: Restaurant
+  value: AdminLinkForm
+  saving: boolean
+  onChange: (brand: Brand, restaurant: Restaurant, key: keyof AdminLinkForm, value: string) => void
+  onLink: () => void
+}) {
+  return (
+    <div className="mt-2 grid grid-cols-1 gap-1.5 max-w-72">
+      <input
+        type="email"
+        value={value.email}
+        onChange={e => onChange(brand, restaurant, 'email', e.target.value)}
+        placeholder="Admin email"
+        disabled={saving}
+      />
+      <input
+        type="text"
+        value={value.password}
+        onChange={e => onChange(brand, restaurant, 'password', e.target.value)}
+        placeholder="Temp password, required for new user"
+        disabled={saving}
+        autoComplete="new-password"
+      />
+      <div className="text-[11px]" style={{ color: 'var(--dim)' }}>
+        Temporary password visibility: stores initial password when provided.
+      </div>
+      <button
+        type="button"
+        onClick={onLink}
+        disabled={saving || !value.email.trim()}
+        className="px-3 py-1.5 rounded-lg text-xs font-semibold w-fit"
+        style={{ background: 'var(--gold)', color: '#0f0b07', opacity: saving || !value.email.trim() ? 0.55 : 1 }}
+      >
+        {saving ? 'Linking...' : 'Link / update admin'}
+      </button>
+    </div>
   )
 }
 

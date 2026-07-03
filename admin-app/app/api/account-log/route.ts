@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { cleanEmail, fetchStoredInitialPasswords, isPlatformRole } from '@/lib/adminAccounts'
 
 type BrandMembership = {
   brand_id: number
@@ -27,19 +28,11 @@ type Restaurant = {
   brand_id: number
 }
 
-function isPlatformRole(role: unknown) {
-  return ['super_admin', 'creator', 'dev'].includes(String(role))
-}
-
 async function requireSuperAdmin() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || !isPlatformRole(user.app_metadata?.role)) return null
   return user
-}
-
-function cleanEmail(value: unknown) {
-  return String(value ?? '').trim().toLowerCase()
 }
 
 export async function GET() {
@@ -72,6 +65,7 @@ export async function GET() {
   const restaurantById = new Map(((restaurants ?? []) as Restaurant[]).map(restaurant => [Number(restaurant.id), restaurant]))
   const brandMemberships = (brandUsers ?? []) as BrandMembership[]
   const restaurantMemberships = (restaurantUsers ?? []) as RestaurantMembership[]
+  const storedPasswords = await fetchStoredInitialPasswords(service, (users.users ?? []).map(account => account.id))
 
   const accounts = (users.users ?? [])
     .map(account => {
@@ -103,6 +97,7 @@ export async function GET() {
             brandSlug: brand?.slug ?? '',
           }
         }),
+        storedInitialPassword: storedPasswords.get(userId)?.initialPassword || null,
         createdAt: account.created_at ?? null,
         lastSignInAt: account.last_sign_in_at ?? null,
       }

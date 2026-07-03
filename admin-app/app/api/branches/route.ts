@@ -43,6 +43,7 @@ type BrandRow = {
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const CUSTOMER_APP_URL = (process.env.NEXT_PUBLIC_CUSTOMER_APP_URL || 'https://restaurant-ar.pages.dev').replace(/\/$/, '')
+const TENANT_DOMAIN_BASE = (process.env.NEXT_PUBLIC_TENANT_DOMAIN_BASE || 'betareal.ge').replace(/^https?:\/\//, '').replace(/\/$/, '')
 function isPlatformRole(role: unknown) {
   return ['super_admin', 'creator', 'dev'].includes(String(role))
 }
@@ -86,6 +87,13 @@ async function upsertBranchTheme(
 }
 
 function branchPreviewUrl(slug: string) {
+  if (
+    TENANT_DOMAIN_BASE &&
+    !TENANT_DOMAIN_BASE.includes('localhost') &&
+    !/(^|-)dev($|-)|(^|-)local($|-)|(^|-)private($|-)|(^|-)staging($|-)|(^|-)test($|-)/.test(slug)
+  ) {
+    return `https://${slug}.${TENANT_DOMAIN_BASE}/`
+  }
   const url = new URL(CUSTOMER_APP_URL)
   url.searchParams.set('tenant', slug)
   return url.toString()

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { themePreset, themePresetValuesWithAccents } from '@/lib/themePresets'
+import { cleanEmail, ensureAdminAuthUser, fetchStoredInitialPasswords, isPlatformRole, storeInitialPassword } from '@/lib/adminAccounts'
 
 type TenantPlan = 'ar_menu' | 'full' | 'premium'
 
@@ -48,12 +49,15 @@ type TenantBrand = {
     status: string
     custom_domain: string | null
     managerEmails?: string[]
+    managerCredentials?: { email: string; storedInitialPassword: string | null }[]
   }[]
   adminEmails?: string[]
+  adminCredentials?: { email: string; storedInitialPassword: string | null }[]
 }
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const CUSTOMER_APP_URL = (process.env.NEXT_PUBLIC_CUSTOMER_APP_URL || 'https://restaurant-ar.pages.dev').replace(/\/$/, '')
+const TENANT_DOMAIN_BASE = (process.env.NEXT_PUBLIC_TENANT_DOMAIN_BASE || 'betareal.ge').replace(/^https?:\/\//, '').replace(/\/$/, '')
 function cleanSlug(value: string) {
   return value
     .trim()
@@ -93,21 +97,20 @@ async function upsertTenantTheme(
 }
 
 function tenantPreviewUrl(slug: string) {
+  if (
+    TENANT_DOMAIN_BASE &&
+    !TENANT_DOMAIN_BASE.includes('localhost') &&
+    !/(^|-)dev($|-)|(^|-)local($|-)|(^|-)private($|-)|(^|-)staging($|-)|(^|-)test($|-)/.test(slug)
+  ) {
+    return `https://${slug}.${TENANT_DOMAIN_BASE}/`
+  }
   const url = new URL(CUSTOMER_APP_URL)
   url.searchParams.set('tenant', slug)
   return url.toString()
 }
 
-function isPlatformRole(role: unknown) {
-  return ['super_admin', 'creator', 'dev'].includes(String(role))
-}
-
 function isTenantPlan(value: unknown): value is TenantPlan {
   return value === 'ar_menu' || value === 'full' || value === 'premium'
-}
-
-function cleanEmail(value: unknown) {
-  return String(value ?? '').trim().toLowerCase()
 }
 
 async function enrichTenantEmails(brands: TenantBrand[]) {
@@ -120,18 +123,37 @@ async function enrichTenantEmails(brands: TenantBrand[]) {
     service.auth.admin.listUsers({ page: 1, perPage: 1000 }),
   ])
   const emailById = new Map(users?.users.map(user => [user.id, user.email ?? '']) ?? [])
+  const storedPasswords = await fetchStoredInitialPasswords(
+    service,
+    [
+      ...((brandUsers ?? []).map(row => String(row.user_id))),
+      ...((restaurantUsers ?? []).map(row => String(row.user_id))),
+    ],
+  )
 
   return brands.map(brand => {
-    const adminEmails = (brandUsers ?? [])
+    const adminRows = (brandUsers ?? [])
       .filter(row => Number(row.brand_id) === Number(brand.id))
-      .map(row => emailById.get(String(row.user_id)) ?? '')
-      .filter(Boolean)
+    const adminCredentials = adminRows
+      .map(row => ({
+        email: emailById.get(String(row.user_id)) ?? '',
+        storedInitialPassword: storedPasswords.get(String(row.user_id))?.initialPassword || null,
+      }))
+      .filter(row => row.email)
 
     return {
       ...brand,
-      adminEmails,
+      adminEmails: adminCredentials.map(row => row.email),
+      adminCredentials,
       restaurants: (brand.restaurants ?? []).map(restaurant => ({
         ...restaurant,
+        managerCredentials: (restaurantUsers ?? [])
+          .filter(row => Number(row.restaurant_id) === Number(restaurant.id))
+          .map(row => ({
+            email: emailById.get(String(row.user_id)) ?? '',
+            storedInitialPassword: storedPasswords.get(String(row.user_id))?.initialPassword || null,
+          }))
+          .filter(row => row.email),
         managerEmails: (restaurantUsers ?? [])
           .filter(row => Number(row.restaurant_id) === Number(restaurant.id))
           .map(row => emailById.get(String(row.user_id)) ?? '')
@@ -241,6 +263,7 @@ export async function POST(req: NextRequest) {
     primaryColor,
     secondaryColor,
   )
+  const warnings = themeWarning ? [`theme preset save failed: ${themeWarning}`] : []
 
   let adminUser: { id: string; email: string } | null = null
   if (adminEmail) {
@@ -254,59 +277,16 @@ export async function POST(req: NextRequest) {
       }, { status: 500 })
     }
 
-    const { data: createdUser, error: createUserError } = await service.auth.admin.createUser({
-      email: adminEmail,
-      password: adminPassword,
-      email_confirm: true,
-      app_metadata: { role: 'brand_owner' },
-      user_metadata: {},
-    })
-    const duplicateUser = createUserError?.message?.toLowerCase().includes('already')
-    let userId = createdUser.user?.id ?? ''
-
-    if (createUserError && !duplicateUser) {
+    const ensured = await ensureAdminAuthUser(service, adminEmail, adminPassword)
+    if (ensured.error || !ensured.userId) {
       return NextResponse.json({
-        error: `Tenant created, but admin user creation failed: ${createUserError.message}`,
+        error: `Tenant created, but admin user creation/update failed: ${ensured.error?.message || 'unknown error'}`,
         brand,
         restaurant,
         previewUrl: tenantPreviewUrl(restaurant.slug),
       }, { status: 500 })
     }
-
-    if (!userId) {
-      const { data: users, error: listError } = await service.auth.admin.listUsers({ page: 1, perPage: 1000 })
-      if (listError) {
-        return NextResponse.json({
-          error: `Tenant created, but existing admin user lookup failed: ${listError.message}`,
-          brand,
-          restaurant,
-          previewUrl: tenantPreviewUrl(restaurant.slug),
-        }, { status: 500 })
-      }
-      userId = users.users.find(existing => existing.email?.toLowerCase() === adminEmail)?.id ?? ''
-    }
-
-    if (!userId) {
-      return NextResponse.json({
-        error: 'Tenant created, but admin user could not be found or linked',
-        brand,
-        restaurant,
-        previewUrl: tenantPreviewUrl(restaurant.slug),
-      }, { status: 500 })
-    }
-
-    const { error: metadataError } = await service.auth.admin.updateUserById(userId, {
-      app_metadata: { role: 'brand_owner' },
-      user_metadata: {},
-    })
-    if (metadataError) {
-      return NextResponse.json({
-        error: `Tenant created, but admin metadata update failed: ${metadataError.message}`,
-        brand,
-        restaurant,
-        previewUrl: tenantPreviewUrl(restaurant.slug),
-      }, { status: 500 })
-    }
+    const userId = ensured.userId
 
     const [{ error: brandLinkError }, { error: restaurantLinkError }] = await Promise.all([
       service.from('brand_users').upsert({ brand_id: brand.id, user_id: userId, role: 'brand_owner' }, { onConflict: 'brand_id,user_id' }),
@@ -320,6 +300,15 @@ export async function POST(req: NextRequest) {
         previewUrl: tenantPreviewUrl(restaurant.slug),
       }, { status: 500 })
     }
+    const passwordStoreError = await storeInitialPassword(service, {
+      userId,
+      email: adminEmail,
+      password: adminPassword,
+      createdBy: user.id,
+    })
+    if (passwordStoreError) {
+      warnings.push(`temporary password storage failed: ${passwordStoreError.message}`)
+    }
     adminUser = { id: userId, email: adminEmail }
   }
 
@@ -329,10 +318,10 @@ export async function POST(req: NextRequest) {
     adminUser,
     oneTimePassword: adminEmail ? adminPassword : null,
     previewUrl: tenantPreviewUrl(restaurant.slug),
-    credentialNote: adminEmail ? 'Password is shown once. Reset it if lost.' : null,
-    note: themeWarning
-      ? `Created database tenant, but theme preset save failed: ${themeWarning}`
-      : 'Created database tenant. The live shared template opens it with ?tenant=<branch-slug>; wildcard domains/custom Vercel domains are separate infrastructure.',
+    credentialNote: adminEmail ? 'Temporary password visibility: stored initial password is available to super admins only.' : null,
+    note: warnings.length
+      ? `Created database tenant, but ${warnings.join('; ')}`
+      : 'Created database tenant. Active production branches prefer clean <slug>.betareal.ge customer URLs; staging/private slugs fall back to the Pages tenant URL.',
   }, { status: 201 })
 }
 
