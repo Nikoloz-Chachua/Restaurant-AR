@@ -98,10 +98,6 @@ type BranchForm = {
   secondaryColor: string
   createStarterCategory: boolean
 }
-type AdminLinkForm = {
-  email: string
-  password: string
-}
 
 const PLAN_LABELS: Record<Brand['plan'], string> = {
   ar_menu: 'AR Menu 300',
@@ -215,8 +211,6 @@ export default function TenantsPage() {
   const logoInputRef = useRef<HTMLInputElement>(null)
   const [credentials, setCredentials] = useState<OneTimeCredentials | null>(null)
   const [branchForm, setBranchForm] = useState<Record<number, BranchForm>>({})
-  const [adminLinkForms, setAdminLinkForms] = useState<Record<string, AdminLinkForm>>({})
-  const [linkingKey, setLinkingKey] = useState('')
   const [form, setForm] = useState<TenantForm>({
     brandName: '',
     brandSlug: '',
@@ -496,71 +490,6 @@ export default function TenantsPage() {
     })
   }
 
-  function adminLinkKey(brand: Brand, restaurant: Restaurant) {
-    return `${brand.id}:${restaurant.id}`
-  }
-
-  function adminLinkForm(brand: Brand, restaurant: Restaurant) {
-    return adminLinkForms[adminLinkKey(brand, restaurant)] ?? { email: '', password: '' }
-  }
-
-  function updateAdminLinkForm(brand: Brand, restaurant: Restaurant, key: keyof AdminLinkForm, value: string) {
-    const formKey = adminLinkKey(brand, restaurant)
-    setAdminLinkForms(forms => ({
-      ...forms,
-      [formKey]: { ...(forms[formKey] ?? { email: '', password: '' }), [key]: value },
-    }))
-  }
-
-  async function linkAdmin(brand: Brand, restaurant: Restaurant) {
-    const formKey = adminLinkKey(brand, restaurant)
-    const current = adminLinkForm(brand, restaurant)
-    setLinkingKey(formKey)
-    setMessage('')
-    const res = await fetch('/api/admin-links', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'link',
-        brandId: brand.id,
-        restaurantId: restaurant.id,
-        email: current.email,
-        password: current.password,
-      }),
-    })
-    const json = await res.json().catch(() => ({}))
-    setLinkingKey('')
-    if (!res.ok) {
-      setMessage(json.error || 'Admin link failed')
-      return
-    }
-    setMessage(`${json.email} linked to ${brand.name} / ${restaurant.name}${json.warning ? `. ${json.warning}` : ''}`)
-    setAdminLinkForms(forms => ({ ...forms, [formKey]: { email: '', password: '' } }))
-    await load()
-    await loadAccountLog()
-  }
-
-  async function unlinkAdmin(brand: Brand, restaurant: Restaurant, email: string) {
-    if (!window.confirm(`Unlink ${email} from ${brand.name} / ${restaurant.name}?`)) return
-    const formKey = adminLinkKey(brand, restaurant)
-    setLinkingKey(formKey)
-    setMessage('')
-    const res = await fetch('/api/admin-links', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'unlink', brandId: brand.id, restaurantId: restaurant.id, email }),
-    })
-    const json = await res.json().catch(() => ({}))
-    setLinkingKey('')
-    if (!res.ok) {
-      setMessage(json.error || 'Admin unlink failed')
-      return
-    }
-    setMessage(`${email} unlinked from ${brand.name} / ${restaurant.name}`)
-    await load()
-    await loadAccountLog()
-  }
-
   async function deleteTenant(brand: Brand) {
     if (!window.confirm(`Delete ${brand.name}? This removes its restaurants, menu, categories, theme rows, and live tenant link.`)) return
     setSaving(true)
@@ -765,7 +694,7 @@ export default function TenantsPage() {
           <table className="w-full text-sm" style={{ minWidth: '980px' }}>
             <thead>
               <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
-                {['Brand', 'Plan', 'Admins', 'Branches / managers', 'Status', 'Actions'].map(h => (
+                {['Brand', 'Plan', 'Admins', 'Branches', 'Status', 'Actions'].map(h => (
                   <th key={h} className="px-4 py-3 text-left font-medium" style={{ color: 'var(--dim)' }}>{h}</th>
                 ))}
               </tr>
@@ -818,25 +747,6 @@ export default function TenantsPage() {
                               <a href={tenantPreviewUrl(r)} target="_blank" rel="noreferrer" className="block text-xs font-mono mt-1 break-all hover:underline" style={{ color: 'var(--gold)' }}>
                                 Web page: {tenantPreviewUrl(r)}
                               </a>
-                              <div className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-                                Branch managers: {(r.managerCredentials ?? []).length ? (
-                                  <CredentialList
-                                    credentials={r.managerCredentials ?? []}
-                                    onUnlink={email => void unlinkAdmin(brand, r, email)}
-                                    disabled={linkingKey === adminLinkKey(brand, r)}
-                                  />
-                                ) : (r.managerEmails ?? []).length ? <EmailList emails={r.managerEmails ?? []} /> : 'None'}
-                              </div>
-                              {access.canManageTenants && (
-                                <AdminLinkEditor
-                                  brand={brand}
-                                  restaurant={r}
-                                  value={adminLinkForm(brand, r)}
-                                  saving={linkingKey === adminLinkKey(brand, r)}
-                                  onChange={updateAdminLinkForm}
-                                  onLink={() => void linkAdmin(brand, r)}
-                                />
-                              )}
                             </div>
                           ))}
                         </div>
@@ -1105,54 +1015,6 @@ function CredentialList({
         </span>
       ))}
     </span>
-  )
-}
-
-function AdminLinkEditor({
-  brand,
-  restaurant,
-  value,
-  saving,
-  onChange,
-  onLink,
-}: {
-  brand: Brand
-  restaurant: Restaurant
-  value: AdminLinkForm
-  saving: boolean
-  onChange: (brand: Brand, restaurant: Restaurant, key: keyof AdminLinkForm, value: string) => void
-  onLink: () => void
-}) {
-  return (
-    <div className="mt-2 grid grid-cols-1 gap-1.5 max-w-72">
-      <input
-        type="email"
-        value={value.email}
-        onChange={e => onChange(brand, restaurant, 'email', e.target.value)}
-        placeholder="Admin email"
-        disabled={saving}
-      />
-      <input
-        type="text"
-        value={value.password}
-        onChange={e => onChange(brand, restaurant, 'password', e.target.value)}
-        placeholder="Temp password, required for new user"
-        disabled={saving}
-        autoComplete="new-password"
-      />
-      <div className="text-[11px]" style={{ color: 'var(--dim)' }}>
-        Temporary password visibility: stores initial password when provided.
-      </div>
-      <button
-        type="button"
-        onClick={onLink}
-        disabled={saving || !value.email.trim()}
-        className="px-3 py-1.5 rounded-lg text-xs font-semibold w-fit"
-        style={{ background: 'var(--gold)', color: '#0f0b07', opacity: saving || !value.email.trim() ? 0.55 : 1 }}
-      >
-        {saving ? 'Linking...' : 'Link / update admin'}
-      </button>
-    </div>
   )
 }
 
