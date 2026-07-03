@@ -90,12 +90,12 @@ is provisioned per client.
 
 | Component | Hosted on | Why there | Owned by |
 |---|---|---|---|
-| **Customer menu app** | **Cloudflare Workers** (Static Assets) | Static, global edge, cheap. **Workers (not Pages) because we need a _wildcard route_ `*.betareal.app` to serve every tenant from one deploy — Pages cannot do wildcard subdomains natively.** Also the clean fallback origin for Cloudflare for SaaS custom domains. | Temo |
-| **Model/asset storage** | **Cloudflare R2** (one bucket) | **Zero egress fees** — the single most important infra fact for us. 3D models are multi-MB and downloaded by every visitor; on R2 that bandwidth is free. (This is what fixed the June Supabase egress overage.) | Temo |
-| **Database + Auth** | **Supabase** (one shared project) | Postgres + RLS gives us true row-level tenant isolation; Auth gives us logins + roles via JWT. One project, many tenants. | Temo |
-| **Admin panel** | **Vercel** (Next.js) | Already built there; SSR + API routes for presign/custom-hostname/invite; good DX. One deploy serves all tenants (tenant chosen by login). | George |
-| **Custom domains** | **Cloudflare for SaaS** (Custom Hostnames) | Lets each restaurant use `menu.theirbrand.ge` against our one Worker, with auto-issued SSL, via API automation. | Temo |
-| **DNS / wildcard** | **Cloudflare DNS** | Wildcard `*.betareal.app` → the Worker route. One-time setup. | Temo |
+| **Customer menu app** | **Cloudflare Workers** (Static Assets) | Static, global edge, cheap. **Workers (not Pages) because we need a _wildcard route_ `*.betareal.app` to serve every tenant from one deploy — Pages cannot do wildcard subdomains natively.** Also the clean fallback origin for Cloudflare for SaaS custom domains. | Niko |
+| **Model/asset storage** | **Cloudflare R2** (one bucket) | **Zero egress fees** — the single most important infra fact for us. 3D models are multi-MB and downloaded by every visitor; on R2 that bandwidth is free. (This is what fixed the June Supabase egress overage.) | Niko |
+| **Database + Auth** | **Supabase** (one shared project) | Postgres + RLS gives us true row-level tenant isolation; Auth gives us logins + roles via JWT. One project, many tenants. | Niko |
+| **Admin panel** | **Vercel** (Next.js) | Already built there; SSR + API routes for presign/custom-hostname/invite; good DX. One deploy serves all tenants (tenant chosen by login). | Niko |
+| **Custom domains** | **Cloudflare for SaaS** (Custom Hostnames) | Lets each restaurant use `menu.theirbrand.ge` against our one Worker, with auto-issued SSL, via API automation. | Niko |
+| **DNS / wildcard** | **Cloudflare DNS** | Wildcard `*.betareal.app` → the Worker route. One-time setup. | Niko |
 
 > ✅ **Subdomains ARE fully supported — and BetaReal+ stays on Cloudflare.**
 > Common point of confusion: only the Cloudflare **Pages** product lacks wildcard

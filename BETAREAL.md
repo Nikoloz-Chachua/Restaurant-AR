@@ -159,7 +159,7 @@ We run **three** distinct front-ends:
 | Surface | What it is | Where it lives | Who uses it |
 |---|---|---|---|
 | **Customer menu app** | `index.html` — shared WebAR menu template | **Cloudflare Pages** → https://restaurant-ar.pages.dev | Restaurant guests |
-| **Admin panel** | `admin-app/` — Next.js app to manage menu + theme + view analytics | **Vercel** (George's account) | Restaurant staff / us |
+| **Admin panel** | `admin-app/` — Next.js app to manage menu + theme + view analytics | **Vercel** (Niko's account) → https://betareal-admin.vercel.app | Restaurant staff / us |
 | **Analytics dashboard** | `admin.html` — Chart.js dashboard | Served from Cloudflare Pages, **embedded via iframe** inside the admin panel's Dashboard page | Restaurant owners / us |
 
 The admin panel's Dashboard page embeds `https://restaurant-ar.pages.dev/admin.html` in an iframe and securely passes the admin's language, theme, and Supabase access token via `postMessage` (locked to the exact origin, never `*`). Tenant-scoped analytics should carry `brand_id` and `restaurant_id`.
@@ -323,21 +323,21 @@ This is a genuine product differentiator: **most QR menus give the restaurant ze
 
 | Thing | Provider | Owned by | Notes |
 |---|---|---|---|
-| Customer app + analytics dashboard | **Cloudflare Pages** | Temo | Deploys from the **`cloudflare`** git branch |
-| Model storage | **Cloudflare R2** | Temo | Public bucket |
-| Admin panel | **Vercel** | **George** | Next.js app — **deploys from the `main` git branch** |
+| Customer app + analytics dashboard | **Cloudflare Pages** | **Niko** | Deploys from the **`cloudflare`** git branch → restaurant-ar.pages.dev |
+| Model storage | **Cloudflare R2** | **Niko** | Public bucket |
+| Admin panel | **Vercel** | **Niko** | Next.js app — deploys from the **`cloudflare`** git branch → betareal-admin.vercel.app |
+| Database, Auth | **Supabase** | **Niko** | Project `lwdpegloznhpcecivhfy`; tenant isolation enforced by RLS |
+| `betareal.ge` DNS zone | **Cloudflare** | **Niko** | Wildcard `*.betareal.ge` → Pages; each tenant subdomain must be added as a Pages custom domain or it 1014s |
 
-> ⚠️ **Two branches drive two deploys** (they have diverged — don't assume they're in sync):
-> - **`cloudflare`** → Cloudflare Pages → **customer app** (`index.html`, `sw.js`, `admin.html`, `foods/`).
-> - **`main`** → Vercel → **admin app** (`admin-app/`).
+> **One branch drives both deploys (as of 2026-07-04):** every push to **`cloudflare`** deploys
+> the customer app (Cloudflare Pages) AND the admin app (Vercel). The **`main`** branch is
+> **stale** (frozen 2026-06-19) — do not commit to it and do not trust its contents.
 >
-> So: customer-app changes go on `cloudflare`; **admin-app changes must go on `main`** to actually deploy. A commit to one branch does **not** affect the other deploy.
-| Database, Auth | **Supabase** | Temo (personal org) | Shared project; tenant isolation must be enforced by RLS |
-| "Everything hosted via my device" | Local (Temo) | Temo | ⚠️ Single point of failure |
+> ⚠️ **Bus factor:** all four accounts above are Niko's personal accounts.
 
 **Admin app environment variables (Vercel):** `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL`, plus Supabase URL + anon key.
 
-**Note (from memory):** the GSStudio Supabase org has 2 projects (free-tier limit) — do **not** touch `oaqoxndnmltvajdtfrcu`. Our project lives in Temo's personal org.
+**Note (from memory):** the GSStudio Supabase org has 2 projects (free-tier limit) — do **not** touch `oaqoxndnmltvajdtfrcu`. The live multi-tenant project is `lwdpegloznhpcecivhfy` on **Niko's** account; the old single-tenant project `xctoxhaahxtcicfgnmme` (Temo's) is retired — do not migrate or edit it.
 
 ---
 
@@ -345,10 +345,9 @@ This is a genuine product differentiator: **most QR menus give the restaurant ze
 
 **MUST follow every time** (this is in `CLAUDE.md` too):
 
-1. **Two deploy branches — pick the right one:**
-   - **Customer app** (`index.html`, `sw.js`, `admin.html`, `foods/`) → commit to **`cloudflare`** (Cloudflare Pages).
-   - **Admin app** (`admin-app/`) → commit to **`main`** (Vercel).
-   - A commit to one branch does **not** deploy the other. The branches have diverged — don't assume parity.
+1. **One deploy branch: `cloudflare`.** Customer app (`index.html`, `sw.js`, `admin.html`, `foods/`)
+   and admin app (`admin-app/`) both deploy from it (Cloudflare Pages + Vercel respectively).
+   **Never commit to `main`** — it is stale (frozen 2026-06-19) and deploys nothing.
 2. **Bump `CACHE_NAME` in `sw.js`** (`bl-v55` → `bl-v56` → …) in the **same commit** whenever any of these change:
    - `index.html`, `foods/menu.json`, `sw.js` itself, any local GLB, or any new file served to the browser.
    - If you forget, returning visitors keep seeing the **old cached version** until a hard refresh.
@@ -564,7 +563,7 @@ Bilingual (Georgian/English) survey; first responses **2026-06-05**, wider distr
 | Founder | Title (official) | Primary responsibilities |
 |---|---|---|
 | **Temo Tkeshelashvili** | **CEO** | Business strategy, customer discovery, sales, marketing, WebAR development, financial management. Winner of TSU Higgs Cleverton accelerator. Most involved; currently full-time (no other job). Hosts/owns most infra. |
-| **George Tchitchinadze** | Web Platform / Data / AI Infra | Web platform development, data engineering, AI training infrastructure. Owns the Vercel account. |
+| **George Tchitchinadze** | Web Platform / Data / AI Infra | Web platform development, data engineering, AI training infrastructure. |
 | **Nikoloz Chachua** | Sales / Marketing / AI | Sales, customer outreach, marketing, AI development + model fine-tuning. |
 | **Ilia Nozadze** | 3D / AR / Finance | Food-item photoshoots, 3D asset creation, AR integration, financial planning, AI-related development. |
 | **Davit Jincharadze** | 3D Optimization | 3D model processing & optimization (real dishes → optimized interactive assets). |
@@ -678,9 +677,9 @@ Stage:            Pre-revenue, MVP live, validation in progress
 Team:             5 active founders (CS students, TSU); originally 6 (1 left amicably)
 Market:           Tbilisi → Georgia → international
 Live customer app:  https://restaurant-ar.pages.dev        (Cloudflare Pages, branch `cloudflare`)
-Admin panel:        Next.js 16 / React 19 on Vercel (George's account)
+Admin panel:        Next.js 16 / React 19 on Vercel (Niko's account) — betareal-admin.vercel.app
 Analytics:          admin.html (Chart.js), embedded in admin via iframe
-Database:           Supabase project xctoxhaahxtcicfgnmme ("Restaurant AR Claude version")
+Database:           Supabase project lwdpegloznhpcecivhfy (Niko's account; multi-tenant)
 Tables:             menu_items, categories, theme_config, events  (+ Auth)
 Model storage:      Cloudflare R2 with restaurant-slug key prefixes
 Thumbnails:         Cloudflare R2, client-side WebP
