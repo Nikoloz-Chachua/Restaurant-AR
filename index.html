@@ -1561,8 +1561,27 @@
         }
 
     </style>
+    <!-- ── Anti-FOUC cloak ───────────────────────────────────────────
+         The page ships with default night/empty-template markup and only
+         resolves the tenant's real theme + template + colours after a
+         Supabase round-trip. On slow mobile the visitor watched the default
+         menu build itself and then morph. This splash hides everything until
+         the tenant theme/template is applied AND the menu has rendered, then
+         fades out. A failsafe timeout guarantees it never sticks. -->
+    <style id="br-cloak-css">
+        #br-splash{position:fixed;inset:0;z-index:99999;background:var(--bg,#14100b);
+            display:flex;align-items:center;justify-content:center;
+            transition:opacity .45s ease, background .3s ease;}
+        #br-splash.br-hide{opacity:0;pointer-events:none;}
+        #br-splash .br-spin{width:38px;height:38px;border-radius:50%;
+            border:3px solid rgba(231,177,90,.25);border-top-color:var(--accent,#e7b15a);
+            animation:br-spin .8s linear infinite;}
+        @keyframes br-spin{to{transform:rotate(360deg)}}
+    </style>
+    <noscript><style>#br-splash{display:none!important}</style></noscript>
 </head>
 <body>
+    <div id="br-splash" aria-hidden="true"><div class="br-spin"></div></div>
     <script>
     (function() {
         var ua = navigator.userAgent;
@@ -3740,8 +3759,9 @@
                 items = await fetch('./foods/menu.json').then(r => r.json()).catch(() => fallback);
             }
 
-            // Apply remote theme in parallel — doesn't block menu render
-            applyRemoteTheme();
+            // Apply remote theme in parallel — doesn't block menu render.
+            // Keep a handle so the boot cloak can reveal only after it lands.
+            window.__brThemeReady = applyRemoteTheme();
 
             menuItems = items;
             window.__menuItems = items;
@@ -4202,8 +4222,28 @@ document.getElementById('basket-items').addEventListener('click', e => {
         // empty the footer would render high in the viewport, then get shoved
         // ~700px down when the cards populate — a large CLS. Showing it after
         // the build means it appears below the full menu (off-screen), no shift.
+        // ── Reveal the app once it's actually ready ────────────────────
+        function _revealApp() {
+            const s = document.getElementById('br-splash');
+            if (!s || s._done) return;
+            s._done = true;
+            s.classList.add('br-hide');
+            setTimeout(() => s.remove(), 600);
+        }
+        // Failsafe: never let the cloak stick, even if Supabase or JS fails.
+        setTimeout(_revealApp, 5000);
+
         if (_previewAccessAllowed) {
-            buildMenu().finally(() => document.querySelector('.site-footer')?.classList.add('show'));
+            buildMenu().finally(() => {
+                document.querySelector('.site-footer')?.classList.add('show');
+                // Reveal only after BOTH the menu rendered AND the remote
+                // theme/template applied — two rAFs so the browser paints the
+                // final themed layout before the splash fades.
+                Promise.resolve(window.__brThemeReady).finally(() =>
+                    requestAnimationFrame(() => requestAnimationFrame(_revealApp)));
+            });
+        } else {
+            _revealApp(); // preview-gated page: show the gate immediately
         }
     </script>
     <script>
