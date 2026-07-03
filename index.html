@@ -3832,27 +3832,37 @@
                 return section;
             }
 
+            // Sentinel for the virtual "3D" category (banner + all AR/3D dishes). It is
+            // display-only: 3D dishes keep their real category, and both cards share the
+            // same globalIdx, so basket/AR/analytics treat them as one item. A sentinel
+            // (not the literal name "3D") so it can never collide with a real category.
+            const AR_CAT = '__ar3d';
+
+            function renderARFeaturedBlock(parent) {
+                const arEntries = items
+                    .map((item, globalIdx) => ({ item, globalIdx }))
+                    .filter(({ item }) => _isAREnabledMenuItem(item));
+                if (!arEntries.length) return;
+                parent.appendChild(renderARFeaturedBanner());
+                arEntries.forEach(({ item, globalIdx }) => parent.appendChild(renderMenuCard(item, globalIdx, true)));
+            }
+
             function renderMenuList(cat = '') {
                 list.innerHTML = '';
 
-                if (cat) {
+                if (cat === AR_CAT) {
+                    renderARFeaturedBlock(list);
+                } else if (cat) {
                     const selected = categoryMap.get(cat);
                     if (selected) {
                         list.appendChild(renderCategorySection(selected, selected.items, true));
                     }
                 } else {
-                    const arEntries = items
-                        .map((item, globalIdx) => ({ item, globalIdx }))
-                        .filter(({ item }) => _isAREnabledMenuItem(item));
-                    if (arEntries.length) {
-                        list.appendChild(renderARFeaturedBanner());
-                        arEntries.forEach(({ item, globalIdx }) => list.appendChild(renderMenuCard(item, globalIdx, true)));
-                    }
+                    renderARFeaturedBlock(list);
+                    // Every category keeps ALL its items (3D ones included), in menu order —
+                    // a 3D dish appears both in the virtual 3D block above and here.
                     categories.forEach(catEntry => {
-                        const regularEntries = catEntry.items.filter(({ item }) => !_isAREnabledMenuItem(item));
-                        if (regularEntries.length) {
-                            list.appendChild(renderCategorySection(catEntry, regularEntries, false));
-                        }
+                        list.appendChild(renderCategorySection(catEntry, catEntry.items, false));
                     });
                 }
 
@@ -3871,6 +3881,15 @@
             allPill.dataset.catKa = '';
             allPill.textContent   = window.__lang === 'ka' ? 'ყველა' : 'All';
             filterDiv.appendChild(allPill);
+
+            if (items.some(item => _isAREnabledMenuItem(item))) {
+                const arPill = document.createElement('button');
+                arPill.className    = 'cat-pill';
+                arPill.dataset.cat  = AR_CAT;
+                arPill.dataset.catKa = '3D';
+                arPill.textContent  = '3D';
+                filterDiv.appendChild(arPill);
+            }
 
             categories.forEach(cat => {
                 const pill = document.createElement('button');
@@ -3894,7 +3913,7 @@
             filterDiv.addEventListener('click', e => {
                 const pill = e.target.closest('.cat-pill');
                 if (pill) {
-                    track('category_filter', null, { category: pill.dataset.cat || 'All' });
+                    track('category_filter', null, { category: pill.dataset.cat === AR_CAT ? '3D' : (pill.dataset.cat || 'All') });
                     applyFilter(pill.dataset.cat);
                 }
             });
@@ -3904,6 +3923,8 @@
                 document.querySelectorAll('.cat-pill').forEach(p => {
                     if (p.dataset.cat === '') {
                         p.textContent = lang === 'ka' ? 'ყველა' : 'All';
+                    } else if (p.dataset.cat === AR_CAT) {
+                        p.textContent = '3D';
                     } else {
                         const name = lang === 'ka' ? p.dataset.catKa : p.dataset.cat;
                         p.textContent = _cleanText(name);
