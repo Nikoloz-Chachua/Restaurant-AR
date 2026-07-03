@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ka" data-theme="night">
+<html lang="ka" data-theme="night" data-template="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -154,8 +154,7 @@
             transition: color var(--t);
             overflow-x: hidden;
         }
-        html:not([data-template]) body,
-        html[data-template=""] body {
+        html:not([data-template]) body {
             opacity: 0;
         }
         html[data-template] body {
