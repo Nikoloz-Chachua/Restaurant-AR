@@ -957,6 +957,48 @@
 
         .cat-section { display: contents; }
 
+        .ar-featured-banner {
+            grid-column: 1 / -1;
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 10px 12px;
+            background:
+                linear-gradient(135deg, var(--glow2), transparent 58%),
+                var(--card-bg);
+            box-shadow: var(--item-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            overflow: hidden;
+        }
+        .ar-featured-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.15rem;
+            letter-spacing: 1.8px;
+            color: var(--accent);
+            line-height: 1;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .ar-featured-copy {
+            color: var(--dim);
+            font-size: 0.7rem;
+            font-weight: 800;
+            line-height: 1.25;
+            text-align: right;
+        }
+
+        .menu-item.ar-featured {
+            border-color: var(--accent);
+            box-shadow: var(--item-hover-shadow);
+        }
+        .menu-item.ar-featured::before {
+            width: 5px;
+            background: var(--cta-bg);
+        }
+
         [data-template="fresh_glass"] {
             --card-blur: 14px;
             --card-radius: 22px;
@@ -2879,6 +2921,7 @@
                 const allPill = document.querySelector('.cat-pill[data-cat=""]');
                 if (allPill) allPill.textContent = lang === 'ka' ? 'ყველა' : 'All';
             }
+            if (typeof window._renderMenuList === 'function') window._renderMenuList();
             if (modal.classList.contains('active')) updateModal();
             const _mArBtn = document.getElementById('modal-ar-btn');
             if (_mArBtn) _mArBtn.textContent = _arButtonLabel(modalItems[modalIndex]);
@@ -2886,6 +2929,13 @@
             document.getElementById('basket-bar-count') && _updateBasketBar();
             if (document.getElementById('basket-panel').style.display !== 'none') _renderBasketPanel();
             document.querySelectorAll('.qty-ctrl').forEach(ctrl => _syncQtyCtrl(ctrl.dataset.idx));
+        }
+
+        function _applyHeadingFontToMenu() {
+            const cfg = _themeConfig || {};
+            if (!cfg.font_heading) return;
+            document.querySelectorAll('.restaurant-name, .item-name, .category-header, .badge-3d, .ar-featured-title')
+                .forEach(el => { el.style.fontFamily = `'${cfg.font_heading}', sans-serif`; });
         }
 
         document.getElementById('lang-toggle').addEventListener('click', () => {
@@ -3173,6 +3223,10 @@
 
         function _hasModel(item) {
             return !!_safeModelUrl(item);
+        }
+
+        function _isAREnabledMenuItem(item) {
+            return item?.is_3d !== false && _hasModel(item);
         }
 
         function _canLikelyAR(item, cap = window.__arCap) {
@@ -3538,8 +3592,7 @@
                     link.rel  = 'stylesheet';
                     link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(cfg.font_heading)}&display=swap`;
                     document.head.appendChild(link);
-                    document.querySelectorAll('.restaurant-name, .item-name, .category-header, .badge-3d')
-                        .forEach(el => { el.style.fontFamily = `'${cfg.font_heading}', sans-serif`; });
+                    _applyHeadingFontToMenu();
                 }
                 // Branding
                 _applyBrandTitle();
@@ -3646,7 +3699,8 @@
             // Fallback for a genuinely idle visitor (past the audit window): bring it to life anyway.
             setTimeout(_kickHeavy, 10000);
 
-            // Group by category, preserving order from JSON
+            // Group by category, preserving source order. AR/3D-enabled means the same
+            // valid model-backed item that already receives a live 3D thumbnail + AR button.
             const categories = [];
             window.__categories = categories;
             const categoryMap = new Map();
@@ -3662,93 +3716,150 @@
 
             const list = document.getElementById('menu-list');
 
-            categories.forEach(cat => {
-                const catItems = cat.items.map(e => e.item);
+            function _arFeaturedText() {
+                return window.__lang === 'ka'
+                    ? { title: 'AR / 3D კერძები', copy: 'ნახე მაგიდაზე ან 3D-ში' }
+                    : { title: 'AR / 3D items', copy: 'View them on your table or in 3D' };
+            }
 
-                const section = document.createElement('div');
-                section.className = 'cat-section';
-                section.dataset.cat = cat.name;
+            function renderARFeaturedBanner() {
+                const text = _arFeaturedText();
+                const banner = document.createElement('div');
+                banner.className = 'ar-featured-banner';
+                banner.innerHTML = `
+                    <span class="ar-featured-title">${_escapeHtml(text.title)}</span>
+                    <span class="ar-featured-copy">${_escapeHtml(text.copy)}</span>`;
+                return banner;
+            }
 
+            function renderCategoryHeader(cat) {
                 const header = document.createElement('div');
                 header.className = 'category-header';
                 header.dataset.catName   = cat.name;
                 header.dataset.catNameKa = cat.name_ka;
                 header.textContent = _cleanText(window.__lang === 'ka' ? cat.name_ka : cat.name);
-                section.appendChild(header);
+                return header;
+            }
 
-                cat.items.forEach(({ item, globalIdx }, localIdx) => {
-                    const card = document.createElement('div');
-                    card.className = 'menu-item';
-                    const thumbSrc = _safeAssetUrl(item.thumbnail_url);
-                    // A non-3D item (is_3d === false) or an item with no model renders as a
-                    // plain photo card: no 3D badge, no live-3D thumbnail upgrade, no AR button.
-                    const has3d = item.is_3d !== false && !!_safeAssetUrl(item.model);
-                    const modelSrc = has3d ? _safeAssetUrl(item.model) : '';
-                    const itemName = t(item, 'name');
-                    const itemNameHtml = _escapeHtml(itemName);
-                    const itemDescHtml = _escapeHtml(t(item, 'description'));
-                    const itemPriceHtml = _escapeHtml(item.price);
-                    card.innerHTML = `
-                        <p class="item-name" data-field="name" data-idx="${globalIdx}">${itemNameHtml}</p>
-                        <div class="item-left">
-                            <div class="thumb-wrap">
-                                <img class="thumb-img"${thumbSrc ? ` src="${thumbSrc}"` : ''} data-model="${modelSrc}" alt="${itemNameHtml}" loading="lazy" onerror="this.style.visibility='hidden'">
-                                <div class="thumb-vignette"></div>
-                                ${modelSrc ? '<span class="badge-3d">3D</span>' : ''}
-                            </div>
+            function renderMenuCard(item, globalIdx, promoted = false) {
+                const card = document.createElement('div');
+                card.className = promoted ? 'menu-item ar-featured' : 'menu-item';
+                const thumbSrc = _safeAssetUrl(item.thumbnail_url);
+                // A non-3D item (is_3d === false) or an item with no model renders as a
+                // plain photo card: no 3D badge, no live-3D thumbnail upgrade, no AR button.
+                const has3d = _isAREnabledMenuItem(item);
+                const modelSrc = has3d ? _safeAssetUrl(item.model) : '';
+                const itemName = t(item, 'name');
+                const itemNameHtml = _escapeHtml(itemName);
+                const itemDescHtml = _escapeHtml(t(item, 'description'));
+                const itemPriceHtml = _escapeHtml(item.price);
+                card.innerHTML = `
+                    <p class="item-name" data-field="name" data-idx="${globalIdx}">${itemNameHtml}</p>
+                    <div class="item-left">
+                        <div class="thumb-wrap">
+                            <img class="thumb-img"${thumbSrc ? ` src="${thumbSrc}"` : ''} data-model="${modelSrc}" alt="${itemNameHtml}" loading="lazy" onerror="this.style.visibility='hidden'">
+                            <div class="thumb-vignette"></div>
+                            ${modelSrc ? '<span class="badge-3d">3D</span>' : ''}
                         </div>
-                        <div class="item-right">
-                            <p class="ingredients" data-field="description" data-idx="${globalIdx}">${itemDescHtml}</p>
-                            <div class="item-actions">
-                                <p class="price">${itemPriceHtml}</p>
-                                <div class="qty-ctrl" data-idx="${globalIdx}">
-                                    <button class="qty-add-btn" aria-label="Add to basket"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
-                                    <div class="qty-stepper">
-                                        <button class="qty-dec">&#8722;</button>
-                                        <span class="qty-num">1</span>
-                                        <button class="qty-inc">+</button>
-                                    </div>
+                    </div>
+                    <div class="item-right">
+                        <p class="ingredients" data-field="description" data-idx="${globalIdx}">${itemDescHtml}</p>
+                        <div class="item-actions">
+                            <p class="price">${itemPriceHtml}</p>
+                            <div class="qty-ctrl" data-idx="${globalIdx}">
+                                <button class="qty-add-btn" aria-label="Add to basket"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+                                <div class="qty-stepper">
+                                    <button class="qty-dec">&#8722;</button>
+                                    <span class="qty-num">1</span>
+                                    <button class="qty-inc">+</button>
                                 </div>
                             </div>
-                            ${has3d ? `<button class="ar-btn" data-idx="${globalIdx}">${_arButtonLabel(item)}</button>` : ''}
-                        </div>`;
+                        </div>
+                        ${has3d ? `<button class="ar-btn" data-idx="${globalIdx}">${_arButtonLabel(item)}</button>` : ''}
+                    </div>`;
 
-                    // Thumbnail starts as a poster <img>; it upgrades to live 3D on idle
-                    // (see _startThumbUpgrades). globalIdx is stashed for the upgrade's tap handler.
-                    const thumbImg = card.querySelector('.thumb-img');
-                    if (thumbImg) {
-                        thumbImg.dataset.globalIdx = globalIdx;
-                        if (has3d) {
-                            thumbImg.addEventListener('click', () => openModal(globalIdx, menuItems));
-                        } else if (thumbSrc) {
-                            // Photo-only item: tap the image to expand it fullscreen.
-                            // Scoped to the Monday Greens template (checked at click time,
-                            // after the remote theme has set data-template).
-                            thumbImg.addEventListener('click', e => {
-                                if (document.documentElement.dataset.template !== 'monday_greens') return;
-                                e.stopPropagation();
-                                openLightbox(thumbSrc, itemName);
-                            });
-                        }
-                    }
-
-                    // 3D preview + AR are only wired for 3D items. Non-3D items stay plain
-                    // photo cards; their basket controls below still work.
+                // Thumbnail starts as a poster <img>; it upgrades to live 3D on idle
+                // (see _startThumbUpgrades). globalIdx is stashed for the upgrade's tap handler.
+                const thumbImg = card.querySelector('.thumb-img');
+                if (thumbImg) {
+                    thumbImg.dataset.globalIdx = globalIdx;
                     if (has3d) {
-                        card.querySelector('.item-right').addEventListener('click', () => openModal(globalIdx, menuItems));
-                        card.querySelector('.item-name').addEventListener('click', () => openModal(globalIdx, menuItems));
-                        card.querySelector('.ar-btn')?.addEventListener('click', e => { e.stopPropagation(); openAR(globalIdx, menuItems); });
+                        thumbImg.addEventListener('click', () => openModal(globalIdx, menuItems));
+                    } else if (thumbSrc) {
+                        // Photo-only item: tap the image to expand it fullscreen.
+                        // Scoped to the Monday Greens template (checked at click time,
+                        // after the remote theme has set data-template).
+                        thumbImg.addEventListener('click', e => {
+                            if (document.documentElement.dataset.template !== 'monday_greens') return;
+                            e.stopPropagation();
+                            openLightbox(thumbSrc, itemName);
+                        });
                     }
-                    const qCtrl = card.querySelector('.qty-ctrl');
-                    qCtrl.querySelector('.qty-add-btn').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
-                    qCtrl.querySelector('.qty-dec').addEventListener('click', e => { e.stopPropagation(); const en = _basket.get(String(globalIdx)); if (en) _setQty(String(globalIdx), en.qty - 1); });
-                    qCtrl.querySelector('.qty-inc').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
+                }
 
-                    section.appendChild(card);
-                });
+                // 3D preview + AR are only wired for 3D items. Non-3D items stay plain
+                // photo cards; their basket controls below still work.
+                if (has3d) {
+                    card.querySelector('.item-right').addEventListener('click', () => openModal(globalIdx, menuItems));
+                    card.querySelector('.item-name').addEventListener('click', () => openModal(globalIdx, menuItems));
+                    card.querySelector('.ar-btn')?.addEventListener('click', e => { e.stopPropagation(); openAR(globalIdx, menuItems); });
+                }
+                const qCtrl = card.querySelector('.qty-ctrl');
+                qCtrl.querySelector('.qty-add-btn').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
+                qCtrl.querySelector('.qty-dec').addEventListener('click', e => { e.stopPropagation(); const en = _basket.get(String(globalIdx)); if (en) _setQty(String(globalIdx), en.qty - 1); });
+                qCtrl.querySelector('.qty-inc').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
 
-                list.appendChild(section);
-            });
+                return card;
+            }
+
+            function appendPrioritizedItems(entries, parent, promoted) {
+                const arEntries = entries.filter(({ item }) => _isAREnabledMenuItem(item));
+                const regularEntries = entries.filter(({ item }) => !_isAREnabledMenuItem(item));
+                arEntries.forEach(({ item, globalIdx }) => parent.appendChild(renderMenuCard(item, globalIdx, promoted)));
+                regularEntries.forEach(({ item, globalIdx }) => parent.appendChild(renderMenuCard(item, globalIdx, false)));
+            }
+
+            function renderCategorySection(cat, entries, prioritizeAR) {
+                const section = document.createElement('div');
+                section.className = 'cat-section';
+                section.dataset.cat = cat.name;
+                section.appendChild(renderCategoryHeader(cat));
+                if (prioritizeAR) {
+                    appendPrioritizedItems(entries, section, true);
+                } else {
+                    entries.forEach(({ item, globalIdx }) => section.appendChild(renderMenuCard(item, globalIdx, false)));
+                }
+                return section;
+            }
+
+            function renderMenuList(cat = '') {
+                list.innerHTML = '';
+
+                if (cat) {
+                    const selected = categoryMap.get(cat);
+                    if (selected) {
+                        list.appendChild(renderCategorySection(selected, selected.items, true));
+                    }
+                } else {
+                    const arEntries = items
+                        .map((item, globalIdx) => ({ item, globalIdx }))
+                        .filter(({ item }) => _isAREnabledMenuItem(item));
+                    if (arEntries.length) {
+                        list.appendChild(renderARFeaturedBanner());
+                        arEntries.forEach(({ item, globalIdx }) => list.appendChild(renderMenuCard(item, globalIdx, true)));
+                    }
+                    categories.forEach(catEntry => {
+                        const regularEntries = catEntry.items.filter(({ item }) => !_isAREnabledMenuItem(item));
+                        if (regularEntries.length) {
+                            list.appendChild(renderCategorySection(catEntry, regularEntries, false));
+                        }
+                    });
+                }
+
+                document.querySelectorAll('.qty-ctrl').forEach(ctrl => _syncQtyCtrl(ctrl.dataset.idx));
+                _applyHeadingFontToMenu();
+                if (_heavyKicked) _startThumbUpgrades();
+            }
 
             // ── Category filter pills ──────────────────────────────────
             const filterDiv = document.getElementById('cat-filter');
@@ -3776,9 +3887,8 @@
                 document.querySelectorAll('.cat-pill').forEach(p =>
                     p.classList.toggle('active', p.dataset.cat === cat)
                 );
-                document.querySelectorAll('.cat-section').forEach(s => {
-                    s.style.display = (cat === '' || s.dataset.cat === cat) ? '' : 'none';
-                });
+                renderMenuList(cat);
+                setARButtonsState(false);
             }
 
             filterDiv.addEventListener('click', e => {
@@ -3800,6 +3910,9 @@
                     }
                 });
             };
+            window._renderMenuList = () => renderMenuList(_activeFilter);
+
+            renderMenuList();
 
             applyLang(window.__lang);
 
