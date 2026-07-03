@@ -11,6 +11,10 @@ type MenuItem = {
   price: string; category_id: number | null; model: string; model_usdz: string
   sort_order: number; visible: boolean; ar_scale: number; thumbnail_url: string; thumb_3d: boolean; is_3d: boolean
 }
+type MenuItemPayload = Partial<Omit<MenuItem, 'id'>> & Pick<
+  Omit<MenuItem, 'id'>,
+  'name_en' | 'name_ka' | 'description_en' | 'description_ka' | 'price' | 'category_id' | 'sort_order' | 'visible' | 'thumbnail_url'
+>
 const EMPTY_ITEM: Omit<MenuItem, 'id'> = {
   name_en: '', name_ka: '', description_en: '', description_ka: '',
   price: '', category_id: null, model: '', model_usdz: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '', thumb_3d: false, is_3d: true,
@@ -93,6 +97,32 @@ export default function MenuPage() {
     return maxSortOrder + 1
   }
 
+  function itemPayloadForSave(base: Omit<MenuItem, 'id'>): MenuItemPayload {
+    if (plan.canUploadModels) return base
+
+    const payload: MenuItemPayload = {
+      name_en: base.name_en,
+      name_ka: base.name_ka,
+      description_en: base.description_en,
+      description_ka: base.description_ka,
+      price: base.price,
+      category_id: base.category_id,
+      sort_order: base.sort_order,
+      visible: base.visible,
+      thumbnail_url: base.thumbnail_url,
+    }
+
+    if (!editItem) {
+      payload.is_3d = false
+      payload.model = ''
+      payload.model_usdz = ''
+      payload.thumb_3d = false
+      payload.ar_scale = 1.0
+    }
+
+    return payload
+  }
+
   function openNewItem() {
     const categoryId = categories[0]?.id ?? null
     setEditItem(null)
@@ -125,9 +155,10 @@ export default function MenuPage() {
       return
     }
     setSaving(true)
-    const payload = editItem || sortOrderTouched
+    const nextItemForm = editItem || sortOrderTouched
       ? itemForm
       : { ...itemForm, sort_order: nextSortOrderForCategory(itemForm.category_id) }
+    const payload = itemPayloadForSave(nextItemForm)
     if (editItem) {
       await supabase.from('menu_items').update(payload).eq('id', editItem.id).eq('restaurant_id', plan.restaurantId)
     } else {
@@ -153,11 +184,25 @@ export default function MenuPage() {
     setCatModal(true)
   }
   async function saveCat() {
+    if (!plan.restaurantId) {
+      flash('No restaurant is mapped to this account.')
+      return
+    }
     setSaving(true)
-    if (editCat) {
-      await supabase.from('categories').update(catForm).eq('id', editCat.id).eq('restaurant_id', plan.restaurantId)
-    } else {
-      await supabase.from('categories').insert({ ...catForm, restaurant_id: plan.restaurantId })
+    const res = await fetch('/api/categories/reorder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: editCat?.id ?? null,
+        restaurantId: plan.restaurantId,
+        ...catForm,
+      }),
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => null) as { error?: string } | null
+      setSaving(false)
+      flash(data?.error || 'Category could not be saved.')
+      return
     }
     setSaving(false); setCatModal(false); await load()
     flash(editCat ? T.catUpdated : T.catAdded)
@@ -407,7 +452,7 @@ export default function MenuPage() {
             <table className="w-full text-sm" style={{ minWidth: '420px' }}>
               <thead>
                 <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
-                  {[T.nameEn, T.nameKa, T.colSortOrder, T.colItems, ''].map((h, i) => (
+                  {[T.nameEn, T.nameKa, T.colMenuOrder, T.colItems, ''].map((h, i) => (
                     <th key={i} className="px-4 py-3 text-left font-medium"
                         style={{ color: 'var(--dim)' }}>{h}</th>
                   ))}
@@ -516,11 +561,15 @@ export default function MenuPage() {
               </p>
             </Field>
             {plan.canUploadModels && (
-              <Field label={T.is3dLabel} className="col-span-2">
+              <Field label={T.pictureOnlyLabel} className="col-span-2">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={itemForm.is_3d} style={{ width: 'auto' }}
-                         onChange={e => setItemForm(f => ({ ...f, is_3d: e.target.checked }))} />
-                  <span className="text-sm" style={{ color: 'var(--dim)' }}>{T.is3dHint}</span>
+                  <input type="checkbox" checked={!itemForm.is_3d} style={{ width: 'auto' }}
+                         onChange={e => setItemForm(f => ({
+                           ...f,
+                           is_3d: !e.target.checked,
+                           thumb_3d: e.target.checked ? false : f.thumb_3d,
+                         }))} />
+                  <span className="text-sm" style={{ color: 'var(--dim)' }}>{T.pictureOnlyHint}</span>
                 </label>
               </Field>
             )}
@@ -615,7 +664,7 @@ export default function MenuPage() {
                 </p>
               </div>
             </Field>
-            {plan.canUploadModels && itemForm.thumbnail_url && (
+            {plan.canUploadModels && itemForm.is_3d && itemForm.thumbnail_url && (
               <Field label={T.thumb3dLabel} className="col-span-2">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={itemForm.thumb_3d} style={{ width: 'auto' }}
@@ -685,9 +734,10 @@ export default function MenuPage() {
             <Field label={T.nameKa}>
               <input value={catForm.name_ka} onChange={e => setCatForm(f => ({ ...f, name_ka: e.target.value }))} />
             </Field>
-            <Field label={T.sortOrder}>
-              <input type="number" value={catForm.sort_order}
+            <Field label={T.categoryMenuOrder}>
+              <input type="number" min="1" step="1" value={catForm.sort_order}
                      onChange={e => setCatForm(f => ({ ...f, sort_order: Number(e.target.value) }))} />
+              <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>{T.categoryMenuOrderHint}</p>
             </Field>
           </div>
           <div className="flex justify-end gap-3 mt-6">

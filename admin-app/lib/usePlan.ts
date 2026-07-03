@@ -184,14 +184,14 @@ export function usePlan(): PlanAccess {
             .order('created_at')
             .limit(1)
           const restaurant = restaurants?.[0]
-          role = 'brand_owner'
+          if (!isSuperAdmin) role = 'brand_owner'
           platformPlan = normalizePlatformPlan(brand?.plan)
           if (restaurant) await setTenantFromRestaurant(restaurant)
         } else if (!tenant.restaurantId && restaurantMemberships[0]?.restaurants) {
           const restaurant = (Array.isArray(restaurantMemberships[0].restaurants) ? restaurantMemberships[0].restaurants[0] : restaurantMemberships[0].restaurants) as {
             id: number; slug: string; name: string; brand_id: number; brands?: { plan?: string } | { plan?: string }[]
           }
-          role = normalizeRole(restaurantMemberships[0].role)
+          if (!isSuperAdmin) role = normalizeRole(restaurantMemberships[0].role)
           await setTenantFromRestaurant(restaurant)
         }
       }
