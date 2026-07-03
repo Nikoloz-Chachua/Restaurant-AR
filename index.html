@@ -1482,84 +1482,6 @@
         #modal-ar-btn:active  { opacity: 0.7; transition: opacity 0.08s; }
         #modal-ar-btn:disabled { opacity: 0.45; cursor: wait; }
 
-        body.preview-locked {
-            min-height: 100svh;
-            padding: 0;
-            overflow: hidden;
-        }
-        .preview-lock {
-            position: fixed;
-            inset: 0;
-            z-index: 50000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 28px;
-            background:
-                radial-gradient(80% 48% at 50% 20%, var(--glow) 0%, transparent 62%),
-                linear-gradient(175deg, var(--bg) 0%, var(--bg2) 62%, var(--bg) 100%);
-            color: var(--text);
-            text-align: center;
-        }
-        .preview-lock__box {
-            width: min(100%, 360px);
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            box-shadow: var(--item-shadow);
-            padding: 28px 22px 24px;
-        }
-        .preview-lock__title {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 2rem;
-            letter-spacing: 4px;
-            color: var(--accent);
-            line-height: 1;
-        }
-        .preview-lock__text {
-            margin-top: 12px;
-            color: var(--dim);
-            font-size: 0.86rem;
-            line-height: 1.45;
-        }
-        .preview-lock__input {
-            width: 100%;
-            min-height: 46px;
-            margin-top: 22px;
-            padding: 0 14px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: var(--thumb-bg);
-            color: var(--text);
-            font: 700 0.94rem 'Nunito', sans-serif;
-            outline: none;
-        }
-        .preview-lock__input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--glow);
-        }
-        .preview-lock__button {
-            width: 100%;
-            min-height: 46px;
-            margin-top: 12px;
-            border: 0;
-            border-radius: 12px;
-            background: var(--cta-bg);
-            color: var(--accent-text);
-            box-shadow: var(--cta-shadow);
-            cursor: pointer;
-            font: 800 0.76rem 'Nunito', sans-serif;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .preview-lock__error {
-            min-height: 18px;
-            margin-top: 10px;
-            color: var(--accent);
-            font-size: 0.78rem;
-            font-weight: 800;
-        }
-
     </style>
     <!-- ── Anti-FOUC cloak ───────────────────────────────────────────
          The page ships with default night/empty-template markup and only
@@ -2633,77 +2555,12 @@
             const link = document.getElementById('app-favicon') || document.querySelector('link[rel~="icon"]');
             if (link) link.href = _FAVICON_BY_TENANT_SLUG[slug] || _DEFAULT_FAVICON;
         }
-        const _PREVIEW_TOKEN = 'mg-preview-2026';
-        const _PREVIEW_ACCESS_KEY_PREFIX = 'bl-preview-access:';
-        function _isPrivatePreviewSlug(slug) {
-            return slug === 'monday-greens-staging' || /-(staging|private)$/.test(slug || '');
-        }
-        function _previewAccessKey(slug) {
-            return _PREVIEW_ACCESS_KEY_PREFIX + slug;
-        }
-        function _getPreviewAccess(slug) {
-            try { return localStorage.getItem(_previewAccessKey(slug)) === '1'; } catch (_) { return false; }
-        }
-        function _setPreviewAccess(slug) {
-            try { localStorage.setItem(_previewAccessKey(slug), '1'); } catch (_) {}
-        }
-        function _removePreviewParam() {
-            try {
-                const url = new URL(location.href);
-                if (!url.searchParams.has('preview')) return;
-                url.searchParams.delete('preview');
-                history.replaceState(null, '', url.pathname + url.search + url.hash);
-            } catch (_) {}
-        }
-        function _renderPreviewLock(slug) {
-            document.documentElement.dataset.template = '';
-            document.body.classList.add('preview-locked');
-            const lock = document.createElement('main');
-            lock.className = 'preview-lock';
-            lock.innerHTML =
-                '<div class="preview-lock__box">' +
-                    '<div class="preview-lock__title">Private Preview</div>' +
-                    '<p class="preview-lock__text">This staging menu is locked. Enter the preview token to continue.</p>' +
-                    '<input class="preview-lock__input" id="preview-token-input" type="password" autocomplete="current-password" placeholder="Preview token" aria-label="Preview token">' +
-                    '<button class="preview-lock__button" id="preview-unlock-button" type="button">Unlock</button>' +
-                    '<div class="preview-lock__error" id="preview-lock-error" role="status" aria-live="polite"></div>' +
-                '</div>';
-            document.body.appendChild(lock);
-            const input = document.getElementById('preview-token-input');
-            const error = document.getElementById('preview-lock-error');
-            const unlock = () => {
-                if ((input.value || '').trim() === _PREVIEW_TOKEN) {
-                    _setPreviewAccess(slug);
-                    _removePreviewParam();
-                    location.reload();
-                    return;
-                }
-                error.textContent = 'Token did not match.';
-                input.select();
-            };
-            document.getElementById('preview-unlock-button').addEventListener('click', unlock);
-            input.addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
-            setTimeout(() => input.focus(), 0);
-        }
-        function _ensurePreviewAccess(slug) {
-            if (!_isPrivatePreviewSlug(slug)) return true;
-            const params = new URLSearchParams(location.search);
-            if (params.get('preview') === _PREVIEW_TOKEN) {
-                _setPreviewAccess(slug);
-                _removePreviewParam();
-                return true;
-            }
-            if (_getPreviewAccess(slug)) return true;
-            _renderPreviewLock(slug);
-            return false;
-        }
         const _requestedTenantSlug = _tenantSlugFromHost();
-        const _previewAccessAllowed = _ensurePreviewAccess(_requestedTenantSlug);
+        const _previewAccessAllowed = true;
         _applyTenantFavicon(_requestedTenantSlug);
         async function _resolveTenant() {
             if (_tenant) return _tenant;
             const slug = _tenantSlugFromHost();
-            if (!_ensurePreviewAccess(slug)) throw new Error('preview access required');
             const isDefaultHost = Boolean(_DEFAULT_RESTAURANT_SLUG) && slug === _DEFAULT_RESTAURANT_SLUG;
             const query = slug
                 ? `restaurants?select=id,slug,name,brand_id,brands(id,slug,name,plan)&slug=eq.${encodeURIComponent(slug)}&limit=1`
