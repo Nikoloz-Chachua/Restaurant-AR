@@ -3066,6 +3066,9 @@
             const posterUrl = _safeAssetUrl(item.thumbnail_url);
             if (posterUrl) modalViewer.setAttribute('poster', posterUrl);
             else modalViewer.removeAttribute('poster');
+            const modalOrbit = _itemCameraOrbit(item);
+            if (modalOrbit) modalViewer.setAttribute('camera-orbit', modalOrbit);
+            else modalViewer.removeAttribute('camera-orbit');
             _ensureModelViewer().then(() => { modalViewer.src = _safeAssetUrl(item.model) || ''; });
             modalTitle.textContent = t(item, 'name');
             document.getElementById('modal-title-d').textContent = t(item, 'name');
@@ -3227,6 +3230,20 @@
 
         function _isAREnabledMenuItem(item) {
             return item?.is_3d !== false && _hasModel(item);
+        }
+
+        // Admin-set starting camera view for an item's 3D thumbnail/modal. Stored in
+        // theme_config as `item_view_<itemId>` = "h v zoom" (degrees, degrees, percent)
+        // and returned as a model-viewer camera-orbit string. Empty string = default view.
+        function _itemCameraOrbit(item) {
+            const raw = (item && item.id != null) ? _themeConfig['item_view_' + item.id] : '';
+            if (!raw) return '';
+            const p = String(raw).trim().split(/\s+/).map(Number);
+            if (p.length !== 3 || p.some(n => !isFinite(n))) return '';
+            const h = Math.max(-360, Math.min(360, p[0]));
+            const v = Math.max(0, Math.min(85, p[1]));
+            const zoom = Math.max(30, Math.min(300, p[2]));
+            return `${h}deg ${v}deg ${zoom}%`;
         }
 
         function _canLikelyAR(item, cap = window.__arCap) {
@@ -3489,6 +3506,8 @@
                 mv.setAttribute('interaction-prompt', 'none');
                 mv.setAttribute('min-camera-orbit', 'auto 0deg auto');
                 mv.setAttribute('max-camera-orbit', 'auto 85deg auto');
+                const orbit = _itemCameraOrbit(menuItems[gIdx]);
+                if (orbit) mv.setAttribute('camera-orbit', orbit);
                 mv.style.cssText = 'position:absolute; inset:0;';
                 wrap.insertBefore(mv, wrap.firstChild);
                 let _px = 0, _py = 0;

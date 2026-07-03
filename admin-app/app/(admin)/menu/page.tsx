@@ -24,6 +24,18 @@ function isActiveArItem(item: Pick<MenuItem, 'visible' | 'model' | 'is_3d'>) {
   return item.visible && item.is_3d && item.model.trim().length > 0
 }
 
+// Per-item starting camera view for the customer 3D thumbnail/preview. Stored in
+// theme_config (key `item_view_<itemId>`, value "h v zoom") — not a menu_items
+// column, so it needs no schema migration. index.html reads the same keys.
+const DEFAULT_ITEM_VIEW = { h: 0, v: 75, zoom: 105 }
+function parseItemView(raw?: string) {
+  const parts = (raw || '').trim().split(/\s+/).map(Number)
+  if (parts.length === 3 && parts.every(n => Number.isFinite(n))) {
+    return { h: parts[0], v: parts[1], zoom: parts[2] }
+  }
+  return { ...DEFAULT_ITEM_VIEW }
+}
+
 export default function MenuPage() {
   const supabase = createClient()
   const [T] = useLang()
@@ -36,6 +48,8 @@ export default function MenuPage() {
   const [itemModal, setItemModal]   = useState(false)
   const [editItem, setEditItem]     = useState<MenuItem | null>(null)
   const [itemForm, setItemForm]     = useState<Omit<MenuItem, 'id'>>(EMPTY_ITEM)
+  const [itemViews, setItemViews]   = useState<Record<number, string>>({})
+  const [viewForm, setViewForm]     = useState({ ...DEFAULT_ITEM_VIEW })
   const [sortOrderTouched, setSortOrderTouched] = useState(false)
   const [saving, setSaving]         = useState(false)
   const [deleteId, setDeleteId]     = useState<number | null>(null)
@@ -61,12 +75,16 @@ export default function MenuPage() {
       return
     }
     setLoading(true)
-    const [{ data: cats }, { data: its }] = await Promise.all([
+    const [{ data: cats }, { data: its }, { data: views }] = await Promise.all([
       supabase.from('categories').select('*').eq('restaurant_id', plan.restaurantId).order('sort_order'),
       supabase.from('menu_items').select('*').eq('restaurant_id', plan.restaurantId).order('category_id').order('sort_order'),
+      supabase.from('theme_config').select('key,value').eq('restaurant_id', plan.restaurantId).like('key', 'item_view_%'),
     ])
     setCategories(cats || [])
     setItems(its || [])
+    setItemViews(Object.fromEntries(
+      (views || []).map(r => [Number(String(r.key).slice('item_view_'.length)), r.value as string])
+    ))
     setLoading(false)
   }, [plan.loading, plan.restaurantId, supabase])
 
@@ -133,6 +151,7 @@ export default function MenuPage() {
       sort_order: nextSortOrderForCategory(categoryId),
       is_3d: plan.canUploadModels,
     })
+    setViewForm({ ...DEFAULT_ITEM_VIEW })
     setItemModal(true)
   }
   function openEditItem(item: MenuItem) {
@@ -143,6 +162,7 @@ export default function MenuPage() {
       price: item.price, category_id: item.category_id, model: item.model, model_usdz: item.model_usdz ?? '',
       sort_order: item.sort_order, visible: item.visible, ar_scale: item.ar_scale ?? 1.0,
       thumbnail_url: item.thumbnail_url ?? '', thumb_3d: item.thumb_3d ?? false, is_3d: item.is_3d ?? true })
+    setViewForm(parseItemView(itemViews[item.id]))
     setItemModal(true)
   }
   async function saveItem() {
@@ -159,10 +179,25 @@ export default function MenuPage() {
       ? itemForm
       : { ...itemForm, sort_order: nextSortOrderForCategory(itemForm.category_id) }
     const payload = itemPayloadForSave(nextItemForm)
+    let savedId: number | null = editItem?.id ?? null
     if (editItem) {
       await supabase.from('menu_items').update(payload).eq('id', editItem.id).eq('restaurant_id', plan.restaurantId)
     } else {
-      await supabase.from('menu_items').insert({ ...payload, restaurant_id: plan.restaurantId })
+      const { data: created } = await supabase.from('menu_items')
+        .insert({ ...payload, restaurant_id: plan.restaurantId }).select('id').single()
+      savedId = created?.id ?? null
+    }
+    if (savedId !== null && plan.canUploadModels) {
+      const viewKey = `item_view_${savedId}`
+      const isDefaultView = viewForm.h === DEFAULT_ITEM_VIEW.h && viewForm.v === DEFAULT_ITEM_VIEW.v && viewForm.zoom === DEFAULT_ITEM_VIEW.zoom
+      if (isDefaultView || !itemForm.is_3d) {
+        await supabase.from('theme_config').delete().eq('restaurant_id', plan.restaurantId).eq('key', viewKey)
+      } else {
+        await supabase.from('theme_config').upsert(
+          { restaurant_id: plan.restaurantId, key: viewKey, value: `${viewForm.h} ${viewForm.v} ${viewForm.zoom}` },
+          { onConflict: 'restaurant_id,key' },
+        )
+      }
     }
     setSaving(false); setItemModal(false); setUploadProgress(''); setThumbProgress(''); await load()
     flash(editItem ? T.itemUpdated : T.itemAdded)
@@ -170,6 +205,7 @@ export default function MenuPage() {
   async function confirmDelete() {
     if (!deleteId) return
     await supabase.from('menu_items').delete().eq('id', deleteId).eq('restaurant_id', plan.restaurantId)
+    await supabase.from('theme_config').delete().eq('restaurant_id', plan.restaurantId).eq('key', `item_view_${deleteId}`)
     setDeleteId(null); await load(); flash(T.itemDeleted)
   }
 
@@ -686,6 +722,28 @@ export default function MenuPage() {
                        value={itemForm.ar_scale}
                        onChange={e => setItemForm(f => ({ ...f, ar_scale: Number(e.target.value) }))} />
                 <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>{T.arScaleHint}</p>
+              </Field>
+            )}
+            {plan.canUploadModels && itemForm.is_3d && (
+              <Field label={T.viewAngle} className="col-span-2">
+                <div className="grid grid-cols-3 gap-3">
+                  <label className="text-xs" style={{ color: 'var(--dim)' }}>
+                    {T.viewAngleH}
+                    <input type="number" min="0" max="360" step="5" value={viewForm.h}
+                           onChange={e => setViewForm(v => ({ ...v, h: Number(e.target.value) }))} />
+                  </label>
+                  <label className="text-xs" style={{ color: 'var(--dim)' }}>
+                    {T.viewAngleV}
+                    <input type="number" min="0" max="85" step="5" value={viewForm.v}
+                           onChange={e => setViewForm(v => ({ ...v, v: Number(e.target.value) }))} />
+                  </label>
+                  <label className="text-xs" style={{ color: 'var(--dim)' }}>
+                    {T.viewAngleZoom}
+                    <input type="number" min="30" max="300" step="5" value={viewForm.zoom}
+                           onChange={e => setViewForm(v => ({ ...v, zoom: Number(e.target.value) }))} />
+                  </label>
+                </div>
+                <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>{T.viewAngleHint}</p>
               </Field>
             )}
             <Field label={T.visibility} className="col-span-2">
