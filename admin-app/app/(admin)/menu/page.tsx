@@ -366,8 +366,6 @@ export default function MenuPage() {
       <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
         <div>
           <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>{T.menuTitle}</h1>
-          {/* TEMP deploy-marker for the Vercel pipeline test — remove once confirmed */}
-          <p className="text-xs font-bold" style={{ color: '#22c55e' }}>BUILD MARKER 2026-07-04 · view-angle build is live</p>
           <p className="text-sm mt-0.5" style={{ color: 'var(--dim)' }}>{T.menuDesc}</p>
           <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
             Tenant: <span style={{ color: 'var(--text)' }}>{plan.restaurantName}</span>
