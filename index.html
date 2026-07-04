@@ -3768,6 +3768,11 @@
                 // plain photo card: no 3D badge, no live-3D thumbnail upgrade, no AR button.
                 const has3d = _isAREnabledMenuItem(item);
                 const modelSrc = has3d ? _safeAssetUrl(item.model) : '';
+                // thumb_3d (admin checkbox "also load 3D model in thumbnail") controls ONLY
+                // the card thumbnail: off = keep the photo (saves bandwidth), on = upgrade to
+                // live 3D. Items with no photo always upgrade so the tile isn't blank. The 3D
+                // badge, tap-to-3D modal, and AR button are unaffected either way.
+                const thumbModelSrc = (has3d && (item.thumb_3d || !thumbSrc)) ? modelSrc : '';
                 const itemName = t(item, 'name');
                 const itemNameHtml = _escapeHtml(itemName);
                 const itemDescHtml = _escapeHtml(t(item, 'description'));
@@ -3776,7 +3781,7 @@
                     <p class="item-name" data-field="name" data-idx="${globalIdx}">${itemNameHtml}</p>
                     <div class="item-left">
                         <div class="thumb-wrap">
-                            <img class="thumb-img"${thumbSrc ? ` src="${thumbSrc}"` : ''} data-model="${modelSrc}" alt="${itemNameHtml}" loading="lazy" onerror="this.style.visibility='hidden'">
+                            <img class="thumb-img"${thumbSrc ? ` src="${thumbSrc}"` : ''} data-model="${thumbModelSrc}" alt="${itemNameHtml}" loading="lazy" onerror="this.style.visibility='hidden'">
                             <div class="thumb-vignette"></div>
                             ${modelSrc ? '<span class="badge-3d">3D</span>' : ''}
                         </div>
