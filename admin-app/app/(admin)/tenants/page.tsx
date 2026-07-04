@@ -124,11 +124,12 @@ function cleanDomain(value: string) {
   return value.trim().replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/\/$/, '').toLowerCase()
 }
 
-function shouldUseCleanTenantDomain(slug: string, status?: string) {
-  if (status && status !== 'active') return false
-  if (!TENANT_DOMAIN_BASE || TENANT_DOMAIN_BASE.includes('localhost')) return false
-  return !/(^|-)dev($|-)|(^|-)local($|-)|(^|-)private($|-)|(^|-)staging($|-)|(^|-)test($|-)/.test(slug)
-}
+// Only subdomains that were manually added as Custom Domains on the Cloudflare
+// Pages project actually resolve; every other *.betareal.ge URL hits Cloudflare
+// error 1014 (CNAME Cross-User Banned) because the DNS zone and the Pages project
+// live in different Cloudflare accounts. Add a slug here ONLY after its subdomain
+// loads in a browser.
+const WORKING_TENANT_SUBDOMAINS = new Set(['rhythm', 'monday-greens'])
 
 function tenantPreviewUrl(restaurant: Pick<Restaurant, 'slug' | 'status' | 'custom_domain'> | string) {
   const slug = typeof restaurant === 'string' ? restaurant : restaurant.slug
@@ -136,7 +137,7 @@ function tenantPreviewUrl(restaurant: Pick<Restaurant, 'slug' | 'status' | 'cust
   if (customDomain && !customDomain.includes('pages.dev') && !customDomain.includes('localhost')) {
     return `https://${customDomain}/`
   }
-  if (shouldUseCleanTenantDomain(slug, typeof restaurant === 'string' ? undefined : restaurant.status)) {
+  if (WORKING_TENANT_SUBDOMAINS.has(slug) && TENANT_DOMAIN_BASE && !TENANT_DOMAIN_BASE.includes('localhost')) {
     return `https://${slug}.${TENANT_DOMAIN_BASE}/`
   }
   return pagesTenantUrl(slug)

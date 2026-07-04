@@ -86,11 +86,16 @@ async function upsertBranchTheme(
   return error?.message ?? ''
 }
 
+// Only subdomains manually whitelisted as Custom Domains on the Cloudflare Pages
+// project resolve; all other *.betareal.ge URLs return Cloudflare error 1014.
+// Keep in sync with WORKING_TENANT_SUBDOMAINS in app/(admin)/tenants/page.tsx.
+const WORKING_TENANT_SUBDOMAINS = new Set(['rhythm', 'monday-greens'])
+
 function branchPreviewUrl(slug: string) {
   if (
+    WORKING_TENANT_SUBDOMAINS.has(slug) &&
     TENANT_DOMAIN_BASE &&
-    !TENANT_DOMAIN_BASE.includes('localhost') &&
-    !/(^|-)dev($|-)|(^|-)local($|-)|(^|-)private($|-)|(^|-)staging($|-)|(^|-)test($|-)/.test(slug)
+    !TENANT_DOMAIN_BASE.includes('localhost')
   ) {
     return `https://${slug}.${TENANT_DOMAIN_BASE}/`
   }
