@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ka" data-theme="night" data-template="">
+<html lang="ka" data-theme="night" data-template="big_sams">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,6 +38,9 @@
          the critical path. display=swap means text shows immediately in a fallback. -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700&display=swap"></noscript>
+    <!-- Big Sam's template fonts: Anton (bold burger display) + Inter (body) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap"></noscript>
     <!-- model-viewer is NOT loaded here. It costs ~250KB + several seconds of main-thread
          eval, and is only needed for the grid's live-3D thumbnails and the tap-to-open 3D
          modal — never for AR (Android = WebXR/Three.js, iOS = native Quick Look). So it is
@@ -139,6 +142,122 @@
                 radial-gradient(130% 100% at 50% 50%, var(--bg2) 0%, var(--modal-bg) 72%);
         }
 
+        /* ══════════════════════════════════════════════════════════════════
+           BIG SAM'S TEMPLATE — baked look for this standalone preview page.
+           Overrides only the base color tokens; every derived token
+           (--card-bg, --cta-bg, --accent-edge, --bg-image …) references these
+           via var(), so the whole app recolors from here. Palette from
+           bigsams.ge: crimson #e6003b on charcoal, warm cream, amber sauce.
+           ══════════════════════════════════════════════════════════════════ */
+        [data-theme="night"] {
+            --bg:#0b0809; --bg2:#17100f; --glow:rgba(230,0,59,0.26); --glow2:rgba(255,122,26,0.16); --shadow:rgba(0,0,0,0.60);
+            --card:#1a1214; --card2:#221619; --border:rgba(230,0,59,0.22); --text:#f6ece9; --dim:#9a8b88;
+            --accent:#e6003b; --accent2:#ff7a1a; --accent-text:#ffffff; --thumb-bg:#120c0e; --modal-bg:#0b0809; --modal-rgb:11,8,9;
+            --card-radius:18px;
+        }
+        [data-theme="day"] {
+            --bg:#f4efe9; --bg2:#e9e0d5; --glow:rgba(230,0,59,0.14); --glow2:rgba(224,106,18,0.10); --shadow:rgba(80,20,30,0.14);
+            --card:#ffffff; --card2:#f6ece0; --border:rgba(230,0,59,0.18); --text:#1a1113; --dim:#8a7a72;
+            --accent:#d1002f; --accent2:#e06a12; --accent-text:#ffffff; --thumb-bg:#f3ece2; --modal-bg:#fbf6ef; --modal-rgb:251,246,239;
+            --card-radius:18px;
+        }
+
+        /* Fonts — Anton for bold display headings, Inter for body, Nunito for
+           Georgian (Anton is Latin-only). */
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        .item-name, .category-header, .ar-featured-title,
+        #modal-title, #modal-title-d, .badge-3d, #brand-title {
+            font-family: 'Anton', 'Bebas Neue', sans-serif;
+            letter-spacing: 0.6px;
+        }
+        html[lang="ka"] .item-name, html[lang="ka"] .category-header,
+        html[lang="ka"] #brand-title, html[lang="ka"] #modal-title,
+        html[lang="ka"] #modal-title-d {
+            font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+            letter-spacing: 0.7px;
+        }
+
+        /* ══════════════════════════════════════════════════════════════════
+           PHONE CARD (≤639px only — desktop/tablet layout is left untouched).
+           Photo dominates the card; below it: name, then add-to-cart + price,
+           then (for 3D items) the AR button. Description is hidden on phone so
+           the image carries the card. The 3D tag already renders on the thumb.
+           ══════════════════════════════════════════════════════════════════ */
+        @media (max-width: 639px) {
+            /* Two items per row — twin-column grid. Category headers and the AR
+               banner span the full width; .cat-section is display:contents (base),
+               so the item cards themselves are the grid children. */
+            [data-template="big_sams"] .menu-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                max-width: 520px;
+                align-items: start;
+            }
+            [data-template="big_sams"] .category-header { grid-column: 1 / -1; }
+
+            [data-template="big_sams"] .menu-item {
+                display: flex;
+                flex-direction: column;
+                padding: 0;
+                overflow: hidden;
+            }
+            [data-template="big_sams"] .item-left { order: 1; width: 100%; }
+            /* Photo carries the card — square image ≈ 60–70% of the card height. */
+            [data-template="big_sams"] .item-left .thumb-wrap,
+            [data-template="big_sams"] .thumb-wrap {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 1 / 1;
+                min-height: unset;
+                border-radius: 14px 14px 0 0;
+                border-bottom: none;
+            }
+            /* 3D tag: compact pill, top-left of the photo */
+            [data-template="big_sams"] .badge-3d {
+                top: 8px; left: 8px; right: auto; bottom: auto;
+                border-radius: 7px;
+                font-size: 0.8rem;
+                padding: 2px 6px 3px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.35), 0 0 14px var(--glow);
+            }
+            /* Name below the photo */
+            [data-template="big_sams"] .item-name {
+                order: 2;
+                padding: 7px 10px 0;
+                font-size: 0.98rem;
+                line-height: 1.12;
+                text-transform: uppercase;
+                color: var(--accent);
+                overflow-wrap: anywhere;
+            }
+            html[lang="ka"] [data-template="big_sams"] .item-name { text-transform: none; }
+            /* Below name: add-to-cart + price, then (3D) the AR button — kept compact */
+            [data-template="big_sams"] .item-right {
+                order: 3;
+                padding: 6px 10px 9px;
+                gap: 6px;
+            }
+            [data-template="big_sams"] .item-right .ingredients { display: none; }
+            [data-template="big_sams"] .item-actions { margin-top: 0; min-height: 0; }
+            [data-template="big_sams"] .price { font-size: 0.92rem; font-weight: 800; }
+            /* Smaller add-to-cart control */
+            [data-template="big_sams"] .qty-add-btn,
+            [data-template="big_sams"] .qty-stepper { width: 28px; height: 28px; border-radius: 8px; }
+            [data-template="big_sams"] .qty-stepper { width: auto; }
+            [data-template="big_sams"] .qty-add-btn svg { width: 14px; height: 14px; }
+            [data-template="big_sams"] .qty-dec,
+            [data-template="big_sams"] .qty-inc { padding: 0 8px; font-size: 0.9rem; }
+            [data-template="big_sams"] .qty-num { font-size: 0.9rem; min-width: 18px; }
+            /* Smaller AR button */
+            [data-template="big_sams"] .ar-btn {
+                width: 100%;
+                padding: 6px;
+                font-size: 0.6rem;
+                border-radius: 8px;
+            }
+        }
+
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         button { touch-action: manipulation; }
 
@@ -152,9 +271,7 @@
             flex-direction: column;
             align-items: center;
             transition: color var(--t);
-            /* clip (not hidden) prevents horizontal scroll WITHOUT creating a
-               scroll container, so position:sticky descendants keep working. */
-            overflow-x: clip;
+            overflow-x: hidden;
         }
         html:not([data-template]) body {
             opacity: 0;
@@ -479,62 +596,6 @@
             color: var(--accent);
             transition: color var(--t);
         }
-
-        /* Per-item add-on options ("Make Double  +6.9 ₾") — tap to select; a selected
-           add-on adds to the basket as its own line with the add-on price included. */
-        .addons {
-            margin-top: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .addon {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            background: transparent;
-            border: none;
-            appearance: none;
-            -webkit-appearance: none;
-            padding: 4px 0;
-            cursor: pointer;
-            font-family: 'Nunito', sans-serif;
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: var(--dim);
-            text-align: left;
-            line-height: 1.25;
-            transition: color 0.15s;
-        }
-        .addon-l { display: flex; align-items: center; gap: 8px; min-width: 0; }
-        .addon-check {
-            width: 16px; height: 16px; flex: 0 0 auto;
-            border: 1.5px solid var(--border);
-            border-radius: 5px;
-            position: relative;
-            transition: background 0.15s, border-color 0.15s;
-        }
-        .addon.selected { color: var(--text); }
-        .addon.selected .addon-check {
-            background: var(--accent);
-            border-color: var(--accent);
-        }
-        .addon.selected .addon-check::after {
-            content: '';
-            position: absolute; left: 4.5px; top: 1px;
-            width: 4px; height: 8px;
-            border: solid #fff; border-width: 0 2px 2px 0;
-            transform: rotate(45deg);
-        }
-        .addon-price {
-            color: var(--accent);
-            font-weight: 800;
-            white-space: nowrap;
-        }
-        .qty-add-btn.just-added { animation: br-pop 0.32s ease; }
-        @keyframes br-pop { 0% { transform: scale(1); } 45% { transform: scale(1.28); } 100% { transform: scale(1); } }
 
         .category-header {
             font-family: 'Bebas Neue', sans-serif;
@@ -989,24 +1050,6 @@
         }
         .cat-filter::-webkit-scrollbar { display: none; }
 
-        /* Sticky category bar — after you scroll past the hero it stays pinned to
-           the top so diners can switch categories at any point. Scoped to the
-           monday_greens skin so other templates are unchanged. */
-        [data-template="monday_greens"] .cat-filter {
-            position: sticky;
-            top: 0;
-            z-index: 30;
-            background: var(--bg);
-            padding-top: 10px;
-            box-shadow: 0 8px 18px -10px var(--shadow, rgba(0,0,0,0.45));
-        }
-        /* Mobile only: the fixed EN / theme toggles (top:14px) live in the same top
-           strip, so drop the pinned pills below them to avoid overlap. The bar's
-           background matches the page bg, so this gap is invisible until it sticks. */
-        @media (max-width: 639px) {
-            [data-template="monday_greens"] .cat-filter { padding-top: 54px; }
-        }
-
         .cat-pill {
             background: var(--pill-bg);
             border: 1px solid var(--border);
@@ -1129,12 +1172,6 @@
             justify-content: center;
             text-align: center;
             overflow: hidden;
-        }
-        /* Hero height. Default = full screen (100svh). A tenant can set theme_config
-           `hero_min_h` (e.g. 56.25vw = true 16:9) so a landscape hero photo shows in
-           full instead of being cropped on tall phone screens. */
-        [data-template="monday_greens"] .mg-hero {
-            min-height: var(--mg-hero-h, 100svh);
         }
         /* The default text title is replaced by branded Monday Greens logos. */
         [data-template="monday_greens"] .header {
@@ -1393,19 +1430,12 @@
             border-bottom: 1px solid var(--border);
             transition: border-color var(--t);
         }
-        .basket-item-info { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
         .basket-item-name {
+            flex: 1;
             font-family: 'Bebas Neue', sans-serif;
             font-size: 1rem;
             letter-spacing: 1px;
             color: var(--accent);
-            transition: color var(--t);
-        }
-        .basket-item-addons {
-            font-family: 'Nunito', sans-serif;
-            font-size: 0.66rem;
-            font-weight: 700;
-            color: var(--dim);
             transition: color var(--t);
         }
         .basket-qty {
@@ -1527,78 +1557,6 @@
         #waiter-qr img  { width: 100%; height: 100%; image-rendering: pixelated; }
         #waiter-overlay-hint {
             margin-top: 16px; font-size: 0.85rem; color: #555; line-height: 1.4;
-        }
-
-        /* ══ Twin phone layout — opt-in per tenant via the admin Theme page
-           (theme_config key `phone_layout` = "twin"). Two photo-forward cards
-           per row on phones: big square image, then name, then price + add-to-
-           cart, then (for 3D items) a small View-on-table button; the 3D tag
-           sits on the photo and the description is hidden to keep cards compact.
-           Everything is gated by [data-phone-layout="twin"] AND the phone
-           breakpoint, so tenants who leave it off — and every desktop/tablet
-           view — are completely unaffected. ══ */
-        @media (max-width: 639px) {
-            [data-phone-layout="twin"] .menu-list {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-                max-width: 520px;
-                align-items: start;
-            }
-            [data-phone-layout="twin"] .category-header { grid-column: 1 / -1; }
-            [data-phone-layout="twin"] .menu-item {
-                display: flex;
-                flex-direction: column;
-                padding: 0;
-                overflow: hidden;
-            }
-            [data-phone-layout="twin"] .item-left { order: 1; width: 100%; }
-            [data-phone-layout="twin"] .item-left .thumb-wrap,
-            [data-phone-layout="twin"] .thumb-wrap {
-                width: 100%;
-                height: auto;
-                aspect-ratio: 1 / 1;      /* big square photo ≈ 60–70% of the card */
-                min-height: unset;
-                border-radius: 14px 14px 0 0;
-                border-bottom: none;
-            }
-            [data-phone-layout="twin"] .badge-3d {
-                top: 8px; left: 8px; right: auto; bottom: auto;
-                border-radius: 7px;
-                font-size: 0.8rem;
-                padding: 2px 6px 3px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.35), 0 0 14px var(--glow);
-            }
-            [data-phone-layout="twin"] .item-name {
-                order: 2;
-                padding: 7px 10px 0;
-                font-size: 0.98rem;
-                line-height: 1.12;
-                overflow-wrap: anywhere;
-            }
-            [data-phone-layout="twin"] .item-right {
-                order: 3;
-                padding: 6px 10px 9px;
-                gap: 6px;
-            }
-            [data-phone-layout="twin"] .item-right .ingredients { display: none; }
-            [data-phone-layout="twin"] .item-actions { margin-top: 0; min-height: 0; }
-            [data-phone-layout="twin"] .price { font-size: 0.92rem; }
-            /* Compact add-to-cart control */
-            [data-phone-layout="twin"] .qty-add-btn,
-            [data-phone-layout="twin"] .qty-stepper { height: 28px; border-radius: 8px; }
-            [data-phone-layout="twin"] .qty-add-btn { width: 28px; }
-            [data-phone-layout="twin"] .qty-add-btn svg { width: 14px; height: 14px; }
-            [data-phone-layout="twin"] .qty-dec,
-            [data-phone-layout="twin"] .qty-inc { padding: 0 8px; font-size: 0.9rem; }
-            [data-phone-layout="twin"] .qty-num { font-size: 0.9rem; min-width: 18px; }
-            /* Smaller "View on table / View in 3D" button */
-            [data-phone-layout="twin"] .ar-btn {
-                width: 100%;
-                padding: 6px;
-                font-size: 0.6rem;
-                border-radius: 8px;
-            }
         }
 
         /* ── Responsive: desktop grid layout ── */
@@ -1782,7 +1740,7 @@
 
     <div class="header">
         <img id="tenant-logo" class="tenant-logo" alt="" decoding="async">
-        <h1 id="brand-title" data-brand>Restaurant Menu</h1>
+        <h1 id="brand-title" data-brand>Big Sam's</h1>
     </div>
 
     <div id="cat-filter" class="cat-filter"></div>
@@ -3043,23 +3001,6 @@
             return _cleanText((window.__lang === 'ka' && item[ka]) ? item[ka] : item[field]);
         }
 
-        // Per-item add-on options (e.g. "Make Double +6.9 ₾"), rendered under the price.
-        // Bilingual: picks ka/en by current language; re-rendered on language toggle
-        // (applyLang calls _renderMenuList). Renders nothing when the item has no add-ons.
-        function _addonsHtml(item, globalIdx) {
-            if (!item.addons || !item.addons.length) return '';
-            const sel = (window.__addonSel && window.__addonSel[globalIdx]) || [];
-            const rows = item.addons.map((a, i) => {
-                const n = _escapeHtml((window.__lang === 'ka' && a.ka) ? a.ka : (a.en || a.ka || ''));
-                const p = _escapeHtml(a.price || '');
-                const on = sel.indexOf(i) >= 0;
-                return `<button type="button" class="addon${on ? ' selected' : ''}" data-ai="${i}" aria-pressed="${on}">`
-                     + `<span class="addon-l"><span class="addon-check" aria-hidden="true"></span><span class="addon-name">${n}</span></span>`
-                     + `<span class="addon-price">+${p}</span></button>`;
-            }).join('');
-            return `<div class="addons">${rows}</div>`;
-        }
-
         function applyLang(lang) {
             window.__lang = lang;
             document.documentElement.lang = lang;
@@ -3718,6 +3659,15 @@
 
         // Fetch theme config from Supabase and apply as CSS overrides
         async function applyRemoteTheme() {
+            // big-sams.html locks the Big Sam's template look (baked into the CSS
+            // above) and must NOT be repainted by any tenant's theme_config. Seed
+            // only the brand title; the live menu still loads in buildMenu() — same
+            // data as index.html. The original theme logic below is kept intact but
+            // unreachable so this file stays an easy diff against index.html.
+            _themeConfig = { site_name: "Big Sam's", site_name_ka: 'ბიგ სემსი' };
+            _applyBrandTitle();
+            return;
+            // eslint-disable-next-line no-unreachable
             try {
                 const tenant = await _resolveTenant();
                 const data = await _supaSelect(`theme_config?select=key,value&restaurant_id=eq.${tenant.restaurant_id}`);
@@ -3765,12 +3715,6 @@
                 }
                 styleEl.textContent = css;
                 document.documentElement.dataset.template = templateKey;
-                // Phone layout option (admin-set): 'twin' shows two photo-forward
-                // cards per row on phones; anything else keeps the default list.
-                // Fully gated by the [data-phone-layout="twin"] attribute + phone
-                // breakpoint, so tenants that don't opt in are unaffected.
-                document.documentElement.dataset.phoneLayout =
-                    cfg.phone_layout === 'twin' ? 'twin' : 'list';
                 // Template/tenant default theme: an explicit `default_theme` token wins;
                 // otherwise Monday Greens tenants default to light. Applied only when the
                 // visitor hasn't toggled the theme themselves, and never persisted (an
@@ -3811,10 +3755,6 @@
                 const heroImg = _safeAssetUrl(cfg.hero_image_url);
                 if (heroImg) {
                     document.documentElement.style.setProperty('--hero-image', `url("${heroImg}")`);
-                }
-                // Optional per-tenant hero height (e.g. "56.25vw" for a full 16:9 banner).
-                if (cfg.hero_min_h) {
-                    document.documentElement.style.setProperty('--mg-hero-h', cfg.hero_min_h);
                 }
                 const heroLogo = document.getElementById('mg-hero-logo');
                 const heroLogoUrl = _safeAssetUrl(cfg.hero_logo_url) || logoUrl;
@@ -3864,7 +3804,6 @@
                             thumbnail_url:  r.thumbnail_url || '',
                             thumb_3d:       r.thumb_3d ?? false,
                             is_3d:          r.is_3d !== false,
-                            addons:         Array.isArray(r.addons) ? r.addons : [],
                         }));
                     } else {
                         // A real resolved tenant with no menu items should stay empty.
@@ -3988,7 +3927,6 @@
                                 </div>
                             </div>
                         </div>
-                        ${_addonsHtml(item, globalIdx)}
                         ${has3d ? `<button class="ar-btn" data-idx="${globalIdx}">${_arButtonLabel(item)}</button>` : ''}
                     </div>`;
 
@@ -4019,37 +3957,9 @@
                     card.querySelector('.ar-btn')?.addEventListener('click', e => { e.stopPropagation(); openAR(globalIdx, menuItems); });
                 }
                 const qCtrl = card.querySelector('.qty-ctrl');
-                const _hasAddons = !!(item.addons && item.addons.length);
-                // Add-on items always add via the "+" button (each add-on combo is its own
-                // basket line, managed in the basket panel); plain items use the stepper.
-                qCtrl.querySelector('.qty-add-btn').addEventListener('click', e => {
-                    e.stopPropagation();
-                    if (_hasAddons) {
-                        const sel = ((window.__addonSel[globalIdx]) || []).slice().sort((a, b) => a - b);
-                        addToBasket(`${globalIdx}#${sel.join(',')}`, item, sel);
-                        const b = e.currentTarget;
-                        b.classList.remove('just-added'); void b.offsetWidth; b.classList.add('just-added');
-                    } else {
-                        addToBasket(String(globalIdx), item);
-                    }
-                });
+                qCtrl.querySelector('.qty-add-btn').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
                 qCtrl.querySelector('.qty-dec').addEventListener('click', e => { e.stopPropagation(); const en = _basket.get(String(globalIdx)); if (en) _setQty(String(globalIdx), en.qty - 1); });
                 qCtrl.querySelector('.qty-inc').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
-
-                // Add-on checkboxes: toggle selection (persisted in __addonSel so it
-                // survives the re-render on language toggle).
-                card.querySelectorAll('.addon').forEach(btn => {
-                    btn.addEventListener('click', e => {
-                        e.stopPropagation();
-                        const ai  = parseInt(btn.dataset.ai, 10);
-                        const arr = window.__addonSel[globalIdx] || (window.__addonSel[globalIdx] = []);
-                        const at  = arr.indexOf(ai);
-                        const on  = at < 0;
-                        if (on) arr.push(ai); else arr.splice(at, 1);
-                        btn.classList.toggle('selected', on);
-                        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-                    });
-                });
 
                 return card;
             }
@@ -4186,9 +4096,8 @@
         }
 
         // ── Basket ─────────────────────────────────────────────────────
-        const _basket = new Map(); // key -> { item, qty, aIdx }  (aIdx = selected add-on indices)
+        const _basket = new Map(); // key = String(globalIdx) -> { item, qty }
         window._basket = _basket;
-        window.__addonSel = window.__addonSel || {}; // globalIdx -> [selected add-on indices]
         const _xrAddedKeys = new Set(); // keys added via XR button (eligible for XR toggle-off)
 
         function _parsePrice(str) {
@@ -4198,15 +4107,9 @@
             const n = Math.round(num * 10) / 10;
             return n + ' ₾';
         }
-        // Unit price of a basket line = item price + any selected add-on prices.
-        function _addonSum(entry) {
-            const list = (entry.item && entry.item.addons) || [];
-            return (entry.aIdx || []).reduce((s, i) => s + _parsePrice(list[i] && list[i].price), 0);
-        }
-        function _lineUnit(entry) { return _parsePrice(entry.item.price) + _addonSum(entry); }
         function _basketTotal() {
             let s = 0;
-            _basket.forEach(entry => { s += _lineUnit(entry) * entry.qty; });
+            _basket.forEach(({ item, qty }) => { s += _parsePrice(item.price) * qty; });
             return s;
         }
         function _basketCount() {
@@ -4246,10 +4149,10 @@
             });
         }
 
-        function addToBasket(key, item, aIdx) {
+        function addToBasket(key, item) {
             const _isNew = !_basket.has(key);
             if (_basket.has(key)) _basket.get(key).qty++;
-            else                   _basket.set(key, { item, qty: 1, aIdx: aIdx || [] });
+            else                   _basket.set(key, { item, qty: 1 });
             if (_isNew) {
                 const _bIdx = parseInt(key, 10);
                 track('basket_add', _bIdx, {
@@ -4284,19 +4187,12 @@
             if (_basket.size === 0) {
                 box.innerHTML = `<p class="basket-empty">${u.emptyBasket}</p>`;
             } else {
-                _basket.forEach((entry, key) => {
-                    const { item, qty, aIdx } = entry;
-                    const line = _lineUnit(entry) * qty;
-                    const addTxt = (aIdx && aIdx.length)
-                        ? aIdx.map(i => { const a = (item.addons || [])[i]; return a ? ((window.__lang === 'ka' && a.ka) ? a.ka : (a.en || a.ka)) : ''; }).filter(Boolean).join(', ')
-                        : '';
+                _basket.forEach(({ item, qty }, key) => {
+                    const line = _parsePrice(item.price) * qty;
                     const row  = document.createElement('div');
                     row.className = 'basket-item';
                     row.innerHTML = `
-                        <div class="basket-item-info">
-                            <span class="basket-item-name">${t(item, 'name')}</span>
-                            ${addTxt ? `<span class="basket-item-addons">+ ${_escapeHtml(addTxt)}</span>` : ''}
-                        </div>
+                        <span class="basket-item-name">${t(item, 'name')}</span>
                         <div class="basket-qty">
                             <button class="qty-btn" data-key="${key}" data-delta="-1">&#8722;</button>
                             <span class="qty-count">${qty}</span>
@@ -4358,9 +4254,9 @@
             if (_basket.size > 0) {
                 const snapshot = [];
                 let total = 0;
-                _basket.forEach((entry) => {
-                    snapshot.push({ name: entry.item.name, qty: entry.qty, price: _fmtPrice(_lineUnit(entry)) });
-                    total += _lineUnit(entry) * entry.qty;
+                _basket.forEach(({ item, qty }) => {
+                    snapshot.push({ name: item.name, qty, price: item.price });
+                    total += _parsePrice(item.price) * qty;
                 });
                 track('basket_clear', null, {
                     item_count: snapshot.length,
@@ -4403,12 +4299,8 @@ document.getElementById('basket-items').addEventListener('click', e => {
 
         function _packOrder() {
             const it = [];
-            _basket.forEach(({ item, qty, aIdx }) => {
-                if (!item || !item.id) return;
-                // [id, qty] or [id, qty, [add-on indices]] — waiter.html resolves the
-                // indices against the live item's addons array.
-                if (aIdx && aIdx.length) it.push([item.id, qty, aIdx]);
-                else it.push([item.id, qty]);
+            _basket.forEach(({ item, qty }) => {
+                if (item && item.id) it.push([item.id, qty]);   // stable DB id, never the fragile index
             });
             const tenant = window.__tenant || {};
             const payload = { v: 1, r: tenant.restaurant_slug || '', ts: Date.now(), it };

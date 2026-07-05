@@ -60,6 +60,7 @@ export default function MenuPage() {
   const [deleteCatId, setDeleteCatId]   = useState<number | null>(null)
 
   const [msg, setMsg] = useState('')
+  const [phoneLayout, setPhoneLayout] = useState<'list' | 'twin'>('list')
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState('')
   const glbInputRef = useRef<HTMLInputElement>(null)
@@ -75,16 +76,18 @@ export default function MenuPage() {
       return
     }
     setLoading(true)
-    const [{ data: cats }, { data: its }, { data: views }] = await Promise.all([
+    const [{ data: cats }, { data: its }, { data: views }, { data: layoutRow }] = await Promise.all([
       supabase.from('categories').select('*').eq('restaurant_id', plan.restaurantId).order('sort_order'),
       supabase.from('menu_items').select('*').eq('restaurant_id', plan.restaurantId).order('category_id').order('sort_order'),
       supabase.from('theme_config').select('key,value').eq('restaurant_id', plan.restaurantId).like('key', 'item_view_%'),
+      supabase.from('theme_config').select('value').eq('restaurant_id', plan.restaurantId).eq('key', 'phone_layout').maybeSingle(),
     ])
     setCategories(cats || [])
     setItems(its || [])
     setItemViews(Object.fromEntries(
       (views || []).map(r => [Number(String(r.key).slice('item_view_'.length)), r.value as string])
     ))
+    setPhoneLayout((layoutRow?.value as string) === 'twin' ? 'twin' : 'list')
     setLoading(false)
   }, [plan.loading, plan.restaurantId, supabase])
 
@@ -98,6 +101,22 @@ export default function MenuPage() {
   }, [itemModal, editItem])
 
   function flash(m: string) { setMsg(m); setTimeout(() => setMsg(''), 3000) }
+
+  // Phone layout toggle. ON = twin (two photo cards per row on phones); OFF =
+  // the default single/list view. Saved immediately to theme_config; the
+  // customer app reads `phone_layout` and only switches when it is "twin", so
+  // desktop and non-twin tenants are unaffected.
+  async function updatePhoneLayout(v: 'list' | 'twin') {
+    if (!plan.restaurantId) return
+    setPhoneLayout(v)
+    const { error } = await supabase.from('theme_config').upsert(
+      { restaurant_id: plan.restaurantId, key: 'phone_layout', value: v },
+      { onConflict: 'restaurant_id,key' },
+    )
+    flash(error ? `Save failed: ${error.message}`
+                : v === 'twin' ? 'Twin phone view on. Reload the live menu to see it.'
+                               : 'Single phone view on.')
+  }
 
   const activeArItemCount = items.filter(isActiveArItem).length
   const itemLimitLabel = plan.itemLimit === null ? 'Unlimited' : String(plan.itemLimit)
@@ -407,6 +426,15 @@ export default function MenuPage() {
                   style={{ background: 'var(--card)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
               Active AR items: <span style={{ color: 'var(--text)' }}>{activeArItemCount} / {itemLimitLabel}</span>
             </span>
+            <button type="button"
+                    onClick={() => updatePhoneLayout(phoneLayout === 'twin' ? 'list' : 'twin')}
+                    className="text-sm px-3 py-2 rounded-lg font-medium transition-colors"
+                    style={{ background: phoneLayout === 'twin' ? 'var(--gold)' : 'var(--card)',
+                             color: phoneLayout === 'twin' ? '#0f0b07' : 'var(--dim)',
+                             border: '1px solid var(--border)' }}
+                    title="Two menu items per row on phones (big photos, compact text). Desktop and tablet are unchanged.">
+              Twin phone view: {phoneLayout === 'twin' ? 'On' : 'Off'}
+            </button>
           </div>
           {planLimitReached && plan.itemLimit !== null && (
             <div className="mb-4 rounded-xl p-3 text-sm"
