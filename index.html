@@ -944,6 +944,12 @@
             padding-top: 10px;
             box-shadow: 0 8px 18px -10px var(--shadow, rgba(0,0,0,0.45));
         }
+        /* Mobile only: the fixed EN / theme toggles (top:14px) live in the same top
+           strip, so drop the pinned pills below them to avoid overlap. The bar's
+           background matches the page bg, so this gap is invisible until it sticks. */
+        @media (max-width: 639px) {
+            [data-template="monday_greens"] .cat-filter { padding-top: 54px; }
+        }
 
         .cat-pill {
             background: var(--pill-bg);
