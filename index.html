@@ -480,29 +480,61 @@
             transition: color var(--t);
         }
 
-        /* Per-item add-on options ("Make Double  +6.9 ₾"), listed under the price. */
+        /* Per-item add-on options ("Make Double  +6.9 ₾") — tap to select; a selected
+           add-on adds to the basket as its own line with the add-on price included. */
         .addons {
             margin-top: 8px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
         }
         .addon {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
-            gap: 12px;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            background: transparent;
+            border: none;
+            appearance: none;
+            -webkit-appearance: none;
+            padding: 4px 0;
+            cursor: pointer;
             font-family: 'Nunito', sans-serif;
             font-size: 0.7rem;
             font-weight: 700;
             color: var(--dim);
+            text-align: left;
             line-height: 1.25;
+            transition: color 0.15s;
+        }
+        .addon-l { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .addon-check {
+            width: 16px; height: 16px; flex: 0 0 auto;
+            border: 1.5px solid var(--border);
+            border-radius: 5px;
+            position: relative;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .addon.selected { color: var(--text); }
+        .addon.selected .addon-check {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        .addon.selected .addon-check::after {
+            content: '';
+            position: absolute; left: 4.5px; top: 1px;
+            width: 4px; height: 8px;
+            border: solid #fff; border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
         }
         .addon-price {
             color: var(--accent);
             font-weight: 800;
             white-space: nowrap;
         }
+        .qty-add-btn.just-added { animation: br-pop 0.32s ease; }
+        @keyframes br-pop { 0% { transform: scale(1); } 45% { transform: scale(1.28); } 100% { transform: scale(1); } }
 
         .category-header {
             font-family: 'Bebas Neue', sans-serif;
@@ -1361,12 +1393,19 @@
             border-bottom: 1px solid var(--border);
             transition: border-color var(--t);
         }
+        .basket-item-info { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
         .basket-item-name {
-            flex: 1;
             font-family: 'Bebas Neue', sans-serif;
             font-size: 1rem;
             letter-spacing: 1px;
             color: var(--accent);
+            transition: color var(--t);
+        }
+        .basket-item-addons {
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.66rem;
+            font-weight: 700;
+            color: var(--dim);
             transition: color var(--t);
         }
         .basket-qty {
@@ -2935,12 +2974,16 @@
         // Per-item add-on options (e.g. "Make Double +6.9 ₾"), rendered under the price.
         // Bilingual: picks ka/en by current language; re-rendered on language toggle
         // (applyLang calls _renderMenuList). Renders nothing when the item has no add-ons.
-        function _addonsHtml(item) {
+        function _addonsHtml(item, globalIdx) {
             if (!item.addons || !item.addons.length) return '';
-            const rows = item.addons.map(a => {
+            const sel = (window.__addonSel && window.__addonSel[globalIdx]) || [];
+            const rows = item.addons.map((a, i) => {
                 const n = _escapeHtml((window.__lang === 'ka' && a.ka) ? a.ka : (a.en || a.ka || ''));
                 const p = _escapeHtml(a.price || '');
-                return `<div class="addon"><span class="addon-name">${n}</span><span class="addon-price">+${p}</span></div>`;
+                const on = sel.indexOf(i) >= 0;
+                return `<button type="button" class="addon${on ? ' selected' : ''}" data-ai="${i}" aria-pressed="${on}">`
+                     + `<span class="addon-l"><span class="addon-check" aria-hidden="true"></span><span class="addon-name">${n}</span></span>`
+                     + `<span class="addon-price">+${p}</span></button>`;
             }).join('');
             return `<div class="addons">${rows}</div>`;
         }
@@ -3867,7 +3910,7 @@
                                 </div>
                             </div>
                         </div>
-                        ${_addonsHtml(item)}
+                        ${_addonsHtml(item, globalIdx)}
                         ${has3d ? `<button class="ar-btn" data-idx="${globalIdx}">${_arButtonLabel(item)}</button>` : ''}
                     </div>`;
 
@@ -3898,9 +3941,37 @@
                     card.querySelector('.ar-btn')?.addEventListener('click', e => { e.stopPropagation(); openAR(globalIdx, menuItems); });
                 }
                 const qCtrl = card.querySelector('.qty-ctrl');
-                qCtrl.querySelector('.qty-add-btn').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
+                const _hasAddons = !!(item.addons && item.addons.length);
+                // Add-on items always add via the "+" button (each add-on combo is its own
+                // basket line, managed in the basket panel); plain items use the stepper.
+                qCtrl.querySelector('.qty-add-btn').addEventListener('click', e => {
+                    e.stopPropagation();
+                    if (_hasAddons) {
+                        const sel = ((window.__addonSel[globalIdx]) || []).slice().sort((a, b) => a - b);
+                        addToBasket(`${globalIdx}#${sel.join(',')}`, item, sel);
+                        const b = e.currentTarget;
+                        b.classList.remove('just-added'); void b.offsetWidth; b.classList.add('just-added');
+                    } else {
+                        addToBasket(String(globalIdx), item);
+                    }
+                });
                 qCtrl.querySelector('.qty-dec').addEventListener('click', e => { e.stopPropagation(); const en = _basket.get(String(globalIdx)); if (en) _setQty(String(globalIdx), en.qty - 1); });
                 qCtrl.querySelector('.qty-inc').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
+
+                // Add-on checkboxes: toggle selection (persisted in __addonSel so it
+                // survives the re-render on language toggle).
+                card.querySelectorAll('.addon').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        e.stopPropagation();
+                        const ai  = parseInt(btn.dataset.ai, 10);
+                        const arr = window.__addonSel[globalIdx] || (window.__addonSel[globalIdx] = []);
+                        const at  = arr.indexOf(ai);
+                        const on  = at < 0;
+                        if (on) arr.push(ai); else arr.splice(at, 1);
+                        btn.classList.toggle('selected', on);
+                        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+                    });
+                });
 
                 return card;
             }
@@ -4037,8 +4108,9 @@
         }
 
         // ── Basket ─────────────────────────────────────────────────────
-        const _basket = new Map(); // key = String(globalIdx) -> { item, qty }
+        const _basket = new Map(); // key -> { item, qty, aIdx }  (aIdx = selected add-on indices)
         window._basket = _basket;
+        window.__addonSel = window.__addonSel || {}; // globalIdx -> [selected add-on indices]
         const _xrAddedKeys = new Set(); // keys added via XR button (eligible for XR toggle-off)
 
         function _parsePrice(str) {
@@ -4048,9 +4120,15 @@
             const n = Math.round(num * 10) / 10;
             return n + ' ₾';
         }
+        // Unit price of a basket line = item price + any selected add-on prices.
+        function _addonSum(entry) {
+            const list = (entry.item && entry.item.addons) || [];
+            return (entry.aIdx || []).reduce((s, i) => s + _parsePrice(list[i] && list[i].price), 0);
+        }
+        function _lineUnit(entry) { return _parsePrice(entry.item.price) + _addonSum(entry); }
         function _basketTotal() {
             let s = 0;
-            _basket.forEach(({ item, qty }) => { s += _parsePrice(item.price) * qty; });
+            _basket.forEach(entry => { s += _lineUnit(entry) * entry.qty; });
             return s;
         }
         function _basketCount() {
@@ -4090,10 +4168,10 @@
             });
         }
 
-        function addToBasket(key, item) {
+        function addToBasket(key, item, aIdx) {
             const _isNew = !_basket.has(key);
             if (_basket.has(key)) _basket.get(key).qty++;
-            else                   _basket.set(key, { item, qty: 1 });
+            else                   _basket.set(key, { item, qty: 1, aIdx: aIdx || [] });
             if (_isNew) {
                 const _bIdx = parseInt(key, 10);
                 track('basket_add', _bIdx, {
@@ -4128,12 +4206,19 @@
             if (_basket.size === 0) {
                 box.innerHTML = `<p class="basket-empty">${u.emptyBasket}</p>`;
             } else {
-                _basket.forEach(({ item, qty }, key) => {
-                    const line = _parsePrice(item.price) * qty;
+                _basket.forEach((entry, key) => {
+                    const { item, qty, aIdx } = entry;
+                    const line = _lineUnit(entry) * qty;
+                    const addTxt = (aIdx && aIdx.length)
+                        ? aIdx.map(i => { const a = (item.addons || [])[i]; return a ? ((window.__lang === 'ka' && a.ka) ? a.ka : (a.en || a.ka)) : ''; }).filter(Boolean).join(', ')
+                        : '';
                     const row  = document.createElement('div');
                     row.className = 'basket-item';
                     row.innerHTML = `
-                        <span class="basket-item-name">${t(item, 'name')}</span>
+                        <div class="basket-item-info">
+                            <span class="basket-item-name">${t(item, 'name')}</span>
+                            ${addTxt ? `<span class="basket-item-addons">+ ${_escapeHtml(addTxt)}</span>` : ''}
+                        </div>
                         <div class="basket-qty">
                             <button class="qty-btn" data-key="${key}" data-delta="-1">&#8722;</button>
                             <span class="qty-count">${qty}</span>
@@ -4195,9 +4280,9 @@
             if (_basket.size > 0) {
                 const snapshot = [];
                 let total = 0;
-                _basket.forEach(({ item, qty }) => {
-                    snapshot.push({ name: item.name, qty, price: item.price });
-                    total += _parsePrice(item.price) * qty;
+                _basket.forEach((entry) => {
+                    snapshot.push({ name: entry.item.name, qty: entry.qty, price: _fmtPrice(_lineUnit(entry)) });
+                    total += _lineUnit(entry) * entry.qty;
                 });
                 track('basket_clear', null, {
                     item_count: snapshot.length,
@@ -4240,8 +4325,12 @@ document.getElementById('basket-items').addEventListener('click', e => {
 
         function _packOrder() {
             const it = [];
-            _basket.forEach(({ item, qty }) => {
-                if (item && item.id) it.push([item.id, qty]);   // stable DB id, never the fragile index
+            _basket.forEach(({ item, qty, aIdx }) => {
+                if (!item || !item.id) return;
+                // [id, qty] or [id, qty, [add-on indices]] — waiter.html resolves the
+                // indices against the live item's addons array.
+                if (aIdx && aIdx.length) it.push([item.id, qty, aIdx]);
+                else it.push([item.id, qty]);
             });
             const tenant = window.__tenant || {};
             const payload = { v: 1, r: tenant.restaurant_slug || '', ts: Date.now(), it };
