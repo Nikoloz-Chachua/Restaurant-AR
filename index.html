@@ -152,7 +152,9 @@
             flex-direction: column;
             align-items: center;
             transition: color var(--t);
-            overflow-x: hidden;
+            /* clip (not hidden) prevents horizontal scroll WITHOUT creating a
+               scroll container, so position:sticky descendants keep working. */
+            overflow-x: clip;
         }
         html:not([data-template]) body {
             opacity: 0;
@@ -931,6 +933,18 @@
         }
         .cat-filter::-webkit-scrollbar { display: none; }
 
+        /* Sticky category bar — after you scroll past the hero it stays pinned to
+           the top so diners can switch categories at any point. Scoped to the
+           monday_greens skin so other templates are unchanged. */
+        [data-template="monday_greens"] .cat-filter {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            background: var(--bg);
+            padding-top: 10px;
+            box-shadow: 0 8px 18px -10px var(--shadow, rgba(0,0,0,0.45));
+        }
+
         .cat-pill {
             background: var(--pill-bg);
             border: 1px solid var(--border);
@@ -1053,6 +1067,12 @@
             justify-content: center;
             text-align: center;
             overflow: hidden;
+        }
+        /* Hero height. Default = full screen (100svh). A tenant can set theme_config
+           `hero_min_h` (e.g. 56.25vw = true 16:9) so a landscape hero photo shows in
+           full instead of being cropped on tall phone screens. */
+        [data-template="monday_greens"] .mg-hero {
+            min-height: var(--mg-hero-h, 100svh);
         }
         /* The default text title is replaced by branded Monday Greens logos. */
         [data-template="monday_greens"] .header {
@@ -3627,6 +3647,10 @@
                 const heroImg = _safeAssetUrl(cfg.hero_image_url);
                 if (heroImg) {
                     document.documentElement.style.setProperty('--hero-image', `url("${heroImg}")`);
+                }
+                // Optional per-tenant hero height (e.g. "56.25vw" for a full 16:9 banner).
+                if (cfg.hero_min_h) {
+                    document.documentElement.style.setProperty('--mg-hero-h', cfg.hero_min_h);
                 }
                 const heroLogo = document.getElementById('mg-hero-logo');
                 const heroLogoUrl = _safeAssetUrl(cfg.hero_logo_url) || logoUrl;
