@@ -480,6 +480,30 @@
             transition: color var(--t);
         }
 
+        /* Per-item add-on options ("Make Double  +6.9 ₾"), listed under the price. */
+        .addons {
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .addon {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--dim);
+            line-height: 1.25;
+        }
+        .addon-price {
+            color: var(--accent);
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
         .category-header {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 1.4rem;
@@ -2908,6 +2932,19 @@
             return _cleanText((window.__lang === 'ka' && item[ka]) ? item[ka] : item[field]);
         }
 
+        // Per-item add-on options (e.g. "Make Double +6.9 ₾"), rendered under the price.
+        // Bilingual: picks ka/en by current language; re-rendered on language toggle
+        // (applyLang calls _renderMenuList). Renders nothing when the item has no add-ons.
+        function _addonsHtml(item) {
+            if (!item.addons || !item.addons.length) return '';
+            const rows = item.addons.map(a => {
+                const n = _escapeHtml((window.__lang === 'ka' && a.ka) ? a.ka : (a.en || a.ka || ''));
+                const p = _escapeHtml(a.price || '');
+                return `<div class="addon"><span class="addon-name">${n}</span><span class="addon-price">+${p}</span></div>`;
+            }).join('');
+            return `<div class="addons">${rows}</div>`;
+        }
+
         function applyLang(lang) {
             window.__lang = lang;
             document.documentElement.lang = lang;
@@ -3706,6 +3743,7 @@
                             thumbnail_url:  r.thumbnail_url || '',
                             thumb_3d:       r.thumb_3d ?? false,
                             is_3d:          r.is_3d !== false,
+                            addons:         Array.isArray(r.addons) ? r.addons : [],
                         }));
                     } else {
                         // A real resolved tenant with no menu items should stay empty.
@@ -3829,6 +3867,7 @@
                                 </div>
                             </div>
                         </div>
+                        ${_addonsHtml(item)}
                         ${has3d ? `<button class="ar-btn" data-idx="${globalIdx}">${_arButtonLabel(item)}</button>` : ''}
                     </div>`;
 
