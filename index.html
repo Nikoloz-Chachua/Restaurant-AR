@@ -367,6 +367,87 @@
             z-index: 1001;
         }
 
+        /* ── Rich photo popup (twin view) ──
+           Same visual language as the 3D modal, but for plain photo items:
+           name on top, the full photo, then description + price + add-to-cart.
+           Opened via openLightbox(src, alt, item, idx); the plain image lightbox
+           (no name/panel) still works when called with just (src, alt). */
+        #lightbox-name, #lightbox-panel { display: none; }
+        #img-lightbox.has-panel {
+            flex-direction: column;
+            padding: 0;
+            cursor: default;
+            background: rgba(0, 0, 0, 0.94);
+        }
+        #img-lightbox.has-panel #lightbox-name {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            padding: max(16px, env(safe-area-inset-top)) 46px 6px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(1.6rem, 6vw, 2.2rem);
+            letter-spacing: 2px;
+            line-height: 1.1;
+            background: linear-gradient(100deg, var(--accent), var(--accent2), var(--accent));
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--accent);
+            text-shadow: 0 2px 18px var(--glow);
+        }
+        html[lang="ka"] #img-lightbox.has-panel #lightbox-name {
+            font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+            font-weight: 800; letter-spacing: 0.5px;
+            -webkit-text-fill-color: initial;
+        }
+        #img-lightbox.has-panel #lightbox-img {
+            flex: 1 1 auto;
+            min-height: 0;
+            width: 100%;
+            max-width: 100%;
+            max-height: none;
+            object-fit: contain;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 4px 16px;
+            box-sizing: border-box;
+        }
+        #img-lightbox.has-panel #lightbox-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 20px calc(16px + env(safe-area-inset-bottom));
+        }
+        #lightbox-desc {
+            font-size: 0.82rem;
+            color: var(--dim);
+            line-height: 1.5;
+            text-align: center;
+            max-width: 460px;
+            margin: 0;
+            max-height: 22vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        #lightbox-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+        #lightbox-price {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(1.4rem, 5vw, 2rem);
+            letter-spacing: 2px;
+            background: linear-gradient(100deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--accent);
+        }
+
         .badge-3d {
             position: absolute;
             bottom: 0;
@@ -1796,10 +1877,27 @@
         <p class="footer-copy">&copy; 2026 BetaReal &middot; Augmented Reality Menus</p>
     </footer>
 
-    <!-- Fullscreen image lightbox for photo-only (non-3D) items -->
+    <!-- Fullscreen image lightbox for photo (non-3D) items. Plain image by
+         default; twin view opens it with the name + description + price + add
+         panel (see openLightbox / .has-panel). -->
     <div id="img-lightbox" aria-hidden="true">
         <button class="close-btn" id="lightbox-close" aria-label="Close">&#10005;</button>
+        <div id="lightbox-name"></div>
         <img id="lightbox-img" alt="">
+        <div id="lightbox-panel">
+            <p id="lightbox-desc"></p>
+            <div id="lightbox-row">
+                <span id="lightbox-price"></span>
+                <div class="qty-ctrl" id="lightbox-qty" data-idx="">
+                    <button class="qty-add-btn" aria-label="Add to basket"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+                    <div class="qty-stepper">
+                        <button class="qty-dec">&#8722;</button>
+                        <span class="qty-num">1</span>
+                        <button class="qty-inc">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="modal">
@@ -3331,26 +3429,59 @@
             document.body.style.overflow = '';
         }
 
-        // ── Image lightbox (photo-only items) ──────────────────────────
+        // ── Image lightbox / rich photo popup ──────────────────────────
         const _lightbox    = document.getElementById('img-lightbox');
         const _lightboxImg = document.getElementById('lightbox-img');
-        function openLightbox(src, alt) {
+        const _lbName      = document.getElementById('lightbox-name');
+        const _lbDesc      = document.getElementById('lightbox-desc');
+        const _lbPrice     = document.getElementById('lightbox-price');
+        const _lbPanel     = document.getElementById('lightbox-panel');
+        const _lbQtyCtrl   = document.getElementById('lightbox-qty');
+        let   _lbItem      = null;
+        // openLightbox(src, alt)            → plain fullscreen image.
+        // openLightbox(src, alt, item, idx) → rich popup: name on top, photo,
+        //   then description + price + add-to-cart. The panel qty control reuses
+        //   the standard .qty-ctrl markup with the item's data-idx, so
+        //   _syncQtyCtrl keeps it in step with the card control and basket bar.
+        function openLightbox(src, alt, item, idx) {
             if (!src) return;
             _lightboxImg.src = src;
             _lightboxImg.alt = alt || '';
+            if (item != null && idx != null) {
+                _lbItem = item;
+                const key = String(idx);
+                _lbQtyCtrl.dataset.idx = key;
+                _lbName.textContent  = t(item, 'name');
+                _lbPrice.textContent = item.price || '';
+                const d = t(item, 'description') || '';
+                _lbDesc.textContent = d;
+                _lbDesc.style.display = d ? '' : 'none';
+                _lightbox.classList.add('has-panel');
+                _syncQtyCtrl(key);
+            } else {
+                _lbItem = null;
+                _lightbox.classList.remove('has-panel');
+            }
             _lightbox.classList.add('open');
             _lightbox.setAttribute('aria-hidden', 'false');
             document.body.style.overflow = 'hidden';
         }
         function closeLightbox() {
-            _lightbox.classList.remove('open');
+            _lightbox.classList.remove('open', 'has-panel');
             _lightbox.setAttribute('aria-hidden', 'true');
             _lightboxImg.removeAttribute('src');
+            _lbItem = null;
             document.body.style.overflow = '';
         }
-        // Tap anywhere on the backdrop, or the close button, to dismiss.
+        // Backdrop / close button / photo tap dismiss; taps on the name or the
+        // panel must not.
         _lightbox.addEventListener('click', closeLightbox);
+        _lbPanel.addEventListener('click', e => e.stopPropagation());
+        _lbName.addEventListener('click', e => e.stopPropagation());
         document.getElementById('lightbox-close').addEventListener('click', e => { e.stopPropagation(); closeLightbox(); });
+        _lbQtyCtrl.querySelector('.qty-add-btn').addEventListener('click', e => { e.stopPropagation(); if (_lbItem) addToBasket(_lbQtyCtrl.dataset.idx, _lbItem); });
+        _lbQtyCtrl.querySelector('.qty-dec').addEventListener('click', e => { e.stopPropagation(); const k = _lbQtyCtrl.dataset.idx; const en = _basket.get(k); if (en) _setQty(k, en.qty - 1); });
+        _lbQtyCtrl.querySelector('.qty-inc').addEventListener('click', e => { e.stopPropagation(); if (_lbItem) addToBasket(_lbQtyCtrl.dataset.idx, _lbItem); });
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape' && _lightbox.classList.contains('open')) closeLightbox();
         });
@@ -4000,13 +4131,19 @@
                     if (has3d) {
                         thumbImg.addEventListener('click', () => openModal(globalIdx, menuItems));
                     } else if (thumbSrc) {
-                        // Photo-only item: tap the image to expand it fullscreen.
-                        // Scoped to the Monday Greens template (checked at click time,
-                        // after the remote theme has set data-template).
+                        // Photo-only item: tap the image to expand it. In twin phone
+                        // layout it opens the rich popup (name + photo + description +
+                        // price + add-to-cart); Monday Greens keeps the plain image.
+                        // Checked at click time, after the remote theme has set the
+                        // data-template / data-phone-layout attributes.
                         thumbImg.addEventListener('click', e => {
-                            if (document.documentElement.dataset.template !== 'monday_greens') return;
-                            e.stopPropagation();
-                            openLightbox(thumbSrc, itemName);
+                            if (document.documentElement.dataset.phoneLayout === 'twin') {
+                                e.stopPropagation();
+                                openLightbox(thumbSrc, itemName, item, globalIdx);
+                            } else if (document.documentElement.dataset.template === 'monday_greens') {
+                                e.stopPropagation();
+                                openLightbox(thumbSrc, itemName);
+                            }
                         });
                     }
                 }
