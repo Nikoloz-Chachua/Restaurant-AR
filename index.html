@@ -801,20 +801,25 @@
             top: 16px;
             left: 16px;
             z-index: 3;
-            width: 40px;
-            height: 40px;
+            width: 52px;
+            height: 52px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 1px;
             background: rgba(var(--modal-rgb), 0.6);
             color: var(--text);
             border: 1px solid var(--accent);
             border-radius: 50%;
             padding: 0;
             cursor: pointer;
+            font-family: 'Nunito', system-ui, sans-serif;
             box-shadow: 0 4px 16px var(--glow);
             transition: background var(--t), color var(--t), transform 0.12s;
         }
+        .spin-360   { font-size: 13px; font-weight: 900; line-height: 1; letter-spacing: -0.5px; }
+        .spin-label { font-size: 8.5px; font-weight: 800; line-height: 1; letter-spacing: 1.5px; }
         .spin-btn:active { transform: scale(0.9); }
         .spin-btn.active {
             background: var(--accent);
@@ -1931,11 +1936,8 @@
         <button class="nav-arrow right-arrow" id="modal-next">&#10095;</button>
         <button class="close-btn" id="close-btn" aria-label="Close">&#10005;</button>
         <button class="spin-btn" id="modal-spin" aria-label="Auto-spin" aria-pressed="false" title="360° auto-spin">
-            <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-                <text x="16" y="15.5" text-anchor="middle" font-family="'Nunito', system-ui, sans-serif" font-size="13" font-weight="900" letter-spacing="-1" fill="currentColor">360</text>
-                <path d="M6.5 19.5 C10 25.6, 22 25.6, 25.5 19.5" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/>
-                <path d="M25.5 19.5 L21.3 20 M25.5 19.5 L24.1 15.5" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <span class="spin-360">360&deg;</span>
+            <span class="spin-label">SPIN</span>
         </button>
         <div id="modal-title"></div>
         <div id="modal-viewer-wrap">
