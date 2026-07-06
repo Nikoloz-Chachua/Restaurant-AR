@@ -1935,7 +1935,7 @@
         <button class="nav-arrow left-arrow"  id="modal-prev">&#10094;</button>
         <button class="nav-arrow right-arrow" id="modal-next">&#10095;</button>
         <button class="close-btn" id="close-btn" aria-label="Close">&#10005;</button>
-        <button class="spin-btn" id="modal-spin" aria-label="Auto-spin" aria-pressed="false" title="360° auto-spin">
+        <button class="spin-btn" id="modal-spin" aria-label="Auto-spin" aria-pressed="false" title="360° auto-spin" style="display:none">
             <span class="spin-360">360&deg;</span>
             <span class="spin-label">SPIN</span>
         </button>
@@ -4021,6 +4021,12 @@
                 if (cfg.hero_min_h) {
                     document.documentElement.style.setProperty('--mg-hero-h', cfg.hero_min_h);
                 }
+                // 360° auto-spin button in the 3D viewer — per-tenant, off by default
+                // (owner enables it in the admin panel via theme_config.spin_enabled).
+                const _spinOn = /^(1|true|on|yes)$/i.test(String(cfg.spin_enabled || '').trim());
+                window.__spinEnabled = _spinOn;
+                const _spinBtn = document.getElementById('modal-spin');
+                if (_spinBtn) _spinBtn.style.display = _spinOn ? 'flex' : 'none';
                 const heroLogo = document.getElementById('mg-hero-logo');
                 const heroLogoUrl = _safeAssetUrl(cfg.hero_logo_url) || logoUrl;
                 if (heroLogo && heroLogoUrl) {

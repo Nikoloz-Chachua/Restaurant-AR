@@ -61,6 +61,7 @@ export default function MenuPage() {
 
   const [msg, setMsg] = useState('')
   const [phoneLayout, setPhoneLayout] = useState<'list' | 'twin'>('list')
+  const [spinEnabled, setSpinEnabled] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState('')
   const glbInputRef = useRef<HTMLInputElement>(null)
@@ -76,11 +77,12 @@ export default function MenuPage() {
       return
     }
     setLoading(true)
-    const [{ data: cats }, { data: its }, { data: views }, { data: layoutRow }] = await Promise.all([
+    const [{ data: cats }, { data: its }, { data: views }, { data: layoutRow }, { data: spinRow }] = await Promise.all([
       supabase.from('categories').select('*').eq('restaurant_id', plan.restaurantId).order('sort_order'),
       supabase.from('menu_items').select('*').eq('restaurant_id', plan.restaurantId).order('category_id').order('sort_order'),
       supabase.from('theme_config').select('key,value').eq('restaurant_id', plan.restaurantId).like('key', 'item_view_%'),
       supabase.from('theme_config').select('value').eq('restaurant_id', plan.restaurantId).eq('key', 'phone_layout').maybeSingle(),
+      supabase.from('theme_config').select('value').eq('restaurant_id', plan.restaurantId).eq('key', 'spin_enabled').maybeSingle(),
     ])
     setCategories(cats || [])
     setItems(its || [])
@@ -88,6 +90,7 @@ export default function MenuPage() {
       (views || []).map(r => [Number(String(r.key).slice('item_view_'.length)), r.value as string])
     ))
     setPhoneLayout((layoutRow?.value as string) === 'twin' ? 'twin' : 'list')
+    setSpinEnabled(/^(1|true|on|yes)$/i.test(String(spinRow?.value ?? '')))
     setLoading(false)
   }, [plan.loading, plan.restaurantId, supabase])
 
@@ -116,6 +119,21 @@ export default function MenuPage() {
     flash(error ? `Save failed: ${error.message}`
                 : v === 'twin' ? 'Twin phone view on. Reload the live menu to see it.'
                                : 'Single phone view on.')
+  }
+
+  // 360° Spin toggle. ON adds a "360° SPIN" button in the 3D viewer that slowly
+  // auto-rotates the dish (hands-free). Saved to theme_config.spin_enabled; the
+  // customer app shows the button only when this is truthy, so it's off by default.
+  async function updateSpinEnabled(on: boolean) {
+    if (!plan.restaurantId) return
+    setSpinEnabled(on)
+    const { error } = await supabase.from('theme_config').upsert(
+      { restaurant_id: plan.restaurantId, key: 'spin_enabled', value: on ? 'true' : 'false' },
+      { onConflict: 'restaurant_id,key' },
+    )
+    flash(error ? `Save failed: ${error.message}`
+                : on ? '360° Spin on. Reload the live menu to see it.'
+                     : '360° Spin off.')
   }
 
   const activeArItemCount = items.filter(isActiveArItem).length
@@ -434,6 +452,15 @@ export default function MenuPage() {
                              border: '1px solid var(--border)' }}
                     title="Two menu items per row on phones (big photos, compact text). Desktop and tablet are unchanged.">
               Twin phone view: {phoneLayout === 'twin' ? 'On' : 'Off'}
+            </button>
+            <button type="button"
+                    onClick={() => updateSpinEnabled(!spinEnabled)}
+                    className="text-sm px-3 py-2 rounded-lg font-medium transition-colors"
+                    style={{ background: spinEnabled ? 'var(--gold)' : 'var(--card)',
+                             color: spinEnabled ? '#0f0b07' : 'var(--dim)',
+                             border: '1px solid var(--border)' }}
+                    title="Adds a 360° SPIN button in the 3D view so guests can hand over the phone and the dish rotates on its own.">
+              360° Spin: {spinEnabled ? 'On' : 'Off'}
             </button>
           </div>
           {planLimitReached && plan.itemLimit !== null && (
