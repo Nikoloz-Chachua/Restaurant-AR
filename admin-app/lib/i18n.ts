@@ -126,6 +126,10 @@ const en = {
   brandHero: 'Hero image',
   brandHeroHint: 'Full-screen background photo for the Monday Greens template hero.',
   reloadHint: 'After saving, reload the menu to see changes: ',
+  previewLabel: 'Live Preview',
+  previewDesktop: 'Desktop',
+  previewPhone: 'Phone',
+  previewHint: 'Approximate preview of your unsaved colors, fonts, logo and background. Save, then reload the live menu to publish.',
 }
 
 const ka: typeof en = {
@@ -254,6 +258,10 @@ const ka: typeof en = {
   brandHero: 'ჰერო სურათი',
   brandHeroHint: 'სრულ ეკრანზე ფონური ფოტო Monday Greens-ის შაბლონის ჰერო სექციისთვის.',
   reloadHint: 'შენახვის შემდეგ განაახლე მენიუ ცვლილებების სანახავად: ',
+  previewLabel: 'ცოცხალი გადახედვა',
+  previewDesktop: 'დესკტოპი',
+  previewPhone: 'ტელეფონი',
+  previewHint: 'შენი შეუნახავი ფერების, შრიფტების, ლოგოსა და ფონის სავარაუდო გადახედვა. შეინახე და განაახლე ცოცხალი მენიუ გამოსაქვეყნებლად.',
 }
 
 export const translations = { en, ka }
