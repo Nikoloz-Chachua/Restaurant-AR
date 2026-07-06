@@ -795,6 +795,37 @@
             box-shadow: 0 4px 16px var(--glow);
             transition: background var(--t), color var(--t), transform 0.12s;
         }
+        /* Auto-spin toggle: mirrors the close button on the top-left. */
+        .spin-btn {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            z-index: 3;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1px;
+            background: rgba(var(--modal-rgb), 0.6);
+            color: var(--text);
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            padding: 0;
+            cursor: pointer;
+            font-family: 'Nunito', system-ui, sans-serif;
+            box-shadow: 0 4px 16px var(--glow);
+            transition: background var(--t), color var(--t), transform 0.12s;
+        }
+        .spin-360   { font-size: 13px; font-weight: 900; line-height: 1; letter-spacing: -0.5px; }
+        .spin-label { font-size: 8.5px; font-weight: 800; line-height: 1; letter-spacing: 1.5px; }
+        .spin-btn:active { transform: scale(0.9); }
+        .spin-btn.active {
+            background: var(--accent);
+            color: var(--accent-text);
+            border-color: transparent;
+        }
         .close-btn:active { transform: scale(0.92); }
 
         /* ── Desktop: slide-up drawer (>=640px) ── */
@@ -1904,6 +1935,10 @@
         <button class="nav-arrow left-arrow"  id="modal-prev">&#10094;</button>
         <button class="nav-arrow right-arrow" id="modal-next">&#10095;</button>
         <button class="close-btn" id="close-btn" aria-label="Close">&#10005;</button>
+        <button class="spin-btn" id="modal-spin" aria-label="Auto-spin" aria-pressed="false" title="360° auto-spin" style="display:none">
+            <span class="spin-360">360&deg;</span>
+            <span class="spin-label">SPIN</span>
+        </button>
         <div id="modal-title"></div>
         <div id="modal-viewer-wrap">
             <model-viewer id="modal-viewer"
@@ -2978,6 +3013,7 @@
                 loading:   'Loading...',
                 close:     'Close',
                 tip:       'Drag to rotate',
+                spin:      'Auto-spin',
                 placeHint: 'Point at a flat surface, then tap to place',
                 moveHint:  'Drag to rotate · Pinch to scale',
                 exitAR:    'Exit Model view',
@@ -3021,6 +3057,7 @@
                 loading:   'იტვირთება...',
                 close:     'დახურვა',
                 tip:       'გაასრიალეთ მოსაბრუნებლად',
+                spin:      'ავტო-ტრიალი',
                 placeHint: 'მიუშვირე ბრტყელ ზედაპირს, როდესაც გამოჩნდება ნიშნული შეეხე',
                 moveHint:  'გასაბრუნებლად გაასრიალე · პინჩი მასშტაბისთვის',
                 exitAR:    'მოდელის დახურვა',
@@ -3170,6 +3207,7 @@
             _themeToggle.setAttribute('aria-label', theme === 'night' ? u.themeDay : u.themeNight);
             document.getElementById('close-btn').setAttribute('aria-label', u.close);
             document.getElementById('modal-tip').textContent     = u.tip;
+            document.getElementById('modal-spin').setAttribute('aria-label', u.spin);
             window.XR?.refreshHint?.();
             document.getElementById('xr-move-hint').textContent  = u.moveHint;
             document.getElementById('xr-exit').textContent        = u.exitAR;
@@ -3280,6 +3318,21 @@
         // ── Modal ──────────────────────────────────────────────────────
         const modal       = document.getElementById('modal');
         const modalViewer = document.getElementById('modal-viewer');
+        // Hands-free auto-spin toggle for the 3D viewer (show the phone, no fingers).
+        const modalSpinBtn = document.getElementById('modal-spin');
+        let _modalSpin = false;
+        function _applyModalSpin() {
+            if (_modalSpin) {
+                modalViewer.setAttribute('auto-rotate', '');
+                modalViewer.setAttribute('auto-rotate-delay', '0');   // resume immediately after a touch
+                modalViewer.setAttribute('rotation-per-second', '20deg'); // slow, gentle spin
+            } else {
+                modalViewer.removeAttribute('auto-rotate');
+            }
+            modalSpinBtn.classList.toggle('active', _modalSpin);
+            modalSpinBtn.setAttribute('aria-pressed', _modalSpin ? 'true' : 'false');
+        }
+        modalSpinBtn.addEventListener('click', e => { e.stopPropagation(); _modalSpin = !_modalSpin; _applyModalSpin(); });
         const modalTitle  = document.getElementById('modal-title');
         const modalPrice  = document.getElementById('modal-price');
         let menuItems  = [];
@@ -3366,12 +3419,14 @@
             const key = String(modalIndex);
             document.getElementById('modal-qty-ctrl').dataset.idx = key;
             _syncQtyCtrl(key);
+            _applyModalSpin();
         }
 
         function openModal(localIdx, catItems, fallbackMessage = '') {
             modalItems = catItems || menuItems;
             modalIndex = localIdx;
             modalMessage = fallbackMessage;
+            _modalSpin = false;   // each dish opens static; tap the spin button to rotate
             // Arrows only make sense when 2+ dishes in this list have a 3D model.
             const _navModels = modalItems.filter(_hasModel).length;
             const _navDisp = _navModels > 1 ? '' : 'none';
@@ -3966,6 +4021,12 @@
                 if (cfg.hero_min_h) {
                     document.documentElement.style.setProperty('--mg-hero-h', cfg.hero_min_h);
                 }
+                // 360° auto-spin button in the 3D viewer — per-tenant, off by default
+                // (owner enables it in the admin panel via theme_config.spin_enabled).
+                const _spinOn = /^(1|true|on|yes)$/i.test(String(cfg.spin_enabled || '').trim());
+                window.__spinEnabled = _spinOn;
+                const _spinBtn = document.getElementById('modal-spin');
+                if (_spinBtn) _spinBtn.style.display = _spinOn ? 'flex' : 'none';
                 const heroLogo = document.getElementById('mg-hero-logo');
                 const heroLogoUrl = _safeAssetUrl(cfg.hero_logo_url) || logoUrl;
                 if (heroLogo && heroLogoUrl) {
