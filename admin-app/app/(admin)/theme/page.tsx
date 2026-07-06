@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, type CSSProperties } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/useLang'
 import type { Translations } from '@/lib/i18n'
@@ -277,6 +277,10 @@ export default function ThemePage() {
         </div>
       </div>
 
+      <div className="flex flex-col xl:flex-row gap-6 items-start">
+        {/* ── Left: editor controls (unchanged behaviour) ─────────────── */}
+        <div className="w-full xl:flex-1 xl:min-w-0 xl:max-w-2xl">
+
       <div className="flex gap-1 mb-6 p-1 rounded-lg w-fit"
            style={{ background: 'var(--card)' }}>
         {tabs.map(t => (
@@ -400,6 +404,11 @@ export default function ThemePage() {
           )
         })()}
       </div>
+        </div>
+
+        {/* ── Right: live preview ─────────────────────────────────────── */}
+        <ThemePreview config={config} activeTab={tab} />
+      </div>
     </div>
   )
 }
@@ -508,6 +517,234 @@ function BrandRow({ label, value, onChange }: { label: string; value: string; on
          style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
       <div className="text-xs mb-2 uppercase tracking-widest" style={{ color: 'var(--dim)' }}>{label}</div>
       <input value={value} onChange={e => onChange(e.target.value)} />
+    </div>
+  )
+}
+
+// ── Live preview ──────────────────────────────────────────────────────
+// Renders a faithful mock of the customer menu by scoping the SAME CSS
+// variables the live site sets (see index.html → applyRemoteTheme varMap)
+// onto a wrapper, from the current unsaved `config`. Read-only: it only
+// consumes config, never writes it.
+
+type PreviewMode = 'night' | 'day'
+type PreviewDevice = 'desktop' | 'phone'
+
+// Fallbacks for the 10 base color keys when a tenant hasn't set one — mirror
+// the generic index.html :root so the mock is never blank.
+const PREVIEW_DEFAULTS = {
+  night: {
+    bg: '#14100b', card: '#211a12', card2: '#2b2218', border: 'rgba(231,177,90,0.20)',
+    text: '#f1e7d4', dim: '#9a8a70', accent: '#e7b15a', accent_text: '#14100b',
+    thumb_bg: '#0d0a07', modal_bg: '#14100b',
+  },
+  day: {
+    bg: '#f3e9d6', card: '#fbf4e4', card2: '#ecdcc0', border: 'rgba(176,122,30,0.22)',
+    text: '#221a0e', dim: '#6b5a3c', accent: '#8c6014', accent_text: '#ffffff',
+    thumb_bg: '#c8b898', modal_bg: '#f3e9d6',
+  },
+} as const
+
+function ThemePreview({ config, activeTab }: { config: ThemeConfig; activeTab: string }) {
+  const [T] = useLang()
+  const [device, setDevice] = useState<PreviewDevice>('desktop')
+  const [mode, setMode]     = useState<PreviewMode>('night')
+
+  // Follow the editor into the palette being edited (night/day tabs).
+  useEffect(() => {
+    if (activeTab === 'day') setMode('day')
+    else if (activeTab === 'night') setMode('night')
+  }, [activeTab])
+
+  // Load the chosen Google Fonts so the preview types in the real faces.
+  const fontBody    = config.font_body    || 'Nunito'
+  const fontHeading = config.font_heading || 'Bebas Neue'
+  useEffect(() => {
+    const fams = Array.from(new Set([fontBody, fontHeading])).filter(Boolean)
+    const links = fams.map(fam => {
+      const l = document.createElement('link')
+      l.rel = 'stylesheet'
+      l.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fam)}:wght@400;600;700&display=swap`
+      document.head.appendChild(l)
+      return l
+    })
+    return () => { links.forEach(l => l.remove()) }
+  }, [fontBody, fontHeading])
+
+  const d = PREVIEW_DEFAULTS[mode]
+  const V = (k: string) => config[`${mode}_${k}`]
+  const base = (k: keyof typeof d) => V(k) || d[k]
+  const accent = base('accent')
+  const card = base('card'), card2 = base('card2')
+
+  // Same CSS variables index.html applies, scoped to this subtree only.
+  const vars = {
+    '--bg': base('bg'),
+    '--bg-image': V('bg_image') || 'none',
+    '--bg-size': V('bg_size') || 'auto',
+    '--bg-repeat': V('bg_repeat') || 'no-repeat',
+    '--card': card,
+    '--card2': card2,
+    '--card-bg': V('card_bg') || `linear-gradient(158deg, ${card} 0%, ${card2} 100%)`,
+    '--card-radius': V('card_radius') || '16px',
+    '--border': base('border'),
+    '--text': base('text'),
+    '--dim': base('dim'),
+    '--accent': accent,
+    '--accent-text': base('accent_text'),
+    '--thumb-bg': base('thumb_bg'),
+    '--thumb-vignette': V('thumb_vignette') || 'none',
+    '--cta-bg': V('cta_bg') || accent,
+    '--pill-bg': V('pill_bg') || 'transparent',
+    '--pill-active-bg': V('pill_active_bg') || accent,
+    '--hero-color': V('hero_color') || accent,
+    '--divider-bg': V('divider_bg') || `linear-gradient(90deg, transparent, ${accent}, transparent)`,
+    '--item-shadow': V('item_shadow') || '0 4px 14px rgba(0,0,0,0.28)',
+    '--modal-bg': base('modal_bg'),
+  } as CSSProperties
+
+  const brand = config.site_name || 'Your Restaurant'
+  const logoUrl = config.logo_url || ''
+  const cols = device === 'desktop' ? 2 : 1
+  const frameW = device === 'desktop' ? 560 : 300
+
+  const items = [
+    { emoji: '🥗', name: 'Seasonal Bowl',   desc: 'Fresh grains, roasted vegetables, herbs, house dressing.', price: '24 ₾' },
+    { emoji: '🍽️', name: 'Signature Plate',  desc: 'A balanced plate built around the kitchen signature.',      price: '29 ₾' },
+    { emoji: '🍟', name: 'Crisp Side',       desc: 'Crisp seasonal side with a bright dipping sauce.',          price: '12 ₾' },
+    { emoji: '🥤', name: 'House Drink',      desc: 'Refreshing house drink served cold.',                       price: '7 ₾'  },
+  ]
+  const shown = device === 'desktop' ? items : items.slice(0, 3)
+
+  return (
+    <div className="w-full xl:w-auto xl:sticky xl:top-4 shrink-0">
+      <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+        <span className="text-xs uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
+          {T.previewLabel}
+        </span>
+        <div className="flex gap-2">
+          <Segmented value={device} onChange={v => setDevice(v as PreviewDevice)}
+                     options={[{ id: 'desktop', label: T.previewDesktop }, { id: 'phone', label: T.previewPhone }]} />
+          <Segmented value={mode} onChange={v => setMode(v as PreviewMode)}
+                     options={[{ id: 'night', label: T.tabNight }, { id: 'day', label: T.tabDay }]} />
+        </div>
+      </div>
+
+      <div className="rounded-2xl p-3 flex justify-center"
+           style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+        <div style={{ width: frameW, maxWidth: '100%' }}>
+          <div className="overflow-hidden shadow-xl"
+               style={{
+                 ...vars,
+                 borderRadius: device === 'phone' ? 34 : 12,
+                 border: device === 'phone' ? '9px solid #0c0a08' : '1px solid rgba(0,0,0,0.35)',
+               }}>
+            {device === 'desktop' ? (
+              <div className="flex items-center gap-1.5 px-3 py-2" style={{ background: '#141210' }}>
+                <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#ff5f57' }} />
+                <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#febc2e' }} />
+                <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#28c840' }} />
+                <span className="ml-2 text-[10px] px-2 py-0.5 rounded" style={{ background: '#26221d', color: '#9a8a70' }}>
+                  menu.betareal.ge
+                </span>
+              </div>
+            ) : (
+              <div className="flex justify-center py-1.5" style={{ background: '#0c0a08' }}>
+                <span className="w-16 h-1.5 rounded-full" style={{ background: '#2a2622' }} />
+              </div>
+            )}
+
+            <div style={{
+              background: 'var(--bg-image, none)',
+              backgroundColor: 'var(--bg)',
+              backgroundSize: 'var(--bg-size, auto)',
+              backgroundRepeat: 'var(--bg-repeat, no-repeat)',
+              fontFamily: `'${fontBody}', sans-serif`,
+              padding: device === 'phone' ? '18px 14px 14px' : '22px 20px 18px',
+              maxHeight: 470, overflowY: 'auto',
+            }}>
+              <div className="text-center mb-4">
+                {logoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={logoUrl} alt={brand}
+                       style={{ maxWidth: device === 'phone' ? 150 : 190, maxHeight: 70, margin: '0 auto', objectFit: 'contain' }} />
+                ) : (
+                  <div style={{
+                    fontFamily: `'${fontHeading}', sans-serif`, color: 'var(--hero-color)',
+                    letterSpacing: 3, fontSize: device === 'phone' ? 22 : 28, lineHeight: 1.1,
+                    textTransform: 'uppercase', fontWeight: 700,
+                  }}>{brand}</div>
+                )}
+                <div style={{ height: 3, width: 66, margin: '10px auto 0', borderRadius: 3, background: 'var(--divider-bg)' }} />
+              </div>
+
+              <div className="flex gap-2 mb-4 justify-center flex-wrap">
+                {['Mains', 'Sides', 'Drinks'].map((c, i) => (
+                  <span key={c} className="text-[11px] px-3 py-1 rounded-full" style={{
+                    background: i === 0 ? 'var(--pill-active-bg)' : 'var(--pill-bg)',
+                    color: i === 0 ? 'var(--accent-text)' : 'var(--dim)',
+                    border: i === 0 ? 'none' : '1px solid var(--border)',
+                  }}>{c}</span>
+                ))}
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 12 }}>
+                {shown.map((it, i) => (
+                  <div key={i} style={{
+                    background: 'var(--card-bg)', border: '1px solid var(--border)',
+                    borderRadius: 'var(--card-radius, 16px)', boxShadow: 'var(--item-shadow)',
+                    padding: 12, display: 'flex', flexDirection: 'column', gap: 8,
+                  }}>
+                    <div className="relative flex items-center justify-center"
+                         style={{ background: 'var(--thumb-bg)', borderRadius: 12, height: device === 'phone' ? 84 : 96, fontSize: 34 }}>
+                      <span style={{ position: 'absolute', inset: 0, borderRadius: 12, background: 'var(--thumb-vignette, none)' }} />
+                      <span style={{ position: 'relative' }}>{it.emoji}</span>
+                      <span className="absolute top-1.5 right-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded"
+                            style={{ background: 'var(--cta-bg)', color: 'var(--accent-text)', letterSpacing: 0.5 }}>3D</span>
+                    </div>
+                    <div style={{ color: 'var(--text)', fontWeight: 700, fontSize: 14 }}>{it.name}</div>
+                    <div style={{ color: 'var(--dim)', fontSize: 11, lineHeight: 1.4 }}>{it.desc}</div>
+                    <div className="flex items-center justify-between mt-1">
+                      <span style={{ color: 'var(--hero-color)', fontWeight: 700, fontSize: 15 }}>{it.price}</span>
+                      <button style={{ background: 'var(--cta-bg)', color: 'var(--accent-text)', fontSize: 12, fontWeight: 700, padding: '5px 12px', borderRadius: 999 }}>
+                        + Add
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between px-4 py-3"
+                 style={{ background: 'var(--modal-bg)', borderTop: '1px solid var(--border)', fontFamily: `'${fontBody}', sans-serif` }}>
+              <span style={{ color: 'var(--dim)', fontSize: 12 }}>2 items · 53 ₾</span>
+              <span className="px-4 py-1.5 rounded-full text-xs font-bold" style={{ background: 'var(--cta-bg)', color: 'var(--accent-text)' }}>
+                View Cart
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p className="mt-2 text-[11px] leading-relaxed" style={{ color: 'var(--dim)' }}>
+        {T.previewHint}
+      </p>
+    </div>
+  )
+}
+
+function Segmented({ value, onChange, options }:
+  { value: string; onChange: (v: string) => void; options: { id: string; label: string }[] }) {
+  return (
+    <div className="flex gap-1 p-1 rounded-lg" style={{ background: 'var(--card)' }}>
+      {options.map(o => (
+        <button key={o.id} onClick={() => onChange(o.id)}
+                className="px-3 py-1 rounded-md text-xs font-medium transition-all"
+                style={{ background: value === o.id ? 'var(--gold)' : 'transparent',
+                         color: value === o.id ? '#0f0b07' : 'var(--dim)' }}>
+          {o.label}
+        </button>
+      ))}
     </div>
   )
 }
