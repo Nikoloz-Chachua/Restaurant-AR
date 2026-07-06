@@ -2970,8 +2970,6 @@
                 }
             });
         }, { passive: true });
-        if (_previewAccessAllowed) track('page_load', null, { return_visitor: _isReturnVisitor });
-
         const UI = {
             en: {
                 tagline:   'Taste the Wild',
@@ -3997,6 +3995,7 @@
             {
                 try {
                     const tenant = await _resolveTenant();
+                    track('page_load', null, { return_visitor: _isReturnVisitor });
                     const data = await _supaSelect(
                         `menu_items?select=*,categories(name_en,name_ka)&restaurant_id=eq.${tenant.restaurant_id}&visible=eq.true&order=category_id,sort_order`
                     );
