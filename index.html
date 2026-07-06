@@ -3323,14 +3323,26 @@
             closeModal();
             openAR(idx, items);
         });
+        // Step to the next/prev item that actually has a 3D model, so the arrows
+        // never land on a photo-only dish (which would show an empty viewer).
+        function _stepModalToModel(dir) {
+            const n = modalItems.length;
+            if (!n) return modalIndex;
+            let i = modalIndex;
+            for (let s = 0; s < n; s++) {
+                i = (i + dir + n) % n;
+                if (_hasModel(modalItems[i])) return i;
+            }
+            return modalIndex; // no other 3D item — stay put
+        }
         document.getElementById('modal-prev').addEventListener('click', e => {
             e.stopPropagation();
-            modalIndex = (modalIndex - 1 + modalItems.length) % modalItems.length;
+            modalIndex = _stepModalToModel(-1);
             updateModal();
         });
         document.getElementById('modal-next').addEventListener('click', e => {
             e.stopPropagation();
-            modalIndex = (modalIndex + 1) % modalItems.length;
+            modalIndex = _stepModalToModel(1);
             updateModal();
         });
 
@@ -3362,6 +3374,11 @@
             modalItems = catItems || menuItems;
             modalIndex = localIdx;
             modalMessage = fallbackMessage;
+            // Arrows only make sense when 2+ dishes in this list have a 3D model.
+            const _navModels = modalItems.filter(_hasModel).length;
+            const _navDisp = _navModels > 1 ? '' : 'none';
+            document.getElementById('modal-prev').style.display = _navDisp;
+            document.getElementById('modal-next').style.display = _navDisp;
             const _viewItem = modalItems[localIdx];
             const _viewIdx  = (_viewItem && menuItems) ? menuItems.indexOf(_viewItem) : null;
             _modalOpenTime = Date.now();
@@ -3739,7 +3756,11 @@
                     return;
                 }
                 try {
-                    await window.XR.start(localIdx, _arCatItems);
+                    // Carousel navigates only 3D-model items, so photo-only dishes
+                    // never appear as empty slots. Remap the index into that list.
+                    const _arList = _arCatItems.filter(_hasModel);
+                    const _arIdx  = Math.max(0, _arList.indexOf(item));
+                    await window.XR.start(_arIdx, _arList);
                 } catch (err) {
                     console.error('XR start failed:', err);
                     _fallbackTo3D(localIdx, _arCatItems, UI[window.__lang].arFailed);
