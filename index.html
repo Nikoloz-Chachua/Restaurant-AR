@@ -452,7 +452,7 @@
             position: absolute;
             bottom: 0;
             right: 0;
-            background: var(--cta-bg);
+            background: var(--badge-bg, var(--cta-bg));
             color: var(--accent-text);
             font-family: 'Bebas Neue', sans-serif;
             font-size: 0.9rem;
@@ -557,7 +557,7 @@
             font-family: 'Bebas Neue', sans-serif;
             font-size: 1.15rem;
             letter-spacing: 1px;
-            color: var(--accent);
+            color: var(--price-color, var(--accent));
             transition: color var(--t);
         }
 
@@ -1324,8 +1324,8 @@
 
         .qty-add-btn {
             background: transparent;
-            color: var(--accent);
-            border: 1.5px solid var(--accent);
+            color: var(--add-btn-color, var(--accent));
+            border: 1.5px solid var(--add-btn-color, var(--accent));
             border-radius: 9px;
             width: 34px;
             height: 34px;
@@ -3941,7 +3941,8 @@
                     pill_bg: '--pill-bg', pill_active_bg: '--pill-active-bg',
                     cta_bg: '--cta-bg', cta_shadow: '--cta-shadow',
                     hero_color: '--hero-color', hero_shadow: '--hero-shadow', divider_bg: '--divider-bg',
-                    modal_bg_image: '--modal-bg-image'
+                    modal_bg_image: '--modal-bg-image',
+                    badge_bg: '--badge-bg', price_color: '--price-color', add_btn_color: '--add-btn-color'
                 };
                 // Clear any inline CSS-variable overrides a previous version may have set
                 // directly on <html> (inline styles beat attribute-selector rules and would

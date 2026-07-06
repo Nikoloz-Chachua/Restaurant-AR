@@ -58,6 +58,11 @@ export default function Sidebar({ open, onClose }: Props) {
   const tenantQuery = plan.restaurantSlug ? `?tenant=${encodeURIComponent(plan.restaurantSlug)}` : ''
   const tenantHref = (href: string) => tenantQuery && href !== '/tenants' ? `${href}${tenantQuery}` : href
 
+  // "View Menu" must open THIS tenant's live menu (base + ?tenant=<slug>),
+  // matching how the customer app resolves tenants — not a bare, tenant-less URL.
+  const customerBase = (process.env.NEXT_PUBLIC_CUSTOMER_APP_URL || 'https://restaurant-ar.pages.dev').replace(/\/$/, '')
+  const viewMenuHref = plan.restaurantSlug ? `${customerBase}/${tenantQuery}` : customerBase
+
   const NAV = [
     plan.canManageTenants ? { href: '/tenants', label: 'Tenants', icon: '▦' } : null,
     !plan.canManageTenants && plan.canManageBranches ? { href: '/tenants', label: 'Branches', icon: '▦' } : null,
@@ -174,7 +179,7 @@ export default function Sidebar({ open, onClose }: Props) {
       {/* Footer links */}
       <div className="px-3 pb-4 shrink-0">
         <a
-          href="https://restaurant-ar.pages.dev"
+          href={viewMenuHref}
           target="_blank"
           rel="noreferrer"
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm mb-1 transition-colors duration-150"

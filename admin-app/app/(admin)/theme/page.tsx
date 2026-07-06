@@ -18,6 +18,9 @@ const NIGHT_FIELDS: { key: string; tKey: keyof Translations }[] = [
   { key: 'night_dim',         tKey: 'colorDim' },
   { key: 'night_accent',      tKey: 'colorAccent' },
   { key: 'night_accent_text', tKey: 'colorAccentText' },
+  { key: 'night_price_color', tKey: 'colorPrice' },
+  { key: 'night_badge_bg',    tKey: 'colorBadge' },
+  { key: 'night_add_btn_color', tKey: 'colorAddBtn' },
   { key: 'night_thumb_bg',    tKey: 'colorThumbBg' },
   { key: 'night_modal_bg',    tKey: 'colorModalBg' },
 ]
@@ -30,6 +33,9 @@ const DAY_FIELDS: { key: string; tKey: keyof Translations }[] = [
   { key: 'day_dim',         tKey: 'colorDim' },
   { key: 'day_accent',      tKey: 'colorAccent' },
   { key: 'day_accent_text', tKey: 'colorAccentText' },
+  { key: 'day_price_color', tKey: 'colorPrice' },
+  { key: 'day_badge_bg',    tKey: 'colorBadge' },
+  { key: 'day_add_btn_color', tKey: 'colorAddBtn' },
   { key: 'day_thumb_bg',    tKey: 'colorThumbBg' },
   { key: 'day_modal_bg',    tKey: 'colorModalBg' },
 ]
@@ -132,6 +138,18 @@ export default function ThemePage() {
         next[`${prefix}_bg_image`] = 'linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%)'
         next[`${prefix}_bg_size`] = 'auto'
         next[`${prefix}_bg_repeat`] = 'no-repeat'
+      }
+      // The thumbnail stage renders with --stage-bg and the modal with
+      // --modal-bg-image; templates set those explicitly, which would override
+      // a plain thumb_bg / modal_bg color and make the picker look like it does
+      // nothing. Re-link the derived token to the chosen color so it takes.
+      if ((key === 'night_thumb_bg' || key === 'day_thumb_bg') && value.trim()) {
+        const prefix = key === 'night_thumb_bg' ? 'night' : 'day'
+        next[`${prefix}_stage_bg`] = 'var(--thumb-bg)'
+      }
+      if ((key === 'night_modal_bg' || key === 'day_modal_bg') && value.trim()) {
+        const prefix = key === 'night_modal_bg' ? 'night' : 'day'
+        next[`${prefix}_modal_bg_image`] = 'linear-gradient(180deg, var(--modal-bg) 0%, var(--modal-bg) 100%)'
       }
       return next
     })
@@ -598,6 +616,9 @@ function ThemePreview({ config, activeTab }: { config: ThemeConfig; activeTab: s
     '--pill-bg': V('pill_bg') || 'transparent',
     '--pill-active-bg': V('pill_active_bg') || accent,
     '--hero-color': V('hero_color') || accent,
+    '--badge-bg': V('badge_bg') || V('cta_bg') || accent,
+    '--price-color': V('price_color') || V('hero_color') || accent,
+    '--add-btn-color': V('add_btn_color') || accent,
     '--divider-bg': V('divider_bg') || `linear-gradient(90deg, transparent, ${accent}, transparent)`,
     '--item-shadow': V('item_shadow') || '0 4px 14px rgba(0,0,0,0.28)',
     '--modal-bg': base('modal_bg'),
@@ -700,13 +721,13 @@ function ThemePreview({ config, activeTab }: { config: ThemeConfig; activeTab: s
                       <span style={{ position: 'absolute', inset: 0, borderRadius: 12, background: 'var(--thumb-vignette, none)' }} />
                       <span style={{ position: 'relative' }}>{it.emoji}</span>
                       <span className="absolute top-1.5 right-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded"
-                            style={{ background: 'var(--cta-bg)', color: 'var(--accent-text)', letterSpacing: 0.5 }}>3D</span>
+                            style={{ background: 'var(--badge-bg)', color: 'var(--accent-text)', letterSpacing: 0.5 }}>3D</span>
                     </div>
                     <div style={{ color: 'var(--text)', fontWeight: 700, fontSize: 14 }}>{it.name}</div>
                     <div style={{ color: 'var(--dim)', fontSize: 11, lineHeight: 1.4 }}>{it.desc}</div>
                     <div className="flex items-center justify-between mt-1">
-                      <span style={{ color: 'var(--hero-color)', fontWeight: 700, fontSize: 15 }}>{it.price}</span>
-                      <button style={{ background: 'var(--cta-bg)', color: 'var(--accent-text)', fontSize: 12, fontWeight: 700, padding: '5px 12px', borderRadius: 999 }}>
+                      <span style={{ color: 'var(--price-color)', fontWeight: 700, fontSize: 15 }}>{it.price}</span>
+                      <button style={{ background: 'transparent', color: 'var(--add-btn-color)', border: '1.5px solid var(--add-btn-color)', fontSize: 12, fontWeight: 700, padding: '5px 12px', borderRadius: 999 }}>
                         + Add
                       </button>
                     </div>
