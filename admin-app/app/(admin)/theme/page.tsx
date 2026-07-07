@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback, type CSSProperties } from 'react'
+import { useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/useLang'
 import type { Translations } from '@/lib/i18n'
@@ -158,12 +158,20 @@ export default function ThemePage() {
   const [T] = useLang()
   const plan = usePlan()
   const [config, setConfig]   = useState<ThemeConfig>({})
+  const [savedConfig, setSavedConfig] = useState<ThemeConfig>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving]   = useState(false)
   const [msg, setMsg]         = useState('')
   const [tab, setTab]         = useState<'templates' | 'night' | 'day' | 'background' | 'fonts' | 'branding'>('templates')
   const [flashKey, setFlashKey]       = useState<string | null>(null)
   const [pendingPick, setPendingPick] = useState<string | null>(null)
+
+  // Unsaved-changes tracking: compare the working config against the last
+  // persisted snapshot (order-independent).
+  const dirty = useMemo(
+    () => JSON.stringify(Object.entries(config).sort()) !== JSON.stringify(Object.entries(savedConfig).sort()),
+    [config, savedConfig],
+  )
 
   const load = useCallback(async () => {
     if (plan.loading || !plan.canUseTheme || !plan.restaurantId) {
@@ -174,10 +182,36 @@ export default function ThemePage() {
     const map: ThemeConfig = {}
     data?.forEach(r => { map[r.key] = r.value })
     setConfig(map)
+    setSavedConfig(map)
     setLoading(false)
   }, [plan.canUseTheme, plan.loading, plan.restaurantId, supabase])
 
   useEffect(() => { void Promise.resolve().then(load) }, [load])
+
+  // Leave guard #1 — warn on refresh / tab-close / external navigation.
+  useEffect(() => {
+    if (!dirty) return
+    const onBeforeUnload = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = '' }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [dirty])
+
+  // Leave guard #2 — confirm before an in-app (SPA) navigation away, e.g. the
+  // sidebar links. Capture-phase so it runs before Next's <Link> click handler;
+  // cancelling blocks the navigation. Skips new-tab / external / hash / modified
+  // clicks (those don't lose the current edits).
+  useEffect(() => {
+    if (!dirty) return
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+      const a = (e.target as HTMLElement).closest('a')
+      const href = a?.getAttribute('href')
+      if (!a || !href || a.target === '_blank' || href.startsWith('#') || /^[a-z]+:\/\//i.test(href)) return
+      if (!window.confirm(T.unsavedLeave)) { e.preventDefault(); e.stopPropagation() }
+    }
+    document.addEventListener('click', onClick, true)
+    return () => document.removeEventListener('click', onClick, true)
+  }, [dirty, T])
 
   // Click-to-edit: a preview element asks to edit `field` in `m` (night/day).
   // Switch to that tab, then (after it renders) scroll the row into view, flash
@@ -293,6 +327,7 @@ export default function ThemePage() {
     setSaving(true)
     const rows = Object.entries(config).map(([key, value]) => ({ key, value, restaurant_id: plan.restaurantId }))
     await supabase.from('theme_config').upsert(rows, { onConflict: 'restaurant_id,key' })
+    setSavedConfig({ ...config })
     setSaving(false)
     setMsg(T.saved)
     setTimeout(() => setMsg(''), 4000)
@@ -309,6 +344,7 @@ export default function ThemePage() {
       return
     }
     setConfig(next)
+    setSavedConfig({ ...next })
     setMsg(T.resetDone)
     setTimeout(() => setMsg(''), 3000)
   }
@@ -371,6 +407,13 @@ export default function ThemePage() {
               {msg}
             </span>
           )}
+          {dirty && !msg && (
+            <span className="text-sm px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5"
+                  style={{ background: 'rgba(231,177,90,0.15)', color: 'var(--gold)' }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--gold)' }} />
+              {T.unsavedChanges}
+            </span>
+          )}
           <button onClick={reset}
                   className="px-4 py-2 rounded-lg text-sm"
                   style={{ color: 'var(--danger)', border: '1px solid rgba(224,82,82,0.3)' }}>
@@ -378,7 +421,10 @@ export default function ThemePage() {
           </button>
           <button onClick={save} disabled={saving}
                   className="px-5 py-2 rounded-lg text-sm font-semibold"
-                  style={{ background: 'var(--gold)', color: '#0f0b07', opacity: saving ? 0.6 : 1 }}>
+                  style={{ background: 'var(--gold)', color: '#0f0b07',
+                           opacity: saving ? 0.6 : dirty ? 1 : 0.65,
+                           boxShadow: dirty && !saving ? '0 0 0 3px rgba(231,177,90,0.28)' : undefined,
+                           transition: 'box-shadow .2s, opacity .2s' }}>
             {saving ? T.saving : T.saveChanges}
           </button>
         </div>
