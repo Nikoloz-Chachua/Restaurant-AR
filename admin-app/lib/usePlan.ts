@@ -25,6 +25,7 @@ export type PlanAccess = {
   restaurantId: number | null
   restaurantSlug: string
   restaurantName: string
+  restaurantDomain: string
   hasTenantContext: boolean
 }
 
@@ -87,7 +88,7 @@ function accessFor(
   role: RoleId,
   plan: PlanId,
   loading: boolean,
-  tenant: Partial<Pick<PlanAccess, 'brandId' | 'restaurantId' | 'restaurantSlug' | 'restaurantName'>> = {},
+  tenant: Partial<Pick<PlanAccess, 'brandId' | 'restaurantId' | 'restaurantSlug' | 'restaurantName' | 'restaurantDomain'>> = {},
   platformPlan: PlatformPlanId = legacyPlatformPlan(plan),
 ): PlanAccess {
   const isSuperAdmin = role === 'super_admin'
@@ -116,6 +117,7 @@ function accessFor(
     restaurantId: tenant.restaurantId ?? null,
     restaurantSlug: tenant.restaurantSlug ?? '',
     restaurantName: tenant.restaurantName ?? '',
+    restaurantDomain: tenant.restaurantDomain ?? '',
     hasTenantContext,
   }
 }
@@ -136,13 +138,13 @@ export function usePlan(): PlanAccess {
         : normalizePlan(metadata.plan)
       let role = normalizeRole(metadata.role)
       let platformPlan = legacyPlatformPlan(plan)
-      let tenant: Partial<Pick<PlanAccess, 'brandId' | 'restaurantId' | 'restaurantSlug' | 'restaurantName'>> = {}
+      let tenant: Partial<Pick<PlanAccess, 'brandId' | 'restaurantId' | 'restaurantSlug' | 'restaurantName' | 'restaurantDomain'>> = {}
 
       if (userId) {
         const requestedSlug = requestedRestaurantSlug()
         const [{ data: brandUsers }, { data: restaurantUsers }] = await Promise.all([
           supabase.from('brand_users').select('brand_id, role, brands(plan)').eq('user_id', userId),
-          supabase.from('restaurant_users').select('restaurant_id, role, restaurants(id, slug, name, brand_id, brands(plan))').eq('user_id', userId),
+          supabase.from('restaurant_users').select('restaurant_id, role, restaurants(id, slug, name, brand_id, custom_domain, brands(plan))').eq('user_id', userId),
         ])
         const brandMemberships = brandUsers ?? []
         const restaurantMemberships = restaurantUsers ?? []
@@ -151,7 +153,7 @@ export function usePlan(): PlanAccess {
         const isSuperAdmin = role === 'super_admin'
 
         async function setTenantFromRestaurant(restaurant: {
-          id: number; slug: string; name: string; brand_id: number; brands?: { plan?: string } | { plan?: string }[] | null
+          id: number; slug: string; name: string; brand_id: number; custom_domain?: string | null; brands?: { plan?: string } | { plan?: string }[] | null
         }) {
           const brand = Array.isArray(restaurant.brands) ? restaurant.brands[0] : restaurant.brands
           platformPlan = normalizePlatformPlan(brand?.plan)
@@ -160,13 +162,14 @@ export function usePlan(): PlanAccess {
             restaurantId: restaurant.id,
             restaurantSlug: restaurant.slug,
             restaurantName: restaurant.name,
+            restaurantDomain: restaurant.custom_domain ?? '',
           }
         }
 
         if (requestedSlug) {
           const { data: requestedRestaurant } = await supabase
             .from('restaurants')
-            .select('id, slug, name, brand_id, brands(plan)')
+            .select('id, slug, name, brand_id, custom_domain, brands(plan)')
             .eq('slug', requestedSlug)
             .maybeSingle()
           if (requestedRestaurant && (isSuperAdmin || brandIds.has(requestedRestaurant.brand_id) || restaurantIds.has(requestedRestaurant.id))) {
@@ -179,7 +182,7 @@ export function usePlan(): PlanAccess {
           const brand = (Array.isArray(brandUser.brands) ? brandUser.brands[0] : brandUser.brands) as { plan?: string } | null
           const { data: restaurants } = await supabase
             .from('restaurants')
-            .select('id, slug, name, brand_id, brands(plan)')
+            .select('id, slug, name, brand_id, custom_domain, brands(plan)')
             .eq('brand_id', brandUser.brand_id)
             .order('created_at')
             .limit(1)
@@ -189,7 +192,7 @@ export function usePlan(): PlanAccess {
           if (restaurant) await setTenantFromRestaurant(restaurant)
         } else if (!tenant.restaurantId && restaurantMemberships[0]?.restaurants) {
           const restaurant = (Array.isArray(restaurantMemberships[0].restaurants) ? restaurantMemberships[0].restaurants[0] : restaurantMemberships[0].restaurants) as {
-            id: number; slug: string; name: string; brand_id: number; brands?: { plan?: string } | { plan?: string }[]
+            id: number; slug: string; name: string; brand_id: number; custom_domain?: string | null; brands?: { plan?: string } | { plan?: string }[]
           }
           if (!isSuperAdmin) role = normalizeRole(restaurantMemberships[0].role)
           await setTenantFromRestaurant(restaurant)

@@ -58,10 +58,17 @@ export default function Sidebar({ open, onClose }: Props) {
   const tenantQuery = plan.restaurantSlug ? `?tenant=${encodeURIComponent(plan.restaurantSlug)}` : ''
   const tenantHref = (href: string) => tenantQuery && href !== '/tenants' ? `${href}${tenantQuery}` : href
 
-  // "View Menu" must open THIS tenant's live menu (base + ?tenant=<slug>),
-  // matching how the customer app resolves tenants — not a bare, tenant-less URL.
+  // "View Menu" must open THIS tenant's real live URL. Preference order:
+  //   1. its custom_domain (e.g. monday-greens.betareal.ge), if set;
+  //   2. otherwise <slug>.betareal.ge — the wildcard subdomain the customer app
+  //      resolves via _tenantSlugFromHost;
+  //   3. bare base URL only if there's no tenant at all.
   const customerBase = (process.env.NEXT_PUBLIC_CUSTOMER_APP_URL || 'https://restaurant-ar.pages.dev').replace(/\/$/, '')
-  const viewMenuHref = plan.restaurantSlug ? `${customerBase}/${tenantQuery}` : customerBase
+  const viewMenuHref = plan.restaurantDomain
+    ? `https://${plan.restaurantDomain.replace(/^https?:\/\//, '').replace(/\/$/, '')}/`
+    : plan.restaurantSlug
+      ? `https://${plan.restaurantSlug}.betareal.ge/`
+      : customerBase
 
   const NAV = [
     plan.canManageTenants ? { href: '/tenants', label: 'Tenants', icon: '▦' } : null,
