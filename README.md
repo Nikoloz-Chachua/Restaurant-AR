@@ -4,7 +4,6 @@ A WebAR restaurant menu. Customers browse 3D food models and place them on their
 
 ## Live
 
-**[TEMOtkesh.github.io/Restaurant-AR](https://TEMOtkesh.github.io/Restaurant-AR/)**
 
 ## How it works
 
