@@ -133,6 +133,7 @@ const en = {
   previewDesktop: 'Desktop',
   previewPhone: 'Phone',
   previewHint: 'Approximate preview of your unsaved colors, fonts, logo and background. Save, then reload the live menu to publish.',
+  contrastLow: 'Low contrast — may be hard to read',
 }
 
 const ka: typeof en = {
@@ -268,6 +269,7 @@ const ka: typeof en = {
   previewDesktop: 'დესკტოპი',
   previewPhone: 'ტელეფონი',
   previewHint: 'შენი შეუნახავი ფერების, შრიფტების, ლოგოსა და ფონის სავარაუდო გადახედვა. შეინახე და განაახლე ცოცხალი მენიუ გამოსაქვეყნებლად.',
+  contrastLow: 'დაბალი კონტრასტი — შესაძლოა ძნელად წასაკითხი იყოს',
 }
 
 export const translations = { en, ka }

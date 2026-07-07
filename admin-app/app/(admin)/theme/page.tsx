@@ -99,6 +99,60 @@ async function toWebP(file: File): Promise<Blob> {
   })
 }
 
+// ── Contrast (WCAG) ───────────────────────────────────────────────────
+// Each editable color is checked against the surface it sits on; a row warns
+// when the ratio drops below 3:1 (the large/UI-text threshold). `against` = the
+// row is foreground text over that key; `fg` = the row is a background and that
+// key is the text on it.
+const CONTRAST: Record<string, { against?: string; fg?: string }> = {
+  text:          { against: 'card' },
+  dim:           { against: 'card' },
+  price_color:   { against: 'card' },
+  add_btn_color: { against: 'card' },
+  accent_text:   { against: 'accent' },
+  badge_bg:      { fg: 'accent_text' },
+  modal_bg:      { fg: 'dim' },
+  bg:            { fg: 'text' },
+  card:          { fg: 'text' },
+  card2:         { fg: 'text' },
+}
+function hexToRgb(h: string): [number, number, number] | null {
+  let s = (h || '').trim().replace('#', '')
+  if (s.length === 3) s = s.split('').map(c => c + c).join('')
+  if (!/^[0-9a-fA-F]{6}$/.test(s)) return null
+  return [0, 2, 4].map(i => parseInt(s.slice(i, i + 2), 16)) as [number, number, number]
+}
+function relLum([r, g, b]: [number, number, number]): number {
+  const a = [r, g, b].map(v => { const s = v / 255; return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4) })
+  return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2]
+}
+function contrastRatio(a: string, b: string): number | null {
+  const c1 = hexToRgb(a), c2 = hexToRgb(b)
+  if (!c1 || !c2) return null
+  const L1 = relLum(c1), L2 = relLum(c2), hi = Math.max(L1, L2), lo = Math.min(L1, L2)
+  return (hi + 0.05) / (lo + 0.05)
+}
+// Effective on-screen color for a base field — mirrors the preview's fallbacks.
+function effColor(field: string, mode: string, config: ThemeConfig): string | undefined {
+  const v = config[`${mode}_${field}`]
+  if (field === 'price_color')   return v || config[`${mode}_hero_color`] || config[`${mode}_accent`]
+  if (field === 'add_btn_color') return v || config[`${mode}_accent`]
+  if (field === 'badge_bg')      return v || config[`${mode}_accent`]
+  return v
+}
+// The failing ratio (< 3) for a field key like "night_text", or null if fine/N-A.
+function rowWarnRatio(fieldKey: string, config: ThemeConfig): number | null {
+  const m = fieldKey.startsWith('day_') ? 'day' : 'night'
+  const field = fieldKey.replace(/^(night|day)_/, '')
+  const spec = CONTRAST[field]
+  if (!spec) return null
+  const fg = effColor(spec.fg || field, m, config)
+  const bg = effColor(spec.against || field, m, config)
+  if (!fg || !bg) return null
+  const r = contrastRatio(fg, bg)
+  return r != null && r < 3 ? r : null
+}
+
 export default function ThemePage() {
   const supabase = createClient()
   const [T] = useLang()
@@ -108,6 +162,8 @@ export default function ThemePage() {
   const [saving, setSaving]   = useState(false)
   const [msg, setMsg]         = useState('')
   const [tab, setTab]         = useState<'templates' | 'night' | 'day' | 'background' | 'fonts' | 'branding'>('templates')
+  const [flashKey, setFlashKey]       = useState<string | null>(null)
+  const [pendingPick, setPendingPick] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     if (plan.loading || !plan.canUseTheme || !plan.restaurantId) {
@@ -122,6 +178,33 @@ export default function ThemePage() {
   }, [plan.canUseTheme, plan.loading, plan.restaurantId, supabase])
 
   useEffect(() => { void Promise.resolve().then(load) }, [load])
+
+  // Click-to-edit: a preview element asks to edit `field` in `m` (night/day).
+  // Switch to that tab, then (after it renders) scroll the row into view, flash
+  // it, and open its color picker.
+  const pickField = useCallback((m: 'night' | 'day', field: string) => {
+    setTab(m)
+    setPendingPick(`${m}_${field}`)
+  }, [])
+  useEffect(() => {
+    if (!pendingPick) return
+    const raf = requestAnimationFrame(() => {
+      const row = document.getElementById(`crow-${pendingPick}`)
+      if (row) {
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        const input = row.querySelector('input[type=color]') as (HTMLInputElement & { showPicker?: () => void }) | null
+        try { input?.showPicker?.() } catch { input?.focus() }
+      }
+      setFlashKey(pendingPick)
+      setPendingPick(null)
+    })
+    return () => cancelAnimationFrame(raf)
+  }, [pendingPick, tab])
+  useEffect(() => {
+    if (!flashKey) return
+    const t = setTimeout(() => setFlashKey(null), 1300)
+    return () => clearTimeout(t)
+  }, [flashKey])
 
   const [uploadingKey, setUploadingKey] = useState('')
 
@@ -228,6 +311,12 @@ export default function ThemePage() {
     setConfig(next)
     setMsg(T.resetDone)
     setTimeout(() => setMsg(''), 3000)
+  }
+
+  // Legibility hint for a color row (or null). Built here so it can be localized.
+  const warnText = (key: string): string | null => {
+    const r = rowWarnRatio(key, config)
+    return r != null ? `${T.contrastLow} (${r.toFixed(1)}:1)` : null
   }
 
   const tabs = [
@@ -343,11 +432,13 @@ export default function ThemePage() {
             </div>
           )}
           {tab === 'night' && NIGHT_FIELDS.map(f => (
-            <ColorRow key={f.key} label={T[f.tKey] as string} value={config[f.key] ?? ''}
+            <ColorRow key={f.key} fieldKey={f.key} label={T[f.tKey] as string} value={config[f.key] ?? ''}
+                      flash={flashKey === f.key} warning={warnText(f.key)}
                       onChange={v => setColor(f.key, v)} />
           ))}
           {tab === 'day' && DAY_FIELDS.map(f => (
-            <ColorRow key={f.key} label={T[f.tKey] as string} value={config[f.key] ?? ''}
+            <ColorRow key={f.key} fieldKey={f.key} label={T[f.tKey] as string} value={config[f.key] ?? ''}
+                      flash={flashKey === f.key} warning={warnText(f.key)}
                       onChange={v => setColor(f.key, v)} />
           ))}
           {tab === 'background' && (
@@ -425,17 +516,22 @@ export default function ThemePage() {
         </div>
 
         {/* ── Right: live preview ─────────────────────────────────────── */}
-        <ThemePreview config={config} activeTab={tab} />
+        <ThemePreview config={config} activeTab={tab} onPick={pickField} />
       </div>
     </div>
   )
 }
 
-function ColorRow({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function ColorRow({ fieldKey, label, value, onChange, flash, warning }:
+  { fieldKey?: string; label: string; value: string; onChange: (v: string) => void; flash?: boolean; warning?: string | null }) {
   const colorVal = isColor(value) ? toHex(value) : '#000000'
+  const borderColor = flash ? 'var(--gold)' : warning ? 'rgba(224,83,60,0.55)' : 'var(--border)'
   return (
-    <div className="flex items-center gap-4 p-3 rounded-xl"
-         style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+    <div id={fieldKey ? `crow-${fieldKey}` : undefined}
+         className="flex items-center gap-4 p-3 rounded-xl"
+         style={{ background: 'var(--card)', border: `1px solid ${borderColor}`,
+                  boxShadow: flash ? '0 0 0 3px rgba(231,177,90,0.35)' : undefined,
+                  transition: 'box-shadow .2s, border-color .2s' }}>
       <input type="color" value={colorVal} onChange={e => onChange(e.target.value)}
              style={{ width: 44, height: 36, padding: '2px 4px', flexShrink: 0 }} />
       <div className="flex-1">
@@ -446,6 +542,15 @@ function ColorRow({ label, value, onChange }: { label: string; value: string; on
                style={{ fontSize: '0.8rem', padding: '4px 8px' }}
                placeholder="#rrggbb or rgba(…)" />
       </div>
+      {warning && (
+        <span title={warning} className="shrink-0" style={{ cursor: 'help', lineHeight: 0 }}>
+          <svg width="17" height="15" viewBox="0 0 16 14" aria-hidden="true">
+            <path d="M8 1.4 L15 12.6 H1 Z" fill="none" stroke="#e0533c" strokeWidth="1.5" strokeLinejoin="round" />
+            <line x1="8" y1="5.4" x2="8" y2="8.8" stroke="#e0533c" strokeWidth="1.5" strokeLinecap="round" />
+            <circle cx="8" cy="10.9" r="0.9" fill="#e0533c" />
+          </svg>
+        </span>
+      )}
       <div className="w-10 h-8 rounded-md border shrink-0"
            style={{ background: value, borderColor: 'var(--border)' }} />
     </div>
@@ -563,7 +668,8 @@ const PREVIEW_DEFAULTS = {
   },
 } as const
 
-function ThemePreview({ config, activeTab }: { config: ThemeConfig; activeTab: string }) {
+function ThemePreview({ config, activeTab, onPick }:
+  { config: ThemeConfig; activeTab: string; onPick: (mode: PreviewMode, field: string) => void }) {
   const [T] = useLang()
   const [device, setDevice] = useState<PreviewDevice>('desktop')
   const [mode, setMode]     = useState<PreviewMode>('night')
@@ -639,6 +745,7 @@ function ThemePreview({ config, activeTab }: { config: ThemeConfig; activeTab: s
 
   return (
     <div className="w-full xl:w-auto xl:sticky xl:top-4 shrink-0">
+      <style>{`.pv-hot{cursor:pointer;outline:2px solid transparent;outline-offset:2px;border-radius:4px;transition:outline-color .12s}.pv-hot:hover{outline-color:#38bdf8}`}</style>
       <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
         <span className="text-xs uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
           {T.previewLabel}
@@ -655,6 +762,10 @@ function ThemePreview({ config, activeTab }: { config: ThemeConfig; activeTab: s
            style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
         <div style={{ width: frameW, maxWidth: '100%' }}>
           <div className="overflow-hidden shadow-xl"
+               onClick={e => {
+                 const el = (e.target as HTMLElement).closest<HTMLElement>('[data-field]')
+                 if (el?.dataset.field) onPick(mode, el.dataset.field)
+               }}
                style={{
                  ...vars,
                  borderRadius: device === 'phone' ? 34 : 12,
@@ -675,7 +786,7 @@ function ThemePreview({ config, activeTab }: { config: ThemeConfig; activeTab: s
               </div>
             )}
 
-            <div style={{
+            <div className="pv-hot" data-field="bg" title={`✎ ${T.colorBg}`} style={{
               background: 'var(--bg-image, none)',
               backgroundColor: 'var(--bg)',
               backgroundSize: 'var(--bg-size, auto)',
@@ -701,7 +812,8 @@ function ThemePreview({ config, activeTab }: { config: ThemeConfig; activeTab: s
 
               <div className="flex gap-2 mb-4 justify-center flex-wrap">
                 {['Mains', 'Sides', 'Drinks'].map((c, i) => (
-                  <span key={c} className="text-[11px] px-3 py-1 rounded-full" style={{
+                  <span key={c} className={`text-[11px] px-3 py-1 rounded-full${i === 0 ? ' pv-hot' : ''}`}
+                        data-field={i === 0 ? 'accent' : undefined} title={i === 0 ? `✎ ${T.colorAccent}` : undefined} style={{
                     background: i === 0 ? 'var(--pill-active-bg)' : 'var(--pill-bg)',
                     color: i === 0 ? 'var(--accent-text)' : 'var(--dim)',
                     border: i === 0 ? 'none' : '1px solid var(--border)',
@@ -711,23 +823,23 @@ function ThemePreview({ config, activeTab }: { config: ThemeConfig; activeTab: s
 
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 12 }}>
                 {shown.map((it, i) => (
-                  <div key={i} style={{
+                  <div key={i} className="pv-hot" data-field="card" title={`✎ ${T.colorCard}`} style={{
                     background: 'var(--card-bg)', border: '1px solid var(--border)',
                     borderRadius: 'var(--card-radius, 16px)', boxShadow: 'var(--item-shadow)',
                     padding: 12, display: 'flex', flexDirection: 'column', gap: 8,
                   }}>
-                    <div className="relative flex items-center justify-center"
+                    <div className="relative flex items-center justify-center pv-hot" data-field="thumb_bg" title={`✎ ${T.colorThumbBg}`}
                          style={{ background: 'var(--thumb-bg)', borderRadius: 12, height: device === 'phone' ? 84 : 96, fontSize: 34 }}>
                       <span style={{ position: 'absolute', inset: 0, borderRadius: 12, background: 'var(--thumb-vignette, none)' }} />
                       <span style={{ position: 'relative' }}>{it.emoji}</span>
-                      <span className="absolute top-1.5 right-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded"
+                      <span className="absolute top-1.5 right-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded pv-hot" data-field="badge_bg" title={`✎ ${T.colorBadge}`}
                             style={{ background: 'var(--badge-bg)', color: 'var(--accent-text)', letterSpacing: 0.5 }}>3D</span>
                     </div>
-                    <div style={{ color: 'var(--text)', fontWeight: 700, fontSize: 14 }}>{it.name}</div>
-                    <div style={{ color: 'var(--dim)', fontSize: 11, lineHeight: 1.4 }}>{it.desc}</div>
+                    <div className="pv-hot" data-field="text" title={`✎ ${T.colorText}`} style={{ color: 'var(--text)', fontWeight: 700, fontSize: 14 }}>{it.name}</div>
+                    <div className="pv-hot" data-field="dim" title={`✎ ${T.colorDim}`} style={{ color: 'var(--dim)', fontSize: 11, lineHeight: 1.4 }}>{it.desc}</div>
                     <div className="flex items-center justify-between mt-1">
-                      <span style={{ color: 'var(--price-color)', fontWeight: 700, fontSize: 15 }}>{it.price}</span>
-                      <button style={{ background: 'transparent', color: 'var(--add-btn-color)', border: '1.5px solid var(--add-btn-color)', fontSize: 12, fontWeight: 700, padding: '5px 12px', borderRadius: 999 }}>
+                      <span className="pv-hot" data-field="price_color" title={`✎ ${T.colorPrice}`} style={{ color: 'var(--price-color)', fontWeight: 700, fontSize: 15 }}>{it.price}</span>
+                      <button className="pv-hot" data-field="add_btn_color" title={`✎ ${T.colorAddBtn}`} style={{ background: 'transparent', color: 'var(--add-btn-color)', border: '1.5px solid var(--add-btn-color)', fontSize: 12, fontWeight: 700, padding: '5px 12px', borderRadius: 999 }}>
                         + Add
                       </button>
                     </div>
@@ -736,7 +848,7 @@ function ThemePreview({ config, activeTab }: { config: ThemeConfig; activeTab: s
               </div>
             </div>
 
-            <div className="flex items-center justify-between px-4 py-3"
+            <div className="flex items-center justify-between px-4 py-3 pv-hot" data-field="modal_bg" title={`✎ ${T.colorModalBg}`}
                  style={{ background: 'var(--modal-bg)', borderTop: '1px solid var(--border)', fontFamily: `'${fontBody}', sans-serif` }}>
               <span style={{ color: 'var(--dim)', fontSize: 12 }}>2 items · 53 ₾</span>
               <span className="px-4 py-1.5 rounded-full text-xs font-bold" style={{ background: 'var(--cta-bg)', color: 'var(--accent-text)' }}>
