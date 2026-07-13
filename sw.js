@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bl-v113';
+const CACHE_NAME = 'bl-v114';
 
 const SUPABASE_URL  = 'https://lwdpegloznhpcecivhfy.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_65dKKpb-lxOr8JTjdj7yxw_LZzcJp5h';

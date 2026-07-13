@@ -7,10 +7,11 @@ export const DEFAULT_MENU_FILTERS = Object.freeze({
 })
 
 export function hasActiveArMedia(item) {
-  return Boolean(item?.is_3d) && String(item?.model || '').trim().length > 0
+  return item?.text_only !== true && Boolean(item?.is_3d) && String(item?.model || '').trim().length > 0
 }
 
 export function getMenuItemMediaState(item) {
+  if (item?.text_only === true) return 'text'
   const hasThumbnail = String(item?.thumbnail_url || '').trim().length > 0
   const hasAr = hasActiveArMedia(item)
 

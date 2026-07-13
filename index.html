@@ -298,6 +298,20 @@
                 border-color: var(--accent);
             }
         }
+        .menu-item.no-image {
+            grid-template-columns: minmax(0, 1fr);
+            grid-template-areas: "name" "right";
+            row-gap: 8px;
+            background:
+                linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, transparent), transparent 46%),
+                var(--card-bg);
+        }
+        .menu-item.no-image .item-left { display: none; }
+        .menu-item.no-image .item-right { grid-area: right; }
+        .menu-item.no-image .ingredients {
+            margin-top: 0;
+            min-height: 0;
+        }
 
         .thumb-wrap {
             position: relative;
@@ -1864,6 +1878,13 @@
                 padding: 0;
                 overflow: hidden;
             }
+            .menu-item.no-image {
+                padding: 14px;
+            }
+            .menu-item.no-image .item-name,
+            .menu-item.no-image .item-right {
+                padding: 0;
+            }
 
             .item-left  { order: 1; width: 100%; }
             .item-name  { order: 2; padding: 10px 14px 4px; }
@@ -2330,7 +2351,7 @@
 
         // ── Models ────────────────────────────────────────────────────
         function preloadModels() {
-            const paths = [...new Set(MENU.map(m => _safeAssetUrl(m.model) || m.model).filter(Boolean))];
+            const paths = [...new Set(MENU.filter(_isAREnabledMenuItem).map(m => _safeAssetUrl(m.model) || m.model).filter(Boolean))];
             return Promise.allSettled(paths.map(p => {
                 if (modelGLTFs[p]) return Promise.resolve();
                 if (_modelLoadPromises[p]) return _modelLoadPromises[p];
@@ -3755,7 +3776,7 @@
         }
 
         function _isAREnabledMenuItem(item) {
-            return item?.is_3d !== false && _hasModel(item);
+            return item?.text_only !== true && item?.is_3d !== false && _hasModel(item);
         }
 
         // Admin-set starting camera view for an item's 3D thumbnail/modal. Stored in
@@ -4246,6 +4267,7 @@
                             thumbnail_url:  r.thumbnail_url || '',
                             thumb_3d:       r.thumb_3d ?? false,
                             is_3d:          r.is_3d !== false,
+                            text_only:      r.text_only === true,
                             addons:         Array.isArray(r.addons) ? r.addons : [],
                             variants:       Array.isArray(r.variants) ? r.variants : [],
                         }));
@@ -4350,11 +4372,12 @@
                 // plain photo card: no 3D badge, no live-3D thumbnail upgrade, no AR button.
                 const has3d = _isAREnabledMenuItem(item);
                 const modelSrc = has3d ? _safeAssetUrl(item.model) : '';
+                const noImage = item.text_only === true || (!thumbSrc && !has3d);
                 // thumb_3d (admin checkbox "also load 3D model in thumbnail") controls ONLY
                 // the card thumbnail: off = keep the photo (saves bandwidth), on = upgrade to
                 // live 3D. Items with no photo always upgrade so the tile isn't blank. The 3D
                 // badge, tap-to-3D modal, and AR button are unaffected either way.
-                const thumbModelSrc = (has3d && (item.thumb_3d || !thumbSrc)) ? modelSrc : '';
+                const thumbModelSrc = (!noImage && has3d && (item.thumb_3d || !thumbSrc)) ? modelSrc : '';
                 const itemName = t(item, 'name');
                 const itemNameHtml = _escapeHtml(itemName);
                 const itemDescHtml = _escapeHtml(t(item, 'description'));
@@ -4363,15 +4386,16 @@
                 const _hasVariants = !!(item.variants && item.variants.length);
                 const _cardVi = _hasVariants ? _variantIndex(item, globalIdx) : -1;
                 const itemPriceHtml = _escapeHtml(_hasVariants ? (item.variants[_cardVi].price || '') : item.price);
+                if (noImage) card.classList.add('no-image');
                 card.innerHTML = `
                     <p class="item-name" data-field="name" data-idx="${globalIdx}">${itemNameHtml}</p>
-                    <div class="item-left">
+                    ${noImage ? '' : `<div class="item-left">
                         <div class="thumb-wrap">
-                            <img class="thumb-img"${thumbSrc ? ` src="${thumbSrc}"` : ''} data-model="${thumbModelSrc}" alt="${itemNameHtml}" loading="lazy" onerror="this.style.visibility='hidden'">
+                            <img class="thumb-img"${thumbSrc ? ` src="${thumbSrc}"` : ''} data-model="${thumbModelSrc}" alt="${itemNameHtml}" loading="lazy">
                             <div class="thumb-vignette"></div>
                             ${modelSrc ? '<span class="badge-3d">3D</span>' : ''}
                         </div>
-                    </div>
+                    </div>`}
                     <div class="item-right">
                         <p class="ingredients" data-field="description" data-idx="${globalIdx}">${itemDescHtml}</p>
                         <div class="item-actions">
@@ -4395,6 +4419,10 @@
                 const thumbImg = card.querySelector('.thumb-img');
                 if (thumbImg) {
                     thumbImg.dataset.globalIdx = globalIdx;
+                    thumbImg.addEventListener('error', () => {
+                        card.classList.add('no-image');
+                        card.querySelector('.item-left')?.remove();
+                    }, { once: true });
                     if (has3d) {
                         thumbImg.addEventListener('click', () => openModal(globalIdx, menuItems));
                     } else if (thumbSrc) {

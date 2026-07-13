@@ -14,7 +14,7 @@ type MenuItem = {
   id: number; name_en: string; name_ka: string
   description_en: string; description_ka: string
   price: string; category_id: number | null; model: string; model_usdz: string
-  sort_order: number; visible: boolean; ar_scale: number; thumbnail_url: string; thumb_3d: boolean; is_3d: boolean
+  sort_order: number; visible: boolean; ar_scale: number; thumbnail_url: string; thumb_3d: boolean; is_3d: boolean; text_only: boolean
 }
 type MenuItemPayload = Partial<Omit<MenuItem, 'id'>> & Pick<
   Omit<MenuItem, 'id'>,
@@ -29,11 +29,24 @@ type MenuFilters = {
 }
 const EMPTY_ITEM: Omit<MenuItem, 'id'> = {
   name_en: '', name_ka: '', description_en: '', description_ka: '',
-  price: '', category_id: null, model: '', model_usdz: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '', thumb_3d: false, is_3d: true,
+  price: '', category_id: null, model: '', model_usdz: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '', thumb_3d: false, is_3d: true, text_only: false,
 }
 
 function isActiveArItem(item: Pick<MenuItem, 'visible' | 'model' | 'is_3d'>) {
   return item.visible && item.is_3d && item.model.trim().length > 0
+}
+
+function normalizeTextOnlyItem(item: Omit<MenuItem, 'id'>) {
+  if (!item.text_only) return item
+  return {
+    ...item,
+    is_3d: false,
+    model: '',
+    model_usdz: '',
+    thumbnail_url: '',
+    thumb_3d: false,
+    ar_scale: 1.0,
+  }
 }
 
 // Per-item starting camera view for the customer 3D thumbnail/preview. Stored in
@@ -161,7 +174,8 @@ export default function MenuPage() {
 
   function activeCountWithForm() {
     const existingItems = editItem ? items.filter(item => item.id !== editItem.id) : items
-    const formItem = { visible: itemForm.visible, model: itemForm.model, is_3d: itemForm.is_3d }
+    const normalizedForm = normalizeTextOnlyItem(itemForm)
+    const formItem = { visible: normalizedForm.visible, model: normalizedForm.model, is_3d: normalizedForm.is_3d }
     return existingItems.filter(isActiveArItem).length + (isActiveArItem(formItem) ? 1 : 0)
   }
 
@@ -172,21 +186,23 @@ export default function MenuPage() {
   }
 
   function itemPayloadForSave(base: Omit<MenuItem, 'id'>): MenuItemPayload {
-    if (plan.canUploadModels) return base
+    const normalized = normalizeTextOnlyItem(base)
+    if (plan.canUploadModels) return normalized
 
     const payload: MenuItemPayload = {
-      name_en: base.name_en,
-      name_ka: base.name_ka,
-      description_en: base.description_en,
-      description_ka: base.description_ka,
-      price: base.price,
-      category_id: base.category_id,
-      sort_order: base.sort_order,
-      visible: base.visible,
-      thumbnail_url: base.thumbnail_url,
+      name_en: normalized.name_en,
+      name_ka: normalized.name_ka,
+      description_en: normalized.description_en,
+      description_ka: normalized.description_ka,
+      price: normalized.price,
+      category_id: normalized.category_id,
+      sort_order: normalized.sort_order,
+      visible: normalized.visible,
+      thumbnail_url: normalized.thumbnail_url,
+      text_only: normalized.text_only,
     }
 
-    if (!editItem) {
+    if (!editItem || normalized.text_only) {
       payload.is_3d = false
       payload.model = ''
       payload.model_usdz = ''
@@ -217,7 +233,8 @@ export default function MenuPage() {
       description_en: item.description_en, description_ka: item.description_ka,
       price: item.price, category_id: item.category_id, model: item.model, model_usdz: item.model_usdz ?? '',
       sort_order: item.sort_order, visible: item.visible, ar_scale: item.ar_scale ?? 1.0,
-      thumbnail_url: item.thumbnail_url ?? '', thumb_3d: item.thumb_3d ?? false, is_3d: item.is_3d ?? true })
+      thumbnail_url: item.thumbnail_url ?? '', thumb_3d: item.thumb_3d ?? false, is_3d: item.is_3d ?? true,
+      text_only: item.text_only ?? (!item.is_3d && !item.thumbnail_url && !item.model && !item.model_usdz) })
     setViewForm(parseItemView(itemViews[item.id]))
     setItemModal(true)
   }
@@ -246,7 +263,7 @@ export default function MenuPage() {
     if (savedId !== null && plan.canUploadModels) {
       const viewKey = `item_view_${savedId}`
       const isDefaultView = viewForm.h === DEFAULT_ITEM_VIEW.h && viewForm.v === DEFAULT_ITEM_VIEW.v && viewForm.zoom === DEFAULT_ITEM_VIEW.zoom
-      if (isDefaultView || !itemForm.is_3d) {
+      if (isDefaultView || !nextItemForm.is_3d || nextItemForm.text_only) {
         await supabase.from('theme_config').delete().eq('restaurant_id', plan.restaurantId).eq('key', viewKey)
       } else {
         await supabase.from('theme_config').upsert(
@@ -396,7 +413,7 @@ export default function MenuPage() {
         body: blob,
       })
       if (!upload.ok) throw new Error(`R2 upload failed: ${upload.status}`)
-      setItemForm(f => ({ ...f, thumbnail_url: publicUrl }))
+      setItemForm(f => ({ ...f, thumbnail_url: publicUrl, text_only: false }))
       setThumbProgress(text(T.uploadedFile, { name: file.name }))
     } catch (e) {
       setThumbProgress(text(T.uploadFailed, { message: e instanceof Error ? e.message : String(e) }))
@@ -431,7 +448,7 @@ export default function MenuPage() {
       })
       if (!upload.ok) throw new Error(`R2 upload failed: ${upload.status}`)
 
-      setItemForm(f => kind === 'usdz' ? { ...f, model_usdz: publicUrl } : { ...f, model: publicUrl })
+      setItemForm(f => kind === 'usdz' ? { ...f, model_usdz: publicUrl, text_only: false } : { ...f, model: publicUrl, text_only: false, is_3d: true })
       setUploadProgress(text(T.uploadedFile, { name: file.name }))
     } catch (e) {
       setUploadProgress(text(T.uploadFailed, { message: e instanceof Error ? e.message : String(e) }))
@@ -744,7 +761,7 @@ export default function MenuPage() {
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={!itemForm.is_3d && !itemForm.thumbnail_url && !itemForm.model && !itemForm.model_usdz}
+                  checked={itemForm.text_only}
                   style={{ width: 'auto' }}
                   onChange={e => {
                     if (e.target.checked) {
@@ -755,9 +772,10 @@ export default function MenuPage() {
                         model_usdz: '',
                         thumbnail_url: '',
                         thumb_3d: false,
+                        text_only: true,
                       }))
                     } else {
-                      setItemForm(f => ({ ...f, is_3d: plan.canUploadModels }))
+                      setItemForm(f => ({ ...f, text_only: false, is_3d: plan.canUploadModels ? true : f.is_3d }))
                     }
                   }}
                 />
@@ -769,20 +787,21 @@ export default function MenuPage() {
                 {T.textOnlyHint}
               </p>
             </Field>
-            {plan.canUploadModels && (
+            {plan.canUploadModels && !itemForm.text_only && (
               <Field label={T.pictureOnlyLabel} className="col-span-2">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={!itemForm.is_3d} style={{ width: 'auto' }}
                          onChange={e => setItemForm(f => ({
                            ...f,
                            is_3d: !e.target.checked,
+                           text_only: false,
                            thumb_3d: e.target.checked ? false : f.thumb_3d,
                          }))} />
                   <span className="text-sm" style={{ color: 'var(--dim)' }}>{T.pictureOnlyHint}</span>
                 </label>
               </Field>
             )}
-            {plan.canUploadModels && itemForm.is_3d && (
+            {plan.canUploadModels && itemForm.is_3d && !itemForm.text_only && (
               <Field label={T.model3d} className="col-span-2">
                 <div className="space-y-2">
                   <p className="text-xs leading-5" style={{ color: 'var(--dim)' }}>
@@ -833,6 +852,7 @@ export default function MenuPage() {
                 </div>
               </Field>
             )}
+            {!itemForm.text_only && (
             <Field label={T.thumbnailLabel} className="col-span-2">
               <div className="space-y-2">
                 <div className="flex gap-2 items-center">
@@ -873,7 +893,8 @@ export default function MenuPage() {
                 </p>
               </div>
             </Field>
-            {plan.canUploadModels && itemForm.is_3d && itemForm.thumbnail_url && (
+            )}
+            {plan.canUploadModels && itemForm.is_3d && !itemForm.text_only && itemForm.thumbnail_url && (
               <Field label={T.thumb3dLabel} className="col-span-2">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={itemForm.thumb_3d} style={{ width: 'auto' }}
@@ -889,7 +910,7 @@ export default function MenuPage() {
                        setItemForm(f => ({ ...f, sort_order: Number(e.target.value) }))
                      }} />
             </Field>
-            {plan.canUploadModels && (
+            {plan.canUploadModels && !itemForm.text_only && (
               <Field label={T.arScale}>
                 <input type="number" min="0.01" max="10" step="0.05"
                        value={itemForm.ar_scale}
@@ -897,7 +918,7 @@ export default function MenuPage() {
                 <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>{T.arScaleHint}</p>
               </Field>
             )}
-            {plan.canUploadModels && itemForm.is_3d && (
+            {plan.canUploadModels && itemForm.is_3d && !itemForm.text_only && (
               <Field label={T.viewAngle} className="col-span-2">
                 <div className="grid grid-cols-3 gap-3">
                   <label className="text-xs" style={{ color: 'var(--dim)' }}>

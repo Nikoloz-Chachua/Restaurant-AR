@@ -16,6 +16,7 @@ const items = [
   { id: 2, name_en: 'Lemonade', name_ka: 'ლიმონათი', category_id: 2, visible: true, is_3d: false, model: '', thumbnail_url: 'lemonade.webp', price: '8' },
   { id: 3, name_en: 'Water', name_ka: '', category_id: 2, visible: false, is_3d: false, model: '', thumbnail_url: '', price: '' },
   { id: 4, name_en: '', name_ka: 'სალათი', category_id: null, visible: true, is_3d: true, model: '', thumbnail_url: '', price: '12' },
+  { id: 5, name_en: 'Tea', name_ka: 'ჩაი', category_id: 2, visible: true, text_only: true, is_3d: true, model: 'stale.glb', thumbnail_url: 'stale.webp', price: '6' },
 ]
 
 test('searches trimmed text across English, Georgian, and category names without changing order', () => {
@@ -25,7 +26,7 @@ test('searches trimmed text across English, Georgian, and category names without
   )
   assert.deepEqual(
     filterMenuItems(items, categories, { query: 'drink' }).map(item => item.id),
-    [2, 3],
+    [2, 3, 5],
   )
 })
 
@@ -45,7 +46,8 @@ test('classifies media state from active 3D model and thumbnail presence', () =>
   assert.equal(getMenuItemMediaState(items[0]), 'ar')
   assert.equal(getMenuItemMediaState(items[1]), 'photo')
   assert.equal(getMenuItemMediaState(items[2]), 'text')
-  assert.deepEqual(filterMenuItems(items, categories, { mediaState: 'text' }).map(item => item.id), [3, 4])
+  assert.equal(getMenuItemMediaState(items[4]), 'text')
+  assert.deepEqual(filterMenuItems(items, categories, { mediaState: 'text' }).map(item => item.id), [3, 4, 5])
 })
 
 test('detects active filters after trimming the search query', () => {
