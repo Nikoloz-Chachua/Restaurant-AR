@@ -614,6 +614,42 @@
             font-weight: 800;
             white-space: nowrap;
         }
+
+        /* Per-item size/price variants (e.g. Glass / Bottle) — single-select pills.
+           Exactly one is always chosen; the chosen one sets the price and the basket
+           line. Distinct from add-ons (multi-select, additive). */
+        .variants {
+            margin-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .variant {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 6px;
+            background: var(--pill-bg);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 6px 12px;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--dim);
+            line-height: 1.1;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+        }
+        .variant-price { font-weight: 800; color: var(--accent); white-space: nowrap; }
+        .variant.selected {
+            background: var(--pill-active-bg, var(--accent));
+            border-color: transparent;
+            color: var(--accent-text, #fff);
+        }
+        .variant.selected .variant-price { color: var(--accent-text, #fff); }
+
         .qty-add-btn.just-added { animation: br-pop 0.32s ease; }
         @keyframes br-pop { 0% { transform: scale(1); } 45% { transform: scale(1.28); } 100% { transform: scale(1); } }
 
@@ -3282,6 +3318,26 @@
             return `<div class="addons">${rows}</div>`;
         }
 
+        // Selected variant index for an item (defaults to 0, clamped to a valid one).
+        function _variantIndex(item, globalIdx) {
+            const s = window.__variantSel && window.__variantSel[globalIdx];
+            if (typeof s === 'number' && item.variants && item.variants[s]) return s;
+            return 0;
+        }
+        // Single-select size/price pills (e.g. Glass / Bottle). Empty → nothing shown.
+        function _variantsHtml(item, globalIdx) {
+            if (!item.variants || !item.variants.length) return '';
+            const sel = _variantIndex(item, globalIdx);
+            const rows = item.variants.map((v, i) => {
+                const n = _escapeHtml((window.__lang === 'ka' && v.ka) ? v.ka : (v.en || v.ka || ''));
+                const p = _escapeHtml(v.price || '');
+                const on = i === sel;
+                return `<button type="button" class="variant${on ? ' selected' : ''}" data-vi="${i}" role="radio" aria-checked="${on}">`
+                     + `<span class="variant-name">${n}</span><span class="variant-price">${p}</span></button>`;
+            }).join('');
+            return `<div class="variants" role="radiogroup">${rows}</div>`;
+        }
+
         function applyLang(lang) {
             window.__lang = lang;
             document.documentElement.lang = lang;
@@ -4191,6 +4247,7 @@
                             thumb_3d:       r.thumb_3d ?? false,
                             is_3d:          r.is_3d !== false,
                             addons:         Array.isArray(r.addons) ? r.addons : [],
+                            variants:       Array.isArray(r.variants) ? r.variants : [],
                         }));
                     } else {
                         // A real resolved tenant with no menu items should stay empty.
@@ -4301,7 +4358,11 @@
                 const itemName = t(item, 'name');
                 const itemNameHtml = _escapeHtml(itemName);
                 const itemDescHtml = _escapeHtml(t(item, 'description'));
-                const itemPriceHtml = _escapeHtml(item.price);
+                // Variant-priced items (e.g. Glass / Bottle) show the SELECTED variant's
+                // price here, not the raw item.price (which may be a "16 / 70 ₾" string).
+                const _hasVariants = !!(item.variants && item.variants.length);
+                const _cardVi = _hasVariants ? _variantIndex(item, globalIdx) : -1;
+                const itemPriceHtml = _escapeHtml(_hasVariants ? (item.variants[_cardVi].price || '') : item.price);
                 card.innerHTML = `
                     <p class="item-name" data-field="name" data-idx="${globalIdx}">${itemNameHtml}</p>
                     <div class="item-left">
@@ -4324,6 +4385,7 @@
                                 </div>
                             </div>
                         </div>
+                        ${_variantsHtml(item, globalIdx)}
                         ${_addonsHtml(item, globalIdx)}
                         ${has3d ? `<button class="ar-btn" data-idx="${globalIdx}">${_arButtonLabel(item)}</button>` : ''}
                     </div>`;
@@ -4362,13 +4424,15 @@
                 }
                 const qCtrl = card.querySelector('.qty-ctrl');
                 const _hasAddons = !!(item.addons && item.addons.length);
-                // Add-on items always add via the "+" button (each add-on combo is its own
-                // basket line, managed in the basket panel); plain items use the stepper.
+                // Items with a variant (Glass/Bottle) or add-ons always add via the "+"
+                // button — each variant/add-on combo is its own basket line, managed in
+                // the basket panel; plain items use the inline stepper.
                 qCtrl.querySelector('.qty-add-btn').addEventListener('click', e => {
                     e.stopPropagation();
-                    if (_hasAddons) {
-                        const sel = ((window.__addonSel[globalIdx]) || []).slice().sort((a, b) => a - b);
-                        addToBasket(`${globalIdx}#${sel.join(',')}`, item, sel);
+                    if (_hasVariants || _hasAddons) {
+                        const sel  = ((window.__addonSel[globalIdx]) || []).slice().sort((a, b) => a - b);
+                        const vSel = _hasVariants ? _variantIndex(item, globalIdx) : null;
+                        addToBasket(_basketKey(globalIdx, vSel, sel), item, sel, vSel);
                         const b = e.currentTarget;
                         b.classList.remove('just-added'); void b.offsetWidth; b.classList.add('just-added');
                     } else {
@@ -4390,6 +4454,25 @@
                         if (on) arr.push(ai); else arr.splice(at, 1);
                         btn.classList.toggle('selected', on);
                         btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+                    });
+                });
+
+                // Variant pills: single-select. Selecting one persists the choice
+                // (survives re-render) and updates the displayed price.
+                const _variantBtns = card.querySelectorAll('.variant');
+                _variantBtns.forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        e.stopPropagation();
+                        const vi = parseInt(btn.dataset.vi, 10);
+                        window.__variantSel[globalIdx] = vi;
+                        _variantBtns.forEach(o => {
+                            const on = o === btn;
+                            o.classList.toggle('selected', on);
+                            o.setAttribute('aria-checked', on ? 'true' : 'false');
+                        });
+                        const pv = item.variants[vi];
+                        const priceEl = card.querySelector('.price');
+                        if (priceEl && pv) priceEl.textContent = pv.price || '';
                     });
                 });
 
@@ -4641,10 +4724,19 @@
         }
 
         // ── Basket ─────────────────────────────────────────────────────
-        const _basket = new Map(); // key -> { item, qty, aIdx }  (aIdx = selected add-on indices)
+        const _basket = new Map(); // key -> { item, qty, aIdx, vIdx }
         window._basket = _basket;
-        window.__addonSel = window.__addonSel || {}; // globalIdx -> [selected add-on indices]
+        window.__addonSel   = window.__addonSel   || {}; // globalIdx -> [selected add-on indices]
+        window.__variantSel = window.__variantSel || {}; // globalIdx -> selected variant index
         const _xrAddedKeys = new Set(); // keys added via XR button (eligible for XR toggle-off)
+
+        // Unique basket key per item + chosen variant + add-on combo.
+        function _basketKey(globalIdx, vIdx, aIdxSorted) {
+            let k = String(globalIdx);
+            if (typeof vIdx === 'number' && vIdx >= 0) k += `~v${vIdx}`;
+            if (aIdxSorted && aIdxSorted.length)       k += `#${aIdxSorted.join(',')}`;
+            return k;
+        }
 
         function _parsePrice(str) {
             return parseFloat(String(str).replace(/[^\d.]/g, '')) || 0;
@@ -4658,7 +4750,16 @@
             const list = (entry.item && entry.item.addons) || [];
             return (entry.aIdx || []).reduce((s, i) => s + _parsePrice(list[i] && list[i].price), 0);
         }
-        function _lineUnit(entry) { return _parsePrice(entry.item.price) + _addonSum(entry); }
+        // Base price = the chosen variant's price when the item has variants,
+        // otherwise the item's own price. Add-on prices stack on top of either.
+        function _lineBase(entry) {
+            const item = entry.item;
+            if (entry.vIdx != null && item.variants && item.variants[entry.vIdx]) {
+                return _parsePrice(item.variants[entry.vIdx].price);
+            }
+            return _parsePrice(item.price);
+        }
+        function _lineUnit(entry) { return _lineBase(entry) + _addonSum(entry); }
         function _basketTotal() {
             let s = 0;
             _basket.forEach(entry => { s += _lineUnit(entry) * entry.qty; });
@@ -4701,10 +4802,10 @@
             });
         }
 
-        function addToBasket(key, item, aIdx) {
+        function addToBasket(key, item, aIdx, vIdx) {
             const _isNew = !_basket.has(key);
             if (_basket.has(key)) _basket.get(key).qty++;
-            else                   _basket.set(key, { item, qty: 1, aIdx: aIdx || [] });
+            else                   _basket.set(key, { item, qty: 1, aIdx: aIdx || [], vIdx: (typeof vIdx === 'number' ? vIdx : null) });
             if (_isNew) {
                 const _bIdx = parseInt(key, 10);
                 track('basket_add', _bIdx, {
@@ -4740,8 +4841,11 @@
                 box.innerHTML = `<p class="basket-empty">${u.emptyBasket}</p>`;
             } else {
                 _basket.forEach((entry, key) => {
-                    const { item, qty, aIdx } = entry;
+                    const { item, qty, aIdx, vIdx } = entry;
                     const line = _lineUnit(entry) * qty;
+                    const varTxt = (vIdx != null && item.variants && item.variants[vIdx])
+                        ? ((window.__lang === 'ka' && item.variants[vIdx].ka) ? item.variants[vIdx].ka : (item.variants[vIdx].en || item.variants[vIdx].ka || ''))
+                        : '';
                     const addTxt = (aIdx && aIdx.length)
                         ? aIdx.map(i => { const a = (item.addons || [])[i]; return a ? ((window.__lang === 'ka' && a.ka) ? a.ka : (a.en || a.ka)) : ''; }).filter(Boolean).join(', ')
                         : '';
@@ -4750,6 +4854,7 @@
                     row.innerHTML = `
                         <div class="basket-item-info">
                             <span class="basket-item-name">${t(item, 'name')}</span>
+                            ${varTxt ? `<span class="basket-item-addons">${_escapeHtml(varTxt)}</span>` : ''}
                             ${addTxt ? `<span class="basket-item-addons">+ ${_escapeHtml(addTxt)}</span>` : ''}
                         </div>
                         <div class="basket-qty">
@@ -4858,12 +4963,15 @@ document.getElementById('basket-items').addEventListener('click', e => {
 
         function _packOrder() {
             const it = [];
-            _basket.forEach(({ item, qty, aIdx }) => {
+            _basket.forEach(({ item, qty, aIdx, vIdx }) => {
                 if (!item || !item.id) return;
-                // [id, qty] or [id, qty, [add-on indices]] — waiter.html resolves the
-                // indices against the live item's addons array.
-                if (aIdx && aIdx.length) it.push([item.id, qty, aIdx]);
-                else it.push([item.id, qty]);
+                // [id, qty] · [id, qty, [add-on idx]] · [id, qty, [add-on idx], variantIdx]
+                // — waiter.html re-resolves both against the live item so prices stay current.
+                const hasA = aIdx && aIdx.length;
+                const hasV = (typeof vIdx === 'number');
+                if (hasV)      it.push([item.id, qty, hasA ? aIdx : [], vIdx]);
+                else if (hasA) it.push([item.id, qty, aIdx]);
+                else           it.push([item.id, qty]);
             });
             const tenant = window.__tenant || {};
             const payload = { v: 1, r: tenant.restaurant_slug || '', ts: Date.now(), it };

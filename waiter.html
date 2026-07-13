@@ -160,7 +160,7 @@
                 var ids = items.map(function (p) { return p[0]; })
                                .filter(Boolean)
                                .map(function (id) { return encodeURIComponent(id); });
-                rows = await supa('menu_items?select=id,name_en,name_ka,price,addons&restaurant_id=eq.' +
+                rows = await supa('menu_items?select=id,name_en,name_ka,price,addons,variants&restaurant_id=eq.' +
                     rest.id + '&id=in.(' + ids.join(',') + ')');
             } catch (e) {
                 showState('Could not reach the menu. Check the connection and rescan.', true); return;
@@ -187,7 +187,17 @@
                         '<span class="line-total">—</span></div>';
                     return;
                 }
-                var unit = parsePrice(row.price);
+                // Optional variant index (pair[3]) replaces the base price with the
+                // chosen variant's live price (e.g. Glass vs Bottle).
+                var vIdx = (typeof pair[3] === 'number') ? pair[3] : null;
+                var varTxt = '';
+                var unit;
+                if (vIdx !== null && Array.isArray(row.variants) && row.variants[vIdx]) {
+                    unit = parsePrice(row.variants[vIdx].price);
+                    varTxt = String(row.variants[vIdx].ka || row.variants[vIdx].en || '').trim();
+                } else {
+                    unit = parsePrice(row.price);
+                }
                 // Optional add-on indices (pair[2]) resolve against the live item's
                 // addons array; each adds its price to the unit.
                 var addSel = Array.isArray(pair[2]) ? pair[2] : [];
@@ -209,6 +219,7 @@
                     '<span class="qty">' + qty + '×</span>' +
                     '<span class="name"><span class="primary">' + esc(nm.primary) + '</span>' +
                     (nm.secondary ? '<span class="secondary">' + esc(nm.secondary) + '</span>' : '') +
+                    (varTxt ? '<span class="secondary">' + esc(varTxt) + '</span>' : '') +
                     (addTxt ? '<span class="secondary">+ ' + esc(addTxt) + '</span>' : '') +
                     '<span class="unit">' + fmt(unit) + ' each</span></span>' +
                     '<span class="line-total">' + fmt(lineTotal) + '</span></div>';
