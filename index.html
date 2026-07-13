@@ -1088,6 +1088,16 @@
         }
 
         /* ── Category filter bar ── */
+        /* Wrapper holds the optional FOOD|DRINKS switch above the category pills so
+           the whole bar sticks together. Centers like .header / .menu-list. */
+        .cat-bar {
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
         .cat-filter {
             width: 100%;
             max-width: 450px;
@@ -1101,10 +1111,49 @@
         }
         .cat-filter::-webkit-scrollbar { display: none; }
 
+        /* ── Food / Drinks group switch (opt-in via theme_config.drink_categories) ── */
+        .menu-groups {
+            display: flex;
+            gap: 6px;
+            width: 100%;
+            max-width: 360px;
+            background: var(--pill-bg);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px;
+            box-sizing: border-box;
+        }
+        .menu-groups[hidden] { display: none; }
+        .group-btn {
+            flex: 1 1 0;
+            border: none;
+            background: transparent;
+            color: var(--text);
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 10px 8px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background var(--t), color var(--t);
+        }
+        .group-btn.active {
+            background: var(--pill-active-bg, var(--accent));
+            color: var(--accent-text, #fff);
+            box-shadow: 0 4px 12px -4px var(--shadow, rgba(0,0,0,0.4));
+        }
+        html[lang="ka"] .group-btn {
+            text-transform: none;
+            letter-spacing: 0.3px;
+            font-size: 0.9rem;
+        }
+
         /* Sticky category bar — after you scroll past the hero it stays pinned to
            the top so diners can switch categories at any point. Scoped to the
            monday_greens skin so other templates are unchanged. */
-        [data-template="monday_greens"] .cat-filter {
+        [data-template="monday_greens"] .cat-bar {
             position: sticky;
             top: 0;
             z-index: 30;
@@ -1113,10 +1162,10 @@
             box-shadow: 0 8px 18px -10px var(--shadow, rgba(0,0,0,0.45));
         }
         /* Mobile only: the fixed EN / theme toggles (top:14px) live in the same top
-           strip, so drop the pinned pills below them to avoid overlap. The bar's
+           strip, so drop the pinned bar below them to avoid overlap. The bar's
            background matches the page bg, so this gap is invisible until it sticks. */
         @media (max-width: 639px) {
-            [data-template="monday_greens"] .cat-filter { padding-top: 54px; }
+            [data-template="monday_greens"] .cat-bar { padding-top: 54px; }
         }
 
         .cat-pill {
@@ -1135,6 +1184,7 @@
             transition: background var(--t), border-color var(--t), color var(--t);
             touch-action: manipulation;
         }
+        .cat-pill[hidden] { display: none; }
         .cat-pill:active { opacity: 0.7; transition: opacity 0.08s; }
         .cat-pill.active {
             background: var(--pill-active-bg);
@@ -1717,14 +1767,14 @@
         @media (min-width: 640px) {
             body { padding: 0 32px 64px; }
             [data-template="monday_greens"] body { padding-left: 0; padding-right: 0; }
-            [data-template="monday_greens"] .cat-filter,
+            [data-template="monday_greens"] .cat-bar,
             [data-template="monday_greens"] .menu-list,
             [data-template="monday_greens"] .site-footer {
                 width: calc(100% - 64px);
             }
 
-            .header, .cat-filter { max-width: 880px; }
-            .cat-filter { justify-content: center; }
+            .header, .cat-bar { max-width: 880px; }
+            .cat-filter { max-width: 100%; justify-content: center; }
 
             .menu-list {
                 max-width: 880px;
@@ -1762,7 +1812,7 @@
         }
 
         @media (min-width: 1100px) {
-            .header, .cat-filter { max-width: 1160px; }
+            .header, .cat-bar { max-width: 1160px; }
 
             .menu-list {
                 max-width: 1160px;
@@ -1897,7 +1947,10 @@
         <h1 id="brand-title" data-brand>Restaurant Menu</h1>
     </div>
 
-    <div id="cat-filter" class="cat-filter"></div>
+    <div id="cat-bar" class="cat-bar">
+        <div id="menu-groups" class="menu-groups" hidden></div>
+        <div id="cat-filter" class="cat-filter"></div>
+    </div>
 
     <div class="menu-list" id="menu-list"></div>
 
@@ -3233,6 +3286,7 @@
                 const allPill = document.querySelector('.cat-pill[data-cat=""]');
                 if (allPill) allPill.textContent = lang === 'ka' ? 'ყველა' : 'All';
             }
+            if (typeof window._updateGroupLabels === 'function') window._updateGroupLabels(lang);
             if (typeof window._renderMenuList === 'function') window._renderMenuList();
             if (modal.classList.contains('active')) updateModal();
             const _mArBtn = document.getElementById('modal-ar-btn');
@@ -3921,6 +3975,23 @@
 
         // ── Build menu ─────────────────────────────────────────────────
 
+        // Parse theme_config.drink_categories into a Set of lowercased category
+        // name_en. Accepts a JSON array (["Coffee","Tea"]) or a plain comma/newline
+        // list. Empty/invalid → empty Set (no Food/Drinks switch).
+        function _parseDrinkCats(raw) {
+            const out = new Set();
+            if (!raw) return out;
+            const s = String(raw).trim();
+            let list = [];
+            if (s[0] === '[') { try { list = JSON.parse(s); } catch (e) { list = []; } }
+            if (!list.length) list = s.replace(/^\[|\]$/g, '').split(/[,;\n]/);
+            list.forEach(v => {
+                const n = String(v).replace(/^["'\s]+|["'\s]+$/g, '').toLowerCase();
+                if (n) out.add(n);
+            });
+            return out;
+        }
+
         // Fetch theme config from Supabase and apply as CSS overrides
         async function applyRemoteTheme() {
             try {
@@ -4028,6 +4099,11 @@
                 window.__spinEnabled = _spinOn;
                 const _spinBtn = document.getElementById('modal-spin');
                 if (_spinBtn) _spinBtn.style.display = _spinOn ? 'flex' : 'none';
+                // Food/Drinks split — a tenant lists its drink category names in
+                // theme_config.drink_categories (JSON array or comma list). Non-empty →
+                // a top-level FOOD | DRINKS switch appears; empty/unset → menu unchanged.
+                window.__drinkCats = _parseDrinkCats(cfg.drink_categories);
+                if (typeof window._applyMenuGroups === 'function') window._applyMenuGroups();
                 const heroLogo = document.getElementById('mg-hero-logo');
                 const heroLogoUrl = _safeAssetUrl(cfg.hero_logo_url) || logoUrl;
                 if (heroLogo && heroLogoUrl) {
@@ -4136,6 +4212,16 @@
             });
 
             const list = document.getElementById('menu-list');
+
+            // ── Food / Drinks grouping ──────────────────────────────────
+            // Active only when the tenant configured drink_categories. When on, the
+            // menu is split into two top-level groups; a category is "drink" if its
+            // English name is in the configured set, otherwise "food".
+            let _activeGroup = (window.__menuGroup === 'drink') ? 'drink' : 'food';
+            const _groupingOn = () => !!(window.__drinkCats && window.__drinkCats.size);
+            const _groupOf = (catName) =>
+                (window.__drinkCats && window.__drinkCats.has(String(catName || '').toLowerCase()))
+                    ? 'drink' : 'food';
 
             function _arFeaturedText() {
                 return window.__lang === 'ka'
@@ -4300,9 +4386,11 @@
             const AR_CAT = '__ar3d';
 
             function renderARFeaturedBlock(parent) {
-                const arEntries = items
+                let arEntries = items
                     .map((item, globalIdx) => ({ item, globalIdx }))
                     .filter(({ item }) => _isAREnabledMenuItem(item));
+                // When grouping is on, the 3D block only features the active group's dishes.
+                if (_groupingOn()) arEntries = arEntries.filter(({ item }) => _groupOf(item.category) === _activeGroup);
                 if (!arEntries.length) return;
                 parent.appendChild(renderARFeaturedBanner());
                 arEntries.forEach(({ item, globalIdx }) => parent.appendChild(renderMenuCard(item, globalIdx, true)));
@@ -4321,8 +4409,10 @@
                 } else {
                     renderARFeaturedBlock(list);
                     // Every category keeps ALL its items (3D ones included), in menu order —
-                    // a 3D dish appears both in the virtual 3D block above and here.
+                    // a 3D dish appears both in the virtual 3D block above and here. When
+                    // grouping is on, only the active group's categories are shown.
                     categories.forEach(catEntry => {
+                        if (_groupingOn() && _groupOf(catEntry.name) !== _activeGroup) return;
                         list.appendChild(renderCategorySection(catEntry, catEntry.items, false));
                     });
                 }
@@ -4394,7 +4484,75 @@
             };
             window._renderMenuList = () => renderMenuList(_activeFilter);
 
+            // ── Food / Drinks group switch ──────────────────────────────
+            const groupsDiv = document.getElementById('menu-groups');
+            const _groupLabels = (lang) => (lang === 'ka')
+                ? { food: 'საჭმელი', drink: 'სასმელი' }
+                : { food: 'Food', drink: 'Drinks' };
+
+            function _renderGroupToggle() {
+                const lab = _groupLabels(window.__lang);
+                groupsDiv.innerHTML = '';
+                ['food', 'drink'].forEach(g => {
+                    const b = document.createElement('button');
+                    b.className = 'group-btn' + (g === _activeGroup ? ' active' : '');
+                    b.dataset.group = g;
+                    b.textContent = lab[g];
+                    groupsDiv.appendChild(b);
+                });
+            }
+
+            // Show only the active group's category pills; "All" + "3D" always show.
+            function _updateGroupPillVisibility() {
+                document.querySelectorAll('.cat-pill').forEach(p => {
+                    const c = p.dataset.cat;
+                    p.hidden = !(c === '' || c === AR_CAT) && _groupOf(c) !== _activeGroup;
+                });
+            }
+
+            function _setGroup(g) {
+                if ((g !== 'food' && g !== 'drink') || g === _activeGroup) return;
+                _activeGroup = g;
+                window.__menuGroup = g;
+                document.querySelectorAll('.group-btn').forEach(b => b.classList.toggle('active', b.dataset.group === g));
+                _updateGroupPillVisibility();
+                applyFilter('');   // reset to "All" within the new group and re-render
+            }
+
+            groupsDiv.addEventListener('click', e => {
+                const b = e.target.closest('.group-btn');
+                if (b) { track('menu_group', null, { group: b.dataset.group }); _setGroup(b.dataset.group); }
+            });
+
+            // Called by applyRemoteTheme once drink_categories is known (and once here
+            // in case the theme already resolved). Idempotent.
+            window._applyMenuGroups = function () {
+                if (!_groupingOn()) {
+                    groupsDiv.hidden = true;
+                    document.querySelectorAll('.cat-pill').forEach(p => p.hidden = false);
+                    return;
+                }
+                _activeGroup = (window.__menuGroup === 'drink') ? 'drink' : 'food';
+                _renderGroupToggle();
+                groupsDiv.hidden = false;
+                _updateGroupPillVisibility();
+                // Keep a valid filter for the group; otherwise fall back to "All".
+                if (_activeFilter && _activeFilter !== AR_CAT && _groupOf(_activeFilter) !== _activeGroup) {
+                    applyFilter('');
+                } else {
+                    renderMenuList(_activeFilter);
+                }
+            };
+
+            // Refresh the FOOD/DRINKS labels on language toggle.
+            window._updateGroupLabels = function (lang) {
+                if (groupsDiv.hidden) return;
+                const lab = _groupLabels(lang);
+                groupsDiv.querySelectorAll('.group-btn').forEach(b => { b.textContent = lab[b.dataset.group]; });
+            };
+
             renderMenuList();
+            window._applyMenuGroups();
 
             applyLang(window.__lang);
 
