@@ -1111,6 +1111,36 @@
         }
         .cat-filter::-webkit-scrollbar { display: none; }
 
+        /* Holds the pill scroller + the desktop scroll arrows. */
+        .cat-scroll { position: relative; width: 100%; }
+        /* ‹ › arrows: hidden on mobile (swipe works); on desktop they fade in only
+           when there is more of the pill row to scroll in that direction. */
+        .cat-nav {
+            position: absolute;
+            top: 0;
+            height: 40px;
+            width: 46px;
+            display: none;
+            align-items: center;
+            border: none;
+            cursor: pointer;
+            z-index: 3;
+            padding: 0;
+            font-size: 1.7rem;
+            line-height: 1;
+            font-weight: 700;
+            color: var(--accent, var(--text));
+            background: var(--bg);
+        }
+        .cat-nav-l { left: 0;  justify-content: flex-start; padding-left: 6px;
+            background: linear-gradient(to right, var(--bg) 58%, transparent); }
+        .cat-nav-r { right: 0; justify-content: flex-end;   padding-right: 6px;
+            background: linear-gradient(to left,  var(--bg) 58%, transparent); }
+        .cat-nav:active { opacity: 0.6; }
+        @media (min-width: 640px) {
+            .cat-nav:not([hidden]) { display: flex; }
+        }
+
         /* ── Food / Drinks group switch (opt-in via theme_config.drink_categories) ── */
         .menu-groups {
             display: flex;
@@ -1774,7 +1804,9 @@
             }
 
             .header, .cat-bar { max-width: 880px; }
-            .cat-filter { max-width: 100%; justify-content: center; }
+            /* "safe center" keeps the row centered when it fits, but falls back to
+               start-alignment when it overflows so no leading pills get clipped. */
+            .cat-filter { max-width: 100%; justify-content: safe center; }
 
             .menu-list {
                 max-width: 880px;
@@ -1949,7 +1981,11 @@
 
     <div id="cat-bar" class="cat-bar">
         <div id="menu-groups" class="menu-groups" hidden></div>
-        <div id="cat-filter" class="cat-filter"></div>
+        <div class="cat-scroll">
+            <button type="button" class="cat-nav cat-nav-l" aria-label="Scroll categories left" hidden>&#8249;</button>
+            <div id="cat-filter" class="cat-filter"></div>
+            <button type="button" class="cat-nav cat-nav-r" aria-label="Scroll categories right" hidden>&#8250;</button>
+        </div>
     </div>
 
     <div class="menu-list" id="menu-list"></div>
@@ -3287,6 +3323,7 @@
                 if (allPill) allPill.textContent = lang === 'ka' ? 'ყველა' : 'All';
             }
             if (typeof window._updateGroupLabels === 'function') window._updateGroupLabels(lang);
+            if (typeof window._updateCatNav === 'function') window._updateCatNav();
             if (typeof window._renderMenuList === 'function') window._renderMenuList();
             if (modal.classList.contains('active')) updateModal();
             const _mArBtn = document.getElementById('modal-ar-btn');
@@ -4517,6 +4554,7 @@
                 document.querySelectorAll('.group-btn').forEach(b => b.classList.toggle('active', b.dataset.group === g));
                 _updateGroupPillVisibility();
                 applyFilter('');   // reset to "All" within the new group and re-render
+                _resetCatScroll(); // start the new group's pills from the left + refresh arrows
             }
 
             groupsDiv.addEventListener('click', e => {
@@ -4542,6 +4580,7 @@
                 } else {
                     renderMenuList(_activeFilter);
                 }
+                _resetCatScroll(); // pill set changed with the group — refresh arrows
             };
 
             // Refresh the FOOD/DRINKS labels on language toggle.
@@ -4551,8 +4590,47 @@
                 groupsDiv.querySelectorAll('.group-btn').forEach(b => { b.textContent = lab[b.dataset.group]; });
             };
 
+            // ── Category pills: desktop horizontal-scroll affordances ───
+            // Mobile scrolls by swiping; desktop has no swipe and the scrollbar is
+            // hidden, so overflowing categories were unreachable. Add ‹ › arrows +
+            // mouse-wheel horizontal scroll (paired with `safe center` in CSS).
+            const catScroll = filterDiv;
+            const navL = document.querySelector('.cat-nav-l');
+            const navR = document.querySelector('.cat-nav-r');
+
+            function _updateCatNav() {
+                if (!navL || !navR) return;
+                const max = catScroll.scrollWidth - catScroll.clientWidth;
+                const overflowing = max > 2;
+                const x = catScroll.scrollLeft;
+                navL.hidden = !(overflowing && x > 2);
+                navR.hidden = !(overflowing && x < max - 2);
+            }
+            function _scrollCats(dir) {
+                catScroll.scrollBy({ left: dir * Math.max(160, catScroll.clientWidth * 0.7), behavior: 'smooth' });
+            }
+            function _resetCatScroll() {
+                catScroll.scrollLeft = 0;
+                _updateCatNav();
+            }
+            if (navL) navL.addEventListener('click', () => _scrollCats(-1));
+            if (navR) navR.addEventListener('click', () => _scrollCats(1));
+            catScroll.addEventListener('scroll', _updateCatNav, { passive: true });
+            window.addEventListener('resize', _updateCatNav);
+            // Wheel over the bar → horizontal scroll; only hijack a predominantly
+            // vertical gesture, and only when the row actually overflows.
+            catScroll.addEventListener('wheel', (e) => {
+                const max = catScroll.scrollWidth - catScroll.clientWidth;
+                if (max <= 2 || Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+                catScroll.scrollLeft += e.deltaY;
+                e.preventDefault();
+            }, { passive: false });
+            window._updateCatNav = _updateCatNav;
+
             renderMenuList();
             window._applyMenuGroups();
+            _updateCatNav();
+            if (document.fonts && document.fonts.ready) document.fonts.ready.then(_updateCatNav);
 
             applyLang(window.__lang);
 
