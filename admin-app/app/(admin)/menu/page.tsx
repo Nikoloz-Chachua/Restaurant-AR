@@ -1,8 +1,13 @@
 'use client'
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useLang } from '@/lib/useLang'
 import { usePlan } from '@/lib/usePlan'
+import {
+  DEFAULT_MENU_FILTERS,
+  filterMenuItems,
+  menuFiltersAreActive,
+} from '@/lib/menuFilters'
 
 type Category = { id: number; name_en: string; name_ka: string; sort_order: number }
 type MenuItem = {
@@ -15,6 +20,13 @@ type MenuItemPayload = Partial<Omit<MenuItem, 'id'>> & Pick<
   Omit<MenuItem, 'id'>,
   'name_en' | 'name_ka' | 'description_en' | 'description_ka' | 'price' | 'category_id' | 'sort_order' | 'visible' | 'thumbnail_url'
 >
+type MenuFilters = {
+  query: string
+  categoryId: string
+  visibility: 'all' | 'visible' | 'hidden'
+  mediaState: 'all' | 'ar' | 'photo' | 'text' | 'missing-image'
+  quality: 'all' | 'missing-en' | 'missing-ka' | 'missing-price'
+}
 const EMPTY_ITEM: Omit<MenuItem, 'id'> = {
   name_en: '', name_ka: '', description_en: '', description_ka: '',
   price: '', category_id: null, model: '', model_usdz: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '', thumb_3d: false, is_3d: true,
@@ -38,10 +50,11 @@ function parseItemView(raw?: string) {
 
 export default function MenuPage() {
   const supabase = createClient()
-  const [T] = useLang()
+  const [T, lang] = useLang()
   const plan = usePlan()
   const [categories, setCategories] = useState<Category[]>([])
   const [items, setItems]           = useState<MenuItem[]>([])
+  const [filters, setFilters]       = useState<MenuFilters>({ ...DEFAULT_MENU_FILTERS } as MenuFilters)
   const [loading, setLoading]       = useState(true)
   const [tab, setTab]               = useState<'items' | 'categories'>('items')
 
@@ -286,8 +299,30 @@ export default function MenuPage() {
     setDeleteCatId(null); await load(); flash(T.catDeleted)
   }
 
-  const catName = (id: number | null) =>
-    categories.find(c => c.id === id)?.name_en ?? '—'
+  const categoryName = useCallback((cat: Category) =>
+    lang === 'ka'
+      ? cat.name_ka || cat.name_en || '—'
+      : cat.name_en || cat.name_ka || '—',
+    [lang],
+  )
+  const catName = (id: number | null) => {
+    const category = categories.find(c => c.id === id)
+    return category ? categoryName(category) : '—'
+  }
+  const filteredItems = useMemo<MenuItem[]>(
+    () => filterMenuItems(items, categories, filters) as MenuItem[],
+    [items, categories, filters],
+  )
+  const filtersActive = menuFiltersAreActive(filters)
+  const resultCountLabel = T.menuResultCount
+    .replace('{shown}', String(filteredItems.length))
+    .replace('{total}', String(items.length))
+  function updateFilter<K extends keyof MenuFilters>(key: K, value: MenuFilters[K]) {
+    setFilters(current => ({ ...current, [key]: value }))
+  }
+  function clearFilters() {
+    setFilters({ ...DEFAULT_MENU_FILTERS } as MenuFilters)
+  }
 
   if (!plan.loading && !plan.restaurantId) {
     return (
@@ -463,6 +498,70 @@ export default function MenuPage() {
               360° Spin: {spinEnabled ? 'On' : 'Off'}
             </button>
           </div>
+          <div className="mb-4 rounded-xl p-3 md:p-4"
+               style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
+              <div className="flex-1 min-w-[220px]">
+                <label className="sr-only" htmlFor="menu-search">{T.menuSearchPlaceholder}</label>
+                <input
+                  id="menu-search"
+                  type="search"
+                  value={filters.query}
+                  onChange={e => updateFilter('query', e.target.value)}
+                  placeholder={T.menuSearchPlaceholder}
+                  className="h-11 text-base"
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-end">
+                <FilterField label={T.menuFilterCategory}>
+                  <select value={filters.categoryId} onChange={e => updateFilter('categoryId', e.target.value)}>
+                    <option value="all">{T.menuFilterAll}</option>
+                    {categories.map(category => (
+                      <option key={category.id} value={category.id}>{categoryName(category)}</option>
+                    ))}
+                  </select>
+                </FilterField>
+                <FilterField label={T.menuFilterVisibility}>
+                  <select value={filters.visibility}
+                          onChange={e => updateFilter('visibility', e.target.value as MenuFilters['visibility'])}>
+                    <option value="all">{T.menuFilterAll}</option>
+                    <option value="visible">{T.menuFilterVisible}</option>
+                    <option value="hidden">{T.menuFilterHidden}</option>
+                  </select>
+                </FilterField>
+                <FilterField label={T.menuFilterMedia}>
+                  <select value={filters.mediaState}
+                          onChange={e => updateFilter('mediaState', e.target.value as MenuFilters['mediaState'])}>
+                    <option value="all">{T.menuFilterAll}</option>
+                    <option value="ar">{T.menuFilterAr}</option>
+                    <option value="photo">{T.menuFilterPhotoOnly}</option>
+                    <option value="text">{T.menuFilterTextOnly}</option>
+                    <option value="missing-image">{T.menuFilterMissingImage}</option>
+                  </select>
+                </FilterField>
+                <FilterField label={T.menuFilterQuality}>
+                  <select value={filters.quality}
+                          onChange={e => updateFilter('quality', e.target.value as MenuFilters['quality'])}>
+                    <option value="all">{T.menuFilterAll}</option>
+                    <option value="missing-en">{T.menuFilterMissingEn}</option>
+                    <option value="missing-ka">{T.menuFilterMissingKa}</option>
+                    <option value="missing-price">{T.menuFilterMissingPrice}</option>
+                  </select>
+                </FilterField>
+              </div>
+            </div>
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+              <span className="text-sm" style={{ color: 'var(--dim)' }}>{resultCountLabel}</span>
+              {filtersActive && (
+                <button type="button"
+                        onClick={clearFilters}
+                        className="text-sm px-3 py-1.5 rounded-lg font-medium"
+                        style={{ color: 'var(--gold)', border: '1px solid var(--border)', background: 'var(--card2)' }}>
+                  {T.menuClearFilters}
+                </button>
+              )}
+            </div>
+          </div>
           {planLimitReached && plan.itemLimit !== null && (
             <div className="mb-4 rounded-xl p-3 text-sm"
                  style={{ background: 'rgba(242,181,53,0.08)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
@@ -481,7 +580,7 @@ export default function MenuPage() {
                 </tr>
               </thead>
               <tbody>
-                {items.map((item, i) => (
+                {filteredItems.map((item, i) => (
                   <tr key={item.id}
                       style={{ background: i % 2 ? 'var(--card)' : 'transparent',
                                borderBottom: '1px solid var(--border)' }}>
@@ -530,6 +629,19 @@ export default function MenuPage() {
               </tbody>
             </table>
           </div>
+          {filteredItems.length === 0 && (
+            <div className="mt-4 rounded-xl p-5 text-center"
+                 style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+              <div className="font-semibold" style={{ color: 'var(--text)' }}>{T.menuNoResultsTitle}</div>
+              <p className="text-sm mt-1" style={{ color: 'var(--dim)' }}>{T.menuNoResultsText}</p>
+              <button type="button"
+                      onClick={clearFilters}
+                      className="mt-4 px-4 py-2 rounded-lg text-sm font-semibold"
+                      style={{ background: 'var(--gold)', color: '#0f0b07' }}>
+                {T.menuClearFilters}
+              </button>
+            </div>
+          )}
         </>
       ) : (
         <>
@@ -619,7 +731,7 @@ export default function MenuPage() {
                           sort_order: editItem || sortOrderTouched ? f.sort_order : nextSortOrderForCategory(categoryId),
                         }))
                       }}>
-                {categories.map(c => <option key={c.id} value={c.id}>{c.name_en}</option>)}
+                {categories.map(c => <option key={c.id} value={c.id}>{categoryName(c)}</option>)}
               </select>
             </Field>
             <Field label="Text-only item" className="col-span-2">
@@ -947,5 +1059,15 @@ function Field({ label, children, className = '' }: { label: string; children: R
              style={{ color: 'var(--dim)' }}>{label}</label>
       {children}
     </div>
+  )
+}
+
+function FilterField({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block min-w-0 lg:w-44">
+      <span className="block text-[11px] mb-1.5 uppercase tracking-widest"
+            style={{ color: 'var(--dim)' }}>{label}</span>
+      {children}
+    </label>
   )
 }
