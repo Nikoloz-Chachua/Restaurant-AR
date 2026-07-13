@@ -4,6 +4,7 @@ import { usePlan } from '@/lib/usePlan'
 import LockedCard from '@/components/LockedCard'
 import { createClient } from '@/lib/supabase/client'
 import { TEMPLATE_PRESETS, type StarterTemplateKey } from '@/lib/themePresets'
+import { useLang } from '@/lib/useLang'
 
 type Restaurant = {
   id: number
@@ -20,6 +21,7 @@ type Brand = {
   name: string
   slug: string
   plan: 'ar_menu' | 'full' | 'premium'
+  can_create_branches?: boolean | null
   created_at: string
   restaurants?: Restaurant[]
   adminEmails?: string[]
@@ -49,7 +51,7 @@ type CreatedTenantResponse = {
 }
 
 type PlanUpdateResponse = {
-  brand?: Pick<Brand, 'id' | 'name' | 'slug' | 'plan' | 'created_at'>
+  brand?: Pick<Brand, 'id' | 'name' | 'slug' | 'plan' | 'can_create_branches' | 'created_at'>
   error?: string
 }
 
@@ -108,7 +110,7 @@ const PLAN_LABELS: Record<Brand['plan'], string> = {
 const PLAN_OPTIONS: { value: Brand['plan']; label: string; hint: string }[] = [
   { value: 'ar_menu', label: '300 GEL / AR Menu', hint: 'Menu, AR models, up to 5 items' },
   { value: 'full', label: '450 GEL / Full', hint: 'Theme and analytics, up to 7 items' },
-  { value: 'premium', label: '900 GEL / Premium', hint: 'Unlimited items and branches' },
+  { value: 'premium', label: '900 GEL / Premium', hint: 'Unlimited menu items' },
 ]
 
 const STARTER_TEMPLATE_OPTIONS = TEMPLATE_PRESETS
@@ -196,12 +198,14 @@ async function imageToWebP(file: File) {
 
 export default function TenantsPage() {
   const access = usePlan()
+  const [T] = useLang()
   const supabase = createClient()
   const [brands, setBrands] = useState<Brand[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [planDrafts, setPlanDrafts] = useState<Record<number, Brand['plan']>>({})
   const [updatingPlanBrandId, setUpdatingPlanBrandId] = useState<number | null>(null)
+  const [updatingBranchEntitlementBrandId, setUpdatingBranchEntitlementBrandId] = useState<number | null>(null)
   const [message, setMessage] = useState('')
   const [accountLog, setAccountLog] = useState<AccountLogEntry[]>([])
   const [accountLogLoading, setAccountLogLoading] = useState(false)
@@ -434,6 +438,28 @@ export default function TenantsPage() {
     await load()
   }
 
+  async function updateBranchEntitlement(brand: Brand, canCreateBranches: boolean) {
+    setUpdatingBranchEntitlementBrandId(brand.id)
+    setMessage('')
+    const res = await fetch('/api/tenants', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ brandId: brand.id, canCreateBranches }),
+    })
+    const json = await res.json().catch(() => ({})) as PlanUpdateResponse
+    setUpdatingBranchEntitlementBrandId(null)
+    if (!res.ok || !json.brand) {
+      setMessage(json.error || 'Branch permission update failed')
+      return
+    }
+
+    setBrands(current => current.map(item => (
+      item.id === brand.id ? { ...item, can_create_branches: json.brand!.can_create_branches === true } : item
+    )))
+    setMessage(`${T.branchCreationPermission}: ${json.brand.can_create_branches ? T.enabled : T.disabled}`)
+    await load()
+  }
+
   async function sendPasswordReset(email: string) {
     setResettingEmail(email)
     setMessage('')
@@ -510,7 +536,7 @@ export default function TenantsPage() {
     return (
       <LockedCard
         title="Branch management is not available"
-        description="Only BetaReal super admins and Premium 900 brand owners can create or manage branches from this panel."
+        description="Only BetaReal super admins and linked brand owners can manage branches from this panel."
         planLabel={access.label}
       />
     )
@@ -528,7 +554,7 @@ export default function TenantsPage() {
             {access.canManageTenants
               ? 'Create restaurant tenants and keep their menu/theme editable after launch.'
               : access.canCreateBranches
-                ? 'Open existing branches or add new branches under your Premium 900 brand.'
+                ? 'Open existing branches or add new branches under your brand.'
                 : 'Open an existing branch to manage its menu, theme, and analytics.'}
           </p>
         </div>
@@ -692,10 +718,10 @@ export default function TenantsPage() {
         <p style={{ color: 'var(--dim)' }}>Loading...</p>
       ) : (
         <div className="table-scroll rounded-xl" style={{ border: '1px solid var(--border)' }}>
-          <table className="w-full text-sm" style={{ minWidth: '980px' }}>
+          <table className="w-full text-sm" style={{ minWidth: '1120px' }}>
             <thead>
               <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
-                {['Brand', 'Plan', 'Admins', 'Branches', 'Status', 'Actions'].map(h => (
+                {['Brand', 'Plan', ...(access.canManageTenants ? [T.branchCreationPermission] : []), 'Admins', 'Branches', 'Status', 'Actions'].map(h => (
                   <th key={h} className="px-4 py-3 text-left font-medium" style={{ color: 'var(--dim)' }}>{h}</th>
                 ))}
               </tr>
@@ -727,6 +753,18 @@ export default function TenantsPage() {
                         <span style={{ color: 'var(--gold)' }}>{PLAN_LABELS[brand.plan]}</span>
                       )}
                     </td>
+                    {access.canManageTenants && (
+                      <td className="px-4 py-3">
+                        <BranchEntitlementToggle
+                          brand={brand}
+                          saving={updatingBranchEntitlementBrandId === brand.id}
+                          onChange={enabled => void updateBranchEntitlement(brand, enabled)}
+                          label={T.branchCreationPermission}
+                          enabledLabel={T.enabled}
+                          disabledLabel={T.disabled}
+                        />
+                      </td>
+                    )}
                     <td className="px-4 py-3" style={{ color: 'var(--dim)' }}>
                       {(brand.adminCredentials ?? []).length ? (
                         <CredentialList credentials={brand.adminCredentials ?? []} />
@@ -772,12 +810,11 @@ export default function TenantsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="space-y-3 min-w-56">
-                        {access.canCreateBranches && (
+                        {(access.canManageTenants || (access.canCreateBranches && brand.can_create_branches === true)) && (
                           <BranchCreator
                             brand={brand}
                             saving={saving}
                             value={branchForm[brand.id] ?? emptyBranchForm()}
-                            allowAnyPlan={access.canManageTenants}
                             onChange={updateBranchForm}
                             onCreate={() => void createBranch(brand)}
                           />
@@ -1068,23 +1105,58 @@ function PlanEditor({
   )
 }
 
+function BranchEntitlementToggle({
+  brand,
+  saving,
+  onChange,
+  label,
+  enabledLabel,
+  disabledLabel,
+}: {
+  brand: Brand
+  saving: boolean
+  onChange: (enabled: boolean) => void
+  label: string
+  enabledLabel: string
+  disabledLabel: string
+}) {
+  const enabled = brand.can_create_branches === true
+
+  return (
+    <div className="space-y-2 min-w-44">
+      <label className="inline-flex items-center gap-2 text-xs" style={{ color: 'var(--text)' }}>
+        <input
+          type="checkbox"
+          checked={enabled}
+          disabled={saving}
+          onChange={event => onChange(event.target.checked)}
+        />
+        <span>{enabled ? enabledLabel : disabledLabel}</span>
+      </label>
+      <div className="text-xs leading-5" style={{ color: 'var(--dim)' }}>
+        {label}
+      </div>
+      {saving && (
+        <div className="text-xs" style={{ color: 'var(--gold)' }}>Saving...</div>
+      )}
+    </div>
+  )
+}
+
 function BranchCreator({
   brand,
   value,
-  allowAnyPlan,
   saving,
   onChange,
   onCreate,
 }: {
   brand: Brand
   value: BranchForm
-  allowAnyPlan: boolean
   saving: boolean
   onChange: (brand: Brand, key: keyof BranchForm, value: string | boolean) => void
   onCreate: () => void
 }) {
-  const planAllowed = allowAnyPlan || brand.plan === 'premium'
-  const disabled = saving || !planAllowed
+  const disabled = saving
 
   return (
     <div className="space-y-2">
@@ -1153,7 +1225,7 @@ function BranchCreator({
         className="px-3 py-1.5 rounded-lg text-xs font-semibold"
         style={{ background: 'var(--gold)', color: '#0f0b07', opacity: disabled || !value.branchName.trim() ? 0.55 : 1 }}
       >
-        {planAllowed ? 'Add branch' : 'Premium only'}
+        Add branch
       </button>
     </div>
   )

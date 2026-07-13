@@ -9,6 +9,9 @@ const en = {
   navTheme: 'Theme Editor',
   viewMenu: 'View Menu',
   signOut: 'Sign Out',
+  branchCreationPermission: 'Branch creation',
+  enabled: 'Enabled',
+  disabled: 'Disabled',
 
   analyticsTitle: 'Analytics',
   analyticsDesc: 'Live data from Supabase — all visitor events',
@@ -166,6 +169,9 @@ const ka: typeof en = {
   navTheme: 'თემის რედაქტორი',
   viewMenu: 'მენიუს ნახვა',
   signOut: 'გასვლა',
+  branchCreationPermission: 'ფილიალის დამატება',
+  enabled: 'ჩართულია',
+  disabled: 'გამორთულია',
 
   analyticsTitle: 'ანალიტიკა',
   analyticsDesc: 'სუპაბეისის ცოცხალი მონაცემები — ყველა ვიზიტორის ივენთი',

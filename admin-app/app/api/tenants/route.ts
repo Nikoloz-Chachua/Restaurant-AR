@@ -24,6 +24,7 @@ type TenantPlanUpdateRequest = {
   brandId?: number | string
   brandSlug?: string
   plan?: TenantPlan
+  canCreateBranches?: boolean
 }
 
 type TenantRpcRow = {
@@ -41,6 +42,7 @@ type TenantBrand = {
   name: string
   slug: string
   plan: TenantPlan
+  can_create_branches?: boolean | null
   created_at: string
   restaurants?: {
     id: number
@@ -68,6 +70,11 @@ function cleanSlug(value: string) {
 
 function isColor(value: unknown) {
   return typeof value === 'string' && (/^#[0-9a-fA-F]{6}$/.test(value) || value === '')
+}
+
+function isMissingBranchEntitlementColumn(error: { message?: string; code?: string } | null | undefined) {
+  const message = String(error?.message ?? '').toLowerCase()
+  return error?.code === '42703' || (message.includes('can_create_branches') && message.includes('column'))
 }
 
 async function upsertTenantTheme(
@@ -171,15 +178,23 @@ async function enrichTenantEmails(brands: TenantBrand[]) {
 export async function GET() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const role = user?.app_metadata?.role
-  if (!user || !isPlatformRole(role)) {
+  const { data: superAdminResult } = user ? await supabase.rpc('is_super_admin') : { data: false }
+  if (!user || superAdminResult !== true) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from('brands')
-    .select('id, name, slug, plan, created_at, restaurants(id, name, slug, status, custom_domain)')
+    .select('id, name, slug, plan, can_create_branches, created_at, restaurants(id, name, slug, status, custom_domain)')
     .order('created_at', { ascending: false })
+  if (isMissingBranchEntitlementColumn(error)) {
+    const fallback = await supabase
+      .from('brands')
+      .select('id, name, slug, plan, created_at, restaurants(id, name, slug, status, custom_domain)')
+      .order('created_at', { ascending: false })
+    data = fallback.data?.map(brand => ({ ...brand, can_create_branches: false })) ?? null
+    error = fallback.error
+  }
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   const brands = await enrichTenantEmails((data ?? []) as TenantBrand[])
@@ -333,8 +348,9 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const role = user?.app_metadata?.role
-  if (!user || !isPlatformRole(role)) {
+  const { data: superAdminResult, error: superAdminError } = user ? await supabase.rpc('is_super_admin') : { data: false, error: null }
+  if (superAdminError) return NextResponse.json({ error: superAdminError.message }, { status: 500 })
+  if (!user || superAdminResult !== true) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -346,18 +362,30 @@ export async function PATCH(req: NextRequest) {
   const brandId = Number(body.brandId)
   const brandSlug = cleanSlug(String(body.brandSlug ?? ''))
   const plan = body.plan
+  const hasPlanUpdate = plan !== undefined
+  const hasBranchEntitlementUpdate = body.canCreateBranches !== undefined
 
-  if (!isTenantPlan(plan)) {
+  if (!hasPlanUpdate && !hasBranchEntitlementUpdate) {
+    return NextResponse.json({ error: 'Plan or branch creation entitlement is required' }, { status: 400 })
+  }
+  if (hasPlanUpdate && !isTenantPlan(plan)) {
     return NextResponse.json({ error: 'Plan must be AR Menu 300, Full 450, or Premium 900' }, { status: 400 })
+  }
+  if (hasBranchEntitlementUpdate && typeof body.canCreateBranches !== 'boolean') {
+    return NextResponse.json({ error: 'Branch creation entitlement must be true or false' }, { status: 400 })
   }
   if ((!Number.isInteger(brandId) || brandId <= 0) && !brandSlug) {
     return NextResponse.json({ error: 'Valid brandId or brandSlug is required' }, { status: 400 })
   }
 
+  const updates: Record<string, string | boolean> = { updated_at: new Date().toISOString() }
+  if (hasPlanUpdate) updates.plan = plan as TenantPlan
+  if (hasBranchEntitlementUpdate) updates.can_create_branches = body.canCreateBranches === true
+
   let query = supabase
     .from('brands')
-    .update({ plan, updated_at: new Date().toISOString() })
-    .select('id, name, slug, plan, created_at')
+    .update(updates)
+    .select('id, name, slug, plan, can_create_branches, created_at')
 
   query = Number.isInteger(brandId) && brandId > 0
     ? query.eq('id', brandId)
@@ -373,8 +401,8 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const role = user?.app_metadata?.role
-  if (!user || !isPlatformRole(role)) {
+  const { data: superAdminResult } = user ? await supabase.rpc('is_super_admin') : { data: false }
+  if (!user || superAdminResult !== true) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { themePreset, themePresetValuesWithAccents } from '@/lib/themePresets'
+import { canCreateBranchesForRole, hasBranchCreationEntitlement } from '@/lib/branchPermissions'
 
 type BranchRequest = {
   brandId?: number
@@ -29,6 +30,7 @@ type BrandRow = {
   name: string
   slug: string
   plan: 'ar_menu' | 'full' | 'premium'
+  can_create_branches?: boolean | null
   created_at: string
   restaurants?: {
     id: number
@@ -44,9 +46,6 @@ type BrandRow = {
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const CUSTOMER_APP_URL = (process.env.NEXT_PUBLIC_CUSTOMER_APP_URL || 'https://restaurant-ar.pages.dev').replace(/\/$/, '')
 const TENANT_DOMAIN_BASE = (process.env.NEXT_PUBLIC_TENANT_DOMAIN_BASE || 'betareal.ge').replace(/^https?:\/\//, '').replace(/\/$/, '')
-function isPlatformRole(role: unknown) {
-  return ['super_admin', 'creator', 'dev'].includes(String(role))
-}
 
 function cleanSlug(value: string) {
   return value
@@ -58,6 +57,11 @@ function cleanSlug(value: string) {
 
 function isColor(value: unknown) {
   return typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value)
+}
+
+function isMissingBranchEntitlementColumn(error: { message?: string; code?: string } | null | undefined) {
+  const message = String(error?.message ?? '').toLowerCase()
+  return error?.code === '42703' || (message.includes('can_create_branches') && message.includes('column'))
 }
 
 async function upsertBranchTheme(
@@ -138,8 +142,8 @@ export async function GET() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const role = user.app_metadata?.role
-  const isSuperAdmin = isPlatformRole(role)
+  const { data: superAdminResult } = await supabase.rpc('is_super_admin')
+  const isSuperAdmin = superAdminResult === true
   let brandIds: number[] | null = null
 
   if (!isSuperAdmin) {
@@ -153,14 +157,26 @@ export async function GET() {
     if (brandIds.length === 0) return NextResponse.json({ brands: [] })
   }
 
+  const selectWithEntitlement = 'id, name, slug, plan, can_create_branches, created_at, restaurants(id, name, slug, status, custom_domain)'
+  const selectWithoutEntitlement = 'id, name, slug, plan, created_at, restaurants(id, name, slug, status, custom_domain)'
   let query = supabase
     .from('brands')
-    .select('id, name, slug, plan, created_at, restaurants(id, name, slug, status, custom_domain)')
+    .select(selectWithEntitlement)
     .order('created_at', { ascending: false })
 
   if (brandIds) query = query.in('id', brandIds)
 
-  const { data, error } = await query
+  let { data, error } = await query
+  if (isMissingBranchEntitlementColumn(error)) {
+    let fallbackQuery = supabase
+      .from('brands')
+      .select(selectWithoutEntitlement)
+      .order('created_at', { ascending: false })
+    if (brandIds) fallbackQuery = fallbackQuery.in('id', brandIds)
+    const fallback = await fallbackQuery
+    data = fallback.data?.map(brand => ({ ...brand, can_create_branches: false })) ?? null
+    error = fallback.error
+  }
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   const brands = await enrichEmails((data ?? []) as BrandRow[])
@@ -171,6 +187,9 @@ export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const { data: superAdminResult, error: superAdminError } = await supabase.rpc('is_super_admin')
+  if (superAdminError) return NextResponse.json({ error: superAdminError.message }, { status: 500 })
+  const isSuperAdmin = superAdminResult === true
 
   const body = await req.json().catch(() => null) as BranchRequest | null
   if (!body) return NextResponse.json({ error: 'Invalid JSON request body' }, { status: 400 })
@@ -189,13 +208,47 @@ export async function POST(req: NextRequest) {
   const primaryColor = isColor(body.primaryColor) ? String(body.primaryColor) : preset.primaryColor
   const secondaryColor = isColor(body.secondaryColor) ? String(body.secondaryColor) : preset.secondaryColor
 
-  const { data: brand, error: brandError } = await supabase
+  const service = createAdminClient()
+  if (!service) {
+    return NextResponse.json({ error: 'SUPABASE_SERVICE_ROLE_KEY is missing; branch authorization cannot be verified' }, { status: 500 })
+  }
+
+  let { data: brand, error: brandError } = await service
     .from('brands')
-    .select('id, name, slug')
+    .select('id, name, slug, can_create_branches')
     .eq('id', brandId)
     .maybeSingle()
+  if (isMissingBranchEntitlementColumn(brandError)) {
+    if (!isSuperAdmin) {
+      return NextResponse.json({ error: 'Branch creation is disabled for this tenant' }, { status: 403 })
+    }
+    const fallback = await service
+      .from('brands')
+      .select('id, name, slug')
+      .eq('id', brandId)
+      .maybeSingle()
+    brand = fallback.data ? { ...fallback.data, can_create_branches: false } : null
+    brandError = fallback.error
+  }
   if (brandError) return NextResponse.json({ error: brandError.message }, { status: 500 })
   if (!brand) return NextResponse.json({ error: 'Brand not found or not allowed' }, { status: 404 })
+
+  if (!isSuperAdmin) {
+    const { data: membership, error: membershipError } = await service
+      .from('brand_users')
+      .select('brand_id, role')
+      .eq('brand_id', brandId)
+      .eq('user_id', user.id)
+      .eq('role', 'brand_owner')
+      .maybeSingle()
+    if (membershipError) return NextResponse.json({ error: membershipError.message }, { status: 500 })
+    if (
+      !membership ||
+      !canCreateBranchesForRole('brand_owner', hasBranchCreationEntitlement(brand.can_create_branches))
+    ) {
+      return NextResponse.json({ error: 'Branch creation is disabled for this tenant' }, { status: 403 })
+    }
+  }
 
   const branchSlug = cleanSlug(String(body.branchSlug || `${brand.slug}-${branchArea}`))
   if (!SLUG_RE.test(branchSlug)) {

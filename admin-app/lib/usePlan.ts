@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { canCreateBranchesForRole } from '@/lib/branchPermissions'
 
 export type PlanId = 'creator' | 'basic300' | 'full450' | 'premium900'
 export type PlatformPlanId = 'ar_menu' | 'full' | 'premium'
@@ -26,6 +27,7 @@ export type PlanAccess = {
   restaurantSlug: string
   restaurantName: string
   restaurantDomain: string
+  canCreateBranchesEntitlement: boolean
   hasTenantContext: boolean
 }
 
@@ -88,13 +90,13 @@ function accessFor(
   role: RoleId,
   plan: PlanId,
   loading: boolean,
-  tenant: Partial<Pick<PlanAccess, 'brandId' | 'restaurantId' | 'restaurantSlug' | 'restaurantName' | 'restaurantDomain'>> = {},
+  tenant: Partial<Pick<PlanAccess, 'brandId' | 'restaurantId' | 'restaurantSlug' | 'restaurantName' | 'restaurantDomain' | 'canCreateBranchesEntitlement'>> = {},
   platformPlan: PlatformPlanId = legacyPlatformPlan(plan),
 ): PlanAccess {
   const isSuperAdmin = role === 'super_admin'
   const hasTenantContext = Boolean(tenant.restaurantId)
   const hasFullAccess = hasTenantContext && (isSuperAdmin || platformPlan === 'full' || platformPlan === 'premium')
-  const canCreateBranches = isSuperAdmin || (role === 'brand_owner' && platformPlan === 'premium')
+  const canCreateBranches = canCreateBranchesForRole(role, tenant.canCreateBranchesEntitlement)
 
   return {
     role,
@@ -118,6 +120,7 @@ function accessFor(
     restaurantSlug: tenant.restaurantSlug ?? '',
     restaurantName: tenant.restaurantName ?? '',
     restaurantDomain: tenant.restaurantDomain ?? '',
+    canCreateBranchesEntitlement: tenant.canCreateBranchesEntitlement === true,
     hasTenantContext,
   }
 }
@@ -138,7 +141,7 @@ export function usePlan(): PlanAccess {
         : normalizePlan(metadata.plan)
       let role = normalizeRole(metadata.role)
       let platformPlan = legacyPlatformPlan(plan)
-      let tenant: Partial<Pick<PlanAccess, 'brandId' | 'restaurantId' | 'restaurantSlug' | 'restaurantName' | 'restaurantDomain'>> = {}
+      let tenant: Partial<Pick<PlanAccess, 'brandId' | 'restaurantId' | 'restaurantSlug' | 'restaurantName' | 'restaurantDomain' | 'canCreateBranchesEntitlement'>> = {}
 
       if (userId) {
         const requestedSlug = requestedRestaurantSlug()
@@ -163,6 +166,7 @@ export function usePlan(): PlanAccess {
             restaurantSlug: restaurant.slug,
             restaurantName: restaurant.name,
             restaurantDomain: restaurant.custom_domain ?? '',
+            canCreateBranchesEntitlement: false,
           }
         }
 
@@ -196,6 +200,15 @@ export function usePlan(): PlanAccess {
           }
           if (!isSuperAdmin) role = normalizeRole(restaurantMemberships[0].role)
           await setTenantFromRestaurant(restaurant)
+        }
+
+        if (tenant.brandId) {
+          const { data: entitlementBrand } = await supabase
+            .from('brands')
+            .select('can_create_branches')
+            .eq('id', tenant.brandId)
+            .maybeSingle()
+          tenant.canCreateBranchesEntitlement = entitlementBrand?.can_create_branches === true
         }
       }
 
