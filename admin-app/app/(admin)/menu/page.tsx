@@ -6,10 +6,14 @@ import { usePlan } from '@/lib/usePlan'
 import {
   DEFAULT_MENU_FILTERS,
   filterMenuItems,
+  inferMenuGroupForCategory,
   menuFiltersAreActive,
+  parseDrinkCategories,
+  serializeDrinkCategories,
 } from '@/lib/menuFilters'
 
 type Category = { id: number; name_en: string; name_ka: string; sort_order: number }
+type MenuGroup = 'food' | 'drink'
 type MenuItem = {
   id: number; name_en: string; name_ka: string
   description_en: string; description_ka: string
@@ -22,6 +26,7 @@ type MenuItemPayload = Partial<Omit<MenuItem, 'id'>> & Pick<
 >
 type MenuFilters = {
   query: string
+  menuGroup: 'all' | MenuGroup
   categoryId: string
   visibility: 'all' | 'visible' | 'hidden'
   mediaState: 'all' | 'ar' | 'photo' | 'text' | 'missing-image'
@@ -74,6 +79,9 @@ export default function MenuPage() {
   const [itemModal, setItemModal]   = useState(false)
   const [editItem, setEditItem]     = useState<MenuItem | null>(null)
   const [itemForm, setItemForm]     = useState<Omit<MenuItem, 'id'>>(EMPTY_ITEM)
+  const [itemMenuGroup, setItemMenuGroup] = useState<MenuGroup>('food')
+  const [drinkCategoryNames, setDrinkCategoryNames] = useState<Set<string>>(new Set())
+  const [drinkCategoriesConfigured, setDrinkCategoriesConfigured] = useState(false)
   const [itemViews, setItemViews]   = useState<Record<number, string>>({})
   const [viewForm, setViewForm]     = useState({ ...DEFAULT_ITEM_VIEW })
   const [sortOrderTouched, setSortOrderTouched] = useState(false)
@@ -109,12 +117,13 @@ export default function MenuPage() {
       return
     }
     setLoading(true)
-    const [{ data: cats }, { data: its }, { data: views }, { data: layoutRow }, { data: spinRow }] = await Promise.all([
+    const [{ data: cats }, { data: its }, { data: views }, { data: layoutRow }, { data: spinRow }, { data: drinkRow }] = await Promise.all([
       supabase.from('categories').select('*').eq('restaurant_id', plan.restaurantId).order('sort_order'),
       supabase.from('menu_items').select('*').eq('restaurant_id', plan.restaurantId).order('category_id').order('sort_order'),
       supabase.from('theme_config').select('key,value').eq('restaurant_id', plan.restaurantId).like('key', 'item_view_%'),
       supabase.from('theme_config').select('value').eq('restaurant_id', plan.restaurantId).eq('key', 'phone_layout').maybeSingle(),
       supabase.from('theme_config').select('value').eq('restaurant_id', plan.restaurantId).eq('key', 'spin_enabled').maybeSingle(),
+      supabase.from('theme_config').select('value').eq('restaurant_id', plan.restaurantId).eq('key', 'drink_categories').maybeSingle(),
     ])
     setCategories(cats || [])
     setItems(its || [])
@@ -123,6 +132,8 @@ export default function MenuPage() {
     ))
     setPhoneLayout((layoutRow?.value as string) === 'twin' ? 'twin' : 'list')
     setSpinEnabled(/^(1|true|on|yes)$/i.test(String(spinRow?.value ?? '')))
+    setDrinkCategoryNames(parseDrinkCategories(drinkRow?.value))
+    setDrinkCategoriesConfigured(drinkRow != null)
     setLoading(false)
   }, [plan.loading, plan.restaurantId, supabase])
 
@@ -185,6 +196,49 @@ export default function MenuPage() {
     return maxSortOrder + 1
   }
 
+  function categoryForGroup(categoryId: number | null) {
+    return categoryId === null
+      ? { id: 0, name_en: 'Other', name_ka: 'სხვა', sort_order: 0 }
+      : categories.find(category => category.id === categoryId) ?? null
+  }
+
+  function groupForCategory(categoryId: number | null): MenuGroup {
+    return inferMenuGroupForCategory(categoryForGroup(categoryId), drinkCategoryNames, !drinkCategoriesConfigured)
+  }
+
+  function nextDrinkCategoryNames(categoryId: number | null, group: MenuGroup) {
+    const category = categoryForGroup(categoryId)
+    const name = String(category?.name_en || '').trim()
+    if (!name) return drinkCategoryNames
+    const next = new Set(drinkCategoryNames)
+    if (group === 'drink') {
+      next.add(name.toLocaleLowerCase())
+    } else {
+      next.delete(name.toLocaleLowerCase())
+    }
+    return next
+  }
+
+  async function saveDrinkCategoriesForItem(categoryId: number | null, group: MenuGroup) {
+    if (!plan.restaurantId) return { error: null as { message: string } | null }
+    const next = nextDrinkCategoryNames(categoryId, group)
+    const value = serializeDrinkCategories(
+      categoryId === null && next.has('other')
+        ? [...categories, { id: 0, name_en: 'Other', name_ka: 'სხვა', sort_order: 0 }]
+        : categories,
+      next,
+    )
+    const { error } = await supabase.from('theme_config').upsert(
+      { restaurant_id: plan.restaurantId, key: 'drink_categories', value },
+      { onConflict: 'restaurant_id,key' },
+    )
+    if (!error) {
+      setDrinkCategoryNames(next)
+      setDrinkCategoriesConfigured(true)
+    }
+    return { error }
+  }
+
   function itemPayloadForSave(base: Omit<MenuItem, 'id'>): MenuItemPayload {
     const normalized = normalizeTextOnlyItem(base)
     if (plan.canUploadModels) return normalized
@@ -223,6 +277,7 @@ export default function MenuPage() {
       sort_order: nextSortOrderForCategory(categoryId),
       is_3d: plan.canUploadModels,
     })
+    setItemMenuGroup(groupForCategory(categoryId))
     setViewForm({ ...DEFAULT_ITEM_VIEW })
     setItemModal(true)
   }
@@ -235,6 +290,7 @@ export default function MenuPage() {
       sort_order: item.sort_order, visible: item.visible, ar_scale: item.ar_scale ?? 1.0,
       thumbnail_url: item.thumbnail_url ?? '', thumb_3d: item.thumb_3d ?? false, is_3d: item.is_3d ?? true,
       text_only: item.text_only ?? (!item.is_3d && !item.thumbnail_url && !item.model && !item.model_usdz) })
+    setItemMenuGroup(groupForCategory(item.category_id))
     setViewForm(parseItemView(itemViews[item.id]))
     setItemModal(true)
   }
@@ -254,11 +310,27 @@ export default function MenuPage() {
     const payload = itemPayloadForSave(nextItemForm)
     let savedId: number | null = editItem?.id ?? null
     if (editItem) {
-      await supabase.from('menu_items').update(payload).eq('id', editItem.id).eq('restaurant_id', plan.restaurantId)
+      const { error } = await supabase.from('menu_items').update(payload).eq('id', editItem.id).eq('restaurant_id', plan.restaurantId)
+      if (error) {
+        setSaving(false)
+        flash(text(T.saveFailed, { message: error.message }))
+        return
+      }
     } else {
-      const { data: created } = await supabase.from('menu_items')
+      const { data: created, error } = await supabase.from('menu_items')
         .insert({ ...payload, restaurant_id: plan.restaurantId }).select('id').single()
+      if (error) {
+        setSaving(false)
+        flash(text(T.saveFailed, { message: error.message }))
+        return
+      }
       savedId = created?.id ?? null
+    }
+    const { error: drinkCategoryError } = await saveDrinkCategoriesForItem(nextItemForm.category_id, itemMenuGroup)
+    if (drinkCategoryError) {
+      setSaving(false)
+      flash(text(T.saveFailed, { message: drinkCategoryError.message }))
+      return
     }
     if (savedId !== null && plan.canUploadModels) {
       const viewKey = `item_view_${savedId}`
@@ -333,8 +405,8 @@ export default function MenuPage() {
     return category ? categoryName(category) : '—'
   }
   const filteredItems = useMemo<MenuItem[]>(
-    () => filterMenuItems(items, categories, filters) as MenuItem[],
-    [items, categories, filters],
+    () => filterMenuItems(items, categories, filters, drinkCategoryNames, !drinkCategoriesConfigured) as MenuItem[],
+    [items, categories, filters, drinkCategoryNames, drinkCategoriesConfigured],
   )
   const filtersActive = menuFiltersAreActive(filters)
   const resultCountLabel = T.menuResultCount
@@ -544,6 +616,14 @@ export default function MenuPage() {
                     ))}
                   </select>
                 </FilterField>
+                <FilterField label={T.menuFilterTopLevel}>
+                  <select value={filters.menuGroup}
+                          onChange={e => updateFilter('menuGroup', e.target.value as MenuFilters['menuGroup'])}>
+                    <option value="all">{T.menuFilterAll}</option>
+                    <option value="food">{T.foodTab}</option>
+                    <option value="drink">{T.drinksTab}</option>
+                  </select>
+                </FilterField>
                 <FilterField label={T.menuFilterVisibility}>
                   <select value={filters.visibility}
                           onChange={e => updateFilter('visibility', e.target.value as MenuFilters['visibility'])}>
@@ -596,7 +676,7 @@ export default function MenuPage() {
             <table className="w-full text-sm" style={{ minWidth: '600px' }}>
               <thead>
                 <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
-                  {[T.colName, T.colCategory, T.colPrice, T.colModel, T.colVisible, ''].map((h, i) => (
+                  {[T.colName, T.colCategory, T.colTopLevel, T.colPrice, T.colModel, T.colVisible, ''].map((h, i) => (
                     <th key={i} className="px-4 py-3 text-left font-medium"
                         style={{ color: 'var(--dim)' }}>{h}</th>
                   ))}
@@ -613,6 +693,12 @@ export default function MenuPage() {
                     </td>
                     <td className="px-4 py-3" style={{ color: 'var(--dim)' }}>
                       {catName(item.category_id)}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="text-xs px-2 py-0.5 rounded-full"
+                            style={{ background: 'var(--card2)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
+                        {groupForCategory(item.category_id) === 'drink' ? T.drinksTab : T.foodTab}
+                      </span>
                     </td>
                     <td className="px-4 py-3 font-mono" style={{ color: 'var(--gold)' }}>
                       {item.price}
@@ -753,9 +839,36 @@ export default function MenuPage() {
                           category_id: categoryId,
                           sort_order: editItem || sortOrderTouched ? f.sort_order : nextSortOrderForCategory(categoryId),
                         }))
+                        setItemMenuGroup(groupForCategory(categoryId))
                       }}>
                 {categories.map(c => <option key={c.id} value={c.id}>{categoryName(c)}</option>)}
               </select>
+            </Field>
+            <Field label={T.topLevelTab} className="col-span-2">
+              <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={T.topLevelTab}>
+                {(['food', 'drink'] as const).map(group => (
+                  <label key={group}
+                         className="flex items-center gap-2 rounded-lg px-3 py-2 cursor-pointer"
+                         style={{ background: itemMenuGroup === group ? 'rgba(242,181,53,0.12)' : 'var(--card2)',
+                                  border: `1px solid ${itemMenuGroup === group ? 'var(--gold)' : 'var(--border)'}` }}>
+                    <input
+                      type="radio"
+                      name="menu-group"
+                      value={group}
+                      checked={itemMenuGroup === group}
+                      required
+                      style={{ width: 'auto' }}
+                      onChange={() => setItemMenuGroup(group)}
+                    />
+                    <span className="text-sm font-medium" style={{ color: itemMenuGroup === group ? 'var(--gold)' : 'var(--text)' }}>
+                      {group === 'drink' ? T.drinksTab : T.foodTab}
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
+                {T.topLevelTabHint}
+              </p>
             </Field>
             <Field label={T.textOnlyItem} className="col-span-2">
               <label className="flex items-center gap-2 cursor-pointer">

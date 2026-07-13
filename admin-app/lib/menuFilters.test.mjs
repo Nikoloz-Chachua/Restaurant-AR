@@ -3,7 +3,10 @@ import assert from 'node:assert/strict'
 import {
   filterMenuItems,
   getMenuItemMediaState,
+  inferMenuGroupForCategory,
   menuFiltersAreActive,
+  parseDrinkCategories,
+  serializeDrinkCategories,
 } from './menuFilters.js'
 
 const categories = [
@@ -40,6 +43,23 @@ test('combines category, visibility, media, and quality filters with AND semanti
     }).map(item => item.id),
     [3],
   )
+})
+
+test('parses and serializes the public drink category config', () => {
+  const parsed = parseDrinkCategories('["Drinks", "Coffee"]')
+  assert.equal(parsed.has('drinks'), true)
+  assert.equal(parsed.has('coffee'), true)
+  assert.equal(parseDrinkCategories('Drinks; Tea\nWine').has('tea'), true)
+  assert.equal(serializeDrinkCategories(categories, parsed), '["Drinks"]')
+})
+
+test('filters by the same category-level food and drink split used by the public menu', () => {
+  const drinkCategories = parseDrinkCategories('["Drinks"]')
+  assert.equal(inferMenuGroupForCategory(categories[1], drinkCategories), 'drink')
+  assert.equal(inferMenuGroupForCategory({ name_en: 'Coffee', name_ka: '' }, new Set()), 'drink')
+  assert.equal(inferMenuGroupForCategory({ name_en: 'Coffee', name_ka: '' }, new Set(), false), 'food')
+  assert.deepEqual(filterMenuItems(items, categories, { menuGroup: 'drink' }, drinkCategories).map(item => item.id), [2, 3, 5])
+  assert.deepEqual(filterMenuItems(items, categories, { menuGroup: 'food' }, drinkCategories).map(item => item.id), [1, 4])
 })
 
 test('classifies media state from active 3D model and thumbnail presence', () => {
