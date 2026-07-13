@@ -2,12 +2,14 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { useLang } from '@/lib/useLang'
 
 export default function LoginPage() {
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [error, setError]       = useState('')
   const [loading, setLoading]   = useState(false)
+  const [T] = useLang()
   const router = useRouter()
 
   async function handleLogin(e: React.FormEvent) {
@@ -27,10 +29,10 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold" style={{ color: 'var(--gold)' }}>
-            BetaReal Admin
+            {T.loginTitle}
           </h1>
           <p className="text-sm mt-1" style={{ color: 'var(--dim)' }}>
-            Sign in to manage the restaurant
+            {T.loginSubtitle}
           </p>
         </div>
 
@@ -39,13 +41,13 @@ export default function LoginPage() {
               style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
           <div>
             <label className="block text-xs mb-1 uppercase tracking-widest"
-                   style={{ color: 'var(--dim)' }}>Email</label>
+                   style={{ color: 'var(--dim)' }}>{T.emailLabel}</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)}
                    required autoFocus />
           </div>
           <div>
             <label className="block text-xs mb-1 uppercase tracking-widest"
-                   style={{ color: 'var(--dim)' }}>Password</label>
+                   style={{ color: 'var(--dim)' }}>{T.passwordLabel}</label>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)}
                    required />
           </div>
@@ -61,10 +63,10 @@ export default function LoginPage() {
                   className="w-full py-2.5 rounded-lg font-semibold text-sm transition-opacity"
                   style={{ background: 'var(--gold)', color: '#0f0b07',
                            opacity: loading ? 0.6 : 1 }}>
-            {loading ? 'Signing in…' : 'Sign In'}
+            {loading ? T.signingIn : T.signIn}
           </button>
           <a href="/reset-password" className="block text-center text-xs hover:underline" style={{ color: 'var(--dim)' }}>
-            Forgot password?
+            {T.forgotPassword}
           </a>
         </form>
       </div>

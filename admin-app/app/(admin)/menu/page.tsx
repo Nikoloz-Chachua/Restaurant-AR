@@ -83,6 +83,12 @@ export default function MenuPage() {
   const [thumbUploading, setThumbUploading] = useState(false)
   const [thumbProgress, setThumbProgress] = useState('')
   const thumbInputRef = useRef<HTMLInputElement>(null)
+  const text = useCallback((template: string, values: Record<string, string | number>) => (
+    Object.entries(values).reduce(
+      (result, [key, value]) => result.replace(`{${key}}`, String(value)),
+      template,
+    )
+  ), [])
 
   const load = useCallback(async () => {
     if (plan.loading || !plan.restaurantId) {
@@ -129,9 +135,9 @@ export default function MenuPage() {
       { restaurant_id: plan.restaurantId, key: 'phone_layout', value: v },
       { onConflict: 'restaurant_id,key' },
     )
-    flash(error ? `Save failed: ${error.message}`
-                : v === 'twin' ? 'Twin phone view on. Reload the live menu to see it.'
-                               : 'Single phone view on.')
+    flash(error ? text(T.saveFailed, { message: error.message })
+                : v === 'twin' ? T.twinPhoneOn
+                               : T.singlePhoneOn)
   }
 
   // 360° Spin toggle. ON adds a "360° SPIN" button in the 3D viewer that slowly
@@ -144,13 +150,13 @@ export default function MenuPage() {
       { restaurant_id: plan.restaurantId, key: 'spin_enabled', value: on ? 'true' : 'false' },
       { onConflict: 'restaurant_id,key' },
     )
-    flash(error ? `Save failed: ${error.message}`
-                : on ? '360° Spin on. Reload the live menu to see it.'
-                     : '360° Spin off.')
+    flash(error ? text(T.saveFailed, { message: error.message })
+                : on ? T.spinOn
+                     : T.spinOff)
   }
 
   const activeArItemCount = items.filter(isActiveArItem).length
-  const itemLimitLabel = plan.itemLimit === null ? 'Unlimited' : String(plan.itemLimit)
+  const itemLimitLabel = plan.itemLimit === null ? T.unlimited : String(plan.itemLimit)
   const planLimitReached = plan.itemLimit !== null && activeArItemCount >= plan.itemLimit
 
   function activeCountWithForm() {
@@ -217,11 +223,11 @@ export default function MenuPage() {
   }
   async function saveItem() {
     if (!plan.restaurantId) {
-      flash('No restaurant is mapped to this account.')
+      flash(T.noRestaurantMappedShort)
       return
     }
     if (plan.itemLimit !== null && activeCountWithForm() > plan.itemLimit) {
-      flash(`Plan limit reached: ${activeArItemCount} / ${plan.itemLimit} active AR items.`)
+      flash(text(T.planLimitReached, { active: activeArItemCount, limit: plan.itemLimit }))
       return
     }
     setSaving(true)
@@ -271,7 +277,7 @@ export default function MenuPage() {
   }
   async function saveCat() {
     if (!plan.restaurantId) {
-      flash('No restaurant is mapped to this account.')
+      flash(T.noRestaurantMappedShort)
       return
     }
     setSaving(true)
@@ -287,7 +293,7 @@ export default function MenuPage() {
     if (!res.ok) {
       const data = await res.json().catch(() => null) as { error?: string } | null
       setSaving(false)
-      flash(data?.error || 'Category could not be saved.')
+      flash(data?.error || T.categorySaveFailed)
       return
     }
     setSaving(false); setCatModal(false); await load()
@@ -328,13 +334,13 @@ export default function MenuPage() {
     return (
       <div className="max-w-xl rounded-xl p-6" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
         <div className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--dim)' }}>
-          Tenant required
+          {T.tenantRequired}
         </div>
         <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>
-          No restaurant is mapped to this account
+          {T.noRestaurantMapped}
         </h1>
         <p className="text-sm mt-2 leading-6" style={{ color: 'var(--dim)' }}>
-          Ask a super admin to add this user to a brand or restaurant before editing menu content.
+          {T.noRestaurantMenuDesc}
         </p>
       </div>
     )
@@ -359,7 +365,7 @@ export default function MenuPage() {
 
   async function uploadImage(file: File) {
     if (!file.type.startsWith('image/')) {
-      setThumbProgress('Only image files supported (jpg, png, webp, avif…)')
+      setThumbProgress(T.onlyImageFiles)
       return
     }
     setThumbUploading(true)
@@ -368,7 +374,7 @@ export default function MenuPage() {
     try {
       blob = await toWebP(file)
     } catch {
-      setThumbProgress('Could not process image')
+      setThumbProgress(T.couldNotProcessImage)
       setThumbUploading(false)
       return
     }
@@ -391,9 +397,9 @@ export default function MenuPage() {
       })
       if (!upload.ok) throw new Error(`R2 upload failed: ${upload.status}`)
       setItemForm(f => ({ ...f, thumbnail_url: publicUrl }))
-      setThumbProgress(`Uploaded: ${file.name}`)
+      setThumbProgress(text(T.uploadedFile, { name: file.name }))
     } catch (e) {
-      setThumbProgress(`Upload failed: ${e instanceof Error ? e.message : String(e)}`)
+      setThumbProgress(text(T.uploadFailed, { message: e instanceof Error ? e.message : String(e) }))
     }
     setThumbUploading(false)
   }
@@ -401,7 +407,7 @@ export default function MenuPage() {
   async function uploadModel(file: File, kind: 'glb' | 'usdz') {
     const extension = `.${kind}`
     if (!file.name.toLowerCase().endsWith(extension)) {
-      setUploadProgress(`Only ${extension} files are supported`)
+      setUploadProgress(text(T.onlyExtensionFiles, { extension }))
       return
     }
     setUploading(true)
@@ -426,9 +432,9 @@ export default function MenuPage() {
       if (!upload.ok) throw new Error(`R2 upload failed: ${upload.status}`)
 
       setItemForm(f => kind === 'usdz' ? { ...f, model_usdz: publicUrl } : { ...f, model: publicUrl })
-      setUploadProgress(`Uploaded: ${file.name}`)
+      setUploadProgress(text(T.uploadedFile, { name: file.name }))
     } catch (e) {
-      setUploadProgress(`Upload failed: ${e instanceof Error ? e.message : String(e)}`)
+      setUploadProgress(text(T.uploadFailed, { message: e instanceof Error ? e.message : String(e) }))
     }
     setUploading(false)
   }
@@ -440,7 +446,7 @@ export default function MenuPage() {
           <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>{T.menuTitle}</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--dim)' }}>{T.menuDesc}</p>
           <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-            Tenant: <span style={{ color: 'var(--text)' }}>{plan.restaurantName}</span>
+            {T.tenantLabel}: <span style={{ color: 'var(--text)' }}>{plan.restaurantName}</span>
           </p>
         </div>
         {msg && (
@@ -477,7 +483,7 @@ export default function MenuPage() {
             </button>
             <span className="text-sm px-3 py-2 rounded-lg"
                   style={{ background: 'var(--card)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
-              Active AR items: <span style={{ color: 'var(--text)' }}>{activeArItemCount} / {itemLimitLabel}</span>
+              {T.activeArItems}: <span style={{ color: 'var(--text)' }}>{activeArItemCount} / {itemLimitLabel}</span>
             </span>
             <button type="button"
                     onClick={() => updatePhoneLayout(phoneLayout === 'twin' ? 'list' : 'twin')}
@@ -485,8 +491,8 @@ export default function MenuPage() {
                     style={{ background: phoneLayout === 'twin' ? 'var(--gold)' : 'var(--card)',
                              color: phoneLayout === 'twin' ? '#0f0b07' : 'var(--dim)',
                              border: '1px solid var(--border)' }}
-                    title="Two menu items per row on phones (big photos, compact text). Desktop and tablet are unchanged.">
-              Twin phone view: {phoneLayout === 'twin' ? 'On' : 'Off'}
+                    title={T.twinPhoneTitle}>
+              {T.twinPhoneView}: {phoneLayout === 'twin' ? T.toggleOn : T.toggleOff}
             </button>
             <button type="button"
                     onClick={() => updateSpinEnabled(!spinEnabled)}
@@ -494,8 +500,8 @@ export default function MenuPage() {
                     style={{ background: spinEnabled ? 'var(--gold)' : 'var(--card)',
                              color: spinEnabled ? '#0f0b07' : 'var(--dim)',
                              border: '1px solid var(--border)' }}
-                    title="Adds a 360° SPIN button in the 3D view so guests can hand over the phone and the dish rotates on its own.">
-              360° Spin: {spinEnabled ? 'On' : 'Off'}
+                    title={T.spinTitle}>
+              360° Spin: {spinEnabled ? T.toggleOn : T.toggleOff}
             </button>
           </div>
           <div className="mb-4 rounded-xl p-3 md:p-4"
@@ -565,7 +571,7 @@ export default function MenuPage() {
           {planLimitReached && plan.itemLimit !== null && (
             <div className="mb-4 rounded-xl p-3 text-sm"
                  style={{ background: 'rgba(242,181,53,0.08)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
-              This plan is at its active AR item limit. Hide an existing AR item or upgrade before making another modeled item visible.
+              {T.planLimitReachedHint}
             </div>
           )}
           <div className="table-scroll rounded-xl"
@@ -734,7 +740,7 @@ export default function MenuPage() {
                 {categories.map(c => <option key={c.id} value={c.id}>{categoryName(c)}</option>)}
               </select>
             </Field>
-            <Field label="Text-only item" className="col-span-2">
+            <Field label={T.textOnlyItem} className="col-span-2">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -756,11 +762,11 @@ export default function MenuPage() {
                   }}
                 />
                 <span className="text-sm" style={{ color: 'var(--dim)' }}>
-                  Text-only item / no photo needed
+                  {T.textOnlyLabel}
                 </span>
               </label>
               <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-                Use for simple known items like drinks. It saves without thumbnail, GLB, or USDZ files.
+                {T.textOnlyHint}
               </p>
             </Field>
             {plan.canUploadModels && (
@@ -820,7 +826,7 @@ export default function MenuPage() {
                   </div>
                   {uploadProgress && (
                     <div className="text-xs px-2 py-1.5 rounded"
-                         style={{ background: 'var(--card2)', color: uploadProgress.startsWith('Uploaded:') ? 'var(--success)' : 'var(--danger)', border: '1px solid var(--border)' }}>
+                         style={{ background: 'var(--card2)', color: uploadProgress.startsWith(text(T.uploadedFile, { name: '' })) ? 'var(--success)' : 'var(--danger)', border: '1px solid var(--border)' }}>
                       {uploadProgress}
                     </div>
                   )}
@@ -846,7 +852,7 @@ export default function MenuPage() {
                     </button>
                   )}
                   {itemForm.thumbnail_url && (
-                    <img src={itemForm.thumbnail_url} alt="thumbnail preview"
+                    <img src={itemForm.thumbnail_url} alt={T.thumbnailPreviewAlt}
                          style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6,
                                   border: '1px solid var(--border)' }} />
                   )}
@@ -856,14 +862,14 @@ export default function MenuPage() {
                 <div className="text-xs px-2 py-1.5 rounded truncate"
                      style={{ background: 'var(--card2)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
                   {thumbProgress
-                    ? <span style={{ color: thumbProgress.startsWith('Uploaded:') ? 'var(--success)' : 'var(--danger)' }}>{thumbProgress}</span>
+                    ? <span style={{ color: thumbProgress.startsWith(text(T.uploadedFile, { name: '' })) ? 'var(--success)' : 'var(--danger)' }}>{thumbProgress}</span>
                     : itemForm.thumbnail_url
                       ? <span>{T.current}<span style={{ color: 'var(--text)' }}>{itemForm.thumbnail_url.split('/').pop()}</span></span>
                       : <span style={{ color: 'var(--dim)' }}>{T.noThumbnail}</span>
                   }
                 </div>
                 <p className="text-xs" style={{ color: 'var(--dim)' }}>
-                  Optional. Leave empty for a text-only item.
+                  {T.thumbOptionalHint}
                 </p>
               </div>
             </Field>
@@ -921,7 +927,7 @@ export default function MenuPage() {
                          const existingItems = editItem ? items.filter(item => item.id !== editItem.id) : items
                          const nextCount = existingItems.filter(isActiveArItem).length + (isActiveArItem(next) ? 1 : 0)
                          if (plan.itemLimit !== null && nextCount > plan.itemLimit) {
-                           flash(`Plan limit reached: ${activeArItemCount} / ${plan.itemLimit} active AR items.`)
+                           flash(text(T.planLimitReached, { active: activeArItemCount, limit: plan.itemLimit }))
                            return
                          }
                          setItemForm(next)
@@ -930,7 +936,7 @@ export default function MenuPage() {
               </label>
               {plan.itemLimit !== null && (
                 <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-                  Active AR items count only visible items with a 3D model.
+                  {T.activeArItemsHint}
                 </p>
               )}
             </Field>

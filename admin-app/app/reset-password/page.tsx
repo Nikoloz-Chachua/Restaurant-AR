@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { useLang } from '@/lib/useLang'
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('')
@@ -10,6 +11,7 @@ export default function ResetPasswordPage() {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [T] = useLang()
   const router = useRouter()
 
   useEffect(() => {
@@ -44,7 +46,7 @@ export default function ResetPasswordPage() {
       setError(error.message)
       return
     }
-    setMessage('Password reset email sent.')
+    setMessage(T.passwordResetSent)
   }
 
   async function updatePassword(e: React.FormEvent) {
@@ -52,7 +54,7 @@ export default function ResetPasswordPage() {
     setError('')
     setMessage('')
     if (password.length < 8) {
-      setError('Password must be at least 8 characters.')
+      setError(T.passwordMinLength)
       return
     }
     setLoading(true)
@@ -63,7 +65,7 @@ export default function ResetPasswordPage() {
       setError(error.message)
       return
     }
-    setMessage('Password updated. Redirecting to login...')
+    setMessage(T.passwordUpdated)
     await supabase.auth.signOut()
     setTimeout(() => router.push('/login'), 800)
   }
@@ -73,10 +75,10 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold" style={{ color: 'var(--gold)' }}>
-            Reset password
+            {T.resetPasswordTitle}
           </h1>
           <p className="text-sm mt-1" style={{ color: 'var(--dim)' }}>
-            Passwords are not stored by BetaReal.
+            {T.resetPasswordSubtitle}
           </p>
         </div>
 
@@ -88,7 +90,7 @@ export default function ResetPasswordPage() {
           {hasSession ? (
             <div>
               <label className="block text-xs mb-1 uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
-                New password
+                {T.newPassword}
               </label>
               <input
                 type="password"
@@ -102,7 +104,7 @@ export default function ResetPasswordPage() {
           ) : (
             <div>
               <label className="block text-xs mb-1 uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
-                Email
+                {T.emailLabel}
               </label>
               <input
                 type="email"
@@ -131,7 +133,7 @@ export default function ResetPasswordPage() {
             className="w-full py-2.5 rounded-lg font-semibold text-sm transition-opacity"
             style={{ background: 'var(--gold)', color: '#0f0b07', opacity: loading ? 0.6 : 1 }}
           >
-            {loading ? 'Working...' : hasSession ? 'Update password' : 'Send reset email'}
+            {loading ? T.working : hasSession ? T.updatePassword : T.sendResetEmail}
           </button>
         </form>
       </div>

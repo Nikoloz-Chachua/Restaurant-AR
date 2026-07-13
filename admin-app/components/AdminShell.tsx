@@ -1,9 +1,11 @@
 'use client'
 import { useState } from 'react'
 import Sidebar from './Sidebar'
+import { useLang } from '@/lib/useLang'
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
+  const [T] = useLang()
 
   return (
     <div className="flex min-h-screen md:h-screen md:overflow-hidden">
@@ -27,7 +29,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           <button
             onClick={() => setOpen(true)}
             className="flex flex-col justify-center gap-[5px] w-7 h-7 shrink-0"
-            aria-label="Open menu"
+            aria-label={T.openMenu}
           >
             <span className="block h-[2px] w-full rounded-full transition-all" style={{ background: 'var(--gold)' }} />
             <span className="block h-[2px] w-4 rounded-full transition-all" style={{ background: 'var(--gold)' }} />

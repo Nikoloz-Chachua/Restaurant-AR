@@ -174,7 +174,7 @@ function slugify(value: string) {
     .replace(/^-+|-+$/g, '')
 }
 
-async function imageToWebP(file: File) {
+async function imageToWebP(file: File, loadFailedMessage: string) {
   const url = URL.createObjectURL(file)
   return new Promise<Blob>((resolve, reject) => {
     const img = new Image()
@@ -190,7 +190,7 @@ async function imageToWebP(file: File) {
     }
     img.onerror = () => {
       URL.revokeObjectURL(url)
-      reject(new Error('Could not load logo image'))
+      reject(new Error(loadFailedMessage))
     }
     img.src = url
   })
@@ -229,6 +229,12 @@ export default function TenantsPage() {
     adminEmail: '',
     adminPassword: '',
   })
+  const text = useCallback((template: string, values: Record<string, string | number>) => (
+    Object.entries(values).reduce(
+      (result, [key, value]) => result.replace(`{${key}}`, String(value)),
+      template,
+    )
+  ), [])
 
   const load = useCallback(async () => {
     if (!access.canManageBranches) {
@@ -250,9 +256,9 @@ export default function TenantsPage() {
         ),
       }))
     }
-    else setMessage(json.error || 'Could not load tenants')
+    else setMessage(json.error || T.tenantLoadFailed)
     setLoading(false)
-  }, [access.canManageBranches, access.canManageTenants, access.loading])
+  }, [access.canManageBranches, access.canManageTenants, access.loading, T.tenantLoadFailed])
 
   useEffect(() => { void Promise.resolve().then(load) }, [load])
 
@@ -265,9 +271,9 @@ export default function TenantsPage() {
     const res = await fetch('/api/account-log')
     const json = await res.json().catch(() => ({}))
     if (res.ok) setAccountLog(json.accounts ?? [])
-    else setMessage(json.error || 'Could not load account log')
+    else setMessage(json.error || T.accountLogLoadFailed)
     setAccountLogLoading(false)
-  }, [access.canManageTenants])
+  }, [access.canManageTenants, T.accountLogLoadFailed])
 
   useEffect(() => { void Promise.resolve().then(loadAccountLog) }, [loadAccountLog])
 
@@ -292,14 +298,14 @@ export default function TenantsPage() {
 
   async function uploadTenantLogo(file: File, restaurant: { id: number; slug: string }) {
     if (file.type === 'image/svg+xml' || /\.svg$/i.test(file.name)) {
-      throw new Error('SVG logos are not supported here. Upload PNG, JPG, or WebP.')
+      throw new Error(T.svgLogosUnsupported)
     }
     if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
-      throw new Error('Only PNG, JPG, or WebP logos are supported')
+      throw new Error(T.logoTypesUnsupported)
     }
-    setLogoStatus('Uploading logo...')
-    const blob = await imageToWebP(file).catch(error => {
-      throw new Error(`Logo conversion failed: ${error instanceof Error ? error.message : String(error)}`)
+    setLogoStatus(T.uploadingLogo)
+    const blob = await imageToWebP(file, T.logoLoadFailed).catch(error => {
+      throw new Error(`${T.logoConversionFailed}: ${error instanceof Error ? error.message : String(error)}`)
     })
     const filename = file.name.replace(/\.[^.]+$/i, '.webp')
     const presign = await fetch('/api/r2-presign', {
@@ -328,7 +334,7 @@ export default function TenantsPage() {
       { onConflict: 'restaurant_id,key' },
     )
     if (error) throw new Error(`Theme save failed: ${error.message}`)
-    setLogoStatus('Logo uploaded')
+    setLogoStatus(T.logoUploaded)
   }
 
   async function createTenant() {
@@ -343,22 +349,22 @@ export default function TenantsPage() {
     const json = await res.json().catch(() => ({})) as CreatedTenantResponse
     if (!res.ok) {
       setSaving(false)
-      setMessage(json.error || 'Tenant creation failed')
+      setMessage(json.error || T.tenantCreationFailed)
       return
     }
     let logoNote = ''
     if (logoFile && json.restaurant?.id && json.restaurant.slug) {
       try {
         await uploadTenantLogo(logoFile, { id: json.restaurant.id, slug: json.restaurant.slug })
-        logoNote = ' Logo added.'
+        logoNote = T.logoAdded
       } catch (e) {
         const reason = e instanceof Error ? e.message : String(e)
-        logoNote = ` Logo upload skipped: ${reason}.`
-        setLogoStatus(`Logo upload failed: ${reason}`)
+        logoNote = text(T.logoUploadSkipped, { reason })
+        setLogoStatus(text(T.logoUploadFailed, { reason }))
       }
     }
     setSaving(false)
-    setMessage(`Created ${json.brand?.name ?? 'tenant'}. Public URL: ${json.previewUrl}.${logoNote} Temporary password visibility is stored for super admins when the password table exists.`)
+    setMessage(text(T.tenantCreated, { name: json.brand?.name ?? T.tenantCredential, url: json.previewUrl ?? '', logoNote }))
     if (json.adminUser?.email && json.oneTimePassword) {
       setCredentials({
         brandName: json.brand?.name ?? '',
@@ -401,10 +407,10 @@ export default function TenantsPage() {
     const json = await res.json().catch(() => ({}))
     setSaving(false)
     if (!res.ok) {
-      setMessage(json.error || 'Branch creation failed')
+      setMessage(json.error || T.branchCreationFailed)
       return
     }
-    setMessage(`Created ${json.restaurant.name}. Admin URL: ${json.adminUrl}`)
+    setMessage(text(T.branchCreated, { name: json.restaurant.name, url: json.adminUrl }))
     setBranchForm(forms => ({
       ...forms,
       [brand.id]: emptyBranchForm(),
@@ -426,7 +432,7 @@ export default function TenantsPage() {
     const json = await res.json().catch(() => ({})) as PlanUpdateResponse
     setUpdatingPlanBrandId(null)
     if (!res.ok || !json.brand) {
-      setMessage(json.error || 'Plan update failed')
+      setMessage(json.error || T.planUpdateFailed)
       return
     }
 
@@ -434,7 +440,7 @@ export default function TenantsPage() {
       item.id === brand.id ? { ...item, plan: json.brand!.plan } : item
     )))
     setPlanDrafts(current => ({ ...current, [brand.id]: json.brand!.plan }))
-    setMessage(`Updated ${json.brand.name} to ${PLAN_LABELS[json.brand.plan]}`)
+    setMessage(text(T.planUpdated, { name: json.brand.name, plan: PLAN_LABELS[json.brand.plan] }))
     await load()
   }
 
@@ -449,7 +455,7 @@ export default function TenantsPage() {
     const json = await res.json().catch(() => ({})) as PlanUpdateResponse
     setUpdatingBranchEntitlementBrandId(null)
     if (!res.ok || !json.brand) {
-      setMessage(json.error || 'Branch permission update failed')
+      setMessage(json.error || T.branchPermissionUpdateFailed)
       return
     }
 
@@ -471,14 +477,14 @@ export default function TenantsPage() {
     const json = await res.json().catch(() => ({}))
     setResettingEmail('')
     if (!res.ok) {
-      setMessage(json.error || 'Password reset email failed')
+      setMessage(json.error || T.passwordResetEmailFailed)
       return
     }
-    setMessage(`Password reset email sent to ${email}`)
+    setMessage(text(T.passwordResetEmailSentTo, { email }))
   }
 
   async function removeAccount(account: AccountLogEntry) {
-    if (!window.confirm(`Remove account ${account.email}? This permanently deletes the Supabase Auth user and BetaReal membership mappings.`)) return
+    if (!window.confirm(text(T.removeAccountConfirm, { email: account.email }))) return
     setRemovingAccountId(account.id)
     setMessage('')
     const res = await fetch('/api/account-log', {
@@ -489,10 +495,10 @@ export default function TenantsPage() {
     const json = await res.json().catch(() => ({}))
     setRemovingAccountId('')
     if (!res.ok) {
-      setMessage(json.error || 'Account removal failed')
+      setMessage(json.error || T.accountRemovalFailed)
       return
     }
-    setMessage(`Removed account ${account.email}`)
+    setMessage(text(T.accountRemoved, { email: account.email }))
     await loadAccountLog()
     await load()
   }
@@ -518,31 +524,31 @@ export default function TenantsPage() {
   }
 
   async function deleteTenant(brand: Brand) {
-    if (!window.confirm(`Delete ${brand.name}? This removes its restaurants, menu, categories, theme rows, and live tenant link.`)) return
+    if (!window.confirm(text(T.deleteTenantConfirm, { name: brand.name }))) return
     setSaving(true)
     setMessage('')
     const res = await fetch(`/api/tenants?brandId=${brand.id}`, { method: 'DELETE' })
     const json = await res.json().catch(() => ({}))
     setSaving(false)
     if (!res.ok) {
-      setMessage(json.error || 'Tenant deletion failed')
+      setMessage(json.error || T.tenantDeletionFailed)
       return
     }
-    setMessage(`Deleted ${brand.name}`)
+    setMessage(text(T.tenantDeleted, { name: brand.name }))
     await load()
   }
 
   if (!access.loading && !access.canManageBranches) {
     return (
       <LockedCard
-        title="Branch management is not available"
-        description="Only BetaReal super admins and linked brand owners can manage branches from this panel."
+        title={T.branchManagementLockedTitle}
+        description={T.branchManagementLockedDesc}
         planLabel={access.label}
       />
     )
   }
 
-  const pageTitle = access.canManageTenants ? 'Tenants' : 'Branches'
+  const pageTitle = access.canManageTenants ? T.tenantsTitle : T.branchesTitle
   const canShowCreateTenant = access.canManageTenants
 
   return (
@@ -552,10 +558,10 @@ export default function TenantsPage() {
           <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>{pageTitle}</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--dim)' }}>
             {access.canManageTenants
-              ? 'Create restaurant tenants and keep their menu/theme editable after launch.'
+              ? T.tenantsDesc
               : access.canCreateBranches
-                ? 'Open existing branches or add new branches under your brand.'
-                : 'Open an existing branch to manage its menu, theme, and analytics.'}
+                ? T.branchesCreateDesc
+                : T.branchesOpenDesc}
           </p>
         </div>
         {message && (
@@ -570,12 +576,12 @@ export default function TenantsPage() {
         <section className="mb-6 p-4 rounded-xl" style={{ background: 'rgba(242,181,53,0.08)', border: '1px solid var(--border)' }}>
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h2 className="text-base font-semibold" style={{ color: 'var(--gold)' }}>Initial admin credentials</h2>
+              <h2 className="text-base font-semibold" style={{ color: 'var(--gold)' }}>{T.initialAdminCredentials}</h2>
               <p className="text-sm mt-1" style={{ color: 'var(--dim)' }}>
-                Temporary password visibility: this stored initial password is visible to super admins only.
+                {T.temporaryPasswordVisibility}
               </p>
               <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-                Old Supabase Auth passwords cannot be recovered; older accounts show Unknown unless an initial password was captured.
+                {T.oldPasswordsUnavailable}
               </p>
             </div>
             <button
@@ -584,41 +590,41 @@ export default function TenantsPage() {
               className="px-3 py-1.5 rounded-lg text-xs font-semibold"
               style={{ background: 'var(--gold)', color: '#0f0b07' }}
             >
-              Copy
+              {T.copy}
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4 text-sm">
-            <Credential label="Tenant" value={`${credentials.brandName} / ${credentials.restaurantName}`} />
-            <Credential label="Admin email" value={credentials.adminEmail} />
-            <Credential label="Initial password" value={credentials.initialPassword} secret />
+            <Credential label={T.tenantCredential} value={`${credentials.brandName} / ${credentials.restaurantName}`} />
+            <Credential label={T.adminEmail} value={credentials.adminEmail} />
+            <Credential label={T.initialPassword} value={credentials.initialPassword} secret />
           </div>
         </section>
       )}
 
       {canShowCreateTenant && (
       <section className="mb-8 p-4 rounded-xl" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
-        <h2 className="text-base font-semibold mb-4" style={{ color: 'var(--text)' }}>Create Tenant</h2>
+        <h2 className="text-base font-semibold mb-4" style={{ color: 'var(--text)' }}>{T.createTenant}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Brand name">
-            <input value={form.brandName} onChange={e => update('brandName', e.target.value)} placeholder="New restaurant company" />
+          <Field label={T.brandName}>
+            <input value={form.brandName} onChange={e => update('brandName', e.target.value)} placeholder={T.brandNamePlaceholder} />
           </Field>
-          <Field label="Brand slug">
+          <Field label={T.brandSlug}>
             <input value={form.brandSlug} onChange={e => update('brandSlug', slugify(e.target.value))} placeholder="new-client" />
           </Field>
-          <Field label="First branch name">
-            <input value={form.restaurantName} onChange={e => update('restaurantName', e.target.value)} placeholder="Main branch" />
+          <Field label={T.firstBranchName}>
+            <input value={form.restaurantName} onChange={e => update('restaurantName', e.target.value)} placeholder={T.firstBranchNamePlaceholder} />
           </Field>
-          <Field label="Branch slug">
+          <Field label={T.branchSlug}>
             <input value={form.restaurantSlug} onChange={e => update('restaurantSlug', slugify(e.target.value))} placeholder="new-client-main" />
           </Field>
-          <Field label="Plan">
+          <Field label={T.plan}>
             <select value={form.plan} onChange={e => update('plan', e.target.value as Brand['plan'])}>
               <option value="ar_menu">AR Menu 300</option>
               <option value="full">Full 450</option>
               <option value="premium">Premium 900</option>
             </select>
           </Field>
-          <Field label="Starter template">
+          <Field label={T.starterTemplate}>
             <select
               value={form.templateKey}
               onChange={e => update('templateKey', e.target.value as StarterTemplateKey)}
@@ -634,13 +640,13 @@ export default function TenantsPage() {
               </div>
             </div>
           </Field>
-          <Field label="Primary color">
+          <Field label={T.primaryColor}>
             <input value={form.primaryColor} onChange={e => update('primaryColor', e.target.value)} placeholder="#f2b535" />
           </Field>
-          <Field label="Secondary color">
+          <Field label={T.secondaryColor}>
             <input value={form.secondaryColor} onChange={e => update('secondaryColor', e.target.value)} placeholder="#c07808" />
           </Field>
-          <Field label="Admin email">
+          <Field label={T.adminEmail}>
             <input
               type="email"
               value={form.adminEmail}
@@ -648,16 +654,16 @@ export default function TenantsPage() {
               placeholder="owner@example.com"
             />
           </Field>
-          <Field label="Admin password">
+          <Field label={T.adminPassword}>
             <input
               type="text"
               value={form.adminPassword}
               onChange={e => update('adminPassword', e.target.value)}
-              placeholder="At least 8 characters"
+              placeholder={T.adminPasswordPlaceholder}
               autoComplete="new-password"
             />
           </Field>
-          <Field label="Add logo">
+          <Field label={T.addLogo}>
             <div className="flex flex-wrap items-center gap-2">
               <input
                 ref={logoInputRef}
@@ -676,12 +682,12 @@ export default function TenantsPage() {
                   className="px-3 py-1.5 rounded-lg text-xs font-semibold"
                   style={{ border: '1px solid var(--border)', color: 'var(--dim)' }}
                 >
-                  Clear
+                  {T.clear}
                 </button>
               )}
             </div>
             <div className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-              Optional. PNG, JPG, or WebP will be saved as a public WebP logo after tenant creation.
+              {T.logoHint}
             </div>
             {logoStatus && (
               <div className="text-xs mt-1" style={{ color: logoStatus.includes('failed') ? 'var(--danger)' : 'var(--success)' }}>
@@ -694,10 +700,10 @@ export default function TenantsPage() {
           <button onClick={createTenant} disabled={saving}
                   className="px-5 py-2 rounded-lg text-sm font-semibold"
                   style={{ background: 'var(--gold)', color: '#0f0b07', opacity: saving ? 0.6 : 1 }}>
-            {saving ? 'Creating...' : 'Create tenant'}
+            {saving ? T.creating : T.createTenantButton}
           </button>
           <span className="text-xs" style={{ color: 'var(--dim)' }}>
-            Creates tenant rows and gives a working public menu URL. Temporary password visibility stores the initial password for super admins only.
+            {T.createTenantHint}
           </span>
         </div>
       </section>
@@ -715,13 +721,13 @@ export default function TenantsPage() {
       )}
 
       {loading ? (
-        <p style={{ color: 'var(--dim)' }}>Loading...</p>
+        <p style={{ color: 'var(--dim)' }}>{T.loading}</p>
       ) : (
         <div className="table-scroll rounded-xl" style={{ border: '1px solid var(--border)' }}>
           <table className="w-full text-sm" style={{ minWidth: '1120px' }}>
             <thead>
               <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
-                {['Brand', 'Plan', ...(access.canManageTenants ? [T.branchCreationPermission] : []), 'Admins', 'Branches', 'Status', 'Actions'].map(h => (
+                {[T.brandColumn, T.plan, ...(access.canManageTenants ? [T.branchCreationPermission] : []), T.adminsColumn, T.branchesColumn, T.statusColumn, T.actionsColumn].map(h => (
                   <th key={h} className="px-4 py-3 text-left font-medium" style={{ color: 'var(--dim)' }}>{h}</th>
                 ))}
               </tr>
@@ -771,7 +777,7 @@ export default function TenantsPage() {
                       ) : (brand.adminEmails ?? []).length ? (
                         <EmailList emails={brand.adminEmails ?? []} />
                       ) : (
-                        <span className="text-xs">No linked admin</span>
+                        <span className="text-xs">{T.noLinkedAdmin}</span>
                       )}
                     </td>
                     <td className="px-4 py-3" style={{ color: 'var(--dim)' }}>
@@ -784,12 +790,12 @@ export default function TenantsPage() {
                               </a>
                               <div className="text-xs font-mono mt-0.5" style={{ color: 'var(--dim)' }}>{r.slug}</div>
                               <a href={tenantPreviewUrl(r)} target="_blank" rel="noreferrer" className="block text-xs font-mono mt-1 break-all hover:underline" style={{ color: 'var(--gold)' }}>
-                                Web page: {tenantPreviewUrl(r)}
+                                {T.webPage}: {tenantPreviewUrl(r)}
                               </a>
                             </div>
                           ))}
                         </div>
-                      ) : 'None'}
+                      ) : T.none}
                     </td>
                     <td className="px-4 py-3">
                       <div className="space-y-1">
@@ -803,7 +809,7 @@ export default function TenantsPage() {
                         {!(brand.restaurants ?? []).length && (
                           <span className="text-xs px-2 py-0.5 rounded-full"
                                 style={{ background: 'rgba(224,82,82,0.12)', color: 'var(--danger)' }}>
-                            none
+                            {T.statusNone}
                           </span>
                         )}
                       </div>
@@ -830,7 +836,7 @@ export default function TenantsPage() {
                               opacity: saving ? 0.5 : 1,
                             }}
                           >
-                            Delete
+                            {T.delete}
                           </button>
                         )}
                       </div>
@@ -861,13 +867,15 @@ function AccountLog({
   onReset: (email: string) => void
   onRemove: (account: AccountLogEntry) => void
 }) {
+  const [T] = useLang()
+
   return (
     <section className="mb-8">
       <div className="flex flex-wrap items-end justify-between gap-3 mb-3">
         <div>
-          <h2 className="text-base font-semibold" style={{ color: 'var(--text)' }}>Account Log</h2>
+          <h2 className="text-base font-semibold" style={{ color: 'var(--text)' }}>{T.accountLog}</h2>
           <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-            Temporary password visibility shows stored initial passwords only; old Supabase Auth passwords remain unrecoverable.
+            {T.accountLogDesc}
           </p>
         </div>
       </div>
@@ -875,7 +883,7 @@ function AccountLog({
         <table className="w-full text-xs" style={{ minWidth: '1240px' }}>
           <thead>
             <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
-              {['Email', 'App role', 'Brand / tenant', 'Restaurant / branch', 'Temporary password visibility', 'Created', 'Last sign-in', 'Actions'].map(h => (
+              {[T.emailColumn, T.appRole, T.brandTenant, T.restaurantBranch, T.temporaryPasswordVisibility, T.createdColumn, T.lastSignIn, T.actionsColumn].map(h => (
                 <th key={h} className="px-3 py-2 text-left font-medium" style={{ color: 'var(--dim)' }}>{h}</th>
               ))}
             </tr>
@@ -883,7 +891,7 @@ function AccountLog({
           <tbody>
             {loading ? (
               <tr>
-                <td className="px-3 py-3" colSpan={8} style={{ color: 'var(--dim)' }}>Loading account log...</td>
+                <td className="px-3 py-3" colSpan={8} style={{ color: 'var(--dim)' }}>{T.loadingAccountLog}</td>
               </tr>
             ) : accounts.length ? accounts.map((account, i) => (
               <tr
@@ -903,7 +911,7 @@ function AccountLog({
                         </div>
                       ))}
                     </div>
-                  ) : 'None'}
+                  ) : T.none}
                 </td>
                 <td className="px-3 py-2" style={{ color: 'var(--dim)' }}>
                   {account.restaurantMemberships.length ? (
@@ -916,16 +924,16 @@ function AccountLog({
                         </div>
                       ))}
                     </div>
-                  ) : 'None'}
+                  ) : T.none}
                 </td>
                 <td className="px-3 py-2">
-                  <div className="text-[11px] uppercase" style={{ color: 'var(--dim)' }}>stored initial password</div>
+                  <div className="text-[11px] uppercase" style={{ color: 'var(--dim)' }}>{T.storedInitialPassword}</div>
                   <div className="font-mono break-all" style={{ color: account.storedInitialPassword ? 'var(--gold)' : 'var(--dim)' }}>
-                    {account.storedInitialPassword || 'Unknown'}
+                    {account.storedInitialPassword || T.unknown}
                   </div>
                 </td>
-                <td className="px-3 py-2 font-mono" style={{ color: 'var(--dim)' }}>{formatDate(account.createdAt)}</td>
-                <td className="px-3 py-2 font-mono" style={{ color: 'var(--dim)' }}>{formatDate(account.lastSignInAt)}</td>
+                <td className="px-3 py-2 font-mono" style={{ color: 'var(--dim)' }}>{formatDate(account.createdAt, T.never)}</td>
+                <td className="px-3 py-2 font-mono" style={{ color: 'var(--dim)' }}>{formatDate(account.lastSignInAt, T.never)}</td>
                 <td className="px-3 py-2">
                   <div className="flex flex-wrap gap-2">
                     <button
@@ -935,7 +943,7 @@ function AccountLog({
                       className="px-3 py-1.5 rounded-lg font-semibold"
                       style={{ border: '1px solid var(--border)', color: 'var(--gold)', opacity: resettingEmail === account.email ? 0.6 : 1 }}
                     >
-                      {resettingEmail === account.email ? 'Sending...' : 'Send reset'}
+                      {resettingEmail === account.email ? T.sending : T.sendReset}
                     </button>
                     <button
                       type="button"
@@ -944,14 +952,14 @@ function AccountLog({
                       className="px-3 py-1.5 rounded-lg font-semibold"
                       style={{ border: '1px solid rgba(224,82,82,0.35)', color: 'var(--danger)', opacity: removingAccountId === account.id ? 0.6 : 1 }}
                     >
-                      {removingAccountId === account.id ? 'Removing...' : 'Remove account'}
+                      {removingAccountId === account.id ? T.removing : T.removeAccount}
                     </button>
                   </div>
                 </td>
               </tr>
             )) : (
               <tr>
-                <td className="px-3 py-3" colSpan={8} style={{ color: 'var(--dim)' }}>No auth accounts found.</td>
+                <td className="px-3 py-3" colSpan={8} style={{ color: 'var(--dim)' }}>{T.noAuthAccounts}</td>
               </tr>
             )}
           </tbody>
@@ -961,8 +969,8 @@ function AccountLog({
   )
 }
 
-function formatDate(value: string | null) {
-  if (!value) return 'Never'
+function formatDate(value: string | null, neverLabel: string) {
+  if (!value) return neverLabel
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
   return date.toLocaleString()
@@ -1031,13 +1039,15 @@ function CredentialList({
   onUnlink?: (email: string) => void
   disabled?: boolean
 }) {
+  const [T] = useLang()
+
   return (
     <span className="inline-flex flex-col gap-1">
       {credentials.map(credential => (
         <span key={credential.email} className="block">
           <span className="font-mono text-xs break-all" style={{ color: 'var(--text)' }}>{credential.email}</span>
           <span className="block font-mono text-[11px] break-all" style={{ color: credential.storedInitialPassword ? 'var(--gold)' : 'var(--dim)' }}>
-            stored initial password: {credential.storedInitialPassword || 'Unknown'}
+            {T.storedInitialPassword}: {credential.storedInitialPassword || T.unknown}
           </span>
           {onUnlink && (
             <button
@@ -1047,7 +1057,7 @@ function CredentialList({
               className="mt-1 px-2 py-1 rounded text-[11px] font-semibold"
               style={{ border: '1px solid rgba(224,82,82,0.35)', color: 'var(--danger)', opacity: disabled ? 0.55 : 1 }}
             >
-              Unlink
+              {T.delete}
             </button>
           )}
         </span>
@@ -1069,6 +1079,7 @@ function PlanEditor({
   onChange: (plan: Brand['plan']) => void
   onSave: () => void
 }) {
+  const [T] = useLang()
   const selected = PLAN_OPTIONS.find(option => option.value === value) ?? PLAN_OPTIONS[0]
   const changed = value !== brand.plan
 
@@ -1099,7 +1110,7 @@ function PlanEditor({
           opacity: saving || !changed ? 0.6 : 1,
         }}
       >
-        {saving ? 'Saving...' : changed ? 'Save plan' : PLAN_LABELS[brand.plan]}
+        {saving ? T.saving : changed ? T.savePlan : PLAN_LABELS[brand.plan]}
       </button>
     </div>
   )
@@ -1120,6 +1131,7 @@ function BranchEntitlementToggle({
   enabledLabel: string
   disabledLabel: string
 }) {
+  const [T] = useLang()
   const enabled = brand.can_create_branches === true
 
   return (
@@ -1137,7 +1149,7 @@ function BranchEntitlementToggle({
         {label}
       </div>
       {saving && (
-        <div className="text-xs" style={{ color: 'var(--gold)' }}>Saving...</div>
+        <div className="text-xs" style={{ color: 'var(--gold)' }}>{T.saving}</div>
       )}
     </div>
   )
@@ -1156,6 +1168,7 @@ function BranchCreator({
   onChange: (brand: Brand, key: keyof BranchForm, value: string | boolean) => void
   onCreate: () => void
 }) {
+  const [T] = useLang()
   const disabled = saving
 
   return (
@@ -1164,13 +1177,13 @@ function BranchCreator({
         <input
           value={value.branchName}
           onChange={e => onChange(brand, 'branchName', e.target.value)}
-          placeholder="Branch name"
+          placeholder={T.branchName}
           disabled={disabled}
         />
         <input
           value={value.branchArea}
           onChange={e => onChange(brand, 'branchArea', e.target.value)}
-          placeholder="Area, e.g. Saburtalo"
+          placeholder={T.branchAreaPlaceholder}
           disabled={disabled}
         />
         <input
@@ -1181,7 +1194,7 @@ function BranchCreator({
         />
       </div>
       <label className="block">
-        <div className="text-xs mb-1 uppercase" style={{ color: 'var(--dim)' }}>Starter template</div>
+        <div className="text-xs mb-1 uppercase" style={{ color: 'var(--dim)' }}>{T.starterTemplate}</div>
         <select
           value={value.templateKey}
           onChange={e => onChange(brand, 'templateKey', e.target.value)}
@@ -1200,7 +1213,7 @@ function BranchCreator({
       </label>
       <div className="grid grid-cols-2 gap-2">
         <label className="block">
-          <div className="text-xs mb-1 uppercase" style={{ color: 'var(--dim)' }}>Primary</div>
+          <div className="text-xs mb-1 uppercase" style={{ color: 'var(--dim)' }}>{T.primary}</div>
           <input
             value={value.primaryColor}
             onChange={e => onChange(brand, 'primaryColor', e.target.value)}
@@ -1209,7 +1222,7 @@ function BranchCreator({
           />
         </label>
         <label className="block">
-          <div className="text-xs mb-1 uppercase" style={{ color: 'var(--dim)' }}>Secondary</div>
+          <div className="text-xs mb-1 uppercase" style={{ color: 'var(--dim)' }}>{T.secondary}</div>
           <input
             value={value.secondaryColor}
             onChange={e => onChange(brand, 'secondaryColor', e.target.value)}
@@ -1225,7 +1238,7 @@ function BranchCreator({
         className="px-3 py-1.5 rounded-lg text-xs font-semibold"
         style={{ background: 'var(--gold)', color: '#0f0b07', opacity: disabled || !value.branchName.trim() ? 0.55 : 1 }}
       >
-        Add branch
+        {T.addBranch}
       </button>
     </div>
   )

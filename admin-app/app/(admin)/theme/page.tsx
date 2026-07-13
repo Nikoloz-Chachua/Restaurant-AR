@@ -165,6 +165,12 @@ export default function ThemePage() {
   const [tab, setTab]         = useState<'templates' | 'night' | 'day' | 'background' | 'fonts' | 'branding'>('templates')
   const [flashKey, setFlashKey]       = useState<string | null>(null)
   const [pendingPick, setPendingPick] = useState<string | null>(null)
+  const text = useCallback((template: string, values: Record<string, string | number>) => (
+    Object.entries(values).reduce(
+      (result, [key, value]) => result.replace(`{${key}}`, String(value)),
+      template,
+    )
+  ), [])
 
   // Unsaved-changes tracking: compare the working config against the last
   // persisted snapshot (order-independent).
@@ -273,7 +279,7 @@ export default function ThemePage() {
   }
 
   async function uploadImage(key: string, file: File) {
-    if (!file.type.startsWith('image/')) { setMsg('Only image files are supported'); return }
+    if (!file.type.startsWith('image/')) { setMsg(T.onlyImageFiles); return }
     setUploadingKey(key)
     try {
       const blob = await toWebP(file)
@@ -288,9 +294,9 @@ export default function ThemePage() {
       const up = await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': 'image/webp' }, body: blob })
       if (!up.ok) throw new Error(`R2 upload failed: ${up.status}`)
       set(key, publicUrl)
-      setMsg('Image uploaded. Press Save Changes to publish it.')
+      setMsg(T.imageUploaded)
     } catch (e) {
-      setMsg(`Upload failed: ${e instanceof Error ? e.message : String(e)}`)
+      setMsg(text(T.uploadFailed, { message: e instanceof Error ? e.message : String(e) }))
     }
     setUploadingKey('')
   }
@@ -298,7 +304,7 @@ export default function ThemePage() {
   // Background images set the CSS background-image token (url(...)) plus cover/no-repeat,
   // so an uploaded photo fills the whole menu backdrop.
   async function uploadBgImage(mode: 'night' | 'day', file: File) {
-    if (!file.type.startsWith('image/')) { setMsg('Only image files are supported'); return }
+    if (!file.type.startsWith('image/')) { setMsg(T.onlyImageFiles); return }
     const key = `${mode}_bg_image`
     setUploadingKey(key)
     try {
@@ -316,9 +322,9 @@ export default function ThemePage() {
       set(key, `url("${publicUrl}")`)
       set(`${mode}_bg_size`, 'cover')
       set(`${mode}_bg_repeat`, 'no-repeat')
-      setMsg('Background image uploaded. Press Save Changes to publish it.')
+      setMsg(T.backgroundImageUploaded)
     } catch (e) {
-      setMsg(`Upload failed: ${e instanceof Error ? e.message : String(e)}`)
+      setMsg(text(T.uploadFailed, { message: e instanceof Error ? e.message : String(e) }))
     }
     setUploadingKey('')
   }
@@ -339,7 +345,7 @@ export default function ThemePage() {
     const rows = Object.entries(next).map(([key, value]) => ({ key, value, restaurant_id: plan.restaurantId }))
     const { error } = await supabase.from('theme_config').upsert(rows, { onConflict: 'restaurant_id,key' })
     if (error) {
-      setMsg(`Reset failed: ${error.message}`)
+      setMsg(text(T.resetFailed, { message: error.message }))
       setTimeout(() => setMsg(''), 5000)
       return
     }
@@ -368,13 +374,13 @@ export default function ThemePage() {
     return (
       <div className="max-w-xl rounded-xl p-6" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
         <div className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--dim)' }}>
-          Tenant required
+          {T.tenantRequired}
         </div>
         <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>
-          No restaurant is mapped to this account
+          {T.noRestaurantMapped}
         </h1>
         <p className="text-sm mt-2 leading-6" style={{ color: 'var(--dim)' }}>
-          Ask a super admin to add this user to a brand or restaurant before editing theme settings.
+          {T.noRestaurantThemeDesc}
         </p>
       </div>
     )
@@ -383,8 +389,8 @@ export default function ThemePage() {
   if (!plan.loading && !plan.canUseTheme) {
     return (
       <LockedCard
-        title="Theme customization requires Full or Premium"
-        description="Custom colors, fonts, and branding are available on the Full 450 and Premium 900 plans."
+        title={T.themeLockedTitle}
+        description={T.themeLockedDesc}
         planLabel={plan.label}
       />
     )
@@ -397,7 +403,7 @@ export default function ThemePage() {
           <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>{T.themeTitle}</h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--dim)' }}>{T.themeDesc}</p>
           <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-            Tenant: <span style={{ color: 'var(--text)' }}>{plan.restaurantName}</span>
+            {T.tenantLabel}: <span style={{ color: 'var(--text)' }}>{plan.restaurantName}</span>
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -458,7 +464,7 @@ export default function ThemePage() {
                   type="button"
                   onClick={() => {
                     setConfig(current => ({ ...current, ...preset.values }))
-                    setMsg(`${preset.label} loaded. Press Save Changes to publish it.`)
+                    setMsg(text(T.templateLoaded, { name: preset.label }))
                   }}
                   className="text-left p-4 rounded-xl transition-colors"
                   style={{ background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--text)' }}
@@ -473,7 +479,7 @@ export default function ThemePage() {
                 </button>
               ))}
               <div className="text-xs leading-5" style={{ color: 'var(--dim)' }}>
-                Templates are not locked. Load one, adjust colors/fonts/branding in the other tabs, then save.
+                {T.templatesHint}
               </div>
             </div>
           )}
@@ -505,6 +511,7 @@ export default function ThemePage() {
                     <ImageUploadRow label={T.bgImageLabel} hint="" value={bgImageUrl(config[`${mode}_bg_image`])}
                                     uploading={uploadingKey === `${mode}_bg_image`}
                                     uploadLabel={T.uploadThumb} clearLabel={T.bgClearImage}
+                                    previewAlt={T.imagePreviewAlt}
                                     onPick={f => uploadBgImage(mode, f)}
                                     onClear={() => set(`${mode}_bg_image`, 'none')} />
                   </div>
@@ -535,9 +542,11 @@ export default function ThemePage() {
                         onChange={v => set('site_name_ka', v)} />
               <ImageUploadRow label={T.brandLogo} hint={T.brandLogoHint} value={config.logo_url ?? ''}
                               uploading={uploadingKey === 'logo_url'} uploadLabel={T.uploadThumb} clearLabel={T.clearThumb}
+                              previewAlt={T.imagePreviewAlt}
                               onPick={f => uploadImage('logo_url', f)} onClear={() => set('logo_url', '')} />
               <ImageUploadRow label={T.brandHero} hint={T.brandHeroHint} value={config.hero_image_url ?? ''}
                               uploading={uploadingKey === 'hero_image_url'} uploadLabel={T.uploadThumb} clearLabel={T.clearThumb}
+                              previewAlt={T.imagePreviewAlt}
                               onPick={f => uploadImage('hero_image_url', f)} onClear={() => set('hero_image_url', '')} />
             </>
           )}
@@ -629,6 +638,8 @@ function TemplateSwatch({ values }: { values: ThemeConfig }) {
 }
 
 function FontRow({ label, value, preview, onChange }: { label: string; value: string; preview: string; onChange: (v: string) => void }) {
+  const [T] = useLang()
+
   return (
     <div className="p-3 rounded-xl"
          style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
@@ -638,10 +649,10 @@ function FontRow({ label, value, preview, onChange }: { label: string; value: st
                 onChange={e => { if (e.target.value !== 'custom') onChange(e.target.value) }}
                 style={{ flex: '0 0 200px' }}>
           {GOOGLE_FONTS.map(f => <option key={f} value={f}>{f}</option>)}
-          <option value="custom">Custom…</option>
+          <option value="custom">{T.customFontOption}</option>
         </select>
         <input value={value} onChange={e => onChange(e.target.value)}
-               placeholder="Or type any Google Font name" style={{ flex: 1 }} />
+               placeholder={T.fontPlaceholder} style={{ flex: 1 }} />
       </div>
       <div className="mt-2 text-lg" style={{ fontFamily: `'${value}', sans-serif`, color: 'var(--text)' }}>
         {preview}{value}
@@ -650,8 +661,8 @@ function FontRow({ label, value, preview, onChange }: { label: string; value: st
   )
 }
 
-function ImageUploadRow({ label, hint, value, uploading, uploadLabel, clearLabel, onPick, onClear }: {
-  label: string; hint: string; value: string; uploading: boolean; uploadLabel: string; clearLabel: string
+function ImageUploadRow({ label, hint, value, uploading, uploadLabel, clearLabel, previewAlt, onPick, onClear }: {
+  label: string; hint: string; value: string; uploading: boolean; uploadLabel: string; clearLabel: string; previewAlt: string
   onPick: (f: File) => void; onClear: () => void
 }) {
   return (
@@ -670,7 +681,7 @@ function ImageUploadRow({ label, hint, value, uploading, uploadLabel, clearLabel
                     style={{ background: 'rgba(224,82,82,0.1)', color: 'var(--danger)', border: '1px solid rgba(224,82,82,0.25)' }}>
               {clearLabel}
             </button>
-            <img src={value} alt="preview"
+            <img src={value} alt={previewAlt}
                  style={{ height: 40, maxWidth: 120, objectFit: 'contain', borderRadius: 6, border: '1px solid var(--border)' }} />
           </>
         )}
@@ -776,16 +787,16 @@ function ThemePreview({ config, activeTab, onPick }:
     '--modal-bg': base('modal_bg'),
   } as CSSProperties
 
-  const brand = config.site_name || 'Your Restaurant'
+  const brand = config.site_name || T.previewRestaurant
   const logoUrl = config.logo_url || ''
   const cols = device === 'desktop' ? 2 : 1
   const frameW = device === 'desktop' ? 560 : 300
 
   const items = [
-    { emoji: '🥗', name: 'Seasonal Bowl',   desc: 'Fresh grains, roasted vegetables, herbs, house dressing.', price: '24 ₾' },
-    { emoji: '🍽️', name: 'Signature Plate',  desc: 'A balanced plate built around the kitchen signature.',      price: '29 ₾' },
-    { emoji: '🍟', name: 'Crisp Side',       desc: 'Crisp seasonal side with a bright dipping sauce.',          price: '12 ₾' },
-    { emoji: '🥤', name: 'House Drink',      desc: 'Refreshing house drink served cold.',                       price: '7 ₾'  },
+    { emoji: '🥗', name: T.previewItemSeasonalName, desc: T.previewItemSeasonalDesc, price: '24 ₾' },
+    { emoji: '🍽️', name: T.previewItemSignatureName, desc: T.previewItemSignatureDesc, price: '29 ₾' },
+    { emoji: '🍟', name: T.previewItemSideName, desc: T.previewItemSideDesc, price: '12 ₾' },
+    { emoji: '🥤', name: T.previewItemDrinkName, desc: T.previewItemDrinkDesc, price: '7 ₾'  },
   ]
   const shown = device === 'desktop' ? items : items.slice(0, 3)
 
@@ -857,7 +868,7 @@ function ThemePreview({ config, activeTab, onPick }:
               </div>
 
               <div className="flex gap-2 mb-4 justify-center flex-wrap">
-                {['Mains', 'Sides', 'Drinks'].map((c, i) => (
+                {[T.previewCategoryMains, T.previewCategorySides, T.previewCategoryDrinks].map((c, i) => (
                   <span key={c} className={`text-[11px] px-3 py-1 rounded-full${i === 0 ? ' pv-hot' : ''}`}
                         data-field={i === 0 ? 'accent' : undefined} title={i === 0 ? `✎ ${T.colorAccent}` : undefined} style={{
                     background: i === 0 ? 'var(--pill-active-bg)' : 'var(--pill-bg)',
@@ -886,7 +897,7 @@ function ThemePreview({ config, activeTab, onPick }:
                     <div className="flex items-center justify-between mt-1">
                       <span className="pv-hot" data-field="price_color" title={`✎ ${T.colorPrice}`} style={{ color: 'var(--price-color)', fontWeight: 700, fontSize: 15 }}>{it.price}</span>
                       <button className="pv-hot" data-field="add_btn_color" title={`✎ ${T.colorAddBtn}`} style={{ background: 'transparent', color: 'var(--add-btn-color)', border: '1.5px solid var(--add-btn-color)', fontSize: 12, fontWeight: 700, padding: '5px 12px', borderRadius: 999 }}>
-                        + Add
+                        {T.previewAdd}
                       </button>
                     </div>
                   </div>
@@ -896,9 +907,9 @@ function ThemePreview({ config, activeTab, onPick }:
 
             <div className="flex items-center justify-between px-4 py-3 pv-hot" data-field="modal_bg" title={`✎ ${T.colorModalBg}`}
                  style={{ background: 'var(--modal-bg)', borderTop: '1px solid var(--border)', fontFamily: `'${fontBody}', sans-serif` }}>
-              <span style={{ color: 'var(--dim)', fontSize: 12 }}>2 items · 53 ₾</span>
+              <span style={{ color: 'var(--dim)', fontSize: 12 }}>{T.previewCartCount}</span>
               <span className="px-4 py-1.5 rounded-full text-xs font-bold" style={{ background: 'var(--cta-bg)', color: 'var(--accent-text)' }}>
-                View Cart
+                {T.previewViewCart}
               </span>
             </div>
           </div>

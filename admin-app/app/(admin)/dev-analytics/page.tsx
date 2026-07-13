@@ -63,8 +63,8 @@ export default function DeveloperAnalyticsPage() {
   if (!plan.loading && !plan.canUseDeveloperAnalytics) {
     return (
       <LockedCard
-        title="Developer analytics are creator-only"
-        description="Technical diagnostics, all-event summaries, AR health, and deeper funnel data are available only to internal BetaReal creator accounts."
+        title={T.devAnalyticsLockedTitle}
+        description={T.devAnalyticsLockedDesc}
         planLabel={plan.label}
       />
     )
@@ -76,7 +76,7 @@ export default function DeveloperAnalyticsPage() {
         {T.navDeveloperAnalytics}
       </h1>
       <p className="text-sm mb-4 md:mb-6" style={{ color: 'var(--dim)' }}>
-        Internal technical analytics and diagnostics for the BetaReal team.
+        {T.developerAnalyticsDesc}
       </p>
       <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
         <iframe
@@ -84,7 +84,7 @@ export default function DeveloperAnalyticsPage() {
           src="https://restaurant-ar.pages.dev/dev-analytics.html"
           className="w-full"
           style={{ height: 'clamp(560px, calc(100dvh - 160px), 1400px)', border: 'none' }}
-          title="Developer Analytics Dashboard"
+          title={T.developerAnalyticsIframeTitle}
           onLoad={sendInitialPrefs}
         />
       </div>

@@ -71,8 +71,8 @@ export default function Sidebar({ open, onClose }: Props) {
       : customerBase
 
   const NAV = [
-    plan.canManageTenants ? { href: '/tenants', label: 'Tenants', icon: '▦' } : null,
-    !plan.canManageTenants && plan.canManageBranches ? { href: '/tenants', label: 'Branches', icon: '▦' } : null,
+    plan.canManageTenants ? { href: '/tenants', label: T.navTenants, icon: '▦' } : null,
+    !plan.canManageTenants && plan.canManageBranches ? { href: '/tenants', label: T.navBranches, icon: '▦' } : null,
     plan.canUseMenu ? { href: tenantHref('/menu'), match: '/menu', label: T.navMenu, icon: 'Menu' } : null,
     plan.canUseAnalytics ? { href: tenantHref('/dashboard'), match: '/dashboard', label: T.navAnalytics, icon: 'Data' } : null,
     plan.canUseDeveloperAnalytics ? { href: '/dev-analytics', match: '/dev-analytics', label: T.navDeveloperAnalytics, icon: 'Dev' } : null,
@@ -132,7 +132,7 @@ export default function Sidebar({ open, onClose }: Props) {
           onClick={onClose}
           className="md:hidden w-8 h-8 flex items-center justify-center rounded-lg text-xl leading-none"
           style={{ color: 'var(--dim)' }}
-          aria-label="Close sidebar"
+          aria-label={T.closeSidebar}
         >
           ×
         </button>
@@ -169,7 +169,7 @@ export default function Sidebar({ open, onClose }: Props) {
           onClick={toggleLang}
           className="flex-1 py-2 rounded-lg text-xs font-semibold transition-colors duration-150"
           style={{ background: 'var(--card2)', color: 'var(--gold)', border: '1px solid var(--border)' }}
-          title="Switch language"
+          title={T.switchLanguage}
         >
           {lang === 'en' ? 'KA' : 'EN'}
         </button>
@@ -177,9 +177,9 @@ export default function Sidebar({ open, onClose }: Props) {
           onClick={toggleTheme}
           className="flex-1 py-2 rounded-lg text-xs font-semibold transition-colors duration-150"
           style={{ background: 'var(--card2)', color: 'var(--gold)', border: '1px solid var(--border)' }}
-          title="Switch theme"
+          title={T.switchTheme}
         >
-          {dark ? 'Light' : 'Dark'}
+          {dark ? T.themeLight : T.themeDark}
         </button>
       </div>
 
@@ -194,7 +194,7 @@ export default function Sidebar({ open, onClose }: Props) {
           onMouseEnter={e => e.currentTarget.style.background = 'var(--card2)'}
           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
         >
-          <span className="text-[10px] uppercase tracking-wide w-11 shrink-0">Site</span> {T.viewMenu}
+          <span className="text-[10px] uppercase tracking-wide w-11 shrink-0">{T.sidebarSiteLabel}</span> {T.viewMenu}
         </a>
         <button
           onClick={signOut}
@@ -209,7 +209,7 @@ export default function Sidebar({ open, onClose }: Props) {
             e.currentTarget.style.background = 'transparent'
           }}
         >
-          <span className="text-[10px] uppercase tracking-wide w-11 shrink-0">Exit</span> {T.signOut}
+          <span className="text-[10px] uppercase tracking-wide w-11 shrink-0">{T.sidebarExitLabel}</span> {T.signOut}
         </button>
       </div>
     </aside>

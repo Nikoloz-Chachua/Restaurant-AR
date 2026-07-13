@@ -70,13 +70,13 @@ export default function DashboardPage() {
     return (
       <div className="max-w-xl rounded-xl p-6" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
         <div className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--dim)' }}>
-          Tenant required
+          {T.tenantRequired}
         </div>
         <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>
-          No restaurant is selected
+          {T.noRestaurantSelected}
         </h1>
         <p className="text-sm mt-2 leading-6" style={{ color: 'var(--dim)' }}>
-          Open a tenant from the Tenants page, or ask a super admin to add this user to a brand or restaurant.
+          {T.noRestaurantAnalyticsDesc}
         </p>
       </div>
     )
@@ -85,8 +85,8 @@ export default function DashboardPage() {
   if (!plan.loading && !plan.canUseAnalytics) {
     return (
       <LockedCard
-        title="Analytics requires Full or Premium"
-        description="Visitor analytics are available on the Full 450 and Premium 900 plans. Upgrade the account to see restaurant analytics here."
+        title={T.analyticsLockedTitle}
+        description={T.analyticsLockedDesc}
         planLabel={plan.label}
       />
     )
@@ -104,7 +104,7 @@ export default function DashboardPage() {
           src={analyticsSrc}
           className="w-full"
           style={{ height: 'clamp(480px, calc(100dvh - 160px), 1200px)', border: 'none' }}
-          title="Analytics Dashboard"
+          title={T.analyticsIframeTitle}
           onLoad={sendInitialPrefs}
         />
       </div>

@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import { useLang } from '@/lib/useLang'
 
 export default function LockedCard({
   title,
@@ -10,10 +11,12 @@ export default function LockedCard({
   description: string
   planLabel?: string
 }) {
+  const [T] = useLang()
+
   return (
     <div className="max-w-xl rounded-xl p-6" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
       <div className="text-xs uppercase tracking-widest mb-2" style={{ color: 'var(--dim)' }}>
-        Locked feature
+        {T.lockedFeature}
       </div>
       <h1 className="text-xl md:text-2xl font-bold page-title" style={{ color: 'var(--gold)' }}>
         {title}
@@ -23,7 +26,7 @@ export default function LockedCard({
       </p>
       {planLabel && (
         <p className="text-xs mt-4" style={{ color: 'var(--dim)' }}>
-          Current plan: <span style={{ color: 'var(--text)' }}>{planLabel}</span>
+          {T.currentPlan}: <span style={{ color: 'var(--text)' }}>{planLabel}</span>
         </p>
       )}
       <Link
@@ -31,7 +34,7 @@ export default function LockedCard({
         className="inline-flex mt-5 px-4 py-2 rounded-lg text-sm font-semibold"
         style={{ background: 'var(--gold)', color: '#0f0b07' }}
       >
-        Back to menu
+        {T.backToMenu}
       </Link>
     </div>
   )
