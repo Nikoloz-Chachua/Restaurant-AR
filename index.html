@@ -299,18 +299,49 @@
             }
         }
         .menu-item.no-image {
-            grid-template-columns: minmax(0, 1fr);
-            grid-template-areas: "name" "right";
-            row-gap: 8px;
+            grid-template-columns: minmax(0, 1fr) auto;
+            grid-template-rows: auto;
+            grid-template-areas: "name right"
+                                 "desc right";
+            align-items: start;
+            column-gap: 12px;
+            row-gap: 3px;
+            padding: 12px;
             background:
                 linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, transparent), transparent 46%),
                 var(--card-bg);
         }
         .menu-item.no-image .item-left { display: none; }
-        .menu-item.no-image .item-right { grid-area: right; }
+        .menu-item.no-image .item-name {
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: normal;
+        }
+        .menu-item.no-image .item-right {
+            grid-area: right;
+            display: block;
+            min-width: max-content;
+            padding: 0;
+            align-self: center;
+        }
+        .menu-item.no-image .qty-ctrl,
+        .menu-item.no-image .variants,
+        .menu-item.no-image .addons,
+        .menu-item.no-image .ar-btn {
+            display: none;
+        }
         .menu-item.no-image .ingredients {
+            grid-area: desc;
+            min-width: 0;
+            margin: 0;
+            min-height: 0;
+            overflow-wrap: anywhere;
+            word-break: normal;
+        }
+        .menu-item.no-image .item-actions {
             margin-top: 0;
             min-height: 0;
+            display: block;
         }
 
         .thumb-wrap {
@@ -1879,7 +1910,11 @@
                 overflow: hidden;
             }
             .menu-item.no-image {
-                padding: 14px;
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                grid-template-areas: "name right"
+                                     "desc right";
+                padding: 12px 14px;
             }
             .menu-item.no-image .item-name,
             .menu-item.no-image .item-right {
@@ -4375,8 +4410,7 @@
                 const noImage = item.text_only === true || (!thumbSrc && !has3d);
                 // thumb_3d (admin checkbox "also load 3D model in thumbnail") controls ONLY
                 // the card thumbnail: off = keep the photo (saves bandwidth), on = upgrade to
-                // live 3D. Items with no photo always upgrade so the tile isn't blank. The 3D
-                // badge, tap-to-3D modal, and AR button are unaffected either way.
+                // live 3D. Text-only/no-image dishes stay compact and never get media/AR UI.
                 const thumbModelSrc = (!noImage && has3d && (item.thumb_3d || !thumbSrc)) ? modelSrc : '';
                 const itemName = t(item, 'name');
                 const itemNameHtml = _escapeHtml(itemName);
@@ -4396,6 +4430,11 @@
                             ${modelSrc ? '<span class="badge-3d">3D</span>' : ''}
                         </div>
                     </div>`}
+                    ${noImage ? `
+                    <p class="ingredients" data-field="description" data-idx="${globalIdx}">${itemDescHtml}</p>
+                    <div class="item-right">
+                        <div class="item-actions"><p class="price">${itemPriceHtml}</p></div>
+                    </div>` : `
                     <div class="item-right">
                         <p class="ingredients" data-field="description" data-idx="${globalIdx}">${itemDescHtml}</p>
                         <div class="item-actions">
@@ -4412,7 +4451,7 @@
                         ${_variantsHtml(item, globalIdx)}
                         ${_addonsHtml(item, globalIdx)}
                         ${has3d ? `<button class="ar-btn" data-idx="${globalIdx}">${_arButtonLabel(item)}</button>` : ''}
-                    </div>`;
+                    </div>`}`;
 
                 // Thumbnail starts as a poster <img>; it upgrades to live 3D on idle
                 // (see _startThumbUpgrades). globalIdx is stashed for the upgrade's tap handler.
@@ -4445,7 +4484,7 @@
 
                 // 3D preview + AR are only wired for 3D items. Non-3D items stay plain
                 // photo cards; their basket controls below still work.
-                if (has3d) {
+                if (has3d && !noImage) {
                     card.querySelector('.item-right').addEventListener('click', () => openModal(globalIdx, menuItems));
                     card.querySelector('.item-name').addEventListener('click', () => openModal(globalIdx, menuItems));
                     card.querySelector('.ar-btn')?.addEventListener('click', e => { e.stopPropagation(); openAR(globalIdx, menuItems); });
@@ -4455,20 +4494,22 @@
                 // Items with a variant (Glass/Bottle) or add-ons always add via the "+"
                 // button — each variant/add-on combo is its own basket line, managed in
                 // the basket panel; plain items use the inline stepper.
-                qCtrl.querySelector('.qty-add-btn').addEventListener('click', e => {
-                    e.stopPropagation();
-                    if (_hasVariants || _hasAddons) {
-                        const sel  = ((window.__addonSel[globalIdx]) || []).slice().sort((a, b) => a - b);
-                        const vSel = _hasVariants ? _variantIndex(item, globalIdx) : null;
-                        addToBasket(_basketKey(globalIdx, vSel, sel), item, sel, vSel);
-                        const b = e.currentTarget;
-                        b.classList.remove('just-added'); void b.offsetWidth; b.classList.add('just-added');
-                    } else {
-                        addToBasket(String(globalIdx), item);
-                    }
-                });
-                qCtrl.querySelector('.qty-dec').addEventListener('click', e => { e.stopPropagation(); const en = _basket.get(String(globalIdx)); if (en) _setQty(String(globalIdx), en.qty - 1); });
-                qCtrl.querySelector('.qty-inc').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
+                if (qCtrl) {
+                    qCtrl.querySelector('.qty-add-btn').addEventListener('click', e => {
+                        e.stopPropagation();
+                        if (_hasVariants || _hasAddons) {
+                            const sel  = ((window.__addonSel[globalIdx]) || []).slice().sort((a, b) => a - b);
+                            const vSel = _hasVariants ? _variantIndex(item, globalIdx) : null;
+                            addToBasket(_basketKey(globalIdx, vSel, sel), item, sel, vSel);
+                            const b = e.currentTarget;
+                            b.classList.remove('just-added'); void b.offsetWidth; b.classList.add('just-added');
+                        } else {
+                            addToBasket(String(globalIdx), item);
+                        }
+                    });
+                    qCtrl.querySelector('.qty-dec').addEventListener('click', e => { e.stopPropagation(); const en = _basket.get(String(globalIdx)); if (en) _setQty(String(globalIdx), en.qty - 1); });
+                    qCtrl.querySelector('.qty-inc').addEventListener('click', e => { e.stopPropagation(); addToBasket(String(globalIdx), item); });
+                }
 
                 // Add-on checkboxes: toggle selection (persisted in __addonSel so it
                 // survives the re-render on language toggle).
