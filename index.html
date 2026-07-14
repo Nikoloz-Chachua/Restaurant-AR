@@ -726,6 +726,12 @@
             font-weight: 900;
             padding-top: 22px;
         }
+        /* Monday Greens: its accent teal sits too close to the page background for
+           the category headings (color: var(--accent)) to read, and the admin panel
+           exposes no separate control for them. Pin them to white — legible on both
+           the teal day bg and the dark night bg. Scoped to monday_greens so every
+           other tenant keeps accent-coloured headings. */
+        [data-template="monday_greens"] .category-header { color: #ffffff; }
 
         /* ── Footer ── */
         .site-footer {
