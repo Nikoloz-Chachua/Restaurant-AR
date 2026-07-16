@@ -324,9 +324,10 @@
             padding: 0;
             align-self: center;
         }
-        .menu-item.no-image .qty-ctrl,
-        .menu-item.no-image .variants,
-        .menu-item.no-image .addons,
+        /* Pictureless dishes keep the cart button and their variant/add-on pills:
+           on a drinks-heavy menu most items have no photo, and hiding these made
+           the majority of the menu unorderable (and hid the Bottle price of every
+           Glass/Bottle drink). Only the AR button is dropped — there is no model. */
         .menu-item.no-image .ar-btn {
             display: none;
         }
@@ -338,10 +339,26 @@
             overflow-wrap: anywhere;
             word-break: normal;
         }
+        /* Price stacks over the cart button in the narrow right column, keeping the
+           name/description column as wide as possible for long Georgian names. */
         .menu-item.no-image .item-actions {
             margin-top: 0;
             min-height: 0;
-            display: block;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
+        /* Variants/add-ons span the full card width on the row below — they are far
+           too wide for the max-content price column. Auto-placed, so no empty row
+           (and no row-gap) is reserved on the dishes that have neither. */
+        .menu-item.no-image .no-image-extra {
+            grid-column: 1 / -1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
         }
 
         .thumb-wrap {
@@ -549,8 +566,14 @@
            Name becomes the full-width top row; image bottom-left, description
            bottom-right. Long Georgian names wrap to the next line instead of
            being clipped in the old narrow (108px) name column. Scoped to this
-           template only so other tenants' cards are unchanged. */
-        [data-template="monday_greens"] .menu-item {
+           template only so other tenants' cards are unchanged.
+
+           :not(.no-image) is load-bearing — photo/3D cards only. This rule has the
+           same (0,2,0) specificity as `.menu-item.no-image` but is declared later,
+           so without it the template wins on source order and silently reinstates
+           the 108px photo column on cards that have no photo, leaving a dead column
+           and pushing the description into an implicit grid column. */
+        [data-template="monday_greens"] .menu-item:not(.no-image) {
             grid-template-columns: 108px minmax(0, 1fr);
             grid-template-areas: "name  name" "left  right";
             min-width: 0;
@@ -3386,6 +3409,19 @@
             if (typeof s === 'number' && item.variants && item.variants[s]) return s;
             return 0;
         }
+        // Add-to-basket control. Shared by photo cards and text-only cards so the two
+        // can't drift apart. Starts as the cart button; _syncQtyCtrl swaps in the
+        // stepper once the item is in the basket.
+        function _qtyCtrlHtml(globalIdx) {
+            return `<div class="qty-ctrl" data-idx="${globalIdx}">
+                                <button class="qty-add-btn" aria-label="Add to basket"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+                                <div class="qty-stepper">
+                                    <button class="qty-dec">&#8722;</button>
+                                    <span class="qty-num">1</span>
+                                    <button class="qty-inc">+</button>
+                                </div>
+                            </div>`;
+        }
         // Single-select size/price pills (e.g. Glass / Bottle). Empty → nothing shown.
         function _variantsHtml(item, globalIdx) {
             if (!item.variants || !item.variants.length) return '';
@@ -4427,6 +4463,13 @@
                 const _cardVi = _hasVariants ? _variantIndex(item, globalIdx) : -1;
                 const itemPriceHtml = _escapeHtml(_hasVariants ? (item.variants[_cardVi].price || '') : item.price);
                 if (noImage) card.classList.add('no-image');
+                // Text-only dishes are the majority of a drinks-heavy menu, so they get the
+                // same cart button and variant/add-on pills as photo cards — only the media
+                // stage and AR button are dropped. Variants and add-ons sit in a full-width
+                // row under the name/description rather than in the narrow price column.
+                const noImageExtra = noImage
+                    ? _variantsHtml(item, globalIdx) + _addonsHtml(item, globalIdx)
+                    : '';
                 card.innerHTML = `
                     <p class="item-name" data-field="name" data-idx="${globalIdx}">${itemNameHtml}</p>
                     ${noImage ? '' : `<div class="item-left">
@@ -4439,20 +4482,17 @@
                     ${noImage ? `
                     <p class="ingredients" data-field="description" data-idx="${globalIdx}">${itemDescHtml}</p>
                     <div class="item-right">
-                        <div class="item-actions"><p class="price">${itemPriceHtml}</p></div>
-                    </div>` : `
+                        <div class="item-actions">
+                            <p class="price">${itemPriceHtml}</p>
+                            ${_qtyCtrlHtml(globalIdx)}
+                        </div>
+                    </div>
+                    ${noImageExtra ? `<div class="no-image-extra">${noImageExtra}</div>` : ''}` : `
                     <div class="item-right">
                         <p class="ingredients" data-field="description" data-idx="${globalIdx}">${itemDescHtml}</p>
                         <div class="item-actions">
                             <p class="price">${itemPriceHtml}</p>
-                            <div class="qty-ctrl" data-idx="${globalIdx}">
-                                <button class="qty-add-btn" aria-label="Add to basket"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
-                                <div class="qty-stepper">
-                                    <button class="qty-dec">&#8722;</button>
-                                    <span class="qty-num">1</span>
-                                    <button class="qty-inc">+</button>
-                                </div>
-                            </div>
+                            ${_qtyCtrlHtml(globalIdx)}
                         </div>
                         ${_variantsHtml(item, globalIdx)}
                         ${_addonsHtml(item, globalIdx)}
