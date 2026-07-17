@@ -1501,7 +1501,7 @@
             transition: color var(--t);
         }
 
-        /* ── Show-to-waiter button (in basket footer) ── */
+        /* ── Show-to-staff button (in basket footer) ── */
         .basket-footer { flex-direction: column; gap: 12px; }
         .basket-total-row {
             display: flex; align-items: center; justify-content: space-between;
@@ -1520,7 +1520,7 @@
         #basket-waiter-btn:active { transform: scale(0.98); }
         #basket-waiter-btn:disabled { opacity: 0.55; cursor: default; }
 
-        /* ── Show-to-waiter QR overlay ── */
+        /* ── Show-to-staff QR overlay ── */
         #waiter-overlay {
             position: fixed; inset: 0; z-index: 100000; /* above basket-panel (9000) — it opens from within the basket */
             display: none; align-items: center; justify-content: center;
@@ -1853,19 +1853,19 @@
             </div>
             <button id="basket-waiter-btn" type="button">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><line x1="14" y1="14" x2="14" y2="14.01"/><line x1="17" y1="14" x2="17" y2="14.01"/><line x1="20" y1="14" x2="20" y2="14.01"/><line x1="14" y1="17" x2="14" y2="17.01"/><line x1="17" y1="17" x2="17" y2="17.01"/><line x1="20" y1="17" x2="20" y2="17.01"/><line x1="14" y1="20" x2="14" y2="20.01"/><line x1="17" y1="20" x2="17" y2="20.01"/><line x1="20" y1="20" x2="20" y2="20.01"/></svg>
-                <span id="basket-waiter-label">Show to waiter</span>
+                <span id="basket-waiter-label">Show to staff</span>
             </button>
         </div>
     </div>
 
-    <!-- Show-to-waiter QR overlay (order teleport). QR is generated fully
+    <!-- Show-to-staff QR overlay (order teleport). QR is generated fully
          client-side and lazily; no network call on tap. -->
     <div id="waiter-overlay">
         <div id="waiter-card">
             <button id="waiter-overlay-close" aria-label="Close">&times;</button>
-            <h3 id="waiter-overlay-title">Show to waiter</h3>
+            <h3 id="waiter-overlay-title">Show to staff</h3>
             <div id="waiter-qr"></div>
-            <p id="waiter-overlay-hint">Waiter scans this to get your order</p>
+            <p id="waiter-overlay-hint">Staff scans this to get your order</p>
         </div>
     </div>
 
@@ -2864,8 +2864,8 @@
     emptyBasket:  'Your basket is empty',
     total:        'Total',
     clearBasket:  'Clear',
-    showWaiter:   'Show to waiter',
-    waiterHint:   'The waiter scans this to get your order instantly',
+    showWaiter:   'Show to staff',
+    waiterHint:   'Staff scans this to get your order instantly',
     readyBtn:     '✓ Ready to Order',
     readyDone:    '✓ Order Noted!',
     hideUI:       'HIDE UI',
@@ -3790,7 +3790,7 @@
                     );
                     if (data && data.length) {
                         items = data.map(r => ({
-                            id:             r.id,          // stable DB id — needed by the Show-to-waiter QR payload
+                            id:             r.id,          // stable DB id — needed by the Show-to-staff QR payload
                             name:           _cleanText(r.name_en),
                             name_ka:        _cleanText(r.name_ka),
                             category:       _cleanText(r.categories?.name_en, 'Other'),
@@ -4277,9 +4277,9 @@ document.getElementById('basket-items').addEventListener('click', e => {
             if (entry) _setQty(btn.dataset.key, entry.qty + parseInt(btn.dataset.delta));
         });
 
-        // ── Show-to-waiter QR (order teleport) ────────────────────────────
+        // ── Show-to-staff QR (order teleport) ────────────────────────────
         // The customer's basket is packed into a URL fragment and drawn as a
-        // QR. The waiter scans it → opens /waiter.html which re-resolves the
+        // QR. Staff scans it → opens /waiter.html which re-resolves the
         // item ids against the LIVE menu (so prices are always current).
         // Everything here is client-only; the QR library loads lazily on the
         // first tap so it never touches the menu's initial load.

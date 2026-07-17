@@ -5,7 +5,7 @@ const oldGeorgianCta = 'აჩვენე ოფიციანტს';
 const newGeorgianCta = 'აჩვენეთ სერვისის თანამშრომელს';
 const oldGeorgianHint = 'ოფიციანტი დაასკანერებს და მყისვე მიიღებს შენს შეკვეთას';
 const newGeorgianHint = 'სერვისის თანამშრომელი დაასკანერებს და მყისვე მიიღებს შენს შეკვეთას';
-const englishCta = 'Show to waiter';
+const englishCta = 'Show to staff';
 
 let failed = false;
 
@@ -33,7 +33,7 @@ for (const file of files) {
   }
 
   if (!text.includes(englishCta)) {
-    console.error(`${file}: English waiter CTA changed or is absent`);
+    console.error(`${file}: English staff CTA changed or is absent`);
     failed = true;
   }
 }
@@ -42,4 +42,4 @@ if (failed) {
   process.exit(1);
 }
 
-console.log('Customer waiter CTA localization check passed');
+console.log('Customer staff CTA localization check passed');
