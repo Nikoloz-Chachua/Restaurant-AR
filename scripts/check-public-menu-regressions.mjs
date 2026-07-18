@@ -25,6 +25,7 @@ assert.ok(html.includes('[data-template="monday_greens"] #img-lightbox.has-panel
           html.includes('[data-template="monday_greens"] #basket-waiter-btn') &&
           html.includes('[data-template="monday_greens"] #basket-clear') &&
           html.includes('border: 2px solid #ffffff;') &&
+          html.includes('border-bottom: 1px solid rgba(0, 0, 0, 0.32);') &&
           html.includes('-webkit-text-fill-color: #ffffff;'),
           'Monday Greens product detail text and staff CTA should be pinned to white');
 assert.ok(html.includes('max(12px, env(safe-area-inset-bottom'), 'Mobile 3D modal should account for safe-area bottom');
