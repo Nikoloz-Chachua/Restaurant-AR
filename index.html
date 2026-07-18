@@ -516,6 +516,26 @@
             -webkit-text-fill-color: transparent;
             color: var(--accent);
         }
+        /* Monday Greens product detail surfaces sit on dark photo/model backdrops;
+           pin their content text to white for dependable contrast without changing
+           menu cards or other tenants' theme colours. */
+        [data-template="monday_greens"] #img-lightbox.has-panel #lightbox-name,
+        [data-template="monday_greens"] #img-lightbox.has-panel #lightbox-desc,
+        [data-template="monday_greens"] #img-lightbox.has-panel #lightbox-price,
+        [data-template="monday_greens"] #modal-title,
+        [data-template="monday_greens"] #modal-title-d,
+        [data-template="monday_greens"] #modal-description,
+        [data-template="monday_greens"] #modal-price {
+            background: none;
+            -webkit-background-clip: initial;
+            background-clip: initial;
+            -webkit-text-fill-color: #ffffff;
+            color: #ffffff;
+        }
+        [data-template="monday_greens"] #basket-waiter-btn {
+            -webkit-text-fill-color: #ffffff;
+            color: #ffffff;
+        }
 
         .badge-3d {
             position: absolute;

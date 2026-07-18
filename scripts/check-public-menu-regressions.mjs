@@ -18,6 +18,11 @@ assert.ok(!html.includes('Move slowly over a table or floor'), 'Old broad floor-
 
 assert.ok(html.includes('object-position: center center;'), 'Food thumbnails should force centered crops');
 assert.ok(html.includes('.thumb-wrap model-viewer') && html.includes('contain: paint;'), 'Thumbnail/model stages should be paint-contained');
+assert.ok(html.includes('[data-template="monday_greens"] #img-lightbox.has-panel #lightbox-name') &&
+          html.includes('[data-template="monday_greens"] #modal-description') &&
+          html.includes('[data-template="monday_greens"] #basket-waiter-btn') &&
+          html.includes('-webkit-text-fill-color: #ffffff;'),
+          'Monday Greens product detail text and staff CTA should be pinned to white');
 assert.ok(html.includes('max(12px, env(safe-area-inset-bottom'), 'Mobile 3D modal should account for safe-area bottom');
 assert.ok(html.includes('@media (min-width: 640px) and (max-height: 680px)'), 'Short desktop/tablet 3D modal should keep drawer actions reachable');
 assert.ok(html.includes('#modal-drawer-body {\n                grid-template-rows: 1fr;') && html.includes('bottom: min(var(--drawer-full-h, 300px), 48svh);'), 'Short 3D modal drawer should be open and capped');
