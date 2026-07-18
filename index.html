@@ -1077,6 +1077,26 @@
             transition: color var(--t);
         }
 
+        /* Monday Greens · day theme · 3D modal:
+           the product-detail text is pinned white for the dark NIGHT backdrop,
+           but in the light day theme the modal sits on a pale aqua background,
+           so white washes out. In day mode use the theme's own dark text colours
+           instead — deep teal (var(--text)) for the title/price/description and a
+           slightly softer teal for the tip. Crisp, on-brand, no outline/scrim.
+           Scoped to day + monday_greens only — night mode is untouched. */
+        [data-theme="day"][data-template="monday_greens"] #modal-title,
+        [data-theme="day"][data-template="monday_greens"] #modal-title-d,
+        [data-theme="day"][data-template="monday_greens"] #modal-price,
+        [data-theme="day"][data-template="monday_greens"] #modal-description {
+            color: #0d7b98;
+            -webkit-text-fill-color: #0d7b98;
+        }
+        [data-theme="day"][data-template="monday_greens"] .tip {
+            color: #0d7b98;
+            -webkit-text-fill-color: #0d7b98;
+            opacity: 0.8;
+        }
+
         #modal-message {
             display: none;
             max-width: 340px;
