@@ -20,6 +20,8 @@ assert.ok(html.includes('object-position: center center;'), 'Food thumbnails sho
 assert.ok(html.includes('.thumb-wrap model-viewer') && html.includes('contain: paint;'), 'Thumbnail/model stages should be paint-contained');
 assert.ok(html.includes('[data-template="monday_greens"] #img-lightbox.has-panel #lightbox-name') &&
           html.includes('[data-template="monday_greens"] #modal-description') &&
+          html.includes('[data-template="monday_greens"] #basket-panel .basket-item-name') &&
+          html.includes('[data-template="monday_greens"] #basket-total') &&
           html.includes('[data-template="monday_greens"] #basket-waiter-btn') &&
           html.includes('-webkit-text-fill-color: #ffffff;'),
           'Monday Greens product detail text and staff CTA should be pinned to white');
