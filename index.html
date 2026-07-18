@@ -378,11 +378,15 @@
         .thumb-vignette {
             position: absolute;
             inset: 0;
+            z-index: 2;
             pointer-events: none;
             background: var(--thumb-vignette);
             opacity: 0.6;
         }
         .thumb-wrap model-viewer {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
             width: 100%;
             height: 100%;
             min-height: 108px;
@@ -392,8 +396,16 @@
             overflow: hidden;
             contain: paint;
             touch-action: pan-y;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .thumb-wrap.thumb-model-ready model-viewer {
+            opacity: 1;
+            visibility: visible;
         }
         .thumb-wrap .thumb-img {
+            position: relative;
+            z-index: 1;
             width: 100%;
             height: 100%;
             min-height: 108px;
@@ -401,6 +413,9 @@
             object-position: center center;
             display: block;
             cursor: pointer;
+        }
+        .thumb-wrap.thumb-model-ready .thumb-img {
+            visibility: hidden;
         }
 
         /* ── Fullscreen image lightbox (photo-only items) ── */
@@ -3901,6 +3916,7 @@
                 document.querySelectorAll('.thumb-wrap model-viewer').forEach(mv => {
                     const src = mv.getAttribute('src');
                     if (!src) return;
+                    mv.closest('.thumb-wrap')?.classList.remove('thumb-model-ready');
                     mv.dataset.pausedSrc = src;
                     mv.removeAttribute('src');
                 });
@@ -3924,7 +3940,11 @@
                     const r = mv.getBoundingClientRect();
                     const inView = r.bottom > -100 && r.top < window.innerHeight + 100;
                     if (inView) {
-                        // Visible: bring the live model straight back.
+                        // Visible: bring the live model back, but keep the poster as the
+                        // only visible layer until model-viewer has rendered again.
+                        mv.addEventListener('load', () => {
+                            mv.closest('.thumb-wrap')?.classList.add('thumb-model-ready');
+                        }, { once: true });
                         mv.setAttribute('src', src);
                     } else {
                         // Off-screen: never leave it blank (the old code dropped src here and
@@ -3936,7 +3956,7 @@
                         const img  = wrap && wrap.querySelector('.thumb-img');
                         mv.remove();
                         if (img) {
-                            img.style.visibility = '';
+                            wrap?.classList.remove('thumb-model-ready');
                             delete img.dataset.upgraded;
                             _upgradeObserver.observe(img);
                         }
@@ -4304,9 +4324,9 @@
 
         // ── Poster → live-3D thumbnail upgrade ──────────────────────────────
         // Thumbnails render first as plain <img> posters (no WebGL, paint with the menu).
-        // After first paint, in-view thumbnails upgrade to a live <model-viewer> overlaid
-        // on the poster — staggered, off the critical path. The poster stays beneath until
-        // the model is ready, then is hidden.
+        // After first paint, in-view thumbnails upgrade to a live <model-viewer> that
+        // stays invisible while the external poster <img> remains the only visible
+        // layer. Once the model loads, the wrapper flips to the live model.
         const _upgradePending = new Set();
         let   _upgradeTimer   = null;
 
@@ -4328,9 +4348,8 @@
             const gIdx = parseInt(img.dataset.globalIdx, 10);
             _ensureModelViewer().then(() => {
                 if (!wrap || !wrap.isConnected) return;
+                wrap.classList.remove('thumb-model-ready');
                 const mv = document.createElement('model-viewer');
-                mv.setAttribute('src', model);
-                if (img.getAttribute('src')) mv.setAttribute('poster', img.getAttribute('src'));
                 mv.setAttribute('camera-controls', '');
                 mv.setAttribute('shadow-intensity', '0');
                 mv.setAttribute('interaction-prompt', 'none');
@@ -4338,7 +4357,6 @@
                 mv.setAttribute('max-camera-orbit', 'auto 85deg auto');
                 const orbit = _itemCameraOrbit(menuItems[gIdx]);
                 if (orbit) mv.setAttribute('camera-orbit', orbit);
-                mv.style.cssText = 'position:absolute; inset:0;';
                 wrap.insertBefore(mv, wrap.firstChild);
                 let _px = 0, _py = 0;
                 mv.addEventListener('pointerdown', e => { _px = e.clientX; _py = e.clientY; });
@@ -4346,7 +4364,10 @@
                     if (Math.abs(e.clientX - _px) < 6 && Math.abs(e.clientY - _py) < 6)
                         openModal(gIdx, menuItems);
                 });
-                mv.addEventListener('load', () => { img.style.visibility = 'hidden'; }, { once: true });
+                mv.addEventListener('load', () => {
+                    wrap.classList.add('thumb-model-ready');
+                }, { once: true });
+                mv.setAttribute('src', model);
             });
         }
 

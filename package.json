@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "npx --yes serve -p 3000 .",
     "build": "echo 'No build step for raw HTML'",
+    "test": "node --test publicMenu3dThumbnail.test.mjs",
     "preview": "npx --yes serve -p 3000 .",
     "compress": "npx --yes gltf-pipeline -i food.glb -o food.glb --draco.compressionLevel 10 && npx gltf-pipeline -i Druidi.glb -o Druidi.glb --draco.compressionLevel 10"
   }
