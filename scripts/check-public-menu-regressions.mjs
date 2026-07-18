@@ -23,6 +23,8 @@ assert.ok(html.includes('[data-template="monday_greens"] #img-lightbox.has-panel
           html.includes('[data-template="monday_greens"] #basket-panel .basket-item-name') &&
           html.includes('[data-template="monday_greens"] #basket-total') &&
           html.includes('[data-template="monday_greens"] #basket-waiter-btn') &&
+          html.includes('[data-template="monday_greens"] #basket-clear') &&
+          html.includes('border: 2px solid #ffffff;') &&
           html.includes('-webkit-text-fill-color: #ffffff;'),
           'Monday Greens product detail text and staff CTA should be pinned to white');
 assert.ok(html.includes('max(12px, env(safe-area-inset-bottom'), 'Mobile 3D modal should account for safe-area bottom');
