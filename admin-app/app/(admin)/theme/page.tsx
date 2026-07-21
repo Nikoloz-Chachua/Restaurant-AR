@@ -620,10 +620,10 @@ export default function ThemePage() {
                               uploading={uploadingKey === 'logo_url'} uploadLabel={T.uploadThumb} clearLabel={T.clearThumb}
                               previewAlt={T.imagePreviewAlt}
                               onPick={f => uploadImage('logo_url', f)} onClear={() => set('logo_url', '')} />
-              <ImageUploadRow label={T.brandHero} hint={T.brandHeroHint} value={config.hero_image_url ?? ''}
-                              uploading={uploadingKey === 'hero_image_url'} uploadLabel={T.uploadThumb} clearLabel={T.clearThumb}
-                              previewAlt={T.imagePreviewAlt}
-                              onPick={f => uploadImage('hero_image_url', f)} onClear={() => set('hero_image_url', '')} />
+              {/* The old single "Hero image" row was removed: the gallery replaces it
+                  (one photo = a still hero, two or more crossfade). hero_image_url is
+                  still written automatically from the first gallery photo, so the menu
+                  fallback and older builds keep working. */}
               <HeroGalleryRow label={T.brandHeroGallery} hint={T.brandHeroGalleryHint}
                               images={heroImages} uploading={uploadingKey === 'hero_images'}
                               addLabel={T.heroAddImages} removeLabel={T.heroRemove}
