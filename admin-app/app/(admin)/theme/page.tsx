@@ -7,7 +7,23 @@ import { usePlan } from '@/lib/usePlan'
 import LockedCard from '@/components/LockedCard'
 import { TEMPLATE_PRESETS, type ThemeConfig } from '@/lib/themePresets'
 
-const BRANDING_KEYS = ['site_name', 'site_name_ka', 'logo_url', 'hero_logo_url', 'hero_image_url']
+const BRANDING_KEYS = ['site_name', 'site_name_ka', 'logo_url', 'hero_logo_url', 'hero_image_url', 'hero_images']
+
+// The hero gallery is stored in theme_config.hero_images as a JSON array of URLs.
+// Older rows may hold a comma/newline list, so accept that shape too.
+function parseHeroImages(raw?: string): string[] {
+  const s = (raw || '').trim()
+  if (!s) return []
+  let list: unknown[] = []
+  if (s[0] === '[') { try { list = JSON.parse(s) } catch { list = [] } }
+  if (!list.length) list = s.replace(/^\[|\]$/g, '').split(/[,;\n]/)
+  const out: string[] = []
+  list.forEach(v => {
+    const url = String(v).replace(/^["'\s]+|["'\s]+$/g, '')
+    if (url && !out.includes(url)) out.push(url)
+  })
+  return out
+}
 
 const NIGHT_FIELDS: { key: string; tKey: keyof Translations }[] = [
   { key: 'night_bg',          tKey: 'colorBg' },
@@ -301,6 +317,66 @@ export default function ThemePage() {
     setUploadingKey('')
   }
 
+  // ── Hero gallery ───────────────────────────────────────────────────────────
+  // Photos live in hero_images (JSON array). hero_image_url is kept in sync with the
+  // first photo, so the single-image fallback keeps working everywhere.
+  const heroImages = parseHeroImages(config.hero_images)
+
+  function writeHeroImages(list: string[]) {
+    setConfig(c => ({ ...c, hero_images: JSON.stringify(list), hero_image_url: list[0] ?? '' }))
+  }
+
+  // Appends against the freshest config, so uploading several files can't drop any.
+  function appendHeroImages(urls: string[]) {
+    setConfig(c => {
+      const current = parseHeroImages(c.hero_images)
+      const merged = [...current, ...urls.filter(u => !current.includes(u))]
+      return { ...c, hero_images: JSON.stringify(merged), hero_image_url: merged[0] ?? '' }
+    })
+  }
+
+  async function uploadHeroImages(files: File[]) {
+    const picked = files.filter(f => f.type.startsWith('image/'))
+    if (!picked.length) { setMsg(T.onlyImageFiles); return }
+    setUploadingKey('hero_images')
+    const added: string[] = []
+    try {
+      for (const file of picked) {
+        const blob = await toWebP(file)
+        const filename = file.name.replace(/\.[^.]+$/i, '.webp')
+        const res = await fetch('/api/r2-presign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename, restaurantId: plan.restaurantId, restaurantSlug: plan.restaurantSlug }),
+        })
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `Server error ${res.status}`)
+        const { uploadUrl, publicUrl } = await res.json()
+        const up = await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': 'image/webp' }, body: blob })
+        if (!up.ok) throw new Error(`R2 upload failed: ${up.status}`)
+        added.push(publicUrl)
+      }
+      appendHeroImages(added)
+      setMsg(text(T.heroPhotosUploaded, { count: added.length }))
+    } catch (e) {
+      setMsg(text(T.uploadFailed, { message: e instanceof Error ? e.message : String(e) }))
+    }
+    setUploadingKey('')
+  }
+
+  function removeHeroImage(index: number) {
+    writeHeroImages(heroImages.filter((_, n) => n !== index))
+  }
+
+  function moveHeroImage(index: number, dir: -1 | 1) {
+    const to = index + dir
+    if (to < 0 || to >= heroImages.length) return
+    const list = [...heroImages]
+    const held = list[index]
+    list[index] = list[to]
+    list[to] = held
+    writeHeroImages(list)
+  }
+
   // Background images set the CSS background-image token (url(...)) plus cover/no-repeat,
   // so an uploaded photo fills the whole menu backdrop.
   async function uploadBgImage(mode: 'night' | 'day', file: File) {
@@ -548,6 +624,12 @@ export default function ThemePage() {
                               uploading={uploadingKey === 'hero_image_url'} uploadLabel={T.uploadThumb} clearLabel={T.clearThumb}
                               previewAlt={T.imagePreviewAlt}
                               onPick={f => uploadImage('hero_image_url', f)} onClear={() => set('hero_image_url', '')} />
+              <HeroGalleryRow label={T.brandHeroGallery} hint={T.brandHeroGalleryHint}
+                              images={heroImages} uploading={uploadingKey === 'hero_images'}
+                              addLabel={T.heroAddImages} removeLabel={T.heroRemove}
+                              upLabel={T.heroMoveUp} downLabel={T.heroMoveDown}
+                              emptyLabel={T.heroEmpty} previewAlt={T.imagePreviewAlt}
+                              onPick={uploadHeroImages} onRemove={removeHeroImage} onMove={moveHeroImage} />
             </>
           )}
         </div>
@@ -657,6 +739,67 @@ function FontRow({ label, value, preview, onChange }: { label: string; value: st
       <div className="mt-2 text-lg" style={{ fontFamily: `'${value}', sans-serif`, color: 'var(--text)' }}>
         {preview}{value}
       </div>
+    </div>
+  )
+}
+
+// Multi-photo hero. Order matters (it's the order guests see), so each row carries
+// up/down controls — arrows rather than drag, so it behaves the same on a phone.
+function HeroGalleryRow({ label, hint, images, uploading, addLabel, removeLabel, upLabel, downLabel, emptyLabel, previewAlt, onPick, onRemove, onMove }: {
+  label: string; hint: string; images: string[]; uploading: boolean
+  addLabel: string; removeLabel: string; upLabel: string; downLabel: string
+  emptyLabel: string; previewAlt: string
+  onPick: (files: File[]) => void; onRemove: (index: number) => void; onMove: (index: number, dir: -1 | 1) => void
+}) {
+  const arrowBtn: CSSProperties = {
+    background: 'var(--card2)', color: 'var(--gold)',
+    border: '1px solid var(--border)', borderRadius: 6,
+    width: 28, height: 28, lineHeight: 1, cursor: 'pointer',
+  }
+  return (
+    <div className="p-3 rounded-xl" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+      <div className="text-xs mb-2 uppercase tracking-widest" style={{ color: 'var(--dim)' }}>{label}</div>
+
+      <label className="px-3 py-1.5 rounded text-xs font-medium cursor-pointer inline-block"
+             style={{ background: 'var(--card2)', color: 'var(--gold)', border: '1px solid var(--border)', opacity: uploading ? 0.5 : 1 }}>
+        {uploading ? '…' : addLabel}
+        <input type="file" accept="image/*" multiple style={{ display: 'none' }} disabled={uploading}
+               onChange={e => {
+                 const files = Array.from(e.target.files || [])
+                 if (files.length) onPick(files)
+                 e.target.value = ''
+               }} />
+      </label>
+
+      {images.length === 0 && (
+        <p className="text-xs mt-3" style={{ color: 'var(--dim)' }}>{emptyLabel}</p>
+      )}
+
+      {images.length > 0 && (
+        <ul className="mt-3 flex flex-col gap-2 list-none p-0">
+          {images.map((url, i) => (
+            <li key={`${url}-${i}`} className="flex items-center gap-3 p-2 rounded-lg"
+                style={{ background: 'var(--card2)', border: '1px solid var(--border)' }}>
+              <span className="text-xs w-5 text-center shrink-0" style={{ color: 'var(--dim)' }}>{i + 1}</span>
+              <img src={url} alt={previewAlt}
+                   style={{ height: 44, width: 68, objectFit: 'cover', borderRadius: 6, border: '1px solid var(--border)' }} />
+              <span className="flex-1" />
+              <button type="button" onClick={() => onMove(i, -1)} disabled={i === 0}
+                      title={upLabel} aria-label={upLabel}
+                      style={{ ...arrowBtn, opacity: i === 0 ? 0.35 : 1 }}>↑</button>
+              <button type="button" onClick={() => onMove(i, 1)} disabled={i === images.length - 1}
+                      title={downLabel} aria-label={downLabel}
+                      style={{ ...arrowBtn, opacity: i === images.length - 1 ? 0.35 : 1 }}>↓</button>
+              <button type="button" onClick={() => onRemove(i)} title={removeLabel} aria-label={removeLabel}
+                      style={{ background: 'rgba(224,82,82,0.1)', color: 'var(--danger)',
+                               border: '1px solid rgba(224,82,82,0.25)', borderRadius: 6,
+                               width: 28, height: 28, lineHeight: 1, cursor: 'pointer' }}>×</button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <p className="text-xs mt-2" style={{ color: 'var(--dim)' }}>{hint}</p>
     </div>
   )
 }
