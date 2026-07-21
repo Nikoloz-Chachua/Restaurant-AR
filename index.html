@@ -1568,10 +1568,6 @@
             pointer-events: none;
             transition: opacity var(--mg-hero-fade, 1200ms) ease-in-out;
         }
-        /* Guests who ask for less motion get a single still photo (JS skips the timer). */
-        @media (prefers-reduced-motion: reduce) {
-            [data-template="monday_greens"] .mg-hero-next { transition: none; }
-        }
         [data-template="monday_greens"] .mg-hero-veil {
             position: absolute; inset: 0; z-index: 1;
             background:
@@ -4464,8 +4460,9 @@
             const base = document.querySelector('.mg-hero-photo');
             const next = document.querySelector('.mg-hero-next');
             if (!base || !next || urls.length < 2) return;
-            // A guest who asked for less motion keeps a single still photo.
-            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            // The gallery runs for everyone, including guests with "reduce motion" on:
+            // the rotating hero is the restaurant's headline content, not decoration,
+            // so skipping it would hide two thirds of their photos on those devices.
             urls.forEach(u => { const img = new Image(); img.decoding = 'async'; img.src = u; });
 
             const FADE = 1200, HOLD = 5000;
