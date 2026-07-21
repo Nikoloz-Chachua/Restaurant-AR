@@ -47,6 +47,13 @@ test('3D thumbnail frame clips media without stretching on phone and wider layou
 })
 
 test('Monday Greens long 3D modal titles use tenant-gated fit styling', () => {
+  const mobileTitleRule = cssRule('[data-template="monday_greens"] #modal-title')
+  assert.match(mobileTitleRule, /background:\s*none\b/)
+  assert.match(mobileTitleRule, /-webkit-background-clip:\s*initial\b/)
+  assert.match(mobileTitleRule, /background-clip:\s*initial\b/)
+  assert.match(mobileTitleRule, /-webkit-text-fill-color:\s*var\(--accent\)/)
+  assert.match(mobileTitleRule, /color:\s*var\(--accent\)/)
+
   const longTitleRule = cssRule('[data-tenant-slug="monday-greens"] #modal-title.modal-title-long')
   assert.match(longTitleRule, /transform:\s*translateY\(-12px\)/)
   assert.match(longTitleRule, /font-size:\s*clamp\(1\.18rem,\s*5\.15vw,\s*1\.55rem\)/)
