@@ -45,3 +45,13 @@ test('3D thumbnail frame clips media without stretching on phone and wider layou
   assert.match(html, /\[data-phone-layout="twin"\] \.thumb-wrap \{[\s\S]*?aspect-ratio:\s*1 \/ 1;/)
   assert.match(html, /\[data-phone-layout="twin"\] \.thumb-wrap \.thumb-img,\s*\n\s*\[data-phone-layout="twin"\] \.thumb-wrap model-viewer \{[\s\S]*?height:\s*100%;/)
 })
+
+test('Monday Greens long 3D modal titles use tenant-gated fit styling', () => {
+  const longTitleRule = cssRule('[data-tenant-slug="monday-greens"] #modal-title.modal-title-long')
+  assert.match(longTitleRule, /transform:\s*translateY\(-8px\)/)
+  assert.match(longTitleRule, /font-size:\s*clamp\(1\.28rem,\s*5\.8vw,\s*1\.75rem\)/)
+  assert.match(longTitleRule, /max-height:\s*3\.15em\b/)
+
+  assert.match(html, /document\.documentElement\.dataset\.tenantSlug = _tenant\.restaurant_slug/)
+  assert.match(html, /modalTitle\.classList\.toggle\(\s*'modal-title-long',\s*document\.documentElement\.dataset\.tenantSlug === 'monday-greens' && modalName\.length >= 28\s*\)/)
+})

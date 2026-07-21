@@ -2103,6 +2103,12 @@
                 max-height: 2.25em;
                 overflow: hidden;
             }
+            [data-tenant-slug="monday-greens"] #modal-title.modal-title-long {
+                transform: translateY(-8px);
+                font-size: clamp(1.28rem, 5.8vw, 1.75rem);
+                letter-spacing: 3px;
+                max-height: 3.15em;
+            }
             #modal-viewer-wrap {
                 flex: 1 1 auto;
                 width: min(100%, 520px);
@@ -3343,6 +3349,7 @@
                 brand
             };
             window.__tenant = _tenant;
+            document.documentElement.dataset.tenantSlug = _tenant.restaurant_slug;
             _applyTenantFavicon(_tenant);
             _applyBrandTitle();
             return _tenant;
@@ -3871,8 +3878,13 @@
             if (modalOrbit) modalViewer.setAttribute('camera-orbit', modalOrbit);
             else modalViewer.removeAttribute('camera-orbit');
             _ensureModelViewer().then(() => { modalViewer.src = _safeAssetUrl(item.model) || ''; });
-            modalTitle.textContent = t(item, 'name');
-            document.getElementById('modal-title-d').textContent = t(item, 'name');
+            const modalName = t(item, 'name');
+            modalTitle.textContent = modalName;
+            modalTitle.classList.toggle(
+                'modal-title-long',
+                document.documentElement.dataset.tenantSlug === 'monday-greens' && modalName.length >= 28
+            );
+            document.getElementById('modal-title-d').textContent = modalName;
             modalPrice.textContent = item.price;
             document.getElementById('modal-description').textContent = t(item, 'description') || '';
             const msgEl = document.getElementById('modal-message');
