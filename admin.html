@@ -159,10 +159,7 @@
             <div class="kpi"><div class="kpi-label" data-i18n="kpi_views">3D Views</div><div class="kpi-value" id="kv-views">—</div><div class="kpi-sub" data-i18n="kpi_views_sub">modal opens</div></div>
             <div class="kpi"><div class="kpi-label" data-i18n="kpi_arsuccess">AR Launches</div><div class="kpi-value" id="kv-arsuccess">—</div><div class="kpi-sub" data-i18n="kpi_arsuccess_sub">AR actually opened</div></div>
             <div class="kpi accent"><div class="kpi-label" data-i18n="kpi_adds">Basket Adds</div><div class="kpi-value" id="kv-adds">—</div><div class="kpi-sub" data-i18n="kpi_adds_sub">items added to order</div></div>
-            <div class="kpi accent"><div class="kpi-label" data-i18n="kpi_ar_basket">AR→Basket</div><div class="kpi-value" id="kv-ar-basket">—</div><div class="kpi-sub" data-i18n="kpi_ar_basket_sub">adds driven by AR</div></div>
-            <div class="kpi"><div class="kpi-label" data-i18n="kpi_3d_basket">3D→Basket</div><div class="kpi-value" id="kv-3d-basket">—</div><div class="kpi-sub" data-i18n="kpi_3d_basket_sub">adds driven by 3D</div></div>
             <div class="kpi"><div class="kpi-label" data-i18n="kpi_ar_dur">Avg AR Duration</div><div class="kpi-value" id="kv-ar-dur">—</div><div class="kpi-sub" data-i18n="kpi_ar_dur_sub">seconds per AR session</div></div>
-            <div class="kpi accent"><div class="kpi-label" data-i18n="kpi_ar_devices">AR Devices</div><div class="kpi-value" id="kv-ar-devices">—</div><div class="kpi-sub" data-i18n="kpi_ar_devices_sub">% visitors with AR</div></div>
         </div>
 
         <div class="insight-row" id="insights"></div>
@@ -263,12 +260,9 @@ const T = {
         kpi_arsuccess:'AR Launches', kpi_arsuccess_sub:'AR actually opened',
         kpi_placed:'Models Placed', kpi_placed_sub:'placed on real table',
         kpi_adds:'Basket Adds', kpi_adds_sub:'items added to order',
-        kpi_ar_basket:'AR→Basket', kpi_ar_basket_sub:'adds driven by AR',
-        kpi_3d_basket:'3D→Basket', kpi_3d_basket_sub:'adds driven by 3D',
         kpi_ar_rate:'AR Launch Rate', kpi_ar_rate_sub:'of taps that launched',
         kpi_ar_dur:'Avg AR Duration', kpi_ar_dur_sub:'seconds per AR session',
         kpi_modal_dur:'Avg 3D View', kpi_modal_dur_sub:'seconds studying a dish',
-        kpi_ar_devices:'AR Devices', kpi_ar_devices_sub:'% visitors with AR',
         ch_summary:'Event counts — overview of all tracked actions',
         ch_timeline:'Sessions & Basket Adds per Day', ch_funnel:'AR Funnel — where users drop off',
         ch_attr:'Basket Add Attribution', ch_top_views:'Top Items — 3D Views',
@@ -322,12 +316,9 @@ const T = {
         kpi_arsuccess:'AR გაშვება', kpi_arsuccess_sub:'AR წარმატებით გაიხსნა',
         kpi_placed:'განთავსებული', kpi_placed_sub:'მაგიდაზე დაყენდა',
         kpi_adds:'კალათი', kpi_adds_sub:'კერძი შეკვეთაში',
-        kpi_ar_basket:'AR→კალათი', kpi_ar_basket_sub:'AR-ის შემდეგ შეკვეთა',
-        kpi_3d_basket:'3D→კალათი', kpi_3d_basket_sub:'3D ნახვის შემდეგ',
         kpi_ar_rate:'AR გაშვ. %', kpi_ar_rate_sub:'დაჭერიდან გაიშვა',
         kpi_ar_dur:'AR ხანგძ. საშ.', kpi_ar_dur_sub:'წამი AR სესიაზე',
         kpi_modal_dur:'3D ნახვა საშ.', kpi_modal_dur_sub:'წამი კერძის შესწავლაში',
-        kpi_ar_devices:'AR მოწყობ.', kpi_ar_devices_sub:'% ვიზიტ. AR-ით',
         ch_summary:'ყველა მოვლენის რაოდენობა',
         ch_timeline:'სესიები და კალათი დღეში', ch_funnel:'AR ძაბრი',
         ch_attr:'შეკვეთის ატრიბუცია', ch_top_views:'ტოპ კერძები — 3D',
@@ -650,7 +641,7 @@ function renderAll(events) {
     // missing write targets so the shared render code writes harmlessly instead of throwing.
     // (Charts are already safe — mkChart no-ops when its canvas is absent.)
     ['kv-sessions','kv-views','kv-artaps','kv-arsuccess','kv-placed','kv-adds',
-     'kv-ar-basket','kv-3d-basket','kv-ar-launch-rate','kv-ar-dur','kv-modal-dur','kv-ar-devices',
+     'kv-ar-launch-rate','kv-ar-dur','kv-modal-dur',
      'insights','th-upsell','tb-upsell','th-efficiency','tb-efficiency','th-3d','tb-3d','th-recent','tb-recent']
         .forEach(id => { if (!document.getElementById(id)) {
             const s = document.createElement('div'); s.id = id; s.style.display = 'none'; document.body.appendChild(s);
@@ -693,12 +684,9 @@ function renderAll(events) {
     document.getElementById('kv-arsuccess').textContent       = fmtN(arSuccess.length);
     document.getElementById('kv-placed').textContent          = fmtN(arPlaced.length);
     document.getElementById('kv-adds').textContent            = fmtN(basketAdds.length);
-    document.getElementById('kv-ar-basket').textContent       = pct(afterAR.length, basketAdds.length) + '%';
-    document.getElementById('kv-3d-basket').textContent       = pct(after3D.length, basketAdds.length) + '%';
     document.getElementById('kv-ar-launch-rate').textContent  = pct(arSuccess.length, arTaps.length) + '%';
     document.getElementById('kv-ar-dur').textContent          = fmtS(avgARdur);
     document.getElementById('kv-modal-dur').textContent       = fmtS(avgMdur);
-    document.getElementById('kv-ar-devices').textContent      = pct(arCapable, sessions.length) + '%';
 
     // ── Insights
     {
