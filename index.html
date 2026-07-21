@@ -1557,6 +1557,21 @@
             background-image: var(--hero-image, none);
             background-size: cover; background-position: center; background-repeat: no-repeat;
         }
+        /* Hero gallery: when theme_config.hero_images holds more than one photo, this
+           layer sits directly on top of .mg-hero-photo and fades the NEXT photo in.
+           Once the fade finishes the base layer adopts that photo and this one resets
+           to transparent — so two elements crossfade any number of images. */
+        [data-template="monday_greens"] .mg-hero-next {
+            position: absolute; inset: 0; z-index: 0;
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--mg-hero-fade, 1200ms) ease-in-out;
+        }
+        /* Guests who ask for less motion get a single still photo (JS skips the timer). */
+        @media (prefers-reduced-motion: reduce) {
+            [data-template="monday_greens"] .mg-hero-next { transition: none; }
+        }
         [data-template="monday_greens"] .mg-hero-veil {
             position: absolute; inset: 0; z-index: 1;
             background:
@@ -2324,6 +2339,7 @@
          Degrades to a gradient + the standard header when either is unset. -->
     <section class="mg-hero" aria-hidden="true">
         <div class="mg-hero-photo"></div>
+        <div class="mg-hero-next"></div>
         <div class="mg-hero-veil"></div>
         <img id="mg-hero-logo" class="mg-hero-logo" alt="" decoding="async">
         <a class="mg-hero-scroll" href="#cat-filter" aria-label="Menu">
@@ -4426,6 +4442,58 @@
             return out;
         }
 
+        /* ── Monday Greens hero gallery ──────────────────────────────────────────
+           theme_config.hero_images holds a JSON array (or comma/newline list) of photo
+           URLs. With two or more photos the hero crossfades through them; with one or
+           none it behaves exactly as before and falls back to hero_image_url. */
+        function _parseHeroImages(raw) {
+            if (!raw) return [];
+            const s = String(raw).trim();
+            let list = [];
+            if (s[0] === '[') { try { list = JSON.parse(s); } catch (e) { list = []; } }
+            if (!list.length) list = s.replace(/^\[|\]$/g, '').split(/[,;\n]/);
+            const out = [];
+            list.forEach(v => {
+                const url = _safeAssetUrl(String(v).replace(/^["'\s]+|["'\s]+$/g, ''));
+                if (url && out.indexOf(url) === -1) out.push(url);
+            });
+            return out;
+        }
+
+        function _startHeroGallery(urls) {
+            const base = document.querySelector('.mg-hero-photo');
+            const next = document.querySelector('.mg-hero-next');
+            if (!base || !next || urls.length < 2) return;
+            // A guest who asked for less motion keeps a single still photo.
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            urls.forEach(u => { const img = new Image(); img.decoding = 'async'; img.src = u; });
+
+            const FADE = 1200, HOLD = 5000;
+            let idx = 0, timer = null;
+
+            function step() {
+                idx = (idx + 1) % urls.length;
+                const url = urls[idx];
+                next.style.backgroundImage = `url("${url}")`;
+                requestAnimationFrame(() => { next.style.opacity = '1'; });
+                setTimeout(() => {
+                    // Hand the photo down to the base layer, then reset the fader
+                    // invisibly (transition off + forced reflow = no flash).
+                    base.style.backgroundImage = `url("${url}")`;
+                    next.style.transition = 'none';
+                    next.style.opacity = '0';
+                    void next.offsetWidth;
+                    next.style.transition = '';
+                }, FADE);
+            }
+
+            function play() { if (!timer) timer = setInterval(step, HOLD + FADE); }
+            function pause() { clearInterval(timer); timer = null; }
+            // Don't burn the guest's battery while the tab sits in the background.
+            document.addEventListener('visibilitychange', () => { document.hidden ? pause() : play(); });
+            play();
+        }
+
         // Fetch theme config from Supabase and apply as CSS overrides
         async function applyRemoteTheme() {
             try {
@@ -4519,10 +4587,15 @@
                     logo.onerror = () => { logo.style.display = 'none'; };
                 }
                 // Monday Greens template hero: photo → --hero-image, logo → hero <img>.
-                const heroImg = _safeAssetUrl(cfg.hero_image_url);
-                if (heroImg) {
-                    document.documentElement.style.setProperty('--hero-image', `url("${heroImg}")`);
+                // hero_images (JSON array) turns the hero into a crossfading gallery;
+                // hero_image_url remains the single-photo fallback.
+                const heroGallery = _parseHeroImages(cfg.hero_images);
+                const heroSingle = _safeAssetUrl(cfg.hero_image_url);
+                const heroShots = heroGallery.length ? heroGallery : (heroSingle ? [heroSingle] : []);
+                if (heroShots.length) {
+                    document.documentElement.style.setProperty('--hero-image', `url("${heroShots[0]}")`);
                 }
+                if (heroShots.length > 1) _startHeroGallery(heroShots);
                 // Optional per-tenant hero height (e.g. "56.25vw" for a full 16:9 banner).
                 if (cfg.hero_min_h) {
                     document.documentElement.style.setProperty('--mg-hero-h', cfg.hero_min_h);
