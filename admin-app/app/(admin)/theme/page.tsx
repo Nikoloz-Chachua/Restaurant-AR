@@ -6,8 +6,7 @@ import type { Translations } from '@/lib/i18n'
 import { usePlan } from '@/lib/usePlan'
 import LockedCard from '@/components/LockedCard'
 import { TEMPLATE_PRESETS, type ThemeConfig } from '@/lib/themePresets'
-
-const BRANDING_KEYS = ['site_name', 'site_name_ka', 'logo_url', 'hero_logo_url', 'hero_image_url', 'hero_images']
+import { buildThemeResetConfig, canManageThemeTemplates, clientSafeThemeConfigForSave } from '@/lib/themeReset'
 
 const NIGHT_FIELDS: { key: string; tKey: keyof Translations }[] = [
   { key: 'night_bg',          tKey: 'colorBg' },
@@ -39,6 +38,8 @@ const GOOGLE_FONTS = [
   'Playfair Display', 'Montserrat', 'Raleway', 'Open Sans',
   'Source Sans 3', 'Oswald', 'PT Serif', 'Merriweather',
 ]
+
+type ThemeTab = 'templates' | 'night' | 'day' | 'background' | 'fonts' | 'branding'
 
 function isColor(v: string) {
   return /^#[0-9a-fA-F]{3,8}$/.test(v) || v.startsWith('rgb')
@@ -76,19 +77,6 @@ function parseHeroImages(raw?: string): string[] {
   return out
 }
 
-function currentTemplateDefaults(config: ThemeConfig, restaurantSlug?: string | null): ThemeConfig {
-  const templateKey = config.template_key
-  const preset = TEMPLATE_PRESETS.find(item => item.key === templateKey)
-    ?? (restaurantSlug === 'monday-greens' ? TEMPLATE_PRESETS.find(item => item.key === 'monday_greens') : undefined)
-    ?? TEMPLATE_PRESETS[0]
-  const preservedBranding = Object.fromEntries(
-    BRANDING_KEYS
-      .filter(key => Object.prototype.hasOwnProperty.call(config, key))
-      .map(key => [key, config[key]]),
-  )
-  return { ...preset.values, ...preservedBranding, template_key: preset.key }
-}
-
 // Logo / hero images are converted to WebP client-side, then uploaded straight to R2
 // via the presigned PUT (same path as menu thumbnails). Images are allowed for clients;
 // only GLB/USDZ models are super-admin-only.
@@ -117,7 +105,9 @@ export default function ThemePage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving]   = useState(false)
   const [msg, setMsg]         = useState('')
-  const [tab, setTab]         = useState<'templates' | 'night' | 'day' | 'background' | 'fonts' | 'branding'>('templates')
+  const [tab, setTab]         = useState<ThemeTab>('night')
+  const [loadedTemplateKey, setLoadedTemplateKey] = useState<string | undefined>()
+  const showTemplateControls = canManageThemeTemplates(plan.role)
 
   const load = useCallback(async () => {
     if (plan.loading || !plan.canUseTheme || !plan.restaurantId) {
@@ -128,6 +118,7 @@ export default function ThemePage() {
     const map: ThemeConfig = {}
     data?.forEach(r => { map[r.key] = r.value })
     setConfig(map)
+    setLoadedTemplateKey(map.template_key)
     setLoading(false)
   }, [plan.canUseTheme, plan.loading, plan.restaurantId, supabase])
 
@@ -266,8 +257,13 @@ export default function ThemePage() {
 
   async function save() {
     setSaving(true)
-    const rows = Object.entries(config).map(([key, value]) => ({ key, value, restaurant_id: plan.restaurantId }))
+    const next = showTemplateControls
+      ? config
+      : clientSafeThemeConfigForSave(config, plan.restaurantSlug, loadedTemplateKey)
+    const rows = Object.entries(next).map(([key, value]) => ({ key, value, restaurant_id: plan.restaurantId }))
     await supabase.from('theme_config').upsert(rows, { onConflict: 'restaurant_id,key' })
+    setConfig(next)
+    setLoadedTemplateKey(next.template_key)
     setSaving(false)
     setMsg(T.saved)
     setTimeout(() => setMsg(''), 4000)
@@ -275,7 +271,10 @@ export default function ThemePage() {
 
   async function reset() {
     if (!confirm(T.resetConfirm)) return
-    const next = currentTemplateDefaults(config, plan.restaurantSlug)
+    const resetBase = showTemplateControls
+      ? config
+      : clientSafeThemeConfigForSave(config, plan.restaurantSlug, loadedTemplateKey)
+    const next = buildThemeResetConfig(resetBase, plan.restaurantSlug)
     const rows = Object.entries(next).map(([key, value]) => ({ key, value, restaurant_id: plan.restaurantId }))
     const { error } = await supabase.from('theme_config').upsert(rows, { onConflict: 'restaurant_id,key' })
     if (error) {
@@ -284,18 +283,19 @@ export default function ThemePage() {
       return
     }
     setConfig(next)
+    setLoadedTemplateKey(next.template_key)
     setMsg(T.resetDone)
     setTimeout(() => setMsg(''), 3000)
   }
 
-  const tabs = [
-    { id: 'templates', label: T.tabPresets },
+  const tabs: { id: ThemeTab; label: string }[] = [
+    showTemplateControls ? { id: 'templates', label: T.tabPresets } : null,
     { id: 'night',     label: T.tabNight },
     { id: 'day',       label: T.tabDay },
     { id: 'background', label: T.tabBackground },
     { id: 'fonts',     label: T.tabFonts },
     { id: 'branding',  label: T.tabBranding },
-  ] as const
+  ].filter((item): item is { id: ThemeTab; label: string } => Boolean(item))
 
   if (!plan.loading && !plan.restaurantId) {
     return (
@@ -369,7 +369,7 @@ export default function ThemePage() {
         <p style={{ color: 'var(--dim)' }}>{T.loading}</p>
       ) : (
         <div className="grid grid-cols-1 gap-4 max-w-2xl">
-          {tab === 'templates' && (
+          {showTemplateControls && tab === 'templates' && (
             <div className="grid grid-cols-1 gap-3">
               {TEMPLATE_PRESETS.map(preset => (
                 <button
