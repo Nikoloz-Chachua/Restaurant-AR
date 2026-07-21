@@ -2104,10 +2104,20 @@
                 overflow: hidden;
             }
             [data-tenant-slug="monday-greens"] #modal-title.modal-title-long {
-                transform: translateY(-8px);
-                font-size: clamp(1.28rem, 5.8vw, 1.75rem);
-                letter-spacing: 3px;
-                max-height: 3.15em;
+                transform: translateY(-12px);
+                font-size: clamp(1.18rem, 5.15vw, 1.55rem);
+                line-height: 1.04;
+                letter-spacing: 2px;
+                max-height: none;
+                overflow: visible;
+            }
+            [data-tenant-slug="monday-greens"] #modal-title.modal-title-long.modal-title-extra-long {
+                transform: translateY(-20px);
+                margin-bottom: -14px;
+                padding: 0 48px;
+                font-size: clamp(0.98rem, 4.4vw, 1.28rem);
+                line-height: 1.06;
+                letter-spacing: 1.35px;
             }
             #modal-viewer-wrap {
                 flex: 1 1 auto;
@@ -3880,10 +3890,9 @@
             _ensureModelViewer().then(() => { modalViewer.src = _safeAssetUrl(item.model) || ''; });
             const modalName = t(item, 'name');
             modalTitle.textContent = modalName;
-            modalTitle.classList.toggle(
-                'modal-title-long',
-                document.documentElement.dataset.tenantSlug === 'monday-greens' && modalName.length >= 28
-            );
+            const isMondayGreensLongTitle = document.documentElement.dataset.tenantSlug === 'monday-greens' && modalName.length >= 28;
+            modalTitle.classList.toggle('modal-title-long', isMondayGreensLongTitle);
+            modalTitle.classList.toggle('modal-title-extra-long', isMondayGreensLongTitle && modalName.length >= 40);
             document.getElementById('modal-title-d').textContent = modalName;
             modalPrice.textContent = item.price;
             document.getElementById('modal-description').textContent = t(item, 'description') || '';

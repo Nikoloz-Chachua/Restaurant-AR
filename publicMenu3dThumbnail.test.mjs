@@ -48,10 +48,22 @@ test('3D thumbnail frame clips media without stretching on phone and wider layou
 
 test('Monday Greens long 3D modal titles use tenant-gated fit styling', () => {
   const longTitleRule = cssRule('[data-tenant-slug="monday-greens"] #modal-title.modal-title-long')
-  assert.match(longTitleRule, /transform:\s*translateY\(-8px\)/)
-  assert.match(longTitleRule, /font-size:\s*clamp\(1\.28rem,\s*5\.8vw,\s*1\.75rem\)/)
-  assert.match(longTitleRule, /max-height:\s*3\.15em\b/)
+  assert.match(longTitleRule, /transform:\s*translateY\(-12px\)/)
+  assert.match(longTitleRule, /font-size:\s*clamp\(1\.18rem,\s*5\.15vw,\s*1\.55rem\)/)
+  assert.match(longTitleRule, /letter-spacing:\s*2px\b/)
+  assert.match(longTitleRule, /max-height:\s*none\b/)
+  assert.match(longTitleRule, /overflow:\s*visible\b/)
+  assert.doesNotMatch(longTitleRule, /max-height:\s*(?:\d|calc|min|max|clamp)/)
+
+  const extraLongTitleRule = cssRule('[data-tenant-slug="monday-greens"] #modal-title.modal-title-long.modal-title-extra-long')
+  assert.match(extraLongTitleRule, /transform:\s*translateY\(-20px\)/)
+  assert.match(extraLongTitleRule, /margin-bottom:\s*-14px\b/)
+  assert.match(extraLongTitleRule, /padding:\s*0 48px\b/)
+  assert.match(extraLongTitleRule, /font-size:\s*clamp\(0\.98rem,\s*4\.4vw,\s*1\.28rem\)/)
+  assert.match(extraLongTitleRule, /letter-spacing:\s*1\.35px\b/)
 
   assert.match(html, /document\.documentElement\.dataset\.tenantSlug = _tenant\.restaurant_slug/)
-  assert.match(html, /modalTitle\.classList\.toggle\(\s*'modal-title-long',\s*document\.documentElement\.dataset\.tenantSlug === 'monday-greens' && modalName\.length >= 28\s*\)/)
+  assert.match(html, /const isMondayGreensLongTitle = document\.documentElement\.dataset\.tenantSlug === 'monday-greens' && modalName\.length >= 28/)
+  assert.match(html, /modalTitle\.classList\.toggle\('modal-title-long', isMondayGreensLongTitle\)/)
+  assert.match(html, /modalTitle\.classList\.toggle\('modal-title-extra-long', isMondayGreensLongTitle && modalName\.length >= 40\)/)
 })
