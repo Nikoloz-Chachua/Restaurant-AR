@@ -844,13 +844,24 @@
 
         /* BetaReal's own footer washed out against the Monday Greens teal — the
            theme's --accent and --dim are tuned for dish text on cards, not for this
-           strip. White reads on both themes, so the logo stops swapping per theme
-           and uses the white mark throughout. */
-        [data-template="monday_greens"] .footer-logo-dark,
-        [data-template="monday_greens"] .footer-logo-light { display: none; }
-        [data-template="monday_greens"] .footer-logo-white { display: block; }
-        [data-template="monday_greens"] .footer-email,
-        [data-template="monday_greens"] .footer-copy { color: #fff; }
+           strip. White reads on both of its themes, so the logo stops swapping per
+           theme and uses the white mark throughout.
+
+           Keyed to the tenant slug, NOT data-template: every restaurant resolves to
+           template_key "monday_greens", so that attribute would paint the whole
+           estate white and bury the footer on tenants whose day background is pale
+           (#daf0f3, #FBF7EC). These two are the ones on the teal/near-black
+           palette that white belongs on. */
+        [data-tenant="monday-greens"] .footer-logo-dark,
+        [data-tenant="monday-greens"] .footer-logo-light,
+        [data-tenant="monday-greens-staging"] .footer-logo-dark,
+        [data-tenant="monday-greens-staging"] .footer-logo-light { display: none; }
+        [data-tenant="monday-greens"] .footer-logo-white,
+        [data-tenant="monday-greens-staging"] .footer-logo-white { display: block; }
+        [data-tenant="monday-greens"] .footer-email,
+        [data-tenant="monday-greens"] .footer-copy,
+        [data-tenant="monday-greens-staging"] .footer-email,
+        [data-tenant="monday-greens-staging"] .footer-copy { color: #fff; }
         .footer-email {
             font-family: 'Nunito', sans-serif;
             font-size: 0.82rem;
@@ -3472,6 +3483,10 @@
                 brand
             };
             window.__tenant = _tenant;
+            // Per-restaurant styling hook. data-template cannot do this job: every
+            // tenant currently resolves to template_key "monday_greens", so
+            // [data-template="monday_greens"] matches the whole estate.
+            document.documentElement.dataset.tenant = _tenant.restaurant_slug || '';
             _applyTenantFavicon(_tenant);
             _applyBrandTitle();
             return _tenant;
