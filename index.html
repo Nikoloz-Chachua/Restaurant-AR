@@ -1568,10 +1568,6 @@
             pointer-events: none;
             transition: opacity var(--mg-hero-fade, 1200ms) ease-in-out;
         }
-        /* Guests who ask for less motion get a single still photo (JS skips the timer). */
-        @media (prefers-reduced-motion: reduce) {
-            [data-template="monday_greens"] .mg-hero-next { transition: none; }
-        }
         [data-template="monday_greens"] .mg-hero-veil {
             position: absolute; inset: 0; z-index: 1;
             background:
@@ -2135,7 +2131,12 @@
                 padding: 0 58px;
                 font-size: clamp(1.55rem, 7vw, 2.2rem);
                 line-height: 1.02;
-                max-height: 2.25em;
+                /* Room for a long name. Deliberately NOT in `em`: _fitModalTitle()
+                   shrinks the font to make the text fit, and an em cap would shrink
+                   the box just as fast, so it could never catch up. The viewer below
+                   is `flex: 1 1 auto` with its own min-height, so it absorbs whatever
+                   the title doesn't use. overflow stays as a last-resort guard. */
+                max-height: min(19vh, 152px);
                 overflow: hidden;
             }
             #modal-viewer-wrap {
@@ -3833,6 +3834,34 @@
         modalSpinBtn.addEventListener('click', e => { e.stopPropagation(); _modalSpin = !_modalSpin; _applyModalSpin(); });
         const modalTitle  = document.getElementById('modal-title');
         const modalPrice  = document.getElementById('modal-price');
+
+        /* Long dish names ("Beef Stroganoff, garnish: potatoes / chips / rice") used to
+           overflow the mobile title and get sliced in half by the 3D viewer below.
+           Scale the type down until the whole name fits the height a two-line title
+           already occupies — short names keep their full size and the 3D area never
+           changes. Desktop hides #modal-title entirely, so this is a no-op there. */
+        function _fitModalTitle() {
+            if (!modalTitle || !modalTitle.textContent) return;
+            modalTitle.style.fontSize = '';
+            // Must run while the modal is actually on screen: a hidden element reports
+            // scrollHeight 0, which reads as "already fits" and silently does nothing.
+            if (!modalTitle.clientHeight) return;
+            const cs = getComputedStyle(modalTitle);
+            // Measure against the max-height the stylesheet allows, NOT clientHeight:
+            // the tight line-height leaves scrollHeight a few px above clientHeight at
+            // every size, so comparing those two never settles and crushes the type.
+            // The 6px margin keeps the last line's descenders clear of the clip edge.
+            const limit = (parseFloat(cs.maxHeight) || modalTitle.clientHeight) - 6;
+            let size = parseFloat(cs.fontSize) || 28;
+            for (let i = 0; i < 40 && modalTitle.scrollHeight > limit && size > 15; i++) {
+                size -= 1;
+                modalTitle.style.fontSize = size + 'px';
+            }
+        }
+        // Rotating the phone changes how many lines the name wraps to.
+        window.addEventListener('resize', () => {
+            if (modal.classList.contains('active')) _fitModalTitle();
+        });
         let menuItems  = [];
         let modalItems = [];
         let modalIndex = 0;
@@ -3880,7 +3909,7 @@
             let i = modalIndex;
             for (let s = 0; s < n; s++) {
                 i = (i + dir + n) % n;
-                if (_hasModel(modalItems[i])) return i;
+                if (_isAREnabledMenuItem(modalItems[i])) return i;
             }
             return modalIndex; // no other 3D item — stay put
         }
@@ -3908,6 +3937,7 @@
             else modalViewer.removeAttribute('camera-orbit');
             _ensureModelViewer().then(() => { modalViewer.src = _safeAssetUrl(item.model) || ''; });
             modalTitle.textContent = t(item, 'name');
+            _fitModalTitle();
             document.getElementById('modal-title-d').textContent = t(item, 'name');
             modalPrice.textContent = item.price;
             document.getElementById('modal-description').textContent = t(item, 'description') || '';
@@ -3925,8 +3955,10 @@
             modalIndex = localIdx;
             modalMessage = fallbackMessage;
             _modalSpin = false;   // each dish opens static; tap the spin button to rotate
-            // Arrows only make sense when 2+ dishes in this list have a 3D model.
-            const _navModels = modalItems.filter(_hasModel).length;
+            // Arrows only make sense when 2+ dishes in this list are 3D dishes. Test the
+            // 3D/AR toggle, not merely "a model file exists" — a dish switched off in the
+            // admin panel keeps its uploaded model and must stay out of the 3D viewer.
+            const _navModels = modalItems.filter(_isAREnabledMenuItem).length;
             const _navDisp = _navModels > 1 ? '' : 'none';
             document.getElementById('modal-prev').style.display = _navDisp;
             document.getElementById('modal-next').style.display = _navDisp;
@@ -3942,8 +3974,11 @@
             document.getElementById('modal-drawer').classList.remove('expanded');
             modal.classList.remove('drawer-expanded');
             modalArBtn.textContent  = _arButtonLabel(_viewItem);
-            modalArBtn.style.display = (_hasModel(_viewItem) || _canLikelyAR(_viewItem)) ? 'block' : 'none';
+            modalArBtn.style.display = (_isAREnabledMenuItem(_viewItem) || _canLikelyAR(_viewItem)) ? 'block' : 'none';
             modal.style.display = 'flex';
+            // Only now is the title measurable — updateModal() ran while #modal was
+            // still display:none, where every height reads as 0.
+            _fitModalTitle();
             requestAnimationFrame(() => modal.classList.add('active'));
             document.body.style.overflow = 'hidden';
             // Defer thumbnail teardown past the modal fade-in frame so it doesn't block
@@ -4129,6 +4164,9 @@
         }
 
         function _canLikelyAR(item, cap = window.__arCap) {
+            // A dish with the 3D/AR toggle off is a plain photo dish, even though its
+            // uploaded model (or USDZ) is still attached in the database.
+            if (item?.text_only === true || item?.is_3d === false) return false;
             if (cap === 'webxr') return _hasModel(item);
             if (cap === 'arkit') return !!_usdzUrl(item);
             return false;
@@ -4150,7 +4188,7 @@
                 const item = modalItems[modalIndex];
                 modalArBtn.textContent = loading ? u.loading : _arButtonLabel(item);
                 modalArBtn.disabled = loading;
-                modalArBtn.style.display = (_hasModel(item) || _canLikelyAR(item)) ? 'block' : 'none';
+                modalArBtn.style.display = (_isAREnabledMenuItem(item) || _canLikelyAR(item)) ? 'block' : 'none';
             }
         }
 
@@ -4314,7 +4352,7 @@
                 try {
                     // Carousel navigates only 3D-model items, so photo-only dishes
                     // never appear as empty slots. Remap the index into that list.
-                    const _arList = _arCatItems.filter(_hasModel);
+                    const _arList = _arCatItems.filter(_isAREnabledMenuItem);
                     const _arIdx  = Math.max(0, _arList.indexOf(item));
                     await window.XR.start(_arIdx, _arList);
                 } catch (err) {
@@ -4464,8 +4502,10 @@
             const base = document.querySelector('.mg-hero-photo');
             const next = document.querySelector('.mg-hero-next');
             if (!base || !next || urls.length < 2) return;
-            // A guest who asked for less motion keeps a single still photo.
-            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            // The gallery runs for everyone, including guests with "reduce motion" on:
+            // the rotating hero is the restaurant's headline content, not decoration, and
+            // a slow opacity crossfade involves no movement through space. Reported from a
+            // real phone where the hero sat frozen on the first photo.
             urls.forEach(u => { const img = new Image(); img.decoding = 'async'; img.src = u; });
 
             const FADE = 1200, HOLD = 5000;
