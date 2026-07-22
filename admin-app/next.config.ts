@@ -14,6 +14,11 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
+  // Dev-only: Next treats 127.0.0.1 as a different origin from localhost and blocks
+  // its dev resources (HMR), so `npm run dev` silently breaks when opened on the IP
+  // form instead of localhost. Has no effect on production builds.
+  allowedDevOrigins: ['127.0.0.1'],
+
   async headers() {
     return [
       {
