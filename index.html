@@ -838,8 +838,30 @@
         }
         /* Show the logo variant that matches the active theme */
         .footer-logo-light { display: none; }
+        .footer-logo-white { display: none; }
         [data-theme="day"] .footer-logo-dark  { display: none; }
         [data-theme="day"] .footer-logo-light { display: block; }
+
+        /* BetaReal's own footer washed out against the Monday Greens teal — the
+           theme's --accent and --dim are tuned for dish text on cards, not for this
+           strip. White reads on both of its themes, so the logo stops swapping per
+           theme and uses the white mark throughout.
+
+           Keyed to the tenant slug, NOT data-template: every restaurant resolves to
+           template_key "monday_greens", so that attribute would paint the whole
+           estate white and bury the footer on tenants whose day background is pale
+           (#daf0f3, #FBF7EC). These two are the ones on the teal/near-black
+           palette that white belongs on. */
+        [data-tenant="monday-greens"] .footer-logo-dark,
+        [data-tenant="monday-greens"] .footer-logo-light,
+        [data-tenant="monday-greens-staging"] .footer-logo-dark,
+        [data-tenant="monday-greens-staging"] .footer-logo-light { display: none; }
+        [data-tenant="monday-greens"] .footer-logo-white,
+        [data-tenant="monday-greens-staging"] .footer-logo-white { display: block; }
+        [data-tenant="monday-greens"] .footer-email,
+        [data-tenant="monday-greens"] .footer-copy,
+        [data-tenant="monday-greens-staging"] .footer-email,
+        [data-tenant="monday-greens-staging"] .footer-copy { color: #fff; }
         .footer-email {
             font-family: 'Nunito', sans-serif;
             font-size: 0.82rem;
@@ -2368,6 +2390,7 @@
     <footer class="site-footer">
         <img class="footer-logo footer-logo-dark"  src="./img/betareal-logo-dark.png"  alt="BetaReal" width="333" height="110" loading="lazy" decoding="async">
         <img class="footer-logo footer-logo-light" src="./img/betareal-logo-light.png" alt="BetaReal" width="366" height="110" loading="lazy" decoding="async">
+        <img class="footer-logo footer-logo-white" src="./img/betareal-logo-white.png" alt="BetaReal" width="333" height="110" loading="lazy" decoding="async">
         <a class="footer-email" href="mailto:betareal.ar@gmail.com">betareal.ar@gmail.com</a>
         <p class="footer-copy">&copy; 2026 BetaReal &middot; Augmented Reality Menus</p>
     </footer>
@@ -3460,6 +3483,10 @@
                 brand
             };
             window.__tenant = _tenant;
+            // Per-restaurant styling hook. data-template cannot do this job: every
+            // tenant currently resolves to template_key "monday_greens", so
+            // [data-template="monday_greens"] matches the whole estate.
+            document.documentElement.dataset.tenant = _tenant.restaurant_slug || '';
             _applyTenantFavicon(_tenant);
             _applyBrandTitle();
             return _tenant;
