@@ -2602,13 +2602,94 @@
             if (line) ctx.fillText(line, x, y + count * lh);
         }
 
+        // Card geometry. LABEL_H is the height of a card whose name fits one line;
+        // a name that wraps makes the card taller, nothing else moves.
+        const LABEL_W = 512, LABEL_H = 210, LABEL_PLANE_W = 0.15;
+        const TITLE_MAX = 44, TITLE_MIN = 24, TITLE_LINES = 3, DESC_LH = 28;
+
+        // Break `text` into as many lines as it needs at the ctx's current font.
+        function _labelLines(ctx, text, maxW) {
+            const lines = [];
+            let line = '';
+            for (const word of String(text).split(/\s+/)) {
+                if (!word) continue;
+                const test = line ? line + ' ' + word : word;
+                if (line && ctx.measureText(test).width > maxW) { lines.push(line); line = word; }
+                else line = test;
+            }
+            if (line) lines.push(line);
+            return lines;
+        }
+
+        function _ellipsize(ctx, text, maxW) {
+            let s = String(text);
+            while (s.length > 1 && ctx.measureText(s + '…').width > maxW) s = s.slice(0, -1);
+            return s.replace(/[\s,.:;/-]+$/, '') + '…';
+        }
+
+        // Largest title size whose name fits in TITLE_LINES lines.
+        // fillText's maxWidth argument is deliberately not used anywhere here: it
+        // squeezes the glyphs horizontally instead of scaling them, which is what
+        // turned long names into an unreadable condensed smear in AR.
+        function _fitLabelTitle(ctx, name, maxW) {
+            let size = TITLE_MAX, lines;
+            for (;;) {
+                ctx.font = 'bold ' + size + 'px Arial, sans-serif';
+                lines = _labelLines(ctx, name, maxW);
+                if (lines.length <= TITLE_LINES || size <= TITLE_MIN) break;
+                size -= 2;
+            }
+            // Past TITLE_MIN readability wins over completeness: clip the tail.
+            if (lines.length > TITLE_LINES) {
+                lines = lines.slice(0, TITLE_LINES);
+                lines[TITLE_LINES - 1] = _ellipsize(ctx, lines[TITLE_LINES - 1], maxW);
+            }
+            // A single unbreakable token can still be wider than the card.
+            lines = lines.map(l => ctx.measureText(l).width > maxW ? _ellipsize(ctx, l, maxW) : l);
+            // A nameless item still gets a full-height card rather than a squashed one.
+            if (!lines.length) lines = [''];
+            return { size: size, lines: lines };
+        }
+
+        // The mesh is positioned by its centre in both label modes, so a taller card
+        // simply grows evenly up and down — no anchor maths needed.
+        //
+        // The texture must be REPLACED, not just flagged dirty: three.js allocates a
+        // canvas texture with immutable storage (texStorage2D) sized to the first
+        // upload and afterwards only texSubImage2D's into it. Resizing the canvas
+        // alone therefore paints a shorter card inside the taller card's old block
+        // and leaves the previous dish's pixels visible around it.
+        function _resizeLabel(H) {
+            labelCanvas.height = H;   // note: this also resets the 2D context state
+            if (labelTexture) {
+                labelTexture.dispose();
+                labelTexture = new THREE.CanvasTexture(labelCanvas);
+            }
+            if (!labelMesh) return;
+            labelMesh.material.map = labelTexture;
+            labelMesh.material.needsUpdate = true;
+            labelMesh.geometry.dispose();
+            labelMesh.geometry = new THREE.PlaneGeometry(LABEL_PLANE_W, LABEL_PLANE_W * H / LABEL_W);
+        }
+
         function drawLabel(item) {
             if (!labelCtx) return;
             const ctx = labelCtx;
-            const W = labelCanvas.width, H = labelCanvas.height;
+            const W = labelCanvas.width;
             const lang = window.__lang || 'en';
             const name = (lang === 'ka' && item.name_ka)        ? item.name_ka        : item.name;
             const desc = (lang === 'ka' && item.description_ka) ? item.description_ka : item.description;
+
+            // The title is measured first: it decides how tall the card has to be.
+            const fit      = _fitLabelTitle(ctx, name || '', W - 56);
+            const titleLH  = Math.round(fit.size * 1.15);
+            // 0.716 is Arial's cap height, so the gap above the first line stays 20px
+            // whatever the size — at 44px this reproduces the original baseline of 52.
+            const baseline = Math.round(20 + fit.size * 0.716);
+            const dividerY = baseline + (fit.lines.length - 1) * titleLH + 14;
+            const descY    = dividerY + 22;
+            const H        = descY + 2 * DESC_LH + 66;
+            if (labelCanvas.height !== H) _resizeLabel(H);
 
             ctx.clearRect(0, 0, W, H);
 
@@ -2622,16 +2703,16 @@
             ctx.stroke();
 
             ctx.fillStyle = '#f0c040';
-            ctx.font = 'bold 44px Arial, sans-serif';
-            ctx.fillText(name, 28, 52, W - 56);
+            ctx.font = 'bold ' + fit.size + 'px Arial, sans-serif';
+            fit.lines.forEach(function (line, i) { ctx.fillText(line, 28, baseline + i * titleLH); });
 
             ctx.strokeStyle = 'rgba(240, 192, 64, 0.30)';
             ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.moveTo(28, 66); ctx.lineTo(W - 28, 66); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(28, dividerY); ctx.lineTo(W - 28, dividerY); ctx.stroke();
 
             ctx.fillStyle = '#c0c0c0';
             ctx.font = '22px Arial, sans-serif';
-            _wrapText(ctx, desc, 28, 88, W - 56, 28, 3);
+            _wrapText(ctx, desc || '', 28, descY, W - 56, DESC_LH, 3);
 
             ctx.fillStyle = '#f0c040';
             ctx.font = 'bold 36px Arial, sans-serif';
@@ -2641,16 +2722,15 @@
         }
 
         function createLabelMesh() {
-            const W = 512, H = 210;
             labelCanvas = document.createElement('canvas');
-            labelCanvas.width = W; labelCanvas.height = H;
+            labelCanvas.width = LABEL_W; labelCanvas.height = LABEL_H;
             labelCtx = labelCanvas.getContext('2d');
             labelTexture = new THREE.CanvasTexture(labelCanvas);
             const mat = new THREE.MeshBasicMaterial({
                 map: labelTexture, transparent: true, depthWrite: false, depthTest: false, side: THREE.DoubleSide
             });
-            const planeW = 0.15, planeH = planeW * H / W;
-            labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), mat);
+            const planeH = LABEL_PLANE_W * LABEL_H / LABEL_W;
+            labelMesh = new THREE.Mesh(new THREE.PlaneGeometry(LABEL_PLANE_W, planeH), mat);
             labelMesh.position.set(0, 0.22, 0.015);
             labelMesh.visible = false;
             carouselRoot.add(labelMesh);
