@@ -2653,9 +2653,21 @@
 
         // The mesh is positioned by its centre in both label modes, so a taller card
         // simply grows evenly up and down — no anchor maths needed.
+        //
+        // The texture must be REPLACED, not just flagged dirty: three.js allocates a
+        // canvas texture with immutable storage (texStorage2D) sized to the first
+        // upload and afterwards only texSubImage2D's into it. Resizing the canvas
+        // alone therefore paints a shorter card inside the taller card's old block
+        // and leaves the previous dish's pixels visible around it.
         function _resizeLabel(H) {
             labelCanvas.height = H;   // note: this also resets the 2D context state
+            if (labelTexture) {
+                labelTexture.dispose();
+                labelTexture = new THREE.CanvasTexture(labelCanvas);
+            }
             if (!labelMesh) return;
+            labelMesh.material.map = labelTexture;
+            labelMesh.material.needsUpdate = true;
             labelMesh.geometry.dispose();
             labelMesh.geometry = new THREE.PlaneGeometry(LABEL_PLANE_W, LABEL_PLANE_W * H / LABEL_W);
         }
