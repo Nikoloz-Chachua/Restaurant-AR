@@ -13,7 +13,7 @@ export default function DashboardPage() {
   const tokenRef  = useRef('')
   const [T] = useLang()
   const plan = usePlan()
-  const analyticsSrc = `https://restaurant-ar.pages.dev/admin.html?${new URLSearchParams({
+  const analyticsSrc = `https://preview-unique-visitors-anal.restaurant-ar.pages.dev/admin.html?${new URLSearchParams({
     ...(plan.restaurantId ? { restaurantId: String(plan.restaurantId) } : {}),
     ...(plan.brandId ? { brandId: String(plan.brandId) } : {}),
     ...(plan.restaurantSlug ? { tenant: plan.restaurantSlug } : {}),
