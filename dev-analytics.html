@@ -156,6 +156,8 @@
         <div class="section-label" data-i18n="sec_overview">Overview</div>
         <div class="kpi-grid">
             <div class="kpi accent"><div class="kpi-label" data-i18n="kpi_sessions">Sessions</div><div class="kpi-value" id="kv-sessions">—</div><div class="kpi-sub" data-i18n="kpi_sessions_sub">page loads in range</div></div>
+            <div class="kpi"><div class="kpi-label" data-i18n="kpi_unique_visitors">Unique Visitors</div><div class="kpi-value" id="kv-unique-visitors">—</div><div class="kpi-sub" data-i18n="kpi_unique_visitors_sub">deduped browsers in range</div></div>
+            <div class="kpi accent"><div class="kpi-label" data-i18n="kpi_new_users_today">New Users Today</div><div class="kpi-value" id="kv-new-users-today">—</div><div class="kpi-sub" data-i18n="kpi_new_users_today_sub">first-time visitors today</div></div>
             <div class="kpi"><div class="kpi-label" data-i18n="kpi_views">3D Views</div><div class="kpi-value" id="kv-views">—</div><div class="kpi-sub" data-i18n="kpi_views_sub">modal opens</div></div>
             <div class="kpi"><div class="kpi-label" data-i18n="kpi_artaps">AR Taps</div><div class="kpi-value" id="kv-artaps">—</div><div class="kpi-sub" data-i18n="kpi_artaps_sub">VIEW ON TABLE tapped</div></div>
             <div class="kpi"><div class="kpi-label" data-i18n="kpi_arsuccess">AR Launches</div><div class="kpi-value" id="kv-arsuccess">—</div><div class="kpi-sub" data-i18n="kpi_arsuccess_sub">AR actually opened</div></div>
@@ -389,6 +391,8 @@ const T = {
         sec_3d_eng:'3D Modal Engagement by Item', sec_3d_eng_desc:'How long people study each dish in the 3D viewer',
         sec_recent:'Recent Events (last 50)', sec_upsell_desc:'Order conversion rate per item: customers who used AR/3D vs those who did not',
         kpi_sessions:'Sessions', kpi_sessions_sub:'page loads in range',
+        kpi_unique_visitors:'Unique Visitors', kpi_unique_visitors_sub:'deduped browsers in range',
+        kpi_new_users_today:'New Users Today', kpi_new_users_today_sub:'first-time visitors today',
         kpi_views:'3D Views', kpi_views_sub:'modal opens',
         kpi_artaps:'AR Taps', kpi_artaps_sub:'VIEW ON TABLE tapped',
         kpi_arsuccess:'AR Launches', kpi_arsuccess_sub:'AR actually opened',
@@ -450,6 +454,8 @@ const T = {
         sec_3d_eng:'3D ჩართულობა კერძის მიხედვით', sec_3d_eng_desc:'3D შესწავლის დრო კერძის მიხედვით',
         sec_recent:'ბოლო მოვლენები (50)', sec_upsell_desc:'AR/3D-ის შემდეგ შეკვეთის კონვერსია vs პირდაპირი',
         kpi_sessions:'სესიები', kpi_sessions_sub:'გვერდის ჩატვირთვა',
+        kpi_unique_visitors:'უნიკალური ვიზიტორები', kpi_unique_visitors_sub:'დიაპაზონში გამეორების გარეშე',
+        kpi_new_users_today:'ახალი მომხმარებლები დღეს', kpi_new_users_today_sub:'პირველი ვიზიტი დღეს',
         kpi_views:'3D ნახვები', kpi_views_sub:'3D მოდალი გაიხსნა',
         kpi_artaps:'AR დაჭერა', kpi_artaps_sub:'VIEW ON TABLE',
         kpi_arsuccess:'AR გაშვება', kpi_arsuccess_sub:'AR წარმატებით გაიხსნა',
@@ -672,6 +678,39 @@ function applyHoursFilter(events) {
     return events.filter(e => isWithinHours(e.created_at));
 }
 
+function visitorMetricKey(e) {
+    const visitorId = String(e?.visitor_id || '').trim();
+    if (visitorId) return `v:${visitorId}`;
+    const sessionId = String(e?.session_id || '').trim();
+    return sessionId ? `s:${sessionId}` : '';
+}
+
+function localDateKey(value) {
+    const d = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(d.getTime())) return '';
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function countUniqueVisitors(sessions) {
+    const ids = new Set();
+    sessions.forEach(e => {
+        const key = visitorMetricKey(e);
+        if (key) ids.add(key);
+    });
+    return ids.size;
+}
+
+function countNewUsersToday(sessions) {
+    const today = localDateKey(new Date());
+    const ids = new Set();
+    sessions.forEach(e => {
+        if (e?.extra?.return_visitor !== false || localDateKey(e.created_at) !== today) return;
+        const key = visitorMetricKey(e);
+        if (key) ids.add(key);
+    });
+    return ids.size;
+}
+
 // ════════════════════════════════════════════════════════════════
 // DATA LOADING
 // ════════════════════════════════════════════════════════════════
@@ -811,6 +850,8 @@ function renderAll(events) {
 
     // ── KPIs
     document.getElementById('kv-sessions').textContent        = fmtN(sessions.length);
+    document.getElementById('kv-unique-visitors').textContent = fmtN(countUniqueVisitors(sessions));
+    document.getElementById('kv-new-users-today').textContent = fmtN(countNewUsersToday(sessions));
     document.getElementById('kv-views').textContent           = fmtN(itemViews.length);
     document.getElementById('kv-artaps').textContent          = fmtN(arTaps.length);
     document.getElementById('kv-arsuccess').textContent       = fmtN(arSuccess.length);
