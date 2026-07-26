@@ -6,7 +6,7 @@ const sw = readFileSync('sw.js', 'utf8');
 
 const cacheMatch = sw.match(/CACHE_NAME\s*=\s*'bl-v(\d+)'/);
 assert.ok(cacheMatch, 'service worker cache version must use bl-vNNN format');
-assert.ok(Number(cacheMatch[1]) >= 117, 'service worker cache version must be at least bl-v117');
+assert.ok(Number(cacheMatch[1]) >= 120, 'service worker cache version must be at least bl-v120');
 
 assert.ok(html.includes("showWaiter:   'Show to staff'"), 'English basket CTA should say "Show to staff"');
 assert.ok(html.includes("showWaiter:   'აჩვენეთ სერვისის თანამშრომელს'"), 'Georgian staff CTA should be preserved');
@@ -43,5 +43,19 @@ assert.ok(html.includes('if (!_filterIsValid(cat)) cat = \'\';'), 'Invalid activ
 
 assert.ok(html.includes('Pictureless dishes keep the cart button'), 'Text-only cart control regression note should remain');
 assert.ok(html.includes('same cart button and variant/add-on pills as photo cards'), 'Text-only variants/add-ons behavior should remain');
+
+assert.ok(html.includes('[data-tenant="b-main"] .baoma-shell'), 'BAOMA styling must be scoped to the exact tenant slug');
+assert.ok(html.includes("const _BAOMA_TENANT_SLUG = 'b-main';"), 'BAOMA runtime checks must use the exact tenant slug');
+assert.ok(html.includes('src="./img/baoma/interior-hero.jpg"'), 'BAOMA hero must use the local official-reference image');
+assert.ok(html.includes('src="./img/baoma/interior-terrace.jpg"'), 'BAOMA supporting section must use the local official-reference image');
+assert.ok(html.includes('https://www.instagram.com/restaurant.baoma/'), 'BAOMA info must link to the official Instagram');
+assert.ok(html.includes('11%20Erekle%20II%20Street%2C%20Tbilisi%2C%20Georgia'), 'BAOMA info must link to directions for the verified address');
+assert.ok(html.includes('BAOMA has not published menu items here yet'), 'BAOMA empty state must truthfully avoid fake dishes');
+assert.ok(html.includes("brand: 'BAOMA'") && html.includes("brand: 'ბაომა'"), 'BAOMA customer-facing title should be normalized per language');
+assert.ok(html.includes('hideForEmptyBaoma'), 'BAOMA empty menu should suppress the basket bar through basket state logic');
+assert.ok(!html.includes('baoma-empty-img'), 'BAOMA empty state should not repeat the terrace image');
+assert.ok(!html.includes('tel:'), 'Public menu must not add a hardcoded phone link');
+assert.ok(!/reservation/i.test(html), 'BAOMA implementation must not invent reservation functionality');
+assert.ok(sw.includes('./img/baoma/interior-hero.jpg') && sw.includes('./img/baoma/interior-terrace.jpg'), 'BAOMA local images should be included in the service worker cache');
 
 console.log('Public menu regression assertions passed');
