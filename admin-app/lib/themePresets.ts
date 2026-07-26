@@ -10,6 +10,7 @@ export type StarterTemplateKey =
   | 'mediterranean_air'
   | 'elegant_black'
   | 'monday_greens'
+  | 'baoma'
 
 export type ThemePreset = {
   key: StarterTemplateKey
@@ -18,6 +19,8 @@ export type ThemePreset = {
   primaryColor: string
   secondaryColor: string
   createStarterCategory: boolean
+  /** Keep the preset's own per-mode accents while the owner hasn't changed the colours. */
+  preserveModeAccents?: boolean
   values: ThemeConfig
 }
 
@@ -220,6 +223,32 @@ const TEMPLATE_VISUAL_TOKENS: Record<StarterTemplateKey, ThemeConfig> = {
     day_item_shadow: '0 4px 14px rgba(6,58,66,0.14)', day_item_hover_shadow: '0 12px 26px rgba(6,58,66,0.18)',
     day_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(6,140,150,0.13) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #bfe7ec 0%, #eafafb 72%)',
   },
+  // Values transcribed verbatim from the --baoma-* custom properties in index.html so
+  // the CMS preset and the in-page template fallback cannot drift apart. The layered
+  // bg_image is structural to this template (see _bgOwnedByTemplate in index.html) and
+  // is deliberately not owner-editable.
+  baoma: {
+    night_bg_image: 'radial-gradient(70% 44% at 72% 8%, rgba(199,135,123,0.20) 0%, transparent 62%), radial-gradient(58% 38% at 18% 34%, rgba(217,188,138,0.10) 0%, transparent 68%), linear-gradient(180deg, #642F38 0%, #472028 38%, #261A1D 100%)',
+    night_bg_size: 'auto, auto, auto', night_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    night_card_bg: 'linear-gradient(180deg, rgba(87,40,51,0.98) 0%, rgba(81,36,45,0.98) 100%)', night_card_radius: '18px', night_card_blur: '0px',
+    night_stage_bg: '#3D1B22',
+    night_pill_bg: 'rgba(81,36,45,0.86)', night_pill_active_bg: '#c7877b',
+    night_cta_bg: '#c7877b', night_cta_shadow: '0 10px 26px rgba(199,135,123,0.20)',
+    night_hero_color: '#c7877b', night_hero_shadow: '0 2px 18px rgba(199,135,123,0.24)', night_divider_bg: 'linear-gradient(90deg, transparent, rgba(217,188,138,0.78), transparent)',
+    night_accent_edge: 'linear-gradient(180deg, #c7877b, #D9BC8A)', night_thumb_vignette: 'linear-gradient(180deg, transparent 50%, rgba(38,26,29,0.24))',
+    night_item_shadow: '0 16px 38px rgba(18,9,12,0.32), 0 0 0 1px rgba(199,135,123,0.03)', night_item_hover_shadow: '0 20px 52px rgba(18,9,12,0.44), 0 0 28px rgba(199,135,123,0.10)',
+    night_modal_bg_image: 'radial-gradient(62% 42% at 50% 0%, rgba(199,135,123,0.18), transparent 66%), linear-gradient(180deg, #472028 0%, #261A1D 100%)',
+    day_bg_image: 'linear-gradient(180deg, #FFFCF9 0%, #F8F1ED 56%, #FFFCF9 100%)',
+    day_bg_size: 'auto', day_bg_repeat: 'no-repeat',
+    day_card_bg: 'linear-gradient(180deg, #FFFFFF 0%, #FFFCF9 100%)', day_card_radius: '18px', day_card_blur: '0px',
+    day_stage_bg: '#F7EBE8',
+    day_pill_bg: 'rgba(255,255,255,0.82)', day_pill_active_bg: '#642F38',
+    day_cta_bg: '#642F38', day_cta_shadow: '0 10px 24px rgba(100,47,56,0.18)',
+    day_hero_color: '#642F38', day_hero_shadow: '0 2px 14px rgba(100,47,56,0.14)', day_divider_bg: 'linear-gradient(90deg, transparent, #C5A46D, transparent)',
+    day_accent_edge: 'linear-gradient(180deg, #D8AAA2, #C5A46D)', day_thumb_vignette: 'linear-gradient(180deg, transparent 54%, rgba(100,47,56,0.10))',
+    day_item_shadow: '0 14px 34px rgba(100,47,56,0.08)', day_item_hover_shadow: '0 18px 44px rgba(100,47,56,0.14)',
+    day_modal_bg_image: 'linear-gradient(180deg, #FFFCF9 0%, #F8F1ED 100%)',
+  },
 }
 
 export const TEMPLATE_PRESETS: ThemePreset[] = [
@@ -386,6 +415,28 @@ export const TEMPLATE_PRESETS: ThemePreset[] = [
       default_theme: 'day',
     },
   },
+  {
+    key: 'baoma',
+    label: 'Floral Rose',
+    description: 'Burgundy, rose and champagne with a full-bleed interior hero and a visit/contact section — for fine-dining, wine-led and floral-interior restaurants.',
+    primaryColor: '#642F38',
+    secondaryColor: '#B77A72',
+    createStarterCategory: true,
+    preserveModeAccents: true,
+    values: {
+      night_bg: '#642F38', night_bg2: '#261A1D', night_card: '#51242D', night_card2: '#572833', night_border: 'rgba(199,135,123,.32)',
+      night_text: '#FFF8F3', night_dim: '#E7CBC5', night_accent: '#c7877b', night_accent2: '#D9BC8A', night_accent_text: '#261A1D', night_thumb_bg: '#3D1B22', night_modal_bg: '#3D1B22',
+      night_glow: 'rgba(199,135,123,0.24)', night_glow2: 'rgba(217,188,138,0.12)', night_shadow: 'rgba(12,7,9,0.44)',
+      night_price_color: '#D9BC8A', night_add_btn_color: '#c7877b',
+      day_bg: '#FFFCF9', day_bg2: '#F8F1ED', day_card: '#FFFFFF', day_card2: '#F7EBE8', day_border: 'rgba(183,122,114,.20)',
+      day_text: '#282323', day_dim: '#746765', day_accent: '#642F38', day_accent2: '#B77A72', day_accent_text: '#FFFCF9', day_thumb_bg: '#F7EBE8', day_modal_bg: '#FFFCF9',
+      day_glow: 'rgba(197,164,109,0.18)', day_glow2: 'rgba(183,122,114,0.12)', day_shadow: 'rgba(100,47,56,0.13)',
+      day_price_color: '#642F38', day_add_btn_color: '#642F38',
+      ...TEMPLATE_VISUAL_TOKENS.baoma,
+      font_body: 'Nunito', font_heading: 'Cormorant Garamond', template_key: 'baoma',
+      default_theme: 'day',
+    },
+  },
 ]
 
 export function themePreset(key: unknown) {
@@ -409,6 +460,14 @@ export function themePresetValuesWithAccents(
 ): ThemeConfig {
   const primary = primaryColor && isSixDigitHex(primaryColor) ? primaryColor : preset.primaryColor
   const secondary = secondaryColor && isSixDigitHex(secondaryColor) ? secondaryColor : preset.secondaryColor
+  // Some presets deliberately run a different accent per mode — Floral Rose puts rose
+  // on a burgundy night and burgundy on a cream day. Flattening both modes onto one
+  // primary would paint its night accent the same colour as its night background, so a
+  // preset can opt out for as long as the owner keeps the designed colours. Picking a
+  // custom colour still applies to both modes, exactly as every other template does.
+  if (preset.preserveModeAccents && primary === preset.primaryColor && secondary === preset.secondaryColor) {
+    return { ...preset.values }
+  }
   const primaryRgb = hexToRgb(primary)
   const secondaryRgb = hexToRgb(secondary)
   return {

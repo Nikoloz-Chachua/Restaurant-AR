@@ -7,7 +7,36 @@ import { usePlan } from '@/lib/usePlan'
 import LockedCard from '@/components/LockedCard'
 import { TEMPLATE_PRESETS, type ThemeConfig } from '@/lib/themePresets'
 
-const BRANDING_KEYS = ['site_name', 'site_name_ka', 'logo_url', 'hero_logo_url', 'hero_image_url', 'hero_images']
+// Per-tenant editorial copy rendered by templates that have hero/visit sections.
+// Kept in one list so the editor rows, the preserve-on-template-switch set and the
+// customer app's token names cannot drift apart.
+const CONTENT_FIELDS = [
+  { key: 'hero_kicker',              label: 'contentHeroKicker' },
+  { key: 'hero_kicker_ka',           label: 'contentHeroKickerKa' },
+  { key: 'hero_copy',                label: 'contentHeroCopy' },
+  { key: 'hero_copy_ka',             label: 'contentHeroCopyKa' },
+  { key: 'hero_cta',                 label: 'contentHeroCta' },
+  { key: 'hero_cta_ka',              label: 'contentHeroCtaKa' },
+  { key: 'info_kicker',              label: 'contentInfoKicker' },
+  { key: 'info_kicker_ka',           label: 'contentInfoKickerKa' },
+  { key: 'info_title',               label: 'contentInfoTitle' },
+  { key: 'info_title_ka',            label: 'contentInfoTitleKa' },
+  { key: 'info_text',                label: 'contentInfoText' },
+  { key: 'info_text_ka',             label: 'contentInfoTextKa' },
+  { key: 'info_directions_label',    label: 'contentDirectionsLabel' },
+  { key: 'info_directions_label_ka', label: 'contentDirectionsLabelKa' },
+  { key: 'info_directions_url',      label: 'contentDirectionsUrl' },
+  { key: 'info_instagram_label',     label: 'contentInstagramLabel' },
+  { key: 'info_instagram_url',       label: 'contentInstagramUrl' },
+] as const
+
+// Templates that render the editorial copy above.
+const CONTENT_TEMPLATES = new Set(['baoma'])
+
+const CONTENT_KEYS = [...CONTENT_FIELDS.map(f => f.key), 'info_image_url']
+
+// Content survives a template switch — it describes the restaurant, not the look.
+const BRANDING_KEYS = ['site_name', 'site_name_ka', 'logo_url', 'hero_logo_url', 'hero_image_url', 'hero_images', ...CONTENT_KEYS]
 
 // The hero gallery is stored in theme_config.hero_images as a JSON array of URLs.
 // Older rows may hold a comma/newline list, so accept that shape too.
@@ -630,6 +659,29 @@ export default function ThemePage() {
                               upLabel={T.heroMoveUp} downLabel={T.heroMoveDown}
                               emptyLabel={T.heroEmpty} previewAlt={T.imagePreviewAlt}
                               onPick={uploadHeroImages} onRemove={removeHeroImage} onMove={moveHeroImage} />
+              {/* Templates that render editorial copy of their own expose it here, so a
+                  tenant's wording, address and links are data the owner controls rather
+                  than strings baked into the customer app. Only shown for templates that
+                  actually have these sections. */}
+              {CONTENT_TEMPLATES.has(config.template_key ?? '') && (
+                <>
+                  <div className="pt-2">
+                    <div className="text-sm font-semibold" style={{ color: 'var(--gold)' }}>{T.contentHeading}</div>
+                    <div className="text-xs mt-1" style={{ color: 'var(--dim)' }}>{T.contentHint}</div>
+                  </div>
+                  {CONTENT_FIELDS.map(f => (
+                    <BrandRow key={f.key} label={T[f.label]} value={config[f.key] ?? ''}
+                              onChange={v => set(f.key, v)} />
+                  ))}
+                  <ImageUploadRow label={T.contentInfoImage} hint={T.contentInfoImageHint}
+                                  value={config.info_image_url ?? ''}
+                                  uploading={uploadingKey === 'info_image_url'}
+                                  uploadLabel={T.uploadThumb} clearLabel={T.clearThumb}
+                                  previewAlt={T.imagePreviewAlt}
+                                  onPick={f => uploadImage('info_image_url', f)}
+                                  onClear={() => set('info_image_url', '')} />
+                </>
+              )}
             </>
           )}
         </div>

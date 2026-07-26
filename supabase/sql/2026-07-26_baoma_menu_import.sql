@@ -3291,6 +3291,94 @@ with src as (
   {
     "key": "drink_categories",
     "value": "[\"Non-Alcoholic Drinks\",\"Coffee & Tea\",\"Alcoholic Drinks\"]"
+  },
+  {
+    "key": "template_key",
+    "value": "baoma"
+  },
+  {
+    "key": "default_theme",
+    "value": "day"
+  },
+  {
+    "key": "site_name",
+    "value": "BAOMA"
+  },
+  {
+    "key": "site_name_ka",
+    "value": "ბაომა"
+  },
+  {
+    "key": "hero_kicker",
+    "value": "Georgian restaurant in Tbilisi"
+  },
+  {
+    "key": "hero_kicker_ka",
+    "value": "ქართული რესტორანი თბილისში"
+  },
+  {
+    "key": "hero_copy",
+    "value": "A warm Georgian table with floral interiors, rose tones, and a calm rooftop mood."
+  },
+  {
+    "key": "hero_copy_ka",
+    "value": "თბილი ქართული სუფრა ყვავილოვანი ინტერიერით, ვარდისფერი ტონებით და მშვიდი ტერასის განწყობით."
+  },
+  {
+    "key": "hero_cta",
+    "value": "Explore Menu"
+  },
+  {
+    "key": "hero_cta_ka",
+    "value": "მენიუს ნახვა"
+  },
+  {
+    "key": "info_kicker",
+    "value": "Visit BAOMA"
+  },
+  {
+    "key": "info_kicker_ka",
+    "value": "ეწვიეთ ბაომას"
+  },
+  {
+    "key": "info_title",
+    "value": "11 Erekle II Street"
+  },
+  {
+    "key": "info_title_ka",
+    "value": "ერეკლე II-ის ქუჩა 11"
+  },
+  {
+    "key": "info_text",
+    "value": "Georgian cuisine in the heart of Tbilisi. Follow the official Instagram or get directions to the restaurant."
+  },
+  {
+    "key": "info_text_ka",
+    "value": "ქართული სამზარეულო თბილისის გულში. იხილეთ ოფიციალური Instagram ან მიიღეთ მიმართულება რესტორნამდე."
+  },
+  {
+    "key": "info_directions_label",
+    "value": "Get Directions"
+  },
+  {
+    "key": "info_directions_label_ka",
+    "value": "მიმართულება"
+  },
+  {
+    "key": "info_directions_url",
+    "value": "https://www.google.com/maps/search/?api=1&query=11%20Erekle%20II%20Street%2C%20Tbilisi%2C%20Georgia"
+  },
+  {
+    "key": "info_instagram_label",
+    "value": "@restaurant.baoma"
+  },
+  {
+    "key": "info_instagram_label_ka",
+    "value": "@restaurant.baoma"
+  },
+  {
+    "key": "info_instagram_url",
+    "value": "https://www.instagram.com/restaurant.baoma/"
   }
 ]$baoma_theme$::jsonb)
     as x(key text, value text)

@@ -40,7 +40,7 @@ assert.ok(!fixture.menu_items.some(i => /homemade wine —|Natakhtari beer,/.tes
 
 assert.match(html, /function _baomaFixtureRequested\(\)/)
 assert.match(html, /location\.hostname === 'localhost' \|\| location\.hostname === '127\.0\.0\.1'/)
-assert.match(html, /_tenantSlugFromHost\(\) === _BAOMA_TENANT_SLUG/)
+assert.match(html, /_tenantSlugFromHost\(\) === _BAOMA_FIXTURE_SLUG/)
 assert.match(html, /get\('fixture'\) === 'baoma'/)
 assert.match(html, /const _previewAccessAllowed = true/)
 assert.match(html, /const _analyticsEnabled = !_baomaFixtureRequested\(\)/)
@@ -64,5 +64,39 @@ assert.match(sql, /source menu prices\/translations need client confirmation/i)
 assert.match(sql, /photo rights\/quality should be confirmed/i)
 assert.ok(!/insert into public\.menu_items\s*\(\s*id\b/i.test(sql), 'production SQL must not insert explicit menu IDs')
 assert.ok(!/created_at/i.test(sql), 'production SQL must not set created_at')
+
+// The look is a CMS template, not a per-restaurant fork: the tenant must actually be
+// assigned template_key "baoma", and the preset must exist for the admin to pick it.
+const presets = readFileSync('admin-app/lib/themePresets.ts', 'utf8')
+const themeRow = key => fixture.theme_config.find(r => r.key === key)
+assert.equal(themeRow('template_key')?.value, 'baoma', 'fixture must assign the baoma template')
+assert.match(sql, /"key": "template_key",\s*\n\s*"value": "baoma"/, 'import must assign template_key = baoma')
+assert.ok(presets.includes("| 'baoma'"), 'baoma must be a selectable StarterTemplateKey')
+assert.ok(presets.includes("key: 'baoma',"), 'baoma must have a TEMPLATE_PRESETS entry')
+assert.ok(presets.includes('...TEMPLATE_VISUAL_TOKENS.baoma,'), 'baoma preset must carry its visual tokens')
+assert.ok(presets.includes("template_key: 'baoma',"), 'baoma preset must write template_key')
+// Copy the template renders must be per-tenant data, not hardcoded to this restaurant.
+for (const key of ['site_name', 'hero_kicker', 'hero_copy', 'info_title', 'info_instagram_url', 'info_directions_url']) {
+  assert.ok(themeRow(key), `fixture must carry the ${key} token so another tenant can override it`)
+}
+for (const key of ['site_name_ka', 'hero_kicker_ka', 'hero_copy_ka', 'info_title_ka']) {
+  assert.ok(themeRow(key), `fixture must carry the Georgian ${key} token`)
+}
+assert.ok(!/hero_image_url|info_image_url/.test(sql),
+  'imagery must not be pinned to repo-local paths in the production import — set those tokens to R2 URLs')
+
+// The owner must be able to edit this content from the admin panel, not just the DB.
+const themeEditor = readFileSync('app/(admin)/theme/page.tsx'.replace(/^/, 'admin-app/'), 'utf8')
+assert.ok(themeEditor.includes("const CONTENT_TEMPLATES = new Set(['baoma'])"),
+  'theme editor must expose the content fields for the baoma template')
+assert.ok(themeEditor.includes('...CONTENT_KEYS'),
+  'tenant content must survive a template switch')
+for (const { key } of [{ key: 'hero_copy' }, { key: 'info_title' }, { key: 'info_instagram_url' }]) {
+  assert.ok(themeEditor.includes(`'${key}'`), `theme editor must expose ${key}`)
+}
+// Every editor field must exist as a token the customer app actually reads.
+for (const token of ['hero_kicker', 'hero_copy', 'hero_cta', 'info_kicker', 'info_title', 'info_text']) {
+  assert.ok(html.includes(`'${token}'`), `index.html must read the ${token} token`)
+}
 
 console.log(`BAOMA artifact checks passed: ${fixture.menu_items.length} items, ${fixture.categories.length} categories, ${fixture.menu_items.filter(i => i.thumbnail_url).length} photo items`)

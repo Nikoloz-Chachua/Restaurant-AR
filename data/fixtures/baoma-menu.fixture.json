@@ -137,6 +137,126 @@
       "restaurant_id": 53,
       "key": "drink_categories",
       "value": "[\"Non-Alcoholic Drinks\",\"Coffee & Tea\",\"Alcoholic Drinks\"]"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "template_key",
+      "value": "baoma"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "site_name",
+      "value": "BAOMA"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "site_name_ka",
+      "value": "ბაომა"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "hero_kicker",
+      "value": "Georgian restaurant in Tbilisi"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "hero_kicker_ka",
+      "value": "ქართული რესტორანი თბილისში"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "hero_copy",
+      "value": "A warm Georgian table with floral interiors, rose tones, and a calm rooftop mood."
+    },
+    {
+      "restaurant_id": 53,
+      "key": "hero_copy_ka",
+      "value": "თბილი ქართული სუფრა ყვავილოვანი ინტერიერით, ვარდისფერი ტონებით და მშვიდი ტერასის განწყობით."
+    },
+    {
+      "restaurant_id": 53,
+      "key": "hero_cta",
+      "value": "Explore Menu"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "hero_cta_ka",
+      "value": "მენიუს ნახვა"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "hero_image_url",
+      "value": "./img/baoma/interior-hero-maps.webp"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "info_kicker",
+      "value": "Visit BAOMA"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "info_kicker_ka",
+      "value": "ეწვიეთ ბაომას"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "info_title",
+      "value": "11 Erekle II Street"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "info_title_ka",
+      "value": "ერეკლე II-ის ქუჩა 11"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "info_text",
+      "value": "Georgian cuisine in the heart of Tbilisi. Follow the official Instagram or get directions to the restaurant."
+    },
+    {
+      "restaurant_id": 53,
+      "key": "info_text_ka",
+      "value": "ქართული სამზარეულო თბილისის გულში. იხილეთ ოფიციალური Instagram ან მიიღეთ მიმართულება რესტორნამდე."
+    },
+    {
+      "restaurant_id": 53,
+      "key": "info_directions_label",
+      "value": "Get Directions"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "info_directions_label_ka",
+      "value": "მიმართულება"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "info_directions_url",
+      "value": "https://www.google.com/maps/search/?api=1&query=11%20Erekle%20II%20Street%2C%20Tbilisi%2C%20Georgia"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "info_instagram_label",
+      "value": "@restaurant.baoma"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "info_instagram_label_ka",
+      "value": "@restaurant.baoma"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "info_instagram_url",
+      "value": "https://www.instagram.com/restaurant.baoma/"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "info_image_url",
+      "value": "./img/baoma/interior-terrace.jpg"
+    },
+    {
+      "restaurant_id": 53,
+      "key": "default_theme",
+      "value": "day"
     }
   ],
   "menu_items": [

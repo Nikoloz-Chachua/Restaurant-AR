@@ -44,12 +44,17 @@ assert.ok(html.includes('if (!_filterIsValid(cat)) cat = \'\';'), 'Invalid activ
 assert.ok(html.includes('Pictureless dishes keep the cart button'), 'Text-only cart control regression note should remain');
 assert.ok(html.includes('same cart button and variant/add-on pills as photo cards'), 'Text-only variants/add-ons behavior should remain');
 
-assert.ok(html.includes('[data-tenant="b-main"] .baoma-shell'), 'BAOMA styling must be scoped to the exact tenant slug');
-assert.ok(html.includes("const _BAOMA_TENANT_SLUG = 'b-main';"), 'BAOMA runtime checks must use the exact tenant slug');
+assert.ok(html.includes('[data-template="baoma"] .baoma-shell'), 'BAOMA styling must be scoped to the template key so any tenant can be assigned it');
+assert.ok(!html.includes('[data-tenant="b-main"]'), 'BAOMA styling must not be keyed to a single tenant slug');
+assert.ok(html.includes("const _BAOMA_TEMPLATE_KEY = 'baoma';"), 'BAOMA runtime checks must key off the template');
+assert.ok(html.includes("return document.documentElement.dataset.template === _BAOMA_TEMPLATE_KEY;"),
+          'BAOMA membership must be decided by template_key, not tenant identity');
 assert.ok(html.includes("function _baomaFixtureRequested()"), 'BAOMA fixture gate must be explicit in runtime code');
-assert.ok(html.includes("&& _tenantSlugFromHost() === _BAOMA_TENANT_SLUG") &&
+assert.ok(html.includes("&& _tenantSlugFromHost() === _BAOMA_FIXTURE_SLUG") &&
           html.includes("new URLSearchParams(location.search).get('fixture') === 'baoma'"),
           'BAOMA fixture must require localhost, exact b-main slug, and fixture=baoma');
+assert.ok(html.includes('const _BAOMA_COPY_TOKENS = {'), 'BAOMA copy must be overridable from theme_config');
+assert.ok(html.includes("brand: 'site_name',"), 'BAOMA brand name must read the platform site_name token');
 assert.ok(html.includes('fetch(\'./data/fixtures/baoma-menu.fixture.json\'') || html.includes('fetch("./data/fixtures/baoma-menu.fixture.json"'),
           'BAOMA fixture must be loaded from the static fixture artifact');
 assert.ok(html.includes('src="./img/baoma/interior-hero-maps.webp"'), 'BAOMA hero must use the optimized official Google Maps landscape image');
