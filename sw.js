@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bl-v123';
+const CACHE_NAME = 'bl-v124';
 
 const SUPABASE_URL  = 'https://lwdpegloznhpcecivhfy.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_65dKKpb-lxOr8JTjdj7yxw_LZzcJp5h';
@@ -16,7 +16,7 @@ const PRECACHE = [
     './img/betareal-logo-light.png',
     './img/grain.png',
     './img/monday-greens-favicon.svg',
-    './img/baoma/interior-hero.jpg',
+    './img/baoma/interior-hero-maps.webp',
     './img/baoma/interior-terrace.jpg',
 ];
 

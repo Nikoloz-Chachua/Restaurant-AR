@@ -46,7 +46,13 @@ assert.ok(html.includes('same cart button and variant/add-on pills as photo card
 
 assert.ok(html.includes('[data-tenant="b-main"] .baoma-shell'), 'BAOMA styling must be scoped to the exact tenant slug');
 assert.ok(html.includes("const _BAOMA_TENANT_SLUG = 'b-main';"), 'BAOMA runtime checks must use the exact tenant slug');
-assert.ok(html.includes('src="./img/baoma/interior-hero.jpg"'), 'BAOMA hero must use the local official-reference image');
+assert.ok(html.includes("function _baomaFixtureRequested()"), 'BAOMA fixture gate must be explicit in runtime code');
+assert.ok(html.includes("&& _tenantSlugFromHost() === _BAOMA_TENANT_SLUG") &&
+          html.includes("new URLSearchParams(location.search).get('fixture') === 'baoma'"),
+          'BAOMA fixture must require localhost, exact b-main slug, and fixture=baoma');
+assert.ok(html.includes('fetch(\'./data/fixtures/baoma-menu.fixture.json\'') || html.includes('fetch("./data/fixtures/baoma-menu.fixture.json"'),
+          'BAOMA fixture must be loaded from the static fixture artifact');
+assert.ok(html.includes('src="./img/baoma/interior-hero-maps.webp"'), 'BAOMA hero must use the optimized official Google Maps landscape image');
 assert.ok(html.includes('src="./img/baoma/interior-terrace.jpg"'), 'BAOMA supporting section must use the local official-reference image');
 assert.ok(html.includes('https://www.instagram.com/restaurant.baoma/'), 'BAOMA info must link to the official Instagram');
 assert.ok(html.includes('11%20Erekle%20II%20Street%2C%20Tbilisi%2C%20Georgia'), 'BAOMA info must link to directions for the verified address');
@@ -56,6 +62,7 @@ assert.ok(html.includes('hideForEmptyBaoma'), 'BAOMA empty menu should suppress 
 assert.ok(!html.includes('baoma-empty-img'), 'BAOMA empty state should not repeat the terrace image');
 assert.ok(!html.includes('tel:'), 'Public menu must not add a hardcoded phone link');
 assert.ok(!/reservation/i.test(html), 'BAOMA implementation must not invent reservation functionality');
-assert.ok(sw.includes('./img/baoma/interior-hero.jpg') && sw.includes('./img/baoma/interior-terrace.jpg'), 'BAOMA local images should be included in the service worker cache');
+assert.ok(sw.includes('./img/baoma/interior-hero-maps.webp') && sw.includes('./img/baoma/interior-terrace.jpg'), 'BAOMA local images should be included in the service worker cache');
+assert.ok(!sw.includes('./data/fixtures/baoma-menu.fixture.json'), 'BAOMA localhost fixture must not be precached for production visitors');
 
 console.log('Public menu regression assertions passed');
