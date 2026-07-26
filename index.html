@@ -40,12 +40,22 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@600;700&family=Nunito:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@600;700&family=Nunito:wght@400;600;700&display=swap"></noscript>
     <script>
-        if (new URLSearchParams(location.search).get('tenant') === 'b-main') {
+        {
+            const params = new URLSearchParams(location.search);
+            const host = location.hostname.toLowerCase();
+            const requestedTenant = (params.get('tenant') || params.get('restaurant') || params.get('slug') || '').trim().toLowerCase();
+            const isBaomaRequest = requestedTenant === 'b-main' || host === 'b-main.betareal.app' || host === 'b-main.betareal.ge';
+        if (isBaomaRequest) {
+            document.documentElement.dataset.tenant = 'b-main';
+            if (!localStorage.getItem('bl-theme')) {
+                document.documentElement.setAttribute('data-theme', 'day');
+            }
             var baomaPreload = document.createElement('link');
             baomaPreload.rel = 'preload';
             baomaPreload.as = 'image';
                 baomaPreload.href = './img/baoma/interior-hero-maps.webp';
             document.head.appendChild(baomaPreload);
+        }
         }
     </script>
     <!-- model-viewer is NOT loaded here. It costs ~250KB + several seconds of main-thread
@@ -1649,49 +1659,139 @@
 
         /* ── BAOMA tenant experience — exact tenant slug only ─────────── */
         [data-tenant="b-main"] {
-            --bg: #FFFCF9;
-            --bg2: #F8F1ED;
-            --glow: rgba(197,164,109,0.18);
-            --glow2: rgba(183,122,114,0.12);
-            --shadow: rgba(100,47,56,0.13);
-            --card: #FFFFFF;
-            --card2: #F7EBE8;
-            --border: rgba(183,122,114,.20);
-            --text: #282323;
-            --dim: #746765;
-            --accent: #642F38;
-            --accent2: #B77A72;
-            --accent-text: #FFFCF9;
-            --thumb-bg: #F7EBE8;
-            --modal-bg: #FFFCF9;
-            --modal-rgb: 255,252,249;
-            --bg-image:
-                linear-gradient(180deg, #FFFCF9 0%, #F8F1ED 56%, #FFFCF9 100%);
+            --bg: var(--baoma-bg);
+            --bg2: var(--baoma-bg2);
+            --glow: var(--baoma-glow);
+            --glow2: var(--baoma-glow2);
+            --shadow: var(--baoma-shadow);
+            --card: var(--baoma-card);
+            --card2: var(--baoma-card2);
+            --border: var(--baoma-border);
+            --text: var(--baoma-text);
+            --dim: var(--baoma-dim);
+            --accent: var(--baoma-accent);
+            --accent2: var(--baoma-accent2);
+            --accent-text: var(--baoma-accent-text);
+            --thumb-bg: var(--baoma-thumb-bg);
+            --modal-bg: var(--baoma-modal-bg);
+            --modal-rgb: var(--baoma-modal-rgb);
+            --bg-image: var(--baoma-bg-image);
             --bg-size: auto;
             --bg-repeat: no-repeat;
-            --card-bg: linear-gradient(180deg, #FFFFFF 0%, #FFFCF9 100%);
+            --card-bg: var(--baoma-card-bg);
             --card-blur: 0px;
             --card-radius: 18px;
-            --item-shadow: 0 14px 34px rgba(100,47,56,0.08);
-            --item-hover-shadow: 0 18px 44px rgba(100,47,56,0.14);
-            --accent-edge: linear-gradient(180deg, #D8AAA2, #C5A46D);
-            --stage-bg: #F7EBE8;
-            --thumb-vignette: linear-gradient(180deg, transparent 54%, rgba(100,47,56,0.10));
-            --pill-bg: rgba(255,255,255,0.82);
-            --pill-active-bg: #642F38;
-            --cta-bg: #642F38;
-            --cta-shadow: 0 10px 24px rgba(100,47,56,0.18);
-            --hero-color: #642F38;
+            --item-shadow: var(--baoma-item-shadow);
+            --item-hover-shadow: var(--baoma-item-hover-shadow);
+            --accent-edge: var(--baoma-accent-edge);
+            --stage-bg: var(--baoma-thumb-bg);
+            --thumb-vignette: var(--baoma-thumb-vignette);
+            --pill-bg: var(--baoma-pill-bg);
+            --pill-active-bg: var(--baoma-pill-active-bg);
+            --cta-bg: var(--baoma-cta-bg);
+            --cta-shadow: var(--baoma-cta-shadow);
+            --hero-color: var(--baoma-accent);
             --hero-shadow: none;
-            --divider-bg: linear-gradient(90deg, transparent, #C5A46D, transparent);
-            --modal-bg-image: linear-gradient(180deg, #FFFCF9 0%, #F8F1ED 100%);
-            --price-color: #642F38;
-            --add-btn-color: #642F38;
+            --divider-bg: var(--baoma-divider-bg);
+            --modal-bg-image: var(--baoma-modal-bg-image);
+            --price-color: var(--baoma-price);
+            --add-btn-color: var(--baoma-accent);
+            --baoma-info-gap-title: clamp(10px, 2.6vw, 16px);
+            --baoma-info-gap-text: clamp(16px, 3.4vw, 22px);
+        }
+        [data-theme="day"][data-tenant="b-main"] {
+            --baoma-bg: #FFFCF9;
+            --baoma-bg2: #F8F1ED;
+            --baoma-glow: rgba(197,164,109,0.18);
+            --baoma-glow2: rgba(183,122,114,0.12);
+            --baoma-shadow: rgba(100,47,56,0.13);
+            --baoma-card: #FFFFFF;
+            --baoma-card2: #F7EBE8;
+            --baoma-border: rgba(183,122,114,.20);
+            --baoma-text: #282323;
+            --baoma-dim: #746765;
+            --baoma-muted: #746765;
+            --baoma-accent: #642F38;
+            --baoma-accent2: #B77A72;
+            --baoma-accent-text: #FFFCF9;
+            --baoma-rose: #D8AAA2;
+            --baoma-champagne: #C5A46D;
+            --baoma-thumb-bg: #F7EBE8;
+            --baoma-modal-bg: #FFFCF9;
+            --baoma-modal-rgb: 255,252,249;
+            --baoma-bg-image: linear-gradient(180deg, #FFFCF9 0%, #F8F1ED 56%, #FFFCF9 100%);
+            --baoma-card-bg: linear-gradient(180deg, #FFFFFF 0%, #FFFCF9 100%);
+            --baoma-photo-card-bg: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,252,249,0.98)), radial-gradient(circle at 100% 0%, rgba(197,164,109,0.13), transparent 38%);
+            --baoma-empty-bg: radial-gradient(circle at 100% 0%, rgba(183,122,114,0.22) 0 18%, transparent 19% 36%, rgba(197,164,109,0.13) 37% 48%, transparent 49%), linear-gradient(135deg, rgba(232,217,189,0.50), rgba(247,235,232,0.82) 48%, #FFFCF9 100%);
+            --baoma-item-shadow: 0 14px 34px rgba(100,47,56,0.08);
+            --baoma-item-hover-shadow: 0 18px 44px rgba(100,47,56,0.14);
+            --baoma-accent-edge: linear-gradient(180deg, #D8AAA2, #C5A46D);
+            --baoma-thumb-vignette: linear-gradient(180deg, transparent 54%, rgba(100,47,56,0.10));
+            --baoma-pill-bg: rgba(255,255,255,0.82);
+            --baoma-pill-active-bg: #642F38;
+            --baoma-cta-bg: #642F38;
+            --baoma-cta-shadow: 0 10px 24px rgba(100,47,56,0.18);
+            --baoma-divider-bg: linear-gradient(90deg, transparent, #C5A46D, transparent);
+            --baoma-modal-bg-image: linear-gradient(180deg, #FFFCF9 0%, #F8F1ED 100%);
+            --baoma-price: #642F38;
+            --baoma-header-bg: rgba(255,252,249,0.76);
+            --baoma-header-border: rgba(183,122,114,0.13);
+            --baoma-toggle-bg: rgba(255,252,249,0.94);
+            --baoma-overlay: rgba(40,35,35,0.82);
+            --baoma-lightbox-surface: #FFFCF9;
+            --baoma-lightbox-image-bg: #F7EBE8;
+            --baoma-focus: rgba(100,47,56,0.84);
+        }
+        [data-theme="night"][data-tenant="b-main"] {
+            --baoma-bg: #642F38;
+            --baoma-bg2: #261A1D;
+            --baoma-glow: rgba(199,135,123,0.24);
+            --baoma-glow2: rgba(217,188,138,0.12);
+            --baoma-shadow: rgba(12,7,9,0.44);
+            --baoma-card: #51242D;
+            --baoma-card2: #572833;
+            --baoma-border: rgba(199,135,123,.32);
+            --baoma-text: #FFF8F3;
+            --baoma-dim: #E7CBC5;
+            --baoma-muted: #D8AAA2;
+            --baoma-accent: #c7877b;
+            --baoma-accent2: #D9BC8A;
+            --baoma-accent-text: #261A1D;
+            --baoma-rose: #D8AAA2;
+            --baoma-champagne: #D9BC8A;
+            --baoma-thumb-bg: #3D1B22;
+            --baoma-modal-bg: #3D1B22;
+            --baoma-modal-rgb: 61,27,34;
+            --baoma-bg-image:
+                radial-gradient(70% 44% at 72% 8%, rgba(199,135,123,0.20) 0%, transparent 62%),
+                radial-gradient(58% 38% at 18% 34%, rgba(217,188,138,0.10) 0%, transparent 68%),
+                linear-gradient(180deg, #642F38 0%, #472028 38%, #261A1D 100%);
+            --baoma-card-bg: linear-gradient(180deg, rgba(87,40,51,0.98) 0%, rgba(81,36,45,0.98) 100%);
+            --baoma-photo-card-bg: radial-gradient(circle at 42% 24%, rgba(199,135,123,0.20), transparent 34%), linear-gradient(180deg, rgba(106,48,60,0.96), rgba(81,36,45,0.98));
+            --baoma-empty-bg: radial-gradient(circle at 100% 0%, rgba(199,135,123,0.20) 0 18%, transparent 19% 36%, rgba(217,188,138,0.10) 37% 48%, transparent 49%), linear-gradient(135deg, #572833, #472028 54%, #3D1B22 100%);
+            --baoma-item-shadow: 0 16px 38px rgba(18,9,12,0.32), 0 0 0 1px rgba(199,135,123,0.03);
+            --baoma-item-hover-shadow: 0 20px 52px rgba(18,9,12,0.44), 0 0 28px rgba(199,135,123,0.10);
+            --baoma-accent-edge: linear-gradient(180deg, #c7877b, #D9BC8A);
+            --baoma-thumb-vignette: linear-gradient(180deg, transparent 50%, rgba(38,26,29,0.24));
+            --baoma-pill-bg: rgba(81,36,45,0.86);
+            --baoma-pill-active-bg: #c7877b;
+            --baoma-cta-bg: #c7877b;
+            --baoma-cta-shadow: 0 10px 26px rgba(199,135,123,0.20);
+            --baoma-divider-bg: linear-gradient(90deg, transparent, rgba(217,188,138,0.78), transparent);
+            --baoma-modal-bg-image: radial-gradient(62% 42% at 50% 0%, rgba(199,135,123,0.18), transparent 66%), linear-gradient(180deg, #472028 0%, #261A1D 100%);
+            --baoma-price: #D9BC8A;
+            --baoma-header-bg: rgba(61,27,34,0.78);
+            --baoma-header-border: rgba(199,135,123,0.24);
+            --baoma-toggle-bg: rgba(81,36,45,0.94);
+            --baoma-overlay: rgba(21,10,13,0.88);
+            --baoma-lightbox-surface: #3D1B22;
+            --baoma-lightbox-image-bg: #261A1D;
+            --baoma-focus: rgba(217,188,138,0.86);
         }
         [data-tenant="b-main"] body {
             padding: 0 16px 42px;
-            background: #FFFCF9;
-            color: #282323;
+            background: var(--baoma-bg);
+            color: var(--baoma-text);
             font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
         [data-tenant="b-main"] .mg-hero { display: none; }
@@ -1702,7 +1802,7 @@
             width: 100vw;
             margin-left: calc(50% - 50vw);
             margin-right: calc(50% - 50vw);
-            background: #FFFCF9;
+            background: var(--baoma-bg);
         }
         [data-tenant="b-main"] .baoma-topbar {
             position: fixed;
@@ -1715,8 +1815,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255,252,249,0.76);
-            border-bottom: 1px solid rgba(183,122,114,0.13);
+            background: var(--baoma-header-bg);
+            border-bottom: 1px solid var(--baoma-header-border);
             -webkit-backdrop-filter: blur(16px);
             backdrop-filter: blur(16px);
             box-shadow: 0 12px 30px rgba(100,47,56,0.07);
@@ -1736,9 +1836,9 @@
             min-width: 44px;
             min-height: 44px;
             padding: 0 13px;
-            background: rgba(255,252,249,0.94);
-            color: #642F38;
-            border-color: rgba(183,122,114,.24);
+            background: var(--baoma-toggle-bg);
+            color: var(--baoma-accent);
+            border-color: var(--baoma-border);
             box-shadow: 0 8px 20px rgba(100,47,56,0.10);
             letter-spacing: 0.4px;
         }
@@ -1756,7 +1856,7 @@
             display: flex;
             align-items: flex-end;
             overflow: hidden;
-            background: #642F38;
+            background: var(--baoma-bg);
         }
         [data-tenant="b-main"] .baoma-hero picture,
         [data-tenant="b-main"] .baoma-hero-img {
@@ -1786,7 +1886,7 @@
         }
         [data-tenant="b-main"] .baoma-kicker,
         [data-tenant="b-main"] .baoma-info-kicker {
-            color: #E8D9BD;
+            color: var(--baoma-champagne);
             font-size: 0.72rem;
             font-weight: 800;
             letter-spacing: 0.9px;
@@ -1826,8 +1926,8 @@
         [data-tenant="b-main"] .baoma-hero-btn {
             margin-top: 20px;
             padding: 0 20px;
-            background: #FFFCF9;
-            color: #642F38;
+            background: var(--baoma-text);
+            color: var(--baoma-bg);
             border: 1px solid rgba(232,217,189,0.72);
             box-shadow: 0 14px 34px rgba(0,0,0,0.18);
         }
@@ -1843,8 +1943,8 @@
             top: calc(62px + env(safe-area-inset-top, 0px));
             z-index: 60;
             padding: 10px 16px 8px;
-            background: rgba(255,252,249,0.93);
-            border-bottom: 1px solid rgba(183,122,114,.16);
+            background: color-mix(in srgb, var(--baoma-bg) 88%, transparent);
+            border-bottom: 1px solid var(--baoma-border);
             -webkit-backdrop-filter: blur(16px);
             backdrop-filter: blur(16px);
             box-shadow: 0 12px 28px rgba(100,47,56,0.06);
@@ -1864,17 +1964,17 @@
             min-height: 40px;
             padding: 8px 15px;
             border-radius: 999px;
-            color: #746765;
-            background: rgba(255,255,255,0.82);
-            border-color: rgba(183,122,114,.22);
+            color: var(--baoma-dim);
+            background: var(--baoma-pill-bg);
+            border-color: var(--baoma-border);
             font-size: 0.78rem;
             text-transform: none;
             letter-spacing: 0;
         }
         [data-tenant="b-main"] .cat-pill.active {
-            background: #642F38;
-            color: #FFFCF9;
-            border-color: #642F38;
+            background: var(--baoma-pill-active-bg);
+            color: var(--baoma-accent-text);
+            border-color: transparent;
             box-shadow: 0 9px 22px rgba(100,47,56,0.16);
         }
         [data-tenant="b-main"] .menu-list {
@@ -1885,8 +1985,8 @@
         [data-tenant="b-main"] .category-header {
             max-width: none;
             padding: 24px 2px 8px;
-            border-bottom-color: rgba(183,122,114,.20);
-            color: #642F38;
+            border-bottom-color: var(--baoma-border);
+            color: var(--baoma-accent);
             font-family: "Cormorant Garamond", "Lora", Georgia, serif;
             font-size: 1.55rem;
             font-weight: 700;
@@ -1895,15 +1995,13 @@
         [data-tenant="b-main"] .menu-item {
             position: relative;
             border-radius: 8px;
-            border-color: rgba(183,122,114,.18);
-            box-shadow: 0 12px 28px rgba(100,47,56,0.08);
-            background:
-                linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,252,249,0.98)),
-                radial-gradient(circle at 100% 0%, rgba(197,164,109,0.13), transparent 38%);
+            border-color: var(--baoma-border);
+            box-shadow: var(--baoma-item-shadow);
+            background: var(--baoma-photo-card-bg);
         }
         [data-tenant="b-main"] .menu-item::before {
             width: 2px;
-            background: linear-gradient(180deg, #D8AAA2, #C5A46D);
+            background: var(--baoma-accent-edge);
         }
         [data-tenant="b-main"] .menu-item:not(.no-image) {
             grid-template-columns: minmax(132px, 42%) minmax(0, 1fr);
@@ -1941,15 +2039,15 @@
             display: grid;
             place-items: center;
             border-radius: 50%;
-            border: 1px solid rgba(197,164,109,0.55);
-            color: #642F38;
+            border: 1px solid color-mix(in srgb, var(--baoma-champagne) 64%, transparent);
+            color: var(--baoma-accent);
             font-family: "Cormorant Garamond", Georgia, serif;
             font-size: 1rem;
             font-weight: 700;
-            background: rgba(232,217,189,0.38);
+            background: color-mix(in srgb, var(--baoma-champagne) 26%, transparent);
         }
         [data-tenant="b-main"] .item-name {
-            color: #642F38;
+            color: var(--baoma-accent);
             font-family: "Cormorant Garamond", "Lora", Georgia, serif;
             font-size: 1.28rem;
             font-weight: 700;
@@ -1964,22 +2062,22 @@
             letter-spacing: 0;
         }
         [data-tenant="b-main"] .ingredients {
-            color: #746765;
+            color: var(--baoma-dim);
             font-size: 0.78rem;
             line-height: 1.45;
             overflow-wrap: normal;
             word-break: normal;
         }
         [data-tenant="b-main"] .price {
-            color: #642F38;
+            color: var(--baoma-price);
             font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             font-weight: 800;
             font-size: 1rem;
             letter-spacing: 0;
         }
         [data-tenant="b-main"] .thumb-wrap {
-            border-color: rgba(183,122,114,.20);
-            background: #F7EBE8;
+            border-color: var(--baoma-border);
+            background: var(--baoma-thumb-bg);
         }
         [data-tenant="b-main"] .thumb-img {
             cursor: zoom-in;
@@ -1988,21 +2086,21 @@
         [data-tenant="b-main"] #modal-ar-btn,
         [data-tenant="b-main"] #basket-bar,
         [data-tenant="b-main"] #basket-waiter-btn {
-            background: #642F38;
-            color: #FFFCF9;
-            box-shadow: 0 10px 24px rgba(100,47,56,0.18);
+            background: var(--baoma-cta-bg);
+            color: var(--baoma-accent-text);
+            box-shadow: var(--baoma-cta-shadow);
         }
         [data-tenant="b-main"] .qty-add-btn,
         [data-tenant="b-main"] .qty-stepper {
-            border-color: #B77A72;
-            color: #642F38;
+            border-color: var(--baoma-accent);
+            color: var(--baoma-accent);
         }
         [data-tenant="b-main"] .qty-dec,
         [data-tenant="b-main"] .qty-inc,
         [data-tenant="b-main"] .qty-num,
         [data-tenant="b-main"] .addon-price,
         [data-tenant="b-main"] .variant-price {
-            color: #642F38;
+            color: var(--baoma-price);
         }
         [data-tenant="b-main"] .baoma-empty {
             grid-column: 1 / -1;
@@ -2013,12 +2111,10 @@
             display: flex;
             align-items: center;
             padding: clamp(22px, 4vw, 38px);
-            border: 1px solid rgba(183,122,114,.20);
+            border: 1px solid var(--baoma-border);
             border-radius: 18px;
-            background:
-                radial-gradient(circle at 100% 0%, rgba(183,122,114,0.22) 0 18%, transparent 19% 36%, rgba(197,164,109,0.13) 37% 48%, transparent 49%),
-                linear-gradient(135deg, rgba(232,217,189,0.50), rgba(247,235,232,0.82) 48%, #FFFCF9 100%);
-            box-shadow: 0 14px 34px rgba(100,47,56,0.08);
+            background: var(--baoma-empty-bg);
+            box-shadow: var(--baoma-item-shadow);
             text-align: left;
         }
         [data-tenant="b-main"] .baoma-empty::after {
@@ -2039,7 +2135,7 @@
             max-width: 620px;
         }
         [data-tenant="b-main"] .baoma-empty-title {
-            color: #642F38;
+            color: var(--baoma-accent);
             font-family: "Cormorant Garamond", "Lora", Georgia, serif;
             font-size: clamp(1.75rem, 5vw, 2.35rem);
             font-weight: 700;
@@ -2048,7 +2144,7 @@
         [data-tenant="b-main"] .baoma-empty-copy {
             max-width: 34rem;
             margin-top: 10px;
-            color: #746765;
+            color: var(--baoma-dim);
             line-height: 1.55;
             font-size: 0.96rem;
         }
@@ -2058,27 +2154,33 @@
             max-width: 1120px;
             margin: 38px auto 0;
             padding: 24px 0 4px;
-            border-top: 1px solid rgba(183,122,114,.20);
+            border-top: 1px solid var(--baoma-border);
         }
         [data-tenant="b-main"] .baoma-info-inner {
             display: grid;
-            gap: 18px;
+            gap: clamp(22px, 5vw, 34px);
         }
         [data-tenant="b-main"] .baoma-info-inner > div {
             align-self: center;
             min-width: 0;
         }
         [data-tenant="b-main"] .baoma-info-title {
-            margin-top: 6px;
-            color: #642F38;
+            margin-top: var(--baoma-info-gap-title);
+            color: var(--baoma-accent);
             font-family: "Cormorant Garamond", "Lora", Georgia, serif;
-            font-size: clamp(2rem, 9vw, 3.4rem);
+            font-size: clamp(1.72rem, 7.6vw, 3.35rem);
             font-weight: 600;
-            line-height: 1;
+            line-height: 1.08;
+            overflow-wrap: normal;
+            white-space: normal;
+        }
+        html[lang="ka"][data-tenant="b-main"] .baoma-info-title {
+            font-size: clamp(1.55rem, 6.9vw, 3.05rem);
         }
         [data-tenant="b-main"] .baoma-info-text {
-            color: #746765;
-            line-height: 1.6;
+            margin-top: var(--baoma-info-gap-text);
+            color: var(--baoma-dim);
+            line-height: 1.65;
             max-width: 36rem;
         }
         [data-tenant="b-main"] .baoma-info-actions {
@@ -2091,16 +2193,16 @@
             flex: 1 1 158px;
             max-width: 100%;
             padding: 0 16px;
-            border: 1px solid rgba(183,122,114,.26);
-            color: #642F38;
-            background: #FFFFFF;
+            border: 1px solid var(--baoma-border);
+            color: var(--baoma-accent);
+            background: var(--baoma-card);
             text-align: center;
             white-space: normal;
         }
         [data-tenant="b-main"] .baoma-info-link.primary {
-            background: #642F38;
-            color: #FFFCF9;
-            border-color: #642F38;
+            background: var(--baoma-cta-bg);
+            color: var(--baoma-accent-text);
+            border-color: transparent;
         }
         [data-tenant="b-main"] .baoma-info-img {
             display: block;
@@ -2109,27 +2211,27 @@
             object-fit: cover;
             object-position: center;
             border-radius: 18px;
-            border: 1px solid rgba(183,122,114,.18);
-            box-shadow: 0 16px 38px rgba(100,47,56,0.10);
+            border: 1px solid var(--baoma-border);
+            box-shadow: var(--baoma-item-shadow);
         }
         [data-tenant="b-main"] .site-footer {
             max-width: 1120px;
             margin-top: 34px;
-            border-top-color: rgba(183,122,114,.20);
+            border-top-color: var(--baoma-border);
         }
         [data-tenant="b-main"] .footer-email {
-            color: #642F38;
+            color: var(--baoma-accent);
         }
         [data-tenant="b-main"] .footer-copy {
-            color: #746765;
+            color: var(--baoma-dim);
         }
         [data-tenant="b-main"] #modal {
-            color: #282323;
+            color: var(--baoma-text);
         }
         [data-tenant="b-main"] #modal-title,
         [data-tenant="b-main"] #modal-title-d,
         [data-tenant="b-main"] #modal-price {
-            color: #642F38;
+            color: var(--baoma-accent);
             background: none;
             -webkit-text-fill-color: currentColor;
             letter-spacing: 0;
@@ -2137,11 +2239,11 @@
         [data-tenant="b-main"] #modal-description,
         [data-tenant="b-main"] .tip,
         [data-tenant="b-main"] #modal-message {
-            color: #746765;
+            color: var(--baoma-dim);
         }
         [data-tenant="b-main"] #img-lightbox.has-panel {
             z-index: 5000;
-            background: rgba(40,35,35,0.82);
+            background: var(--baoma-overlay);
             -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
         }
@@ -2151,8 +2253,8 @@
         [data-tenant="b-main"] #img-lightbox.has-panel #lightbox-name {
             width: min(100%, 920px);
             padding: max(18px, env(safe-area-inset-top)) 56px 10px;
-            color: #642F38;
-            background: #FFFCF9;
+            color: var(--baoma-accent);
+            background: var(--baoma-lightbox-surface);
             -webkit-text-fill-color: currentColor;
             border-radius: 20px 20px 0 0;
             box-shadow: 0 -10px 32px rgba(100,47,56,0.10);
@@ -2169,7 +2271,7 @@
             aspect-ratio: 4 / 3;
             object-fit: cover;
             padding: 0;
-            background: #F7EBE8;
+            background: var(--baoma-lightbox-image-bg);
             box-shadow: 0 1px 0 rgba(100,47,56,0.08);
         }
         [data-tenant="b-main"] #img-lightbox.has-panel.no-photo #lightbox-img {
@@ -2183,12 +2285,12 @@
         }
         [data-tenant="b-main"] #img-lightbox.has-panel #lightbox-panel {
             width: min(100%, 920px);
-            background: #FFFCF9;
+            background: var(--baoma-lightbox-surface);
             border-radius: 0 0 20px 20px;
             box-shadow: 0 18px 50px rgba(100,47,56,0.18);
         }
         [data-tenant="b-main"] #img-lightbox.has-panel #lightbox-desc {
-            color: #746765;
+            color: var(--baoma-dim);
             font-size: 0.92rem;
             max-width: 640px;
         }
@@ -2202,7 +2304,7 @@
             display: block;
         }
         [data-tenant="b-main"] #img-lightbox.has-panel #lightbox-price {
-            color: #642F38;
+            color: var(--baoma-price);
             background: none;
             -webkit-text-fill-color: currentColor;
             font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -2210,17 +2312,31 @@
             letter-spacing: 0;
         }
         [data-tenant="b-main"] #basket-panel {
-            background: #FFFCF9;
-            color: #282323;
+            background: var(--baoma-lightbox-surface);
+            color: var(--baoma-text);
+        }
+        [data-theme="night"][data-tenant="b-main"] .footer-logo-dark,
+        [data-theme="night"][data-tenant="b-main"] .footer-logo-light {
+            display: none;
+        }
+        [data-theme="night"][data-tenant="b-main"] .footer-logo-white {
+            display: block;
+        }
+        [data-theme="night"][data-tenant="b-main"] #waiter-overlay {
+            background: rgba(21,10,13,0.82);
+        }
+        [data-theme="night"][data-tenant="b-main"] #waiter-card {
+            background: #FFF8F3;
+            color: #261A1D;
         }
         [data-tenant="b-main"] :focus-visible {
-            outline: 3px solid rgba(197,164,109,0.72);
+            outline: 3px solid var(--baoma-focus);
             outline-offset: 3px;
         }
         [data-tenant="b-main"] #theme-toggle:focus-visible,
         [data-tenant="b-main"] #lang-toggle:focus-visible {
-            outline-color: rgba(100,47,56,0.84);
-            box-shadow: 0 0 0 4px rgba(255,252,249,0.92), 0 8px 20px rgba(100,47,56,0.14);
+            outline-color: var(--baoma-focus);
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--baoma-bg) 78%, transparent), 0 8px 20px var(--baoma-shadow);
         }
         @media (min-width: 640px) {
             [data-tenant="b-main"] body {
