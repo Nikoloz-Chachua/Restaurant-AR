@@ -5841,9 +5841,13 @@
                 // directly on <html> (inline styles beat attribute-selector rules and would
                 // prevent the theme toggle from changing colours).
                 Object.values(varMap).forEach(v => document.documentElement.style.removeProperty(v));
+                // A tenant whose theme_config carries no template_key keeps whatever the
+                // boot script resolved from its slug. Without this, a tenant that is
+                // styled by a template but predates the template_key row would have its
+                // look stripped the moment this fetch lands.
                 const templateKey = /^[a-z0-9_-]+$/.test(cfg.template_key || '')
                     ? cfg.template_key
-                    : '';
+                    : (document.documentElement.dataset.template || '');
                 // Templates whose background treatment is structural to the design, not a
                 // per-tenant colour choice: an owner editing palette colours must not be
                 // able to knock out the layered background the template is built on.
