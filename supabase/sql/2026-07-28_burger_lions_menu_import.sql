@@ -17,8 +17,18 @@
 --   - 27 items carry price_old — their site is running a discount on
 --     those. The card shows the old price struck through beside the new one.
 --     Requires 2026-07-28_menu_item_price_old.sql to have been applied first.
---   - thumbnail_url points at R2 under the burgervazha/ prefix. Upload the WebP
---     set BEFORE committing this, or the menu renders with broken images.
+--   - Photos are served from this repo (img/burgervazha/) through Cloudflare
+--     Pages, the same arrangement BAOMA uses. Nothing to upload; they ship with
+--     the branch. Pages egress is free, so this does not reintroduce the
+--     Supabase-Storage egress problem the R2 rule exists to prevent.
+--     To move them to R2 later, upload the folder and run:
+--       update public.menu_items
+--          set thumbnail_url = replace(thumbnail_url,
+--                'https://restaurant-ar.pages.dev/img/burgervazha/dishes',
+--                '<R2 public base>/burgervazha')
+--        where restaurant_id = 56;
+--     plus the same replace on theme_config.hero_image_url / hero_images /
+--     logo_url / hero_logo_url.
 --
 -- Default safety is ROLLBACK. To execute after review, change only the final
 -- line from ROLLBACK; to COMMIT;
@@ -145,7 +155,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/halapeniu-burgeri-3240.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/halapeniu-burgeri-3240.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -163,7 +173,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/5-yvelis-burgeri-3250.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/5-yvelis-burgeri-3250.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -181,7 +191,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/tetri-lomi-3252.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/tetri-lomi-3252.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -199,7 +209,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/zevsi-3254.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/zevsi-3254.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -217,7 +227,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/spinqsi-mtsvadburgeri-3256.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/spinqsi-mtsvadburgeri-3256.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -235,7 +245,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/everesti-3258.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/everesti-3258.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -253,7 +263,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/steik-burgeri-3261.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/steik-burgeri-3261.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -271,7 +281,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/ideapiqsi-3263.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/ideapiqsi-3263.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -289,7 +299,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/ideapiqsi-3265.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/ideapiqsi-3265.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -307,7 +317,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/obeliqsi-3268.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/obeliqsi-3268.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -325,7 +335,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/asteriqsi-3270.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/asteriqsi-3270.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -343,7 +353,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/obeliqsi-3273.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/obeliqsi-3273.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -361,7 +371,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/druidi-3275.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/druidi-3275.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -379,7 +389,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/iuliusi-3277.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/iuliusi-3277.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -397,7 +407,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/ormagi-problema-3279.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/ormagi-problema-3279.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -415,7 +425,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/bekon-burgeri-3281.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/bekon-burgeri-3281.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -433,7 +443,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/chizburgeri-3283.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/chizburgeri-3283.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -451,7 +461,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/gladiatori-3285.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/gladiatori-3285.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -469,7 +479,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/didi-apetqeba-3287.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/didi-apetqeba-3287.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -487,7 +497,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/smesh-burgeri-2x-3289.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/smesh-burgeri-2x-3289.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -505,7 +515,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/smesh-burgeri-4x-3291.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/smesh-burgeri-4x-3291.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -523,7 +533,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/bekon-burgeris-torti-3293.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/bekon-burgeris-torti-3293.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -541,7 +551,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/khuti-yvelis-burgeris-torti-3295.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/khuti-yvelis-burgeris-torti-3295.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -559,7 +569,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/asteroidi-3297.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/asteroidi-3297.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -577,7 +587,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/lomis-ghriali-3299.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/lomis-ghriali-3299.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -595,7 +605,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/shavi-lomi-3301.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/shavi-lomi-3301.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -613,7 +623,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/lomebis-sousi-nagetsit-3310.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/lomebis-sousi-nagetsit-3310.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -631,7 +641,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/lomebis-sousi-eqstra-3312.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/lomebis-sousi-eqstra-3312.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -649,7 +659,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/didi-pri-nagetsit-3314.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/didi-pri-nagetsit-3314.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -667,7 +677,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/didi-pri-3316.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/didi-pri-3316.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -685,7 +695,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/kartopili-pri-halapeniuti-da-yvelis-sousit-250-gr-3318.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/kartopili-pri-halapeniuti-da-yvelis-sousit-250-gr-3318.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -703,7 +713,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/spets-kartopili-pri-400-gr-3321.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/spets-kartopili-pri-400-gr-3321.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -721,7 +731,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/patara-kartopili-pri-3323.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/patara-kartopili-pri-3323.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -739,7 +749,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/yvelis-sousi-3325.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/yvelis-sousi-3325.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -757,7 +767,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/didi-yvelis-sousi-3327.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/didi-yvelis-sousi-3327.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -775,7 +785,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/barbeqiu-sousi-30gr-3328.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/barbeqiu-sousi-30gr-3328.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -793,7 +803,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/halapenio-30gr-gaziareba-3330.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/halapenio-30gr-gaziareba-3330.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -811,7 +821,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/patara-yvelis-susi-bekonit-3711.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/patara-yvelis-susi-bekonit-3711.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -829,7 +839,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/sashualo-yvelis-susi-bekonit-3713.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/sashualo-yvelis-susi-bekonit-3713.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -847,7 +857,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/didi-yvelis-susi-bekonit-3715.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/didi-yvelis-susi-bekonit-3715.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -865,7 +875,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/tkbiltskhare-sousi-eqstra-3720.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/tkbiltskhare-sousi-eqstra-3720.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -883,7 +893,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/lomebis-sousi-bekonit-3722.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/lomebis-sousi-bekonit-3722.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -901,7 +911,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/sashualo-kartopili-pri-3761.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/sashualo-kartopili-pri-3761.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -919,7 +929,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/koka-kola-0-33-3335.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/koka-kola-0-33-3335.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -937,7 +947,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/chamosaskhmeli-kokakola-0-4-3337.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/chamosaskhmeli-kokakola-0-4-3337.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -955,7 +965,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/koka-kola-zero-0-33-3339.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/koka-kola-zero-0-33-3339.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -973,7 +983,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/panta-0-33-3341.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/panta-0-33-3341.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -991,7 +1001,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/redbuli-red-bull-0-25-3343.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/redbuli-red-bull-0-25-3343.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1009,7 +1019,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/shavi-lomi-apa-0-5-3345.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/shavi-lomi-apa-0-5-3345.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1027,7 +1037,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/kombucha-3347.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/kombucha-3347.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1045,7 +1055,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/likani-0-6-3349.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/likani-0-6-3349.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1063,7 +1073,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/miner-tsyali-mtis-0-5-3353.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/miner-tsyali-mtis-0-5-3353.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1081,7 +1091,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/borjomi-0-5-3355.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/borjomi-0-5-3355.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1099,7 +1109,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/re-preshis-limonati-3357.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/re-preshis-limonati-3357.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1117,7 +1127,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/portokhlis-preshi-3730.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/portokhlis-preshi-3730.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1135,7 +1145,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/tiramisu-3360.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/tiramisu-3360.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1153,7 +1163,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/lions-sweets-chekhuri-pakhlava-3740.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/lions-sweets-chekhuri-pakhlava-3740.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1171,7 +1181,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/papyrus-sigara-nigvziani-3743.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/papyrus-sigara-nigvziani-3743.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1189,7 +1199,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/cafe-mondial-strawberry-3362.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/cafe-mondial-strawberry-3362.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1207,7 +1217,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/cafe-mondial-chocolate-3364.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/cafe-mondial-chocolate-3364.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1225,7 +1235,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/espreso-3367.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/espreso-3367.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1243,7 +1253,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/amerikano-3369.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/amerikano-3369.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1261,7 +1271,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/kapuchino-3371.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/kapuchino-3371.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1279,7 +1289,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/late-3373.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/late-3373.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1297,7 +1307,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/tsivi-yava-nayinit-3732.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/tsivi-yava-nayinit-3732.webp",
     "thumb_3d": false,
     "text_only": false
   },
@@ -1315,7 +1325,7 @@ with src as (
     "model": "",
     "model_usdz": "",
     "ar_scale": 1.0,
-    "thumbnail_url": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/late-makiato-3736.webp",
+    "thumbnail_url": "https://restaurant-ar.pages.dev/img/burgervazha/dishes/late-makiato-3736.webp",
     "thumb_3d": false,
     "text_only": false
   }
@@ -1403,19 +1413,19 @@ with src as (
   },
   {
     "key": "hero_image_url",
-    "value": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/_hero-1.webp"
+    "value": "https://restaurant-ar.pages.dev/img/burgervazha/hero-1.webp"
   },
   {
     "key": "hero_images",
-    "value": "[\"https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/_hero-1.webp\"]"
+    "value": "[\"https://restaurant-ar.pages.dev/img/burgervazha/hero-1.webp\"]"
   },
   {
     "key": "logo_url",
-    "value": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/_brand-logo.webp"
+    "value": "https://restaurant-ar.pages.dev/img/burgervazha/logo.webp"
   },
   {
     "key": "hero_logo_url",
-    "value": "https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/_brand-logo.webp"
+    "value": "https://restaurant-ar.pages.dev/img/burgervazha/logo.webp"
   },
   {
     "key": "night_bg",
@@ -1718,7 +1728,7 @@ set value = excluded.value;
 update public.brands
    set primary_color = '#b22929',
        secondary_color = '#e8a33d',
-       logo_url = 'https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev/burgervazha/_brand-logo.webp'
+       logo_url = 'https://restaurant-ar.pages.dev/img/burgervazha/logo.webp'
  where id = 50
    and slug = 'burgerlions';
 
