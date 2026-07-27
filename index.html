@@ -48,10 +48,15 @@
             // arrival. Adding a tenant to a template is a one-line entry — NOT a code
             // fork. Anything not listed simply renders the base template until fetch.
             const BOOT_TEMPLATE_BY_SLUG = {
-                'b-main': 'baoma'
+                'b-main': 'baoma',
+                'burgervazha': 'burger_lions'
             };
             const BOOT_TEMPLATE_DEFAULTS = {
-                baoma: { theme: 'day', preload: './img/baoma/interior-hero-maps.webp' }
+                baoma: { theme: 'day', preload: './img/baoma/interior-hero-maps.webp' },
+                // night is already the document default, so this only pins it against a
+                // stale 'day' left in localStorage. The hero photo is a tenant upload,
+                // unknown at boot, so there is nothing to preload here.
+                burger_lions: { theme: 'night' }
             };
             const params = new URLSearchParams(location.search);
             const host = location.hostname.toLowerCase();
@@ -728,6 +733,19 @@
             letter-spacing: 1px;
             color: var(--price-color, var(--accent));
             transition: color var(--t);
+        }
+
+        /* Discounted item: the previous price sits struck through before the current
+           one. Rendered only when menu_items.price_old is set, so items — and whole
+           tenants — that never discount are visually untouched. Muted and smaller so
+           the price the guest actually pays stays the loudest thing in the row. */
+        .price-was {
+            color: var(--dim);
+            font-size: 0.78em;
+            margin-right: 0.42em;
+            text-decoration: line-through;
+            text-decoration-thickness: 1px;
+            opacity: 0.75;
         }
 
         /* Per-item add-on options ("Make Double  +6.9 ₾") — tap to select; a selected
@@ -2504,6 +2522,273 @@
                 animation-iteration-count: 1 !important;
                 scroll-behavior: auto !important;
             }
+        }
+
+        /* ── BURGER LIONS template — charcoal, lion red, amber ────────────
+           A dark grill-house look: near-black surfaces, squared-off chrome, heavy
+           uppercase display type, and a full-bleed hero photo behind the crest.
+
+           Two palette notes that are load-bearing:
+           1. The brand red (#b22929) scores 2.64:1 on the charcoal card — unusable
+              for the item names and prices that ride on --accent. Night therefore
+              lifts it to #e8514a (4.65:1) and keeps #b22929 for day (6.48:1 on
+              white) and for CTA fills in both modes, where white sits on top of it
+              at 6.48:1. The preset carries preserveModeAccents so this survives.
+           2. Amber is the appetite colour and does the work red cannot on dark:
+              #f0b657 reaches 9.4:1, so prices and rules use it at night.
+
+           Everything below is scoped to [data-template="burger_lions"]. No other
+           tenant matches, and removing this block returns the base template. */
+        [data-template="burger_lions"] {
+            --bg: var(--bl-bg);
+            --bg2: var(--bl-bg2);
+            --glow: var(--bl-glow);
+            --glow2: var(--bl-glow2);
+            --shadow: var(--bl-shadow);
+            --card: var(--bl-card);
+            --card2: var(--bl-card2);
+            --border: var(--bl-border);
+            --text: var(--bl-text);
+            --dim: var(--bl-dim);
+            --accent: var(--bl-accent);
+            --accent2: var(--bl-accent2);
+            --accent-text: var(--bl-accent-text);
+            --thumb-bg: var(--bl-thumb-bg);
+            --modal-bg: var(--bl-modal-bg);
+            --modal-rgb: var(--bl-modal-rgb);
+            --bg-image: var(--bl-bg-image);
+            --bg-size: auto, auto, auto;
+            --bg-repeat: no-repeat, no-repeat, no-repeat;
+            --card-bg: var(--bl-card-bg);
+            --card-blur: 0px;
+            --card-radius: 14px;
+            --item-shadow: var(--bl-item-shadow);
+            --item-hover-shadow: var(--bl-item-hover-shadow);
+            --accent-edge: var(--bl-accent-edge);
+            --stage-bg: var(--bl-thumb-bg);
+            --thumb-vignette: var(--bl-thumb-vignette);
+            --pill-bg: var(--bl-pill-bg);
+            --pill-active-bg: var(--bl-cta);
+            --cta-bg: var(--bl-cta);
+            --cta-shadow: var(--bl-cta-shadow);
+            --hero-color: var(--bl-accent);
+            --hero-shadow: none;
+            --divider-bg: var(--bl-divider-bg);
+            --modal-bg-image: var(--bl-modal-bg-image);
+            --price-color: var(--bl-price);
+            --add-btn-color: var(--bl-accent);
+        }
+        [data-theme="night"][data-template="burger_lions"] {
+            --bl-bg: #141211;
+            --bl-bg2: #0c0b0a;
+            --bl-glow: rgba(232,163,61,0.13);
+            --bl-glow2: rgba(178,41,41,0.16);
+            --bl-shadow: rgba(0,0,0,0.62);
+            --bl-card: #1e1b1a;
+            --bl-card2: #262220;
+            --bl-border: rgba(232,163,61,0.16);
+            --bl-text: #f7f2e9;
+            --bl-dim: #a89f95;
+            --bl-accent: #e8514a;
+            --bl-accent2: #f0b657;
+            --bl-accent-text: #ffffff;
+            --bl-cta: #b22929;
+            --bl-price: #f0b657;
+            --bl-thumb-bg: #0f0d0c;
+            --bl-modal-bg: #100e0d;
+            --bl-modal-rgb: 16,14,13;
+            --bl-bg-image:
+                radial-gradient(78% 44% at 50% -6%, rgba(178,41,41,0.20) 0%, transparent 62%),
+                radial-gradient(64% 40% at 88% 26%, rgba(232,163,61,0.10) 0%, transparent 70%),
+                linear-gradient(178deg, #141211 0%, #100e0d 54%, #0c0b0a 100%);
+            --bl-card-bg: linear-gradient(168deg, #221e1c 0%, #1a1716 100%);
+            --bl-item-shadow: 0 4px 16px rgba(0,0,0,0.52);
+            --bl-item-hover-shadow: 0 14px 32px rgba(0,0,0,0.62);
+            --bl-accent-edge: linear-gradient(180deg, #b22929, #f0b657);
+            --bl-thumb-vignette: linear-gradient(180deg, transparent 56%, rgba(12,11,10,0.42));
+            --bl-pill-bg: rgba(34,30,28,0.94);
+            --bl-cta-shadow: 0 6px 18px rgba(178,41,41,0.34);
+            --bl-divider-bg: linear-gradient(90deg, transparent, #f0b657, transparent);
+            --bl-modal-bg-image:
+                radial-gradient(70% 46% at 50% 32%, rgba(178,41,41,0.20) 0%, transparent 64%),
+                linear-gradient(180deg, #1a1716 0%, #0c0b0a 100%);
+            --bl-hero-scrim: linear-gradient(180deg, rgba(10,9,8,0.42) 0%, rgba(10,9,8,0.28) 40%, rgba(20,18,17,0.86) 86%, #141211 100%);
+            --bl-header-bg: rgba(16,14,13,0.86);
+        }
+        [data-theme="day"][data-template="burger_lions"] {
+            --bl-bg: #f6f1e8;
+            --bl-bg2: #e9e1d3;
+            --bl-glow: rgba(178,41,41,0.10);
+            --bl-glow2: rgba(138,90,18,0.08);
+            --bl-shadow: rgba(60,40,24,0.16);
+            --bl-card: #ffffff;
+            --bl-card2: #f4ece0;
+            --bl-border: rgba(60,40,24,0.16);
+            --bl-text: #191614;
+            --bl-dim: #6d6259;
+            --bl-accent: #b22929;
+            --bl-accent2: #8a5a12;
+            --bl-accent-text: #ffffff;
+            --bl-cta: #b22929;
+            --bl-price: #8a5a12;
+            --bl-thumb-bg: #ece3d5;
+            --bl-modal-bg: #fbf7f0;
+            --bl-modal-rgb: 251,247,240;
+            --bl-bg-image:
+                radial-gradient(78% 44% at 50% -8%, rgba(178,41,41,0.09) 0%, transparent 62%),
+                radial-gradient(64% 40% at 88% 26%, rgba(138,90,18,0.08) 0%, transparent 70%),
+                linear-gradient(178deg, #f6f1e8 0%, #efe7da 56%, #fbf7f0 100%);
+            --bl-card-bg: linear-gradient(168deg, #ffffff 0%, #f7f1e7 100%);
+            --bl-item-shadow: 0 4px 14px rgba(60,40,24,0.12);
+            --bl-item-hover-shadow: 0 12px 28px rgba(60,40,24,0.18);
+            --bl-accent-edge: linear-gradient(180deg, #b22929, #8a5a12);
+            --bl-thumb-vignette: linear-gradient(180deg, transparent 58%, rgba(60,40,24,0.10));
+            --bl-pill-bg: rgba(255,255,255,0.88);
+            --bl-cta-shadow: 0 6px 16px rgba(178,41,41,0.22);
+            --bl-divider-bg: linear-gradient(90deg, transparent, #8a5a12, transparent);
+            --bl-modal-bg-image:
+                radial-gradient(70% 46% at 50% 32%, rgba(178,41,41,0.10) 0%, transparent 64%),
+                linear-gradient(180deg, #f6f1e8 0%, #fbf7f0 100%);
+            --bl-hero-scrim: linear-gradient(180deg, rgba(20,18,17,0.40) 0%, rgba(20,18,17,0.26) 42%, rgba(246,241,232,0.90) 86%, #f6f1e8 100%);
+            --bl-header-bg: rgba(251,247,240,0.88);
+        }
+
+        /* Hero — reuses the shared .mg-hero markup, so the admin panel's logo and
+           hero-image uploads drive it with no extra wiring. Empty hero_images falls
+           back to the gradient background; empty logo_url hides the crest. */
+        [data-template="burger_lions"] .mg-hero {
+            display: flex;
+            position: relative;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            /* The hero sits inside the centred content column, so it needs the same
+               full-bleed break-out Monday Greens uses. Without it the photo renders
+               as a narrow strip the width of the column. */
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+            min-height: var(--mg-hero-h, 76svh);
+            overflow: hidden;
+            isolation: isolate;
+        }
+        [data-template="burger_lions"] .mg-hero-photo {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-color: #0f0d0c; /* holds the dark while the photo loads / if unset */
+            background-image: var(--hero-image, none);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        [data-template="burger_lions"] .mg-hero-next {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity var(--mg-hero-fade, 1200ms) ease-in-out;
+        }
+        /* The scrim has to reach near-opaque at the bottom: the menu scrolls up
+           into it, and a half-lit photo behind the first category header made the
+           heading unreadable at several of their photo exposures. */
+        [data-template="burger_lions"] .mg-hero-veil {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            background: var(--bl-hero-scrim);
+        }
+        /* Capped at 180px on purpose: the largest crest their site publishes is
+           250×180, so a wider hero logo would be upscaled and visibly soft on a 2x
+           phone. Raise this if they ever supply a vector or larger PNG. */
+        [data-template="burger_lions"] .mg-hero-logo {
+            position: relative;
+            z-index: 3;
+            width: min(38vw, 180px);
+            height: auto;
+            filter: drop-shadow(0 6px 20px rgba(0,0,0,0.5));
+            animation: bl-hero-rise 0.85s cubic-bezier(0.2,0.7,0.2,1) both;
+        }
+        [data-template="burger_lions"] .mg-hero-logo:not([src]) { display: none; }
+        @keyframes bl-hero-rise {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: none; }
+        }
+        [data-template="burger_lions"] .mg-hero-scroll {
+            position: absolute;
+            bottom: 18px;
+            z-index: 3;
+            color: var(--bl-accent2);
+            opacity: 0.85;
+        }
+
+        /* Squared-off chrome. Their site uses hard-edged red tabs and blocky
+           buttons; the base template's 999px pills read too soft against that. */
+        [data-template="burger_lions"] .cat-pill {
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 1.1px;
+            border: 1px solid var(--bl-border);
+        }
+        [data-template="burger_lions"] .cat-pill.active {
+            color: #fff;
+            border-color: transparent;
+        }
+        [data-template="burger_lions"] .ar-btn,
+        [data-template="burger_lions"] .qty-add-btn,
+        [data-template="burger_lions"] .qty-stepper { border-radius: 6px; }
+
+        /* Category heading gets the short amber rule their section kickers use. */
+        [data-template="burger_lions"] .category-header {
+            text-transform: uppercase;
+            color: var(--bl-text);
+            position: relative;
+        }
+        [data-template="burger_lions"] .category-header::before {
+            content: "";
+            display: block;
+            width: 34px;
+            height: 3px;
+            margin-bottom: 10px;
+            border-radius: 2px;
+            background: var(--bl-accent2);
+        }
+        [data-template="burger_lions"] .item-name {
+            text-transform: uppercase;
+            color: var(--bl-text);
+        }
+        /* Georgian is not uppercased — the script has no case, so text-transform is
+           a no-op on the letters but still strips the tighter Latin tracking.
+
+           !important is deliberate and load-bearing: _applyHeadingFontToMenu() writes
+           the tenant's font_heading (Oswald here) as an INLINE style on .item-name and
+           .category-header, and inline beats a plain stylesheet rule. Oswald has no
+           Georgian glyphs, so without this the whole Georgian menu — which is all of
+           it — would drop to an arbitrary generic sans. Scoped to this template so the
+           override cannot reach another tenant. */
+        html[lang="ka"][data-template="burger_lions"] .item-name,
+        html[lang="ka"][data-template="burger_lions"] .category-header {
+            font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif !important;
+            text-transform: none;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+        }
+
+        [data-template="burger_lions"] .menu-item {
+            border: 1px solid var(--bl-border);
+            overflow: hidden;
+        }
+        [data-template="burger_lions"] .header {
+            background: var(--bl-header-bg);
+            backdrop-filter: blur(14px) saturate(130%);
+        }
+        @media (prefers-reduced-motion: reduce) {
+            [data-template="burger_lions"] .mg-hero-logo { animation: none; }
         }
 
         /* ── Quantity stepper (add-to-basket control) ── */
@@ -4759,6 +5044,22 @@
             })[ch]);
         }
 
+        /* Paint a price element, prefixing the struck-through previous price when the
+           item is discounted. Built from text nodes rather than innerHTML so the
+           values stay inert even though they are owner-authored free text. */
+        function _setPriceWithOld(el, price, priceOld) {
+            if (!el) return;
+            el.textContent = '';
+            const was = _cleanText(priceOld);
+            if (was) {
+                const s = document.createElement('span');
+                s.className = 'price-was';
+                s.textContent = was;
+                el.appendChild(s);
+            }
+            el.appendChild(document.createTextNode(_cleanText(price)));
+        }
+
         function _tenantBrandFallback() {
             const tenant = window.__tenant || _tenant || {};
             return _cleanBrandText(tenant.brand?.name)
@@ -5137,7 +5438,7 @@
             modalTitle.textContent = t(item, 'name');
             _fitModalTitle();
             document.getElementById('modal-title-d').textContent = t(item, 'name');
-            modalPrice.textContent = item.price;
+            _setPriceWithOld(modalPrice, item.price, item.price_old);
             document.getElementById('modal-description').textContent = t(item, 'description') || '';
             const msgEl = document.getElementById('modal-message');
             msgEl.textContent = modalMessage;
@@ -5261,7 +5562,8 @@
             if (_lbItem == null || _lbIdx == null) return;
             const hasVariants = !!(_lbItem.variants && _lbItem.variants.length);
             const vIdx = hasVariants ? _variantIndex(_lbItem, _lbIdx) : -1;
-            _lbPrice.textContent = hasVariants ? (_lbItem.variants[vIdx]?.price || '') : (_lbItem.price || '');
+            if (hasVariants) _lbPrice.textContent = _lbItem.variants[vIdx]?.price || '';
+            else _setPriceWithOld(_lbPrice, _lbItem.price || '', _lbItem.price_old);
             _lbOptions.querySelectorAll('.variant').forEach(btn => {
                 const on = parseInt(btn.dataset.vi, 10) === vIdx;
                 btn.classList.toggle('selected', on);
@@ -5775,6 +6077,10 @@
             return out;
         }
 
+        // Templates whose hero has the crossfade layer (.mg-hero-next) in their CSS.
+        // A template not listed here still shows hero_images[0] as a still photo.
+        const HERO_GALLERY_TEMPLATES = new Set(['monday_greens', 'burger_lions']);
+
         function _startHeroGallery(urls) {
             const base = document.querySelector('.mg-hero-photo');
             const next = document.querySelector('.mg-hero-next');
@@ -5938,7 +6244,7 @@
                     const baomaHeroImg = document.querySelector('.baoma-hero-img');
                     if (baomaHeroImg) baomaHeroImg.src = heroShots[0];
                 }
-                if (templateKey === 'monday_greens' && heroShots.length > 1) _startHeroGallery(heroShots);
+                if (HERO_GALLERY_TEMPLATES.has(templateKey) && heroShots.length > 1) _startHeroGallery(heroShots);
                 // Optional per-tenant hero height (e.g. "56.25vw" for a full 16:9 banner).
                 if (cfg.hero_min_h) {
                     document.documentElement.style.setProperty('--mg-hero-h', cfg.hero_min_h);
@@ -6000,6 +6306,7 @@
                             description:    _cleanText(r.description_en),
                             description_ka: _cleanText(r.description_ka),
                             price:          _cleanText(r.price),
+                            price_old:      _cleanText(r.price_old),
                             model:          r.model,
                             model_usdz:     r.model_usdz || '',
                             ar_scale:       r.ar_scale ?? 1.0,
@@ -6136,6 +6443,11 @@
                 const _hasVariants = !!(item.variants && item.variants.length);
                 const _cardVi = _hasVariants ? _variantIndex(item, globalIdx) : -1;
                 const itemPriceHtml = _escapeHtml(_hasVariants ? (item.variants[_cardVi].price || '') : item.price);
+                // A discount belongs to the item's own price. Variant-priced items pick
+                // their price per variant, so the old price would be ambiguous there and
+                // is deliberately suppressed.
+                const priceWasHtml = (!_hasVariants && item.price_old)
+                    ? `<span class="price-was">${_escapeHtml(item.price_old)}</span>` : '';
                 if (noImage) card.classList.add('no-image');
                 // Text-only dishes are the majority of a drinks-heavy menu, so they get the
                 // same cart button and variant/add-on pills as photo cards — only the media
@@ -6157,7 +6469,7 @@
                     <p class="ingredients" data-field="description" data-idx="${globalIdx}">${itemDescHtml}</p>
                     <div class="item-right">
                         <div class="item-actions">
-                            <p class="price">${itemPriceHtml}</p>
+                            <p class="price">${priceWasHtml}${itemPriceHtml}</p>
                             ${_qtyCtrlHtml(globalIdx)}
                         </div>
                     </div>
@@ -6165,7 +6477,7 @@
                     <div class="item-right">
                         <p class="ingredients" data-field="description" data-idx="${globalIdx}">${itemDescHtml}</p>
                         <div class="item-actions">
-                            <p class="price">${itemPriceHtml}</p>
+                            <p class="price">${priceWasHtml}${itemPriceHtml}</p>
                             ${_qtyCtrlHtml(globalIdx)}
                         </div>
                         ${_variantsHtml(item, globalIdx)}
