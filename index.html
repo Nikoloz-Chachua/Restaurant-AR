@@ -6240,6 +6240,35 @@
                 if (heroShots.length) {
                     document.documentElement.style.setProperty('--hero-image', `url("${heroShots[0]}")`);
                 }
+                // ⚠ WORKAROUND — delete this block once the line below is fixed.
+                //
+                // The `isBaomaTenant` check on the next line reads an identifier that
+                // does not exist (every other call site uses `_isBaomaTenant()`). It
+                // throws a ReferenceError that the enclosing `catch (_) {}` swallows,
+                // so EVERY statement after it is skipped for EVERY tenant — including
+                // the hero-logo assignment and _startHeroGallery near the end of this
+                // function.
+                //
+                // Repairing the identifier would also revive the hero gallery, the
+                // FOOD | DRINKS switch and the spin button on tenants that have them
+                // configured but have been running without them since 2026-07-27 —
+                // a visible change to a live menu, so it is deliberately NOT done here.
+                // This block instead does the two things burger_lions needs, ahead of
+                // the throw and scoped to that template, leaving every other tenant on
+                // exactly the code path it runs today.
+                if (templateKey === 'burger_lions') {
+                    const blHeroLogo = document.getElementById('mg-hero-logo');
+                    const blHeroLogoUrl = _safeAssetUrl(cfg.hero_logo_url) || logoUrl;
+                    if (blHeroLogo && blHeroLogoUrl) {
+                        blHeroLogo.src = blHeroLogoUrl;
+                        blHeroLogo.alt = cfg.site_name || tenant.restaurant_name || '';
+                        blHeroLogo.onerror = () => { blHeroLogo.style.display = 'none'; };
+                    }
+                    if (heroShots.length > 1) _startHeroGallery(heroShots);
+                    if (cfg.hero_min_h) {
+                        document.documentElement.style.setProperty('--mg-hero-h', cfg.hero_min_h);
+                    }
+                }
                 if (isBaomaTenant && heroShots.length) {
                     const baomaHeroImg = document.querySelector('.baoma-hero-img');
                     if (baomaHeroImg) baomaHeroImg.src = heroShots[0];
