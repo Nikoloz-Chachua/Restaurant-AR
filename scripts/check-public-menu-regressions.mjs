@@ -66,7 +66,9 @@ assert.ok(html.includes("if (templateKey === 'monday_greens' && heroShots.length
           'Monday Greens full-screen gallery behavior should remain template-scoped');
 assert.ok(html.includes('src="./img/baoma/interior-terrace.jpg"'), 'BAOMA supporting section must use the local official-reference image');
 assert.ok(html.includes('https://www.instagram.com/restaurant.baoma/'), 'BAOMA info must link to the official Instagram');
-assert.ok(html.includes('11%20Erekle%20II%20Street%2C%20Tbilisi%2C%20Georgia'), 'BAOMA info must link to directions for the verified address');
+assert.ok(html.includes('maps/place/BAOMA/@41.69268842974916,44.80671702001008') &&
+          html.includes('0x40440d97adae6705:0xa37697662cee69d6'),
+          'BAOMA directions must open its exact named Google Maps place and coordinates');
 assert.ok(html.includes('BAOMA has not published menu items here yet'), 'BAOMA empty state must truthfully avoid fake dishes');
 assert.ok(html.includes("brand: 'BAOMA'") && html.includes("brand: 'ბაომა'"), 'BAOMA customer-facing title should be normalized per language');
 assert.ok(html.includes('hideForEmptyBaoma'), 'BAOMA empty menu should suppress the basket bar through basket state logic');
