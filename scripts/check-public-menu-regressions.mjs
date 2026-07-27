@@ -58,6 +58,12 @@ assert.ok(html.includes("brand: 'site_name',"), 'BAOMA brand name must read the 
 assert.ok(html.includes('fetch(\'./data/fixtures/baoma-menu.fixture.json\'') || html.includes('fetch("./data/fixtures/baoma-menu.fixture.json"'),
           'BAOMA fixture must be loaded from the static fixture artifact');
 assert.ok(html.includes('src="./img/baoma/interior-hero-maps.webp"'), 'BAOMA hero must use the optimized official Google Maps landscape image');
+assert.ok(html.includes("if (isBaomaTenant && heroShots.length)") &&
+          html.includes("document.querySelector('.baoma-hero-img')") &&
+          html.includes('baomaHeroImg.src = heroShots[0];'),
+          'BAOMA short hero should consume the active tenant hero gallery image without changing its layout');
+assert.ok(html.includes("if (templateKey === 'monday_greens' && heroShots.length > 1) _startHeroGallery(heroShots);"),
+          'Monday Greens full-screen gallery behavior should remain template-scoped');
 assert.ok(html.includes('src="./img/baoma/interior-terrace.jpg"'), 'BAOMA supporting section must use the local official-reference image');
 assert.ok(html.includes('https://www.instagram.com/restaurant.baoma/'), 'BAOMA info must link to the official Instagram');
 assert.ok(html.includes('11%20Erekle%20II%20Street%2C%20Tbilisi%2C%20Georgia'), 'BAOMA info must link to directions for the verified address');

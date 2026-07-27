@@ -3227,7 +3227,7 @@
     <button id="lang-toggle" aria-label="Toggle language">EN</button>
 
     <!-- Monday Greens template hero — shown only when data-template="monday_greens".
-         Photo from theme_config.hero_image_url (--hero-image), logo from logo_url.
+         Photo from theme_config.hero_images/hero_image_url (--hero-image), logo from logo_url.
          Degrades to a gradient + the standard header when either is unset. -->
     <section class="mg-hero" aria-hidden="true">
         <div class="mg-hero-photo"></div>
@@ -5925,8 +5925,8 @@
                     baomaLogo.style.display = 'block';
                     baomaLogo.onerror = () => { baomaLogo.style.display = 'none'; };
                 }
-                // Monday Greens template hero: photo → --hero-image, logo → hero <img>.
-                // hero_images (JSON array) turns the hero into a crossfading gallery;
+                // Tenant hero image: hero_images (JSON array) makes the first photo the
+                // primary hero and may rotate on templates with a gallery layer;
                 // hero_image_url remains the single-photo fallback.
                 const heroGallery = _parseHeroImages(cfg.hero_images);
                 const heroSingle = _safeAssetUrl(cfg.hero_image_url);
@@ -5934,7 +5934,11 @@
                 if (heroShots.length) {
                     document.documentElement.style.setProperty('--hero-image', `url("${heroShots[0]}")`);
                 }
-                if (heroShots.length > 1) _startHeroGallery(heroShots);
+                if (isBaomaTenant && heroShots.length) {
+                    const baomaHeroImg = document.querySelector('.baoma-hero-img');
+                    if (baomaHeroImg) baomaHeroImg.src = heroShots[0];
+                }
+                if (templateKey === 'monday_greens' && heroShots.length > 1) _startHeroGallery(heroShots);
                 // Optional per-tenant hero height (e.g. "56.25vw" for a full 16:9 banner).
                 if (cfg.hero_min_h) {
                     document.documentElement.style.setProperty('--mg-hero-h', cfg.hero_min_h);
