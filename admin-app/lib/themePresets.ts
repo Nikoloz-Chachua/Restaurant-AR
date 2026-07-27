@@ -11,6 +11,7 @@ export type StarterTemplateKey =
   | 'elegant_black'
   | 'monday_greens'
   | 'baoma'
+  | 'burger_lions'
 
 export type ThemePreset = {
   key: StarterTemplateKey
@@ -249,6 +250,30 @@ const TEMPLATE_VISUAL_TOKENS: Record<StarterTemplateKey, ThemeConfig> = {
     day_item_shadow: '0 14px 34px rgba(100,47,56,0.08)', day_item_hover_shadow: '0 18px 44px rgba(100,47,56,0.14)',
     day_modal_bg_image: 'linear-gradient(180deg, #FFFCF9 0%, #F8F1ED 100%)',
   },
+  // Transcribed from the --bl-* custom properties in index.html so the CMS preset
+  // and the in-page template cannot drift apart.
+  burger_lions: {
+    night_bg_image: 'radial-gradient(78% 44% at 50% -6%, rgba(178,41,41,0.20) 0%, transparent 62%), radial-gradient(64% 40% at 88% 26%, rgba(232,163,61,0.10) 0%, transparent 70%), linear-gradient(178deg, #141211 0%, #100e0d 54%, #0c0b0a 100%)',
+    night_bg_size: 'auto, auto, auto', night_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    night_card_bg: 'linear-gradient(168deg, #221e1c 0%, #1a1716 100%)', night_card_radius: '14px', night_card_blur: '0px',
+    night_stage_bg: '#0f0d0c',
+    night_pill_bg: 'rgba(34,30,28,0.94)', night_pill_active_bg: '#b22929',
+    night_cta_bg: '#b22929', night_cta_shadow: '0 6px 18px rgba(178,41,41,0.34)',
+    night_hero_color: '#e8514a', night_hero_shadow: 'none', night_divider_bg: 'linear-gradient(90deg, transparent, #f0b657, transparent)',
+    night_accent_edge: 'linear-gradient(180deg, #b22929, #f0b657)', night_thumb_vignette: 'linear-gradient(180deg, transparent 56%, rgba(12,11,10,0.42))',
+    night_item_shadow: '0 4px 16px rgba(0,0,0,0.52)', night_item_hover_shadow: '0 14px 32px rgba(0,0,0,0.62)',
+    night_modal_bg_image: 'radial-gradient(70% 46% at 50% 32%, rgba(178,41,41,0.20) 0%, transparent 64%), linear-gradient(180deg, #1a1716 0%, #0c0b0a 100%)',
+    day_bg_image: 'radial-gradient(78% 44% at 50% -8%, rgba(178,41,41,0.09) 0%, transparent 62%), radial-gradient(64% 40% at 88% 26%, rgba(138,90,18,0.08) 0%, transparent 70%), linear-gradient(178deg, #f6f1e8 0%, #efe7da 56%, #fbf7f0 100%)',
+    day_bg_size: 'auto, auto, auto', day_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    day_card_bg: 'linear-gradient(168deg, #ffffff 0%, #f7f1e7 100%)', day_card_radius: '14px', day_card_blur: '0px',
+    day_stage_bg: '#ece3d5',
+    day_pill_bg: 'rgba(255,255,255,0.88)', day_pill_active_bg: '#b22929',
+    day_cta_bg: '#b22929', day_cta_shadow: '0 6px 16px rgba(178,41,41,0.22)',
+    day_hero_color: '#b22929', day_hero_shadow: 'none', day_divider_bg: 'linear-gradient(90deg, transparent, #8a5a12, transparent)',
+    day_accent_edge: 'linear-gradient(180deg, #b22929, #8a5a12)', day_thumb_vignette: 'linear-gradient(180deg, transparent 58%, rgba(60,40,24,0.10))',
+    day_item_shadow: '0 4px 14px rgba(60,40,24,0.12)', day_item_hover_shadow: '0 12px 28px rgba(60,40,24,0.18)',
+    day_modal_bg_image: 'radial-gradient(70% 46% at 50% 32%, rgba(178,41,41,0.10) 0%, transparent 64%), linear-gradient(180deg, #f6f1e8 0%, #fbf7f0 100%)',
+  },
 }
 
 export const TEMPLATE_PRESETS: ThemePreset[] = [
@@ -435,6 +460,32 @@ export const TEMPLATE_PRESETS: ThemePreset[] = [
       ...TEMPLATE_VISUAL_TOKENS.baoma,
       font_body: 'Nunito', font_heading: 'Cormorant Garamond', template_key: 'baoma',
       default_theme: 'day',
+    },
+  },
+  {
+    key: 'burger_lions',
+    label: 'Grill House',
+    description: 'Charcoal, lion red and amber with a full-bleed hero photo and squared-off chrome — for burger joints, grills, and sports bars.',
+    primaryColor: '#b22929',
+    secondaryColor: '#e8a33d',
+    createStarterCategory: true,
+    // The brand red reads at 2.64:1 on the charcoal card — fine on the day white
+    // (6.48:1) but unusable for night item names and prices. Night therefore keeps
+    // its own lifted red (#e8514a, 4.65:1) and amber price colour until the owner
+    // deliberately picks new colours, at which point both modes follow their choice.
+    preserveModeAccents: true,
+    values: {
+      night_bg: '#141211', night_bg2: '#0c0b0a', night_card: '#1e1b1a', night_card2: '#262220', night_border: 'rgba(232,163,61,0.16)',
+      night_text: '#f7f2e9', night_dim: '#a89f95', night_accent: '#e8514a', night_accent2: '#f0b657', night_accent_text: '#ffffff', night_thumb_bg: '#0f0d0c', night_modal_bg: '#100e0d',
+      night_glow: 'rgba(232,163,61,0.13)', night_glow2: 'rgba(178,41,41,0.16)', night_shadow: 'rgba(0,0,0,0.62)',
+      night_price_color: '#f0b657', night_add_btn_color: '#e8514a',
+      day_bg: '#f6f1e8', day_bg2: '#e9e1d3', day_card: '#ffffff', day_card2: '#f4ece0', day_border: 'rgba(60,40,24,0.16)',
+      day_text: '#191614', day_dim: '#6d6259', day_accent: '#b22929', day_accent2: '#8a5a12', day_accent_text: '#ffffff', day_thumb_bg: '#ece3d5', day_modal_bg: '#fbf7f0',
+      day_glow: 'rgba(178,41,41,0.10)', day_glow2: 'rgba(138,90,18,0.08)', day_shadow: 'rgba(60,40,24,0.16)',
+      day_price_color: '#8a5a12', day_add_btn_color: '#b22929',
+      ...TEMPLATE_VISUAL_TOKENS.burger_lions,
+      font_body: 'Nunito', font_heading: 'Oswald', template_key: 'burger_lions',
+      default_theme: 'night',
     },
   },
 ]
