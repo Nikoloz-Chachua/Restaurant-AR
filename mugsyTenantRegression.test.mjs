@@ -4,6 +4,7 @@ import test from 'node:test'
 
 const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8')
 const sw = readFileSync(new URL('./sw.js', import.meta.url), 'utf8')
+const manifest = JSON.parse(readFileSync(new URL('./assets/mugsy/manifest.json', import.meta.url), 'utf8'))
 const mugsyFixture = JSON.parse(readFileSync(new URL('./data/fixtures/mugsy-menu.fixture.json', import.meta.url), 'utf8'))
 const presets = readFileSync(new URL('./admin-app/lib/themePresets.ts', import.meta.url), 'utf8')
 const adminUxTest = readFileSync(new URL('./admin-app/lib/adminUx.test.mjs', import.meta.url), 'utf8')
@@ -37,6 +38,43 @@ test('Mugsy copy, ordering, locations, and delivery links are theme-config drive
   assert.ok(!/tel:/.test(html), 'Mugsy shell must not invent a phone link')
 })
 
+test('Mugsy footer signature is centered and BetaReal-linked only for the exact tenant', () => {
+  assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.site-footer \{\s*max-width: 1180px;\s*align-items: center;\s*text-align: center;/)
+  assert.match(html, /function _applyMugsyFooterBrandLink\(\)/)
+  assert.match(html, /if \(!_isMugsyTenant\(\)\) return;[\s\S]*?link\.href = 'https:\/\/betareal\.ge';[\s\S]*?link\.setAttribute\('aria-label', 'Visit BetaReal'\);/)
+  assert.match(html, /footer\.insertBefore\(link, logos\[0\]\);[\s\S]*?logos\.forEach\(logo => link\.appendChild\(logo\)\);/)
+  assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.footer-brand-link:focus-visible/)
+  assert.doesNotMatch(html, /\[data-template="mugsy_street_diner"\] \.site-footer/)
+  assert.doesNotMatch(html, /<a[^>]+href="https:\/\/betareal\.ge"[\s\S]*?<img class="footer-logo/)
+  assert.doesNotMatch(html, /id="mugsy-footer-links"/)
+  assert.doesNotMatch(html, /renderOrders\('mugsy-footer-links'\)/)
+  assert.match(html, /<a class="footer-email" href="mailto:betareal\.ar@gmail\.com">betareal\.ar@gmail\.com<\/a>/)
+})
+
+test('Mugsy delivery services render from config into a local-asset side rail', () => {
+  assert.match(html, /<nav id="mugsy-delivery-rail" class="mugsy-delivery-rail" aria-label="Delivery services" hidden><\/nav>/)
+  assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.mugsy-delivery-rail \{[\s\S]*?position: fixed;[\s\S]*?top: 50svh;[\s\S]*?transform: translateY\(-50%\);/)
+  assert.match(html, /@media \(min-width: 768px\) \{[\s\S]*?\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.mugsy-delivery-rail \{[\s\S]*?display: flex;/)
+  assert.match(html, /const _MUGSY_DELIVERY_ICONS = \{[\s\S]*?wolt: '\.\/assets\/mugsy\/deliveries\/wolt\.jpg'[\s\S]*?glovo: '\.\/assets\/mugsy\/deliveries\/glovo\.png'/)
+  assert.match(html, /function _applyMugsyCopy\(\)[\s\S]*?const orders = _parseConfigList\(cfg\.mugsy_order_links\);[\s\S]*?const orderLinks = orders\.length \? orders : _MUGSY_DEFAULT_ORDER_LINKS;/)
+  assert.match(html, /const renderDeliveryRail = \(\) => \{[\s\S]*?window\.matchMedia\('\(min-width: 768px\)'\)\.matches[\s\S]*?rail\.hidden = true;[\s\S]*?return;/)
+  assert.match(html, /const renderDeliveryRail = \(\) => \{[\s\S]*?const safe = _safeAssetUrl\(link\.url\);[\s\S]*?const icon = _MUGSY_DELIVERY_ICONS\[key\];[\s\S]*?a\.href = safe;[\s\S]*?img\.src = icon;/)
+  assert.match(html, /https:\/\/wolt\.com\/en\/geo\/tbilisi\/restaurant\/magsys-burger/)
+  assert.match(html, /https:\/\/glovoapp\.com\/en\/ge\/tbilisi\/stores\/mugsy-s-burger-tbi/)
+  assert.ok(manifest.assets.some(asset =>
+    asset.role === 'delivery_icon' &&
+    asset.service === 'Wolt' &&
+    asset.source_url === 'https://mugsy.ge/storage/deliveries/01KKBKA1ZAXQXHBJ9APHZ4TGN7.jpg' &&
+    asset.local_path === 'assets/mugsy/deliveries/wolt.jpg'
+  ))
+  assert.ok(manifest.assets.some(asset =>
+    asset.role === 'delivery_icon' &&
+    asset.service === 'Glovo' &&
+    asset.source_url === 'https://mugsy.ge/storage/deliveries/01KKBKB42ZBBQYEXT1BYAP8GDK.png' &&
+    asset.local_path === 'assets/mugsy/deliveries/glovo.png'
+  ))
+})
+
 test('Mugsy menu cards remain data sourced and photo-only items do not advertise AR', () => {
   assert.match(html, /menu_items\?select=\*,categories\(name_en,name_ka\)&restaurant_id=eq\.\$\{tenant\.restaurant_id\}/)
   assert.match(html, /A real resolved tenant with no menu items should stay empty/)
@@ -44,6 +82,17 @@ test('Mugsy menu cards remain data sourced and photo-only items do not advertise
   assert.match(html, /const has3d = _isAREnabledMenuItem\(item\)/)
   assert.match(html, /\$\{has3d \? `<button class="ar-btn"/)
   assert.doesNotMatch(html, /Mugsy.*Featured|Popular/i)
+})
+
+test('Mugsy exact tenant forces phone twin product cards without changing larger breakpoints', () => {
+  assert.match(html, /@media \(max-width: 699px\) \{[\s\S]*?\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.menu-list \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/)
+  assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.category-header,[\s\S]*?\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.mugsy-empty \{[\s\S]*?grid-column: 1 \/ -1;/)
+  assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.menu-item:not\(\.no-image\) \.thumb-wrap \{[\s\S]*?aspect-ratio: 1 \/ 0\.82;[\s\S]*?border-radius: 14px 14px 0 0;/)
+  assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.menu-item:not\(\.no-image\) \.thumb-img,[\s\S]*?object-fit: cover;[\s\S]*?object-position: center center;/)
+  assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.menu-item:not\(\.no-image\) \.qty-add-btn \{[\s\S]*?width: 44px;[\s\S]*?height: 44px;/)
+  assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.menu-item:not\(\.no-image\) \.ar-btn \{[\s\S]*?min-height: 44px;[\s\S]*?white-space: normal;/)
+  assert.match(html, /\(cfg\.phone_layout === 'twin' \|\| _isMugsyTenant\(\)\) \? 'twin' : 'list'/)
+  assert.match(html, /@media \(min-width: 700px\) \{[\s\S]*?\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.menu-list,[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/)
 })
 
 test('Mugsy hero copy describes the interactive BetaReal menu without claiming current AR', () => {
@@ -64,10 +113,17 @@ test('Mugsy street-diner template is superadmin-loadable and tenant admins stay 
 test('service-worker cache was bumped for changed public assets', () => {
   const cacheMatch = sw.match(/CACHE_NAME\s*=\s*'bl-v(\d+)'/)
   assert.ok(cacheMatch, 'service worker cache version must use bl-vNNN format')
-  assert.ok(Number(cacheMatch[1]) >= 133, 'Mugsy basket runtime changes require a bl-v133+ cache')
+  assert.ok(Number(cacheMatch[1]) >= 135, 'Mugsy delivery rail runtime changes require a bl-v135+ cache')
   assert.match(sw, /\.\/assets\/mugsy\/logo\.svg/)
   assert.match(sw, /\.\/assets\/mugsy\/hero-/)
+  assert.match(sw, /\.\/assets\/mugsy\/deliveries\/wolt\.jpg/)
+  assert.match(sw, /\.\/assets\/mugsy\/deliveries\/glovo\.png/)
   assert.doesNotMatch(sw, /\.\/assets\/mugsy\/items-webp\//, 'Mugsy product thumbnails must lazy-load through runtime cache')
+})
+
+test('service-worker cache remains bumped exactly once on the current Mugsy delivery rail line', () => {
+  assert.match(sw, /const CACHE_NAME = 'bl-v136';/)
+  assert.doesNotMatch(sw, /bl-v137/)
 })
 
 test('Mugsy basket rows render dynamic item thumbnails without affecting other tenants', () => {

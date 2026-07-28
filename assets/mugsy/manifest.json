@@ -26,6 +26,20 @@
       "original_local_path": "assets/mugsy/hero-burger.jpg"
     },
     {
+      "role": "delivery_icon",
+      "service": "Wolt",
+      "source_url": "https://mugsy.ge/storage/deliveries/01KKBKA1ZAXQXHBJ9APHZ4TGN7.jpg",
+      "local_path": "assets/mugsy/deliveries/wolt.jpg",
+      "bytes": 35799
+    },
+    {
+      "role": "delivery_icon",
+      "service": "Glovo",
+      "source_url": "https://mugsy.ge/storage/deliveries/01KKBKB42ZBBQYEXT1BYAP8GDK.png",
+      "local_path": "assets/mugsy/deliveries/glovo.png",
+      "bytes": 14055
+    },
+    {
       "role": "product_thumbnail",
       "product_slug": "cheesy",
       "source_url": "https://mugsy.ge/storage/products/featured/01KRX6B5Q63PZB2SC2HD9RMPAT.jpg",
