@@ -3237,7 +3237,8 @@
             --add-btn-color: #D92E27;
         }
         .mugsy-shell,
-        .mugsy-locations { display: none; }
+        .mugsy-locations,
+        .mugsy-delivery-rail { display: none; }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] body {
             padding: 0 12px 42px;
             background: #FFF7E7;
@@ -3409,6 +3410,40 @@
             padding: 0 16px;
             font-size: 0.82rem;
         }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .mugsy-delivery-rail {
+            position: fixed;
+            right: calc(6px + env(safe-area-inset-right, 0px));
+            top: 50svh;
+            z-index: 1210;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transform: translateY(-50%);
+        }
+        .mugsy-delivery-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #FFFDF7;
+            border: 1px solid rgba(45,27,20,0.16);
+            box-shadow: 0 10px 24px rgba(45,27,20,0.18);
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+        .mugsy-delivery-btn:focus-visible {
+            outline: 3px solid #D92E27;
+            outline-offset: 3px;
+        }
+        .mugsy-delivery-icon {
+            width: 25px;
+            height: 25px;
+            display: block;
+            object-fit: contain;
+            border-radius: 7px;
+        }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .cat-bar {
             position: sticky;
             top: 0;
@@ -3455,6 +3490,7 @@
             grid-template-columns: 1fr;
             gap: 14px;
             padding-top: 16px;
+            padding-right: calc(54px + env(safe-area-inset-right, 0px));
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .cat-section {
             display: contents;
@@ -3533,7 +3569,7 @@
             width: 100%;
             max-width: 1180px;
             margin: 26px auto 0;
-            padding: 18px 2px 4px;
+            padding: 18px calc(54px + env(safe-area-inset-right, 0px)) 4px 2px;
             border-top: 1px solid rgba(45,27,20,0.16);
         }
         .mugsy-location-head {
@@ -3575,8 +3611,18 @@
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .site-footer {
             max-width: 1180px;
-            align-items: flex-start;
-            text-align: left;
+            align-items: center;
+            text-align: center;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .footer-brand-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            outline-offset: 4px;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .footer-brand-link:focus-visible {
+            outline: 3px solid #D92E27;
         }
         .mugsy-empty {
             grid-column: 1 / -1;
@@ -3608,9 +3654,18 @@
             letter-spacing: 0;
         }
         @media (min-width: 700px) {
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .mugsy-delivery-rail {
+                right: calc(14px + env(safe-area-inset-right, 0px));
+            }
             [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-list,
             .mugsy-location-list {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-list {
+                padding-right: 16px;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .mugsy-locations {
+                padding-right: 16px;
             }
             [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) {
                 grid-template-columns: 1fr;
@@ -3629,6 +3684,18 @@
             [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-list {
                 grid-template-columns: repeat(3, 1fr);
             }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .mugsy-delivery-rail {
+                right: calc(22px + env(safe-area-inset-right, 0px));
+                gap: 10px;
+            }
+            .mugsy-delivery-btn {
+                width: 50px;
+                height: 50px;
+            }
+            .mugsy-delivery-icon {
+                width: 30px;
+                height: 30px;
+            }
         }
         @media (max-width: 380px) {
             .mugsy-topbar {
@@ -3640,6 +3707,23 @@
             .mugsy-order-main {
                 padding: 0 9px;
                 font-size: 0.72rem;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-list {
+                padding-right: 50px;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .mugsy-locations {
+                padding-right: 50px;
+            }
+            .mugsy-delivery-btn {
+                width: 38px;
+                height: 38px;
+            }
+            .mugsy-delivery-icon {
+                width: 23px;
+                height: 23px;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .mugsy-delivery-rail {
+                top: 58svh;
             }
         }
         @media (max-height: 560px) {
@@ -4538,6 +4622,8 @@
         </section>
     </section>
 
+    <nav id="mugsy-delivery-rail" class="mugsy-delivery-rail" aria-label="Delivery services" hidden></nav>
+
     <div class="header">
         <img id="tenant-logo" class="tenant-logo" alt="" decoding="async">
         <h1 id="brand-title" data-brand>Restaurant Menu</h1>
@@ -4604,7 +4690,6 @@
         <img class="footer-logo footer-logo-dark"  src="./img/betareal-logo-dark.png"  alt="BetaReal" width="333" height="110" loading="lazy" decoding="async">
         <img class="footer-logo footer-logo-light" src="./img/betareal-logo-light.png" alt="BetaReal" width="366" height="110" loading="lazy" decoding="async">
         <img class="footer-logo footer-logo-white" src="./img/betareal-logo-white.png" alt="BetaReal" width="333" height="110" loading="lazy" decoding="async">
-        <div id="mugsy-footer-links" class="mugsy-footer-links"></div>
         <a class="footer-email" href="mailto:betareal.ar@gmail.com">betareal.ar@gmail.com</a>
         <p class="footer-copy">&copy; 2026 BetaReal &middot; Augmented Reality Menus</p>
     </footer>
@@ -5648,6 +5733,10 @@
             { label: 'Wolt', url: 'https://wolt.com/en/geo/tbilisi/restaurant/magsys-burger?srsltid=AfmBOor5reRoicmEFy72EUVGZI728ljsK4D7Hgb7NPpE_PPSjNq7Z9At' },
             { label: 'Glovo', url: 'https://glovoapp.com/en/ge/tbilisi/stores/mugsy-s-burger-tbi' }
         ];
+        const _MUGSY_DELIVERY_ICONS = {
+            wolt: './assets/mugsy/deliveries/wolt.jpg',
+            glovo: './assets/mugsy/deliveries/glovo.png'
+        };
         const _MUGSY_DEFAULT_LOCATIONS = [
             { label: '8/2 Petre Melikishvili Street', label_ka: 'პეტრე მელიქიშვილის ქუჩა 8/2', url: 'https://www.google.com/maps/search/?api=1&query=8%2F2%20Petre%20Melikishvili%20Street%2C%20Tbilisi' },
             { label: '63 Vazha Pshavela Avenue', label_ka: 'ვაჟა-ფშაველას გამზირი 63', url: 'https://www.google.com/maps/search/?api=1&query=63%20Vazha%20Pshavela%20Avenue%2C%20Tbilisi' }
@@ -5810,6 +5899,7 @@
         function _applyMugsyCopy() {
             if (!_isMugsyTenant()) return;
             const cfg = _themeConfig || {};
+            _applyMugsyFooterBrandLink();
             document.querySelectorAll('[data-mugsy]').forEach(el => {
                 const key = el.dataset.mugsy;
                 const txt = _mugsyText(key);
@@ -5853,8 +5943,36 @@
                     wrap.appendChild(a);
                 });
             };
+            const renderDeliveryRail = () => {
+                const rail = document.getElementById('mugsy-delivery-rail');
+                if (!rail) return;
+                rail.textContent = '';
+                orderLinks.forEach(link => {
+                    const safe = _safeAssetUrl(link.url);
+                    const key = String(link.label || '').trim().toLowerCase();
+                    const icon = _MUGSY_DELIVERY_ICONS[key];
+                    if (!safe || !icon) return;
+                    const a = document.createElement('a');
+                    a.className = 'mugsy-delivery-btn';
+                    a.href = safe;
+                    a.target = '_blank';
+                    a.rel = 'noopener';
+                    a.setAttribute('aria-label', `${link.label || 'Delivery'} delivery`);
+                    const img = document.createElement('img');
+                    img.className = 'mugsy-delivery-icon';
+                    img.src = icon;
+                    img.alt = '';
+                    img.width = 50;
+                    img.height = 50;
+                    img.loading = 'eager';
+                    img.decoding = 'async';
+                    a.appendChild(img);
+                    rail.appendChild(a);
+                });
+                rail.hidden = rail.children.length === 0;
+            };
             renderOrders('mugsy-order-links');
-            renderOrders('mugsy-footer-links');
+            renderDeliveryRail();
             const locs = _parseConfigList(cfg.mugsy_locations);
             const locations = locs.length ? locs : _MUGSY_DEFAULT_LOCATIONS;
             const head = document.getElementById('mugsy-location-head');
@@ -5877,6 +5995,19 @@
                 });
                 sec.hidden = list.children.length === 0;
             }
+        }
+        function _applyMugsyFooterBrandLink() {
+            if (!_isMugsyTenant()) return;
+            const footer = document.querySelector('.site-footer');
+            if (!footer || footer.querySelector('.footer-brand-link')) return;
+            const logos = [...footer.querySelectorAll('.footer-logo')];
+            if (!logos.length) return;
+            const link = document.createElement('a');
+            link.className = 'footer-brand-link';
+            link.href = 'https://betareal.ge';
+            link.setAttribute('aria-label', 'Visit BetaReal');
+            footer.insertBefore(link, logos[0]);
+            logos.forEach(logo => link.appendChild(logo));
         }
         // GET /rest/v1/<query> → resolves to the row array, or throws on non-2xx.
         async function _supaSelect(query) {
