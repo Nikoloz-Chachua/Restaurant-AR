@@ -29,6 +29,7 @@ const CONTENT_FIELDS = [
   { key: 'info_directions_url',      label: 'contentDirectionsUrl' },
   { key: 'info_instagram_label',     label: 'contentInstagramLabel' },
   { key: 'info_instagram_url',       label: 'contentInstagramUrl' },
+  { key: 'info_map_query',           label: 'contentMapQuery' },
 ] as const
 
 // Templates that render the editorial copy above.
