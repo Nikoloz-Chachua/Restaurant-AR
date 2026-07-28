@@ -18,6 +18,7 @@ export type StarterTemplateKey =
   | 'pipes_fabrika'
   | 'betareal'
   | 'respublika_grill'
+  | 'iakobis_garden'
 
 export type ThemePreset = {
   key: StarterTemplateKey
@@ -426,6 +427,30 @@ const TEMPLATE_VISUAL_TOKENS: Record<StarterTemplateKey, ThemeConfig> = {
     day_item_shadow: '0 4px 14px rgba(37,28,24,0.12)', day_item_hover_shadow: '0 12px 26px rgba(37,28,24,0.16)',
     day_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(228,37,36,0.08) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #ECEBE9 0%, #F8F7F6 72%)',
   },
+  // Transcribed verbatim from the --ig-* custom properties in index.html so the
+  // CMS preset and the in-page template cannot drift apart.
+  iakobis_garden: {
+    night_bg_image: 'radial-gradient(85% 52% at 50% -8%, rgba(234,74,50,0.12) 0%, transparent 60%), radial-gradient(70% 50% at 88% 30%, rgba(93,118,76,0.14) 0%, transparent 72%), linear-gradient(178deg, #161B13 0%, #1C2317 55%, #161B13 100%)',
+    night_bg_size: 'auto, auto, auto', night_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    night_card_bg: 'linear-gradient(158deg, #1F261C 0%, #29321F 100%)', night_card_radius: '18px', night_card_blur: '0px',
+    night_stage_bg: '#1F261C',
+    night_pill_bg: 'rgba(31,38,28,0.90)', night_pill_active_bg: '#EA4A32',
+    night_cta_bg: '#EA4A32', night_cta_shadow: '0 7px 18px rgba(234,74,50,0.28)',
+    night_hero_color: '#EA4A32', night_hero_shadow: '0 2px 16px rgba(234,74,50,0.22)', night_divider_bg: 'linear-gradient(90deg, transparent, #5D764C, transparent)',
+    night_accent_edge: 'linear-gradient(180deg, #EA4A32, #5D764C)', night_thumb_vignette: 'radial-gradient(ellipse at center, transparent 40%, rgba(31,38,28,0.55) 100%)',
+    night_item_shadow: '0 4px 14px rgba(0,0,0,0.40)', night_item_hover_shadow: '0 12px 26px rgba(0,0,0,0.46)',
+    night_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(234,74,50,0.12) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #1C2317 0%, #161B13 72%)',
+    day_bg_image: 'radial-gradient(90% 50% at 50% -10%, rgba(234,74,50,0.08) 0%, transparent 60%), radial-gradient(72% 48% at 86% 30%, rgba(93,118,76,0.10) 0%, transparent 72%), linear-gradient(178deg, #F4F5F0 0%, #EBECE4 58%, #F8F9F4 100%)',
+    day_bg_size: 'auto, auto, auto', day_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    day_card_bg: 'linear-gradient(158deg, #EBECE4 0%, #F4F5F0 100%)', day_card_radius: '18px', day_card_blur: '0px',
+    day_stage_bg: '#EBECE4',
+    day_pill_bg: 'rgba(235,236,228,0.85)', day_pill_active_bg: '#EA4A32',
+    day_cta_bg: '#EA4A32', day_cta_shadow: '0 7px 18px rgba(234,74,50,0.18)',
+    day_hero_color: '#EA4A32', day_hero_shadow: '0 2px 12px rgba(234,74,50,0.16)', day_divider_bg: 'linear-gradient(90deg, transparent, #5D764C, transparent)',
+    day_accent_edge: 'linear-gradient(180deg, #EA4A32, #5D764C)', day_thumb_vignette: 'radial-gradient(ellipse at center, transparent 42%, rgba(235,236,228,0.55) 100%)',
+    day_item_shadow: '0 4px 14px rgba(36,42,29,0.10)', day_item_hover_shadow: '0 12px 26px rgba(36,42,29,0.14)',
+    day_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(234,74,50,0.08) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #EBECE4 0%, #F8F9F4 72%)',
+  },
 }
 
 
@@ -778,6 +803,27 @@ export const TEMPLATE_PRESETS: ThemePreset[] = [
       ...TEMPLATE_VISUAL_TOKENS.respublika_grill,
       font_body: 'Nunito', font_heading: 'Anton', template_key: 'respublika_grill',
       default_theme: 'night',
+    },
+  },
+  {
+    key: 'iakobis_garden',
+    label: 'Iakobis Garden',
+    description: 'Warm stone and coral with a muted sage secondary, extracted from the client’s own logo — calmer and more editorial than the grill templates, for upscale garden restaurants and cocktail bars.',
+    primaryColor: '#EA4A32',
+    secondaryColor: '#5D764C',
+    createStarterCategory: true,
+    values: {
+      night_bg: '#161B13', night_bg2: '#1C2317', night_card: '#1F261C', night_card2: '#29321F', night_border: '#2C3427',
+      night_text: '#F4F2EC', night_dim: '#9EA894', night_accent: '#EA4A32', night_accent2: '#5D764C', night_accent_text: '#FFFFFF', night_thumb_bg: '#1F261C', night_modal_bg: '#161B13',
+      night_glow: 'rgba(234,74,50,0.35)', night_glow2: 'rgba(93,118,76,0.22)', night_shadow: 'rgba(0,0,0,0.45)',
+      night_price_color: '#EA4A32', night_add_btn_color: '#EA4A32',
+      day_bg: '#F4F5F0', day_bg2: '#EEF0E7', day_card: '#EBECE4', day_card2: '#F4F5F0', day_border: '#DCDED3',
+      day_text: '#242A1D', day_dim: '#68705C', day_accent: '#EA4A32', day_accent2: '#5D764C', day_accent_text: '#FFFFFF', day_thumb_bg: '#EBECE4', day_modal_bg: '#F4F5F0',
+      day_glow: 'rgba(234,74,50,0.22)', day_glow2: 'rgba(93,118,76,0.16)', day_shadow: 'rgba(36,42,29,0.14)',
+      day_price_color: '#EA4A32', day_add_btn_color: '#EA4A32',
+      ...TEMPLATE_VISUAL_TOKENS.iakobis_garden,
+      font_body: 'Nunito', font_heading: 'Fraunces', template_key: 'iakobis_garden',
+      default_theme: 'day',
     },
   },
 ]

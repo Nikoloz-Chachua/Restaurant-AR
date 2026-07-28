@@ -54,7 +54,8 @@
                 'mugsy-main': 'mugsy_street_diner',
                 'pipes-burger-main': 'pipes_fabrika',
                 'gochit-s-burger-main': 'gochit_monster',
-                'r-main': 'respublika_grill'
+                'r-main': 'respublika_grill',
+                'iakobis-ezo-main': 'iakobis_garden'
             };
             const BOOT_TEMPLATE_DEFAULTS = {
                 baoma: { theme: 'day', preload: './img/baoma/interior-hero-maps.webp' },
@@ -66,7 +67,8 @@
                 gochit_monster: { theme: 'night' },
                 mugsy_street_diner: { theme: 'day', preload: './assets/mugsy/hero-burger.webp' },
                 pipes_fabrika: { theme: 'day', preload: './assets/pipes/items-webp/pipes-signature-burger.webp' },
-                respublika_grill: { theme: 'night' }
+                respublika_grill: { theme: 'night' },
+                iakobis_garden: { theme: 'day' }
             };
             const params = new URLSearchParams(location.search);
             const host = location.hostname.toLowerCase();
@@ -3082,6 +3084,271 @@
         }
         [data-template="respublika_grill"] .menu-item:hover {
             border-color: rgba(228,37,36,0.35);
+        }
+
+        /* ── IAKOBIS GARDEN template — warm stone + coral + sage ──────────
+           Upscale garden restaurant & bar, calmer and more editorial than the
+           grill templates above. Built from the client's own logo (coral
+           script, #EA4A32) plus a muted sage-green secondary — not present in
+           the monochrome logo, but a deliberate, garden-appropriate pairing:
+           coral carries every action/attention role, sage carries every
+           structural/quiet role (dividers, hover states, badges), so the two
+           colors never compete for the same job. Day is the primary mode
+           (bright, airy, daytime-garden), unlike the grill templates' Night
+           default. Every color is the tenant's own theme_config value or its
+           fallback — logo, hero-image gallery, night/day colors and fonts are
+           all admin-editable exactly as they are for any other template.
+           Scoped entirely to [data-template="iakobis_garden"]; removing this
+           block returns the base template. */
+        [data-template="iakobis_garden"] {
+            --bg: var(--ig-bg);
+            --bg2: var(--ig-bg2);
+            --glow: var(--ig-glow);
+            --glow2: var(--ig-glow2);
+            --shadow: var(--ig-shadow);
+            --card: var(--ig-card);
+            --card2: var(--ig-card2);
+            --border: var(--ig-border);
+            --text: var(--ig-text);
+            --dim: var(--ig-dim);
+            --accent: var(--ig-accent);
+            --accent2: var(--ig-accent2);
+            --accent-text: var(--ig-accent-text);
+            --thumb-bg: var(--ig-thumb-bg);
+            --modal-bg: var(--ig-modal-bg);
+            --modal-rgb: var(--ig-modal-rgb);
+            --bg-image: var(--ig-bg-image);
+            --bg-size: auto, auto, auto;
+            --bg-repeat: no-repeat, no-repeat, no-repeat;
+            --card-bg: var(--ig-card-bg);
+            --card-blur: 0px;
+            --card-radius: 18px;
+            --item-shadow: var(--ig-item-shadow);
+            --item-hover-shadow: var(--ig-item-hover-shadow);
+            --accent-edge: var(--ig-accent-edge);
+            --stage-bg: var(--ig-thumb-bg);
+            --thumb-vignette: var(--ig-thumb-vignette);
+            --pill-bg: var(--ig-pill-bg);
+            --pill-active-bg: var(--ig-accent);
+            --cta-bg: var(--ig-accent);
+            --cta-shadow: var(--ig-cta-shadow);
+            --hero-color: var(--ig-accent);
+            --hero-shadow: var(--ig-hero-shadow);
+            --divider-bg: var(--ig-divider-bg);
+            --modal-bg-image: var(--ig-modal-bg-image);
+            --price-color: var(--ig-accent);
+            --add-btn-color: var(--ig-accent);
+        }
+        [data-theme="night"][data-template="iakobis_garden"] {
+            --ig-bg: #161B13;
+            --ig-bg2: #1C2317;
+            --ig-glow: rgba(234,74,50,0.35);
+            --ig-glow2: rgba(93,118,76,0.22);
+            --ig-shadow: rgba(0,0,0,0.45);
+            --ig-card: #1F261C;
+            --ig-card2: #29321F;
+            --ig-border: #2C3427;
+            --ig-text: #F4F2EC;
+            --ig-dim: #9EA894;
+            --ig-accent: #EA4A32;
+            --ig-accent2: #5D764C;
+            --ig-accent-text: #FFFFFF;
+            --ig-thumb-bg: #1F261C;
+            --ig-modal-bg: #161B13;
+            --ig-modal-rgb: 22,27,19;
+            --ig-bg-image:
+                radial-gradient(85% 52% at 50% -8%, rgba(234,74,50,0.12) 0%, transparent 60%),
+                radial-gradient(70% 50% at 88% 30%, rgba(93,118,76,0.14) 0%, transparent 72%),
+                linear-gradient(178deg, #161B13 0%, #1C2317 55%, #161B13 100%);
+            --ig-card-bg: linear-gradient(158deg, #1F261C 0%, #29321F 100%);
+            --ig-item-shadow: 0 4px 14px rgba(0,0,0,0.40);
+            --ig-item-hover-shadow: 0 12px 26px rgba(0,0,0,0.46);
+            --ig-accent-edge: linear-gradient(180deg, #EA4A32, #5D764C);
+            --ig-thumb-vignette: radial-gradient(ellipse at center, transparent 40%, rgba(31,38,28,0.55) 100%);
+            --ig-pill-bg: rgba(31,38,28,0.90);
+            --ig-cta-shadow: 0 7px 18px rgba(234,74,50,0.28);
+            --ig-hero-shadow: 0 2px 16px rgba(234,74,50,0.22);
+            --ig-divider-bg: linear-gradient(90deg, transparent, #5D764C, transparent);
+            --ig-modal-bg-image:
+                radial-gradient(70% 48% at 50% 36%, rgba(234,74,50,0.12) 0%, transparent 62%),
+                radial-gradient(130% 100% at 50% 50%, #1C2317 0%, #161B13 72%);
+            --ig-hero-scrim:
+                radial-gradient(60% 40% at 50% 85%, rgba(93,118,76,0.20) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(10,12,8,0.22) 0%, rgba(10,12,8,0.10) 40%, rgba(22,27,19,0.90) 88%, #161B13 100%);
+        }
+        [data-theme="day"][data-template="iakobis_garden"] {
+            --ig-bg: #F4F5F0;
+            --ig-bg2: #EEF0E7;
+            --ig-glow: rgba(234,74,50,0.22);
+            --ig-glow2: rgba(93,118,76,0.16);
+            --ig-shadow: rgba(36,42,29,0.14);
+            --ig-card: #EBECE4;
+            --ig-card2: #F4F5F0;
+            --ig-border: #DCDED3;
+            --ig-text: #242A1D;
+            --ig-dim: #68705C;
+            --ig-accent: #EA4A32;
+            --ig-accent2: #5D764C;
+            --ig-accent-text: #FFFFFF;
+            --ig-thumb-bg: #EBECE4;
+            --ig-modal-bg: #F4F5F0;
+            --ig-modal-rgb: 244,245,240;
+            --ig-bg-image:
+                radial-gradient(90% 50% at 50% -10%, rgba(234,74,50,0.08) 0%, transparent 60%),
+                radial-gradient(72% 48% at 86% 30%, rgba(93,118,76,0.10) 0%, transparent 72%),
+                linear-gradient(178deg, #F4F5F0 0%, #EBECE4 58%, #F8F9F4 100%);
+            --ig-card-bg: linear-gradient(158deg, #EBECE4 0%, #F4F5F0 100%);
+            --ig-item-shadow: 0 4px 14px rgba(36,42,29,0.10);
+            --ig-item-hover-shadow: 0 12px 26px rgba(36,42,29,0.14);
+            --ig-accent-edge: linear-gradient(180deg, #EA4A32, #5D764C);
+            --ig-thumb-vignette: radial-gradient(ellipse at center, transparent 42%, rgba(235,236,228,0.55) 100%);
+            --ig-pill-bg: rgba(235,236,228,0.85);
+            --ig-cta-shadow: 0 7px 18px rgba(234,74,50,0.18);
+            --ig-hero-shadow: 0 2px 12px rgba(234,74,50,0.16);
+            --ig-divider-bg: linear-gradient(90deg, transparent, #5D764C, transparent);
+            --ig-modal-bg-image:
+                radial-gradient(70% 48% at 50% 36%, rgba(234,74,50,0.08) 0%, transparent 62%),
+                radial-gradient(130% 100% at 50% 50%, #EBECE4 0%, #F8F9F4 72%);
+            --ig-hero-scrim:
+                radial-gradient(60% 40% at 50% 85%, rgba(93,118,76,0.14) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(20,18,14,0.14) 0%, rgba(20,18,14,0.06) 40%, rgba(244,245,240,0.90) 88%, #F4F5F0 100%);
+        }
+
+        /* Hero — reuses the shared .mg-hero markup. The logo lockup has a lot
+           of built-in whitespace around the script mark, so it's sized larger
+           than the circular badges other templates use, to read at a similar
+           visual weight. Softer scrim than the grill templates: editorial, not
+           moody — the photo (once the tenant uploads one) should read bright. */
+        [data-template="iakobis_garden"] .mg-hero {
+            display: flex;
+            position: relative;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+            min-height: var(--mg-hero-h, 74svh);
+            overflow: hidden;
+            isolation: isolate;
+        }
+        [data-template="iakobis_garden"] .mg-hero-photo {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-color: #EBECE4; /* holds the stone tone while the photo loads / if unset */
+            background-image: var(--hero-image, none);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        [data-template="iakobis_garden"] .mg-hero-next {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity var(--mg-hero-fade, 1200ms) ease-in-out;
+        }
+        [data-template="iakobis_garden"] .mg-hero-veil {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            background: var(--ig-hero-scrim);
+        }
+        [data-template="iakobis_garden"] .mg-hero-logo {
+            position: relative;
+            z-index: 3;
+            width: min(52vw, 260px);
+            height: auto;
+            filter: drop-shadow(0 8px 20px rgba(234,74,50,0.25));
+            animation: ig-hero-rise 0.9s cubic-bezier(0.2,0.7,0.2,1) both;
+        }
+        [data-template="iakobis_garden"] .mg-hero-logo:not([src]) { display: none; }
+        @keyframes ig-hero-rise {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: none; }
+        }
+        [data-template="iakobis_garden"] .mg-hero-scroll {
+            position: absolute;
+            bottom: 20px;
+            z-index: 3;
+            color: var(--ig-accent2);
+            opacity: 0.9;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            [data-template="iakobis_garden"] .mg-hero-logo { animation: none; }
+        }
+
+        /* Category pills: quiet outline at rest, solid coral fill only when
+           active — coral stays the single "this is selected/actionable"
+           signal, never a resting-state color. */
+        [data-template="iakobis_garden"] .cat-pill {
+            background: transparent;
+            border: 1.5px solid var(--accent);
+            color: var(--accent);
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+        [data-template="iakobis_garden"] .cat-pill.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: var(--cta-shadow);
+        }
+
+        /* Category headings: a small sage "leaf" mark and a thin coral→sage
+           divider, title case (Fraunces, the tenant's own heading font, reads
+           better in title case than shouted uppercase). */
+        [data-template="iakobis_garden"] .category-header {
+            color: var(--text);
+            border-bottom: none;
+            padding: 22px 4px 14px;
+            font-weight: 600;
+            position: relative;
+        }
+        [data-template="iakobis_garden"] .category-header::before {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            margin-right: 9px;
+            border-radius: 50% 2px 50% 50%;
+            background: var(--accent2);
+            vertical-align: middle;
+        }
+        [data-template="iakobis_garden"] .category-header::after {
+            content: "";
+            position: absolute;
+            left: 4px;
+            right: 4px;
+            bottom: 0;
+            height: 2px;
+            background: var(--divider-bg);
+        }
+        /* Georgian has no case and font_heading (Fraunces by default here) is
+           thin on Georgian glyphs — !important is load-bearing:
+           _applyHeadingFontToMenu() writes font_heading as an INLINE style on
+           .item-name/.category-header, which beats a plain stylesheet rule. */
+        html[lang="ka"][data-template="iakobis_garden"] .item-name,
+        html[lang="ka"][data-template="iakobis_garden"] .category-header {
+            font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif !important;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+        }
+
+        /* Menu cards: hover warms toward sage (the quiet/ambient color), not
+           coral (reserved for actionable state) — keeps the two accents doing
+           distinct jobs throughout the template. */
+        [data-template="iakobis_garden"] .menu-item {
+            border: 1px solid var(--border);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+        [data-template="iakobis_garden"] .menu-item:hover {
+            border-color: rgba(93,118,76,0.4);
         }
 
         /* ── BURGER BAR template — charcoal, flame orange, cream ──────────
@@ -8914,7 +9181,7 @@
 
         // Templates whose hero has the crossfade layer (.mg-hero-next) in their CSS.
         // A template not listed here still shows hero_images[0] as a still photo.
-        const HERO_GALLERY_TEMPLATES = new Set(['monday_greens', 'burger_lions', 'respublika_grill']);
+        const HERO_GALLERY_TEMPLATES = new Set(['monday_greens', 'burger_lions', 'respublika_grill', 'iakobis_garden']);
 
         // Templates that render the generic visit/contact block. Mirrors
         // CONTENT_TEMPLATES in the admin app, which decides where the matching
@@ -9299,7 +9566,7 @@
                 // This block instead does the two things burger_lions needs, ahead of
                 // the throw and scoped to that template, leaving every other tenant on
                 // exactly the code path it runs today.
-                if (templateKey === 'burger_lions' || templateKey === 'respublika_grill') {
+                if (templateKey === 'burger_lions' || templateKey === 'respublika_grill' || templateKey === 'iakobis_garden') {
                     const blHeroLogo = document.getElementById('mg-hero-logo');
                     const blHeroLogoUrl = _safeAssetUrl(cfg.hero_logo_url) || logoUrl;
                     if (blHeroLogo && blHeroLogoUrl) {
