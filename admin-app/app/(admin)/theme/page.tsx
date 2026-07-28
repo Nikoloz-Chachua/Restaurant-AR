@@ -32,7 +32,7 @@ const CONTENT_FIELDS = [
 ] as const
 
 // Templates that render the editorial copy above.
-const CONTENT_TEMPLATES = new Set(['baoma'])
+const CONTENT_TEMPLATES = new Set(['baoma', 'burger_bar'])
 
 const CONTENT_KEYS = [...CONTENT_FIELDS.map(f => f.key), 'info_image_url']
 

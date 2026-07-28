@@ -12,6 +12,7 @@ export type StarterTemplateKey =
   | 'monday_greens'
   | 'baoma'
   | 'burger_lions'
+  | 'burger_bar'
 
 export type ThemePreset = {
   key: StarterTemplateKey
@@ -274,6 +275,30 @@ const TEMPLATE_VISUAL_TOKENS: Record<StarterTemplateKey, ThemeConfig> = {
     day_item_shadow: '0 4px 14px rgba(60,40,24,0.12)', day_item_hover_shadow: '0 12px 28px rgba(60,40,24,0.18)',
     day_modal_bg_image: 'radial-gradient(70% 46% at 50% 32%, rgba(178,41,41,0.10) 0%, transparent 64%), linear-gradient(180deg, #f6f1e8 0%, #fbf7f0 100%)',
   },
+  // Transcribed from the --bb-* custom properties in index.html so the CMS preset
+  // and the in-page template cannot drift apart.
+  burger_bar: {
+    night_bg_image: 'radial-gradient(82% 46% at 50% -8%, rgba(255,106,43,0.16) 0%, transparent 62%), radial-gradient(60% 38% at 88% 24%, rgba(255,181,71,0.09) 0%, transparent 70%), linear-gradient(180deg, #17161a 0%, #131215 56%, #0f0e11 100%)',
+    night_bg_size: 'auto, auto, auto', night_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    night_card_bg: 'linear-gradient(170deg, #262429 0%, #1e1d22 100%)', night_card_radius: '18px', night_card_blur: '0px',
+    night_stage_bg: '#131215',
+    night_pill_bg: 'rgba(38,36,41,0.94)', night_pill_active_bg: '#ff6a2b',
+    night_cta_bg: '#ff6a2b', night_cta_shadow: '0 6px 20px rgba(255,106,43,0.32)',
+    night_hero_color: '#ff6a2b', night_hero_shadow: 'none', night_divider_bg: 'linear-gradient(90deg, transparent, #ffb547, transparent)',
+    night_accent_edge: 'linear-gradient(180deg, #ff6a2b, #ffb547)', night_thumb_vignette: 'linear-gradient(180deg, transparent 58%, rgba(15,14,17,0.38))',
+    night_item_shadow: '0 4px 16px rgba(0,0,0,0.48)', night_item_hover_shadow: '0 14px 34px rgba(0,0,0,0.58)',
+    night_modal_bg_image: 'radial-gradient(70% 46% at 50% 30%, rgba(255,106,43,0.18) 0%, transparent 64%), linear-gradient(180deg, #1e1d22 0%, #0f0e11 100%)',
+    day_bg_image: 'radial-gradient(82% 46% at 50% -8%, rgba(184,65,15,0.10) 0%, transparent 62%), radial-gradient(60% 38% at 88% 24%, rgba(138,52,16,0.07) 0%, transparent 70%), linear-gradient(180deg, #faf6ef 0%, #f3ece0 58%, #fffdf8 100%)',
+    day_bg_size: 'auto, auto, auto', day_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    day_card_bg: 'linear-gradient(170deg, #ffffff 0%, #fbf6ee 100%)', day_card_radius: '18px', day_card_blur: '0px',
+    day_stage_bg: '#f2e9dc',
+    day_pill_bg: 'rgba(255,255,255,0.9)', day_pill_active_bg: '#b8410f',
+    day_cta_bg: '#b8410f', day_cta_shadow: '0 6px 18px rgba(184,65,15,0.24)',
+    day_hero_color: '#b8410f', day_hero_shadow: 'none', day_divider_bg: 'linear-gradient(90deg, transparent, #8a3410, transparent)',
+    day_accent_edge: 'linear-gradient(180deg, #b8410f, #8a3410)', day_thumb_vignette: 'linear-gradient(180deg, transparent 60%, rgba(60,38,20,0.10))',
+    day_item_shadow: '0 4px 14px rgba(60,38,20,0.12)', day_item_hover_shadow: '0 12px 30px rgba(60,38,20,0.18)',
+    day_modal_bg_image: 'radial-gradient(70% 46% at 50% 30%, rgba(184,65,15,0.10) 0%, transparent 64%), linear-gradient(180deg, #faf6ef 0%, #fffdf8 100%)',
+  },
 }
 
 export const TEMPLATE_PRESETS: ThemePreset[] = [
@@ -485,6 +510,32 @@ export const TEMPLATE_PRESETS: ThemePreset[] = [
       day_price_color: '#8a5a12', day_add_btn_color: '#b22929',
       ...TEMPLATE_VISUAL_TOKENS.burger_lions,
       font_body: 'Nunito', font_heading: 'Oswald', template_key: 'burger_lions',
+      default_theme: 'night',
+    },
+  },
+  {
+    key: 'burger_bar',
+    label: 'Burger Bar',
+    description: 'Charcoal, flame orange and cream with signature hero cards and a visit/contact block — for burger bars, grills and casual neighbourhood spots.',
+    primaryColor: '#ff6a2b',
+    secondaryColor: '#ffb547',
+    createStarterCategory: true,
+    // Flame orange reads at 5.52:1 on the charcoal card but only ~2.9:1 on the
+    // day white, so day runs a deeper burnt orange (#b8410f, 5.52:1) instead of
+    // flattening both modes onto one accent. Note the night CTA puts near-black
+    // on the orange fill (6.30:1) — white on that orange is 2.86:1 and fails.
+    preserveModeAccents: true,
+    values: {
+      night_bg: '#17161a', night_bg2: '#0f0e11', night_card: '#232228', night_card2: '#2b2930', night_border: 'rgba(255,181,71,0.18)',
+      night_text: '#f5efe6', night_dim: '#9b968f', night_accent: '#ff6a2b', night_accent2: '#ffb547', night_accent_text: '#17161a', night_thumb_bg: '#131215', night_modal_bg: '#131215',
+      night_glow: 'rgba(255,106,43,0.16)', night_glow2: 'rgba(255,181,71,0.09)', night_shadow: 'rgba(0,0,0,0.58)',
+      night_price_color: '#ffb547', night_add_btn_color: '#ff6a2b',
+      day_bg: '#faf6ef', day_bg2: '#f3ece0', day_card: '#ffffff', day_card2: '#fbf6ee', day_border: 'rgba(60,38,20,0.16)',
+      day_text: '#1b1a1e', day_dim: '#6b6560', day_accent: '#b8410f', day_accent2: '#8a3410', day_accent_text: '#ffffff', day_thumb_bg: '#f2e9dc', day_modal_bg: '#fffdf8',
+      day_glow: 'rgba(184,65,15,0.10)', day_glow2: 'rgba(138,52,16,0.07)', day_shadow: 'rgba(60,38,20,0.16)',
+      day_price_color: '#8a3410', day_add_btn_color: '#b8410f',
+      ...TEMPLATE_VISUAL_TOKENS.burger_bar,
+      font_body: 'Inter', font_heading: 'Anton', template_key: 'burger_bar',
       default_theme: 'night',
     },
   },

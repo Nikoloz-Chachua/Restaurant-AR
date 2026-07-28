@@ -49,14 +49,16 @@
             // fork. Anything not listed simply renders the base template until fetch.
             const BOOT_TEMPLATE_BY_SLUG = {
                 'b-main': 'baoma',
-                'burgervazha': 'burger_lions'
+                'burgervazha': 'burger_lions',
+                'burger-bar-main': 'burger_bar'
             };
             const BOOT_TEMPLATE_DEFAULTS = {
                 baoma: { theme: 'day', preload: './img/baoma/interior-hero-maps.webp' },
                 // night is already the document default, so this only pins it against a
                 // stale 'day' left in localStorage. The hero photo is a tenant upload,
                 // unknown at boot, so there is nothing to preload here.
-                burger_lions: { theme: 'night' }
+                burger_lions: { theme: 'night' },
+                burger_bar: { theme: 'night' }
             };
             const params = new URLSearchParams(location.search);
             const host = location.hostname.toLowerCase();
@@ -2791,6 +2793,392 @@
             [data-template="burger_lions"] .mg-hero-logo { animation: none; }
         }
 
+        /* ── BURGER BAR template — charcoal, flame orange, cream ──────────
+           Casual grill-bar look: cooler charcoal than Grill House, flame orange
+           as the hot accent, cream text surfaces, and a signature strip of
+           promoted dishes above the list.
+
+           Contrast notes that are load-bearing:
+           - Flame orange #ff6a2b reads 5.52:1 on the charcoal card, so it works
+             for night item names. On the day white it is only ~2.9:1, so day
+             runs a burnt #b8410f (5.52:1) instead. The preset carries
+             preserveModeAccents to keep that split.
+           - The night CTA puts near-black (#17161a) on the orange fill: 6.30:1.
+             White on that orange is 2.86:1 and would fail, which is why
+             night_accent_text is dark rather than white here.
+
+           All scoped to [data-template="burger_bar"]; removing this block
+           returns the base template. */
+        [data-template="burger_bar"] {
+            --bg: var(--bb-bg);
+            --bg2: var(--bb-bg2);
+            --glow: var(--bb-glow);
+            --glow2: var(--bb-glow2);
+            --shadow: var(--bb-shadow);
+            --card: var(--bb-card);
+            --card2: var(--bb-card2);
+            --border: var(--bb-border);
+            --text: var(--bb-text);
+            --dim: var(--bb-dim);
+            --accent: var(--bb-accent);
+            --accent2: var(--bb-accent2);
+            --accent-text: var(--bb-accent-text);
+            --thumb-bg: var(--bb-thumb-bg);
+            --modal-bg: var(--bb-modal-bg);
+            --modal-rgb: var(--bb-modal-rgb);
+            --bg-image: var(--bb-bg-image);
+            --bg-size: auto, auto, auto;
+            --bg-repeat: no-repeat, no-repeat, no-repeat;
+            --card-bg: var(--bb-card-bg);
+            --card-blur: 0px;
+            --card-radius: 18px;
+            --item-shadow: var(--bb-item-shadow);
+            --item-hover-shadow: var(--bb-item-hover-shadow);
+            --accent-edge: var(--bb-accent-edge);
+            --stage-bg: var(--bb-thumb-bg);
+            --thumb-vignette: var(--bb-thumb-vignette);
+            --pill-bg: var(--bb-pill-bg);
+            --pill-active-bg: var(--bb-accent);
+            --cta-bg: var(--bb-accent);
+            --cta-shadow: var(--bb-cta-shadow);
+            --hero-color: var(--bb-accent);
+            --hero-shadow: none;
+            --divider-bg: var(--bb-divider-bg);
+            --modal-bg-image: var(--bb-modal-bg-image);
+            --price-color: var(--bb-price);
+            --add-btn-color: var(--bb-accent);
+        }
+        [data-theme="night"][data-template="burger_bar"] {
+            --bb-bg: #17161a;
+            --bb-bg2: #0f0e11;
+            --bb-glow: rgba(255,106,43,0.16);
+            --bb-glow2: rgba(255,181,71,0.09);
+            --bb-shadow: rgba(0,0,0,0.58);
+            --bb-card: #232228;
+            --bb-card2: #2b2930;
+            --bb-border: rgba(255,181,71,0.18);
+            --bb-text: #f5efe6;
+            --bb-dim: #9b968f;
+            --bb-accent: #ff6a2b;
+            --bb-accent2: #ffb547;
+            --bb-accent-text: #17161a;
+            --bb-price: #ffb547;
+            --bb-thumb-bg: #131215;
+            --bb-modal-bg: #131215;
+            --bb-modal-rgb: 19,18,21;
+            --bb-bg-image:
+                radial-gradient(82% 46% at 50% -8%, rgba(255,106,43,0.16) 0%, transparent 62%),
+                radial-gradient(60% 38% at 88% 24%, rgba(255,181,71,0.09) 0%, transparent 70%),
+                linear-gradient(180deg, #17161a 0%, #131215 56%, #0f0e11 100%);
+            --bb-card-bg: linear-gradient(170deg, #262429 0%, #1e1d22 100%);
+            --bb-item-shadow: 0 4px 16px rgba(0,0,0,0.48);
+            --bb-item-hover-shadow: 0 14px 34px rgba(0,0,0,0.58);
+            --bb-accent-edge: linear-gradient(180deg, #ff6a2b, #ffb547);
+            --bb-thumb-vignette: linear-gradient(180deg, transparent 58%, rgba(15,14,17,0.38));
+            --bb-pill-bg: rgba(38,36,41,0.94);
+            --bb-cta-shadow: 0 6px 20px rgba(255,106,43,0.32);
+            --bb-divider-bg: linear-gradient(90deg, transparent, #ffb547, transparent);
+            --bb-modal-bg-image:
+                radial-gradient(70% 46% at 50% 30%, rgba(255,106,43,0.18) 0%, transparent 64%),
+                linear-gradient(180deg, #1e1d22 0%, #0f0e11 100%);
+            --bb-bar-bg: rgba(19,18,21,0.9);
+            --bb-scrim: linear-gradient(180deg, rgba(15,14,17,0) 38%, rgba(15,14,17,0.86) 100%);
+        }
+        [data-theme="day"][data-template="burger_bar"] {
+            --bb-bg: #faf6ef;
+            --bb-bg2: #f3ece0;
+            --bb-glow: rgba(184,65,15,0.10);
+            --bb-glow2: rgba(138,52,16,0.07);
+            --bb-shadow: rgba(60,38,20,0.16);
+            --bb-card: #ffffff;
+            --bb-card2: #fbf6ee;
+            --bb-border: rgba(60,38,20,0.16);
+            --bb-text: #1b1a1e;
+            --bb-dim: #6b6560;
+            --bb-accent: #b8410f;
+            --bb-accent2: #8a3410;
+            --bb-accent-text: #ffffff;
+            --bb-price: #8a3410;
+            --bb-thumb-bg: #f2e9dc;
+            --bb-modal-bg: #fffdf8;
+            --bb-modal-rgb: 255,253,248;
+            --bb-bg-image:
+                radial-gradient(82% 46% at 50% -8%, rgba(184,65,15,0.10) 0%, transparent 62%),
+                radial-gradient(60% 38% at 88% 24%, rgba(138,52,16,0.07) 0%, transparent 70%),
+                linear-gradient(180deg, #faf6ef 0%, #f3ece0 56%, #fffdf8 100%);
+            --bb-card-bg: linear-gradient(170deg, #ffffff 0%, #fbf6ee 100%);
+            --bb-item-shadow: 0 4px 14px rgba(60,38,20,0.12);
+            --bb-item-hover-shadow: 0 12px 30px rgba(60,38,20,0.18);
+            --bb-accent-edge: linear-gradient(180deg, #b8410f, #8a3410);
+            --bb-thumb-vignette: linear-gradient(180deg, transparent 60%, rgba(60,38,20,0.10));
+            --bb-pill-bg: rgba(255,255,255,0.9);
+            --bb-cta-shadow: 0 6px 18px rgba(184,65,15,0.24);
+            --bb-divider-bg: linear-gradient(90deg, transparent, #8a3410, transparent);
+            --bb-modal-bg-image:
+                radial-gradient(70% 46% at 50% 30%, rgba(184,65,15,0.10) 0%, transparent 64%),
+                linear-gradient(180deg, #faf6ef 0%, #fffdf8 100%);
+            --bb-bar-bg: rgba(250,246,239,0.92);
+            --bb-scrim: linear-gradient(180deg, rgba(27,26,30,0) 34%, rgba(27,26,30,0.78) 100%);
+        }
+
+        /* Sticky category nav. #lang-toggle and #theme-toggle are position:fixed
+           at top:14px and stand ~35px tall, so a bar pinned to top:0 would have
+           the pills sliding underneath them. It is pinned below that instead,
+           and ::before continues the same surface up behind the two buttons so
+           they read as part of one sticky top bar rather than floating over the
+           menu. Full-bleed because the base .cat-bar is capped at 450px, which
+           would otherwise leave a narrow floating strip on desktop. */
+        [data-template="burger_bar"] .cat-bar {
+            position: sticky;
+            top: 49px;
+            z-index: 30;
+            width: 100vw;
+            max-width: none;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+            background: var(--bb-bar-bg);
+            backdrop-filter: blur(14px) saturate(140%);
+            padding: 8px 0;
+            border-bottom: 1px solid var(--bb-border);
+        }
+        [data-template="burger_bar"] .cat-bar::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 100%;
+            height: 49px;
+            background: var(--bb-bar-bg);
+            backdrop-filter: blur(14px) saturate(140%);
+            pointer-events: none;
+        }
+        /* Keep the pill row itself within the readable column. The full-bleed
+           break-out above escapes the page container's side padding, so the row
+           re-adds it — without this the first pill sits flush on the screen edge. */
+        [data-template="burger_bar"] .cat-scroll,
+        [data-template="burger_bar"] .cat-filter,
+        [data-template="burger_bar"] .menu-groups {
+            max-width: 478px;          /* 450 column + 2 x 14 padding */
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 14px;
+            padding-right: 14px;
+            box-sizing: border-box;
+        }
+        [data-template="burger_bar"] .cat-pill {
+            border-radius: 10px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            border: 1px solid var(--bb-border);
+            min-height: 44px;              /* brief: tappable targets >= 44px */
+        }
+        [data-template="burger_bar"] .cat-pill.active {
+            border-color: transparent;
+            color: var(--bb-accent-text);
+        }
+        [data-template="burger_bar"] .category-header {
+            text-transform: uppercase;
+            color: var(--bb-text);
+        }
+        [data-template="burger_bar"] .item-name { text-transform: uppercase; }
+        /* Anton and other condensed display faces carry no Georgian glyphs, and
+           _applyHeadingFontToMenu writes font_heading as an INLINE style, so a
+           plain rule would lose. Same reasoning as the Grill House template. */
+        html[lang="ka"][data-template="burger_bar"] .item-name,
+        html[lang="ka"][data-template="burger_bar"] .category-header {
+            font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif !important;
+            text-transform: none;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+
+        /* ── Signature strip: promoted dishes as large photo-led cards ──── */
+        .bb-featured { display: none; }
+        [data-template="burger_bar"] .bb-featured {
+            display: grid;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto 6px;
+            padding: 0 14px;
+            gap: 12px;
+            box-sizing: border-box;
+        }
+        [data-template="burger_bar"] .bb-featured:empty { display: none; }
+        [data-template="burger_bar"] .bb-feat-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 18px auto 2px;
+            width: 100%;
+            max-width: 450px;
+            padding: 0 14px;
+            box-sizing: border-box;
+            font-family: 'Anton', 'Nunito', sans-serif;
+            font-size: 1.05rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--bb-text);
+        }
+        html[lang="ka"] [data-template="burger_bar"] .bb-feat-head,
+        html[lang="ka"][data-template="burger_bar"] .bb-feat-head {
+            font-family: 'Nunito', sans-serif;
+            text-transform: none;
+            font-weight: 800;
+        }
+        [data-template="burger_bar"] .bb-feat-head::before {
+            content: "";
+            width: 26px;
+            height: 3px;
+            border-radius: 2px;
+            background: var(--bb-accent);
+            flex: none;
+        }
+        [data-template="burger_bar"] .bb-card {
+            position: relative;
+            display: block;
+            width: 100%;
+            border: 1px solid var(--bb-border);
+            border-radius: 18px;
+            overflow: hidden;
+            background: var(--bb-card-bg);
+            box-shadow: var(--bb-item-shadow);
+            cursor: pointer;
+            text-align: left;
+            padding: 0;
+            font: inherit;
+            color: inherit;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        [data-template="burger_bar"] .bb-card:active { opacity: 0.85; }
+        [data-template="burger_bar"] .bb-card-img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            background: var(--bb-thumb-bg);
+        }
+        /* No photo yet: keep the card's shape so the strip does not jump when a
+           picture is added later. */
+        [data-template="burger_bar"] .bb-card-img[data-empty="1"] {
+            background:
+                repeating-linear-gradient(135deg, transparent 0 12px, rgba(255,181,71,0.06) 12px 24px),
+                var(--bb-thumb-bg);
+        }
+        [data-template="burger_bar"] .bb-card-body {
+            position: absolute;
+            inset: auto 0 0 0;
+            padding: 44px 14px 12px;
+            background: var(--bb-scrim);
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        [data-template="burger_bar"] .bb-card-name {
+            font-family: 'Anton', 'Nunito', sans-serif;
+            font-size: 1.15rem;
+            line-height: 1.15;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: #fff;
+            margin: 0 0 3px;
+        }
+        html[lang="ka"][data-template="burger_bar"] .bb-card-name {
+            font-family: 'Nunito', sans-serif;
+            text-transform: none;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+        }
+        [data-template="burger_bar"] .bb-card-desc {
+            font-size: 0.74rem;
+            line-height: 1.35;
+            color: rgba(255,255,255,0.82);
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        [data-template="burger_bar"] .bb-card-price {
+            flex: none;
+            font-family: 'Anton', 'Nunito', sans-serif;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            color: var(--bb-accent2);
+            white-space: nowrap;
+        }
+        [data-template="burger_bar"] .bb-card-price .price-was {
+            display: block;
+            text-align: right;
+            margin: 0 0 1px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* ── Visit / contact block ──────────────────────────────────────
+           Entirely theme_config-driven and hidden when unset, so no venue's
+           address can appear on another venue's menu. */
+        .venue-info { display: none; }
+        [data-template="burger_bar"] .venue-info {
+            display: block;
+            width: 100%;
+            max-width: 450px;
+            margin: 26px auto 8px;
+            padding: 18px 16px 20px;
+            box-sizing: border-box;
+            border-top: 1px solid var(--bb-border);
+        }
+        [data-template="burger_bar"] .venue-info[hidden] { display: none; }
+        [data-template="burger_bar"] .venue-kicker {
+            font-size: 0.68rem;
+            letter-spacing: 1.6px;
+            text-transform: uppercase;
+            color: var(--bb-accent);
+            margin: 0 0 6px;
+            font-weight: 700;
+        }
+        [data-template="burger_bar"] .venue-title {
+            font-family: 'Anton', 'Nunito', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 0.6px;
+            color: var(--bb-text);
+            margin: 0 0 8px;
+        }
+        html[lang="ka"][data-template="burger_bar"] .venue-title {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+        }
+        [data-template="burger_bar"] .venue-text {
+            font-size: 0.8rem;
+            line-height: 1.5;
+            color: var(--bb-dim);
+            margin: 0 0 14px;
+            white-space: pre-line;
+        }
+        [data-template="burger_bar"] .venue-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        [data-template="burger_bar"] .venue-link {
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+            padding: 0 16px;
+            border-radius: 10px;
+            border: 1px solid var(--bb-border);
+            color: var(--bb-text);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        [data-template="burger_bar"] .venue-link.primary {
+            background: var(--bb-accent);
+            border-color: transparent;
+            color: var(--bb-accent-text);
+        }
+        [data-template="burger_bar"] .venue-link[hidden] { display: none; }
+
         /* ── Quantity stepper (add-to-basket control) ── */
         .qty-ctrl { flex-shrink: 0; }
 
@@ -3556,7 +3944,25 @@
         </div>
     </div>
 
+    <!-- Signature strip. Populated only for templates that promote featured
+         items; stays empty (and display:none) for every other tenant. -->
+    <h2 id="bb-feat-head" class="bb-feat-head" hidden></h2>
+    <div id="bb-featured" class="bb-featured"></div>
+
     <div class="menu-list" id="menu-list"></div>
+
+    <!-- Visit / contact block. Every field comes from theme_config; the whole
+         section stays hidden until a tenant fills it in, so it can never show
+         another restaurant's address. -->
+    <section id="venue-info" class="venue-info" aria-labelledby="venue-title" hidden>
+        <p id="venue-kicker" class="venue-kicker" hidden></p>
+        <h2 id="venue-title" class="venue-title" hidden></h2>
+        <p id="venue-text" class="venue-text" hidden></p>
+        <div class="venue-actions">
+            <a id="venue-directions" class="venue-link primary" target="_blank" rel="noopener" hidden></a>
+            <a id="venue-instagram" class="venue-link" target="_blank" rel="noopener" hidden></a>
+        </div>
+    </section>
 
     <section class="baoma-info" aria-labelledby="baoma-info-title">
         <div class="baoma-info-inner">
@@ -6081,6 +6487,114 @@
         // A template not listed here still shows hero_images[0] as a still photo.
         const HERO_GALLERY_TEMPLATES = new Set(['monday_greens', 'burger_lions']);
 
+        // Templates that render the generic visit/contact block. Mirrors
+        // CONTENT_TEMPLATES in the admin app, which decides where the matching
+        // editor fields appear.
+        const VENUE_INFO_TEMPLATES = new Set(['burger_bar']);
+
+        // Paint the visit/contact block from theme_config. Every field is
+        // optional: an empty value hides its element, and if nothing at all is
+        // set the whole section stays hidden. Georgian reads the `_ka` variant.
+        function _applyVenueInfo(cfg) {
+            const sec = document.getElementById('venue-info');
+            if (!sec) return;
+            const txt = key => {
+                const ka = window.__lang === 'ka' ? _cleanText(cfg[key + '_ka']) : '';
+                return ka || _cleanText(cfg[key]);
+            };
+            const put = (id, text) => {
+                const el = document.getElementById(id);
+                if (!el) return '';
+                el.textContent = text;
+                el.hidden = !text;
+                return text;
+            };
+            const link = (id, label, url) => {
+                const el = document.getElementById(id);
+                if (!el) return '';
+                const safe = _safeAssetUrl(url);
+                el.textContent = label;
+                if (safe) el.href = safe;
+                el.hidden = !(label && safe);
+                return el.hidden ? '' : label;
+            };
+            const filled = [
+                put('venue-kicker', txt('info_kicker')),
+                put('venue-title', txt('info_title')),
+                put('venue-text', txt('info_text')),
+                link('venue-directions', txt('info_directions_label'), cfg.info_directions_url),
+                link('venue-instagram', txt('info_instagram_label'), cfg.info_instagram_url),
+            ].filter(Boolean);
+            sec.hidden = filled.length === 0;
+        }
+
+        // Signature strip: up to three promoted dishes as large photo-led cards
+        // above the list. Only templates that style .bb-featured show it, and
+        // only items explicitly flagged `featured` in the admin panel appear —
+        // so a tenant that promotes nothing simply has no strip.
+        const FEATURED_LIMIT = 3;
+
+        function _renderFeatured(items, activeFilter) {
+            const wrap = document.getElementById('bb-featured');
+            const head = document.getElementById('bb-feat-head');
+            if (!wrap || !head) return;
+            wrap.textContent = '';
+            // Hidden while a category filter is active: promoting a burger at
+            // the top of the Drinks list reads as a bug, not a highlight.
+            const on = VENUE_INFO_TEMPLATES.has(document.documentElement.dataset.template)
+                && !activeFilter;
+            const picks = on
+                ? (items || []).filter(i => i.featured && i.visible !== false).slice(0, FEATURED_LIMIT)
+                : [];
+            head.hidden = !picks.length;
+            if (!picks.length) return;
+            head.textContent = window.__lang === 'ka' ? 'ფირმის კერძები' : "Chef's picks";
+
+            picks.forEach(item => {
+                const idx = items.indexOf(item);
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.className = 'bb-card';
+                const name = t(item, 'name');
+                card.setAttribute('aria-label', name);
+
+                const img = document.createElement('img');
+                img.className = 'bb-card-img';
+                img.loading = 'lazy';
+                img.decoding = 'async';
+                img.alt = '';
+                const src = _safeAssetUrl(item.thumbnail_url);
+                if (src) img.src = src;
+                else img.dataset.empty = '1';
+                img.addEventListener('error', () => { img.removeAttribute('src'); img.dataset.empty = '1'; }, { once: true });
+
+                const body = document.createElement('div');
+                body.className = 'bb-card-body';
+                const left = document.createElement('div');
+                const h = document.createElement('p');
+                h.className = 'bb-card-name';
+                h.textContent = name;
+                left.appendChild(h);
+                const desc = _cleanText(t(item, 'description'));
+                if (desc) {
+                    const d = document.createElement('p');
+                    d.className = 'bb-card-desc';
+                    d.textContent = desc;
+                    left.appendChild(d);
+                }
+                const price = document.createElement('div');
+                price.className = 'bb-card-price';
+                _setPriceWithOld(price, item.price, item.price_old);
+                body.append(left, price);
+                card.append(img, body);
+
+                card.addEventListener('click', () => {
+                    if (src) openLightbox(src, name, item, idx);
+                });
+                wrap.appendChild(card);
+            });
+        }
+
         function _startHeroGallery(urls) {
             const base = document.querySelector('.mg-hero-photo');
             const next = document.querySelector('.mg-hero-next');
@@ -6269,6 +6783,14 @@
                         document.documentElement.style.setProperty('--mg-hero-h', cfg.hero_min_h);
                     }
                 }
+                // Visit / contact block. Same theme_config keys the BAOMA copy
+                // fields already use, so the admin Theme page drives both, but
+                // rendered into generic markup that starts empty — an unset
+                // field hides its element instead of falling back to whatever
+                // restaurant the markup was first written for.
+                // Runs here, ahead of the throw below, for the same reason as
+                // the block above.
+                if (VENUE_INFO_TEMPLATES.has(templateKey)) _applyVenueInfo(cfg);
                 if (isBaomaTenant && heroShots.length) {
                     const baomaHeroImg = document.querySelector('.baoma-hero-img');
                     if (baomaHeroImg) baomaHeroImg.src = heroShots[0];
@@ -6336,6 +6858,7 @@
                             description_ka: _cleanText(r.description_ka),
                             price:          _cleanText(r.price),
                             price_old:      _cleanText(r.price_old),
+                            featured:       r.featured === true,
                             model:          r.model,
                             model_usdz:     r.model_usdz || '',
                             ar_scale:       r.ar_scale ?? 1.0,
@@ -6733,6 +7256,7 @@
                     p.classList.toggle('active', p.dataset.cat === cat)
                 );
                 renderMenuList(cat);
+                _renderFeatured(menuItems, cat);
                 setARButtonsState(false);
             }
 
