@@ -3204,6 +3204,13 @@
             background: var(--bb-accent);
             flex: none;
         }
+        /* A tenant that promotes nothing must show nothing. The heading is set
+           `hidden` in that case, but the display:flex above beats the browser's
+           own [hidden] rule, so the element kept its box and its ::before
+           painted a stray accent dash above the first category. Declared after
+           the base rule so it wins on source order. */
+        [data-template="burger_bar"] .bb-feat-head[hidden],
+        [data-template="gochit_monster"] .bb-feat-head[hidden] { display: none; }
         [data-template="burger_bar"] .bb-card,
         [data-template="gochit_monster"] .bb-card{
             position: relative;
