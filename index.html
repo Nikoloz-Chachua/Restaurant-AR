@@ -51,7 +51,8 @@
                 'b-main': 'baoma',
                 'burgervazha': 'burger_lions',
                 'burger-bar-main': 'burger_bar',
-                'mugsy-main': 'mugsy_street_diner'
+                'mugsy-main': 'mugsy_street_diner',
+                'gochit-s-burger-main': 'gochit_monster'
             };
             const BOOT_TEMPLATE_DEFAULTS = {
                 baoma: { theme: 'day', preload: './img/baoma/interior-hero-maps.webp' },
@@ -60,6 +61,7 @@
                 // unknown at boot, so there is nothing to preload here.
                 burger_lions: { theme: 'night' },
                 burger_bar: { theme: 'night' },
+                gochit_monster: { theme: 'night' },
                 mugsy_street_diner: { theme: 'day', preload: './assets/mugsy/hero-burger.webp' }
             };
             const params = new URLSearchParams(location.search);
@@ -2850,7 +2852,146 @@
             --price-color: var(--bb-price);
             --add-btn-color: var(--bb-accent);
         }
-        [data-theme="night"][data-template="burger_bar"] {
+        /* ── GOCHIT'S MONSTER BURGERS ────────────────────────────────────
+           Shares the compact-template structure above (sticky nav, signature
+           strip, link chips, map) and supplies its own palette. The --bb-*
+           prefix is historical: it is this template family's shared vocabulary,
+           not something specific to Burger Bar.
+
+           The brief said pick one accent and commit, so: electric yellow, taken
+           off the logo's bun. It reads 12.28:1 on the night card, far and away
+           the strongest option. Two consequences worth stating:
+           - Yellow is 1.43:1 on the day white and simply unusable there, so day
+             runs a deep red (#b81818, 6.60:1). preserveModeAccents holds the split.
+           - Anything sitting ON the yellow must be near-black: #0d0d0e gives
+             13.57:1, white gives 1.43:1 — hence the dark accent text.
+           The logo's own red (#e11d1d) is 3.68:1 on the card, so the night
+           secondary is lifted to #ff4444 (5.16:1). */
+        [data-template="gochit_monster"] {
+            --bg: var(--bb-bg);
+            --bg2: var(--bb-bg2);
+            --glow: var(--bb-glow);
+            --glow2: var(--bb-glow2);
+            --shadow: var(--bb-shadow);
+            --card: var(--bb-card);
+            --card2: var(--bb-card2);
+            --border: var(--bb-border);
+            --text: var(--bb-text);
+            --dim: var(--bb-dim);
+            --accent: var(--bb-accent);
+            --accent2: var(--bb-accent2);
+            --accent-text: var(--bb-accent-text);
+            --thumb-bg: var(--bb-thumb-bg);
+            --modal-bg: var(--bb-modal-bg);
+            --modal-rgb: var(--bb-modal-rgb);
+            --bg-image: var(--bb-bg-image);
+            --bg-size: auto, auto, auto;
+            --bg-repeat: no-repeat, no-repeat, no-repeat;
+            --card-bg: var(--bb-card-bg);
+            --card-blur: 0px;
+            --card-radius: 12px;
+            --item-shadow: var(--bb-item-shadow);
+            --item-hover-shadow: var(--bb-item-hover-shadow);
+            --accent-edge: var(--bb-accent-edge);
+            --stage-bg: var(--bb-thumb-bg);
+            --thumb-vignette: var(--bb-thumb-vignette);
+            --pill-bg: var(--bb-pill-bg);
+            --pill-active-bg: var(--bb-accent);
+            --cta-bg: var(--bb-accent);
+            --cta-shadow: var(--bb-cta-shadow);
+            --hero-color: var(--bb-accent);
+            --hero-shadow: none;
+            --divider-bg: var(--bb-divider-bg);
+            --modal-bg-image: var(--bb-modal-bg-image);
+            --price-color: var(--bb-price);
+            --add-btn-color: var(--bb-accent);
+        }
+        [data-theme="night"][data-template="gochit_monster"] {
+            --bb-bg: #0d0d0e;
+            --bb-bg2: #060607;
+            --bb-glow: rgba(255,212,0,0.13);
+            --bb-glow2: rgba(225,29,29,0.14);
+            --bb-shadow: rgba(0,0,0,0.68);
+            --bb-card: #191919;
+            --bb-card2: #212121;
+            --bb-border: rgba(255,212,0,0.20);
+            --bb-text: #f7f2e4;
+            --bb-dim: #a09a8d;
+            --bb-accent: #ffd400;
+            --bb-accent2: #ff4444;
+            --bb-accent-text: #0d0d0e;
+            --bb-price: #ffd400;
+            --bb-thumb-bg: #0a0a0b;
+            --bb-modal-bg: #0d0d0e;
+            --bb-modal-rgb: 13,13,14;
+            --bb-bg-image:
+                radial-gradient(86% 46% at 50% -8%, rgba(255,212,0,0.14) 0%, transparent 60%),
+                radial-gradient(58% 36% at 88% 22%, rgba(225,29,29,0.14) 0%, transparent 68%),
+                linear-gradient(180deg, #0d0d0e 0%, #0a0a0b 56%, #060607 100%);
+            --bb-card-bg: linear-gradient(172deg, #1d1d1d 0%, #151515 100%);
+            --bb-item-shadow: 0 4px 16px rgba(0,0,0,0.6);
+            --bb-item-hover-shadow: 0 14px 34px rgba(0,0,0,0.7);
+            --bb-accent-edge: linear-gradient(180deg, #ffd400, #ff4444);
+            --bb-thumb-vignette: linear-gradient(180deg, transparent 56%, rgba(6,6,7,0.46));
+            --bb-pill-bg: rgba(29,29,29,0.95);
+            --bb-cta-shadow: 0 6px 20px rgba(255,212,0,0.28);
+            --bb-divider-bg: linear-gradient(90deg, transparent, #ffd400, transparent);
+            --bb-modal-bg-image:
+                radial-gradient(70% 46% at 50% 30%, rgba(255,212,0,0.16) 0%, transparent 64%),
+                linear-gradient(180deg, #151515 0%, #060607 100%);
+            --bb-bar-bg: rgba(10,10,11,0.92);
+            --bb-scrim: linear-gradient(180deg, rgba(6,6,7,0) 34%, rgba(6,6,7,0.9) 100%);
+        }
+        [data-theme="day"][data-template="gochit_monster"] {
+            --bb-bg: #fbf7ec;
+            --bb-bg2: #f2ecdc;
+            --bb-glow: rgba(184,24,24,0.09);
+            --bb-glow2: rgba(138,99,0,0.08);
+            --bb-shadow: rgba(40,30,10,0.17);
+            --bb-card: #ffffff;
+            --bb-card2: #fbf6e9;
+            --bb-border: rgba(40,30,10,0.17);
+            --bb-text: #141414;
+            --bb-dim: #6a6459;
+            --bb-accent: #b81818;
+            --bb-accent2: #8a6300;
+            --bb-accent-text: #ffffff;
+            --bb-price: #b81818;
+            --bb-thumb-bg: #f0e9d7;
+            --bb-modal-bg: #fffdf6;
+            --bb-modal-rgb: 255,253,246;
+            --bb-bg-image:
+                radial-gradient(86% 46% at 50% -8%, rgba(184,24,24,0.09) 0%, transparent 60%),
+                radial-gradient(58% 36% at 88% 22%, rgba(138,99,0,0.08) 0%, transparent 68%),
+                linear-gradient(180deg, #fbf7ec 0%, #f5efe0 56%, #fffdf6 100%);
+            --bb-card-bg: linear-gradient(172deg, #ffffff 0%, #fbf6e9 100%);
+            --bb-item-shadow: 0 4px 14px rgba(40,30,10,0.12);
+            --bb-item-hover-shadow: 0 12px 30px rgba(40,30,10,0.18);
+            --bb-accent-edge: linear-gradient(180deg, #b81818, #8a6300);
+            --bb-thumb-vignette: linear-gradient(180deg, transparent 60%, rgba(40,30,10,0.10));
+            --bb-pill-bg: rgba(255,255,255,0.92);
+            --bb-cta-shadow: 0 6px 18px rgba(184,24,24,0.22);
+            --bb-divider-bg: linear-gradient(90deg, transparent, #8a6300, transparent);
+            --bb-modal-bg-image:
+                radial-gradient(70% 46% at 50% 30%, rgba(184,24,24,0.09) 0%, transparent 64%),
+                linear-gradient(180deg, #fbf7ec 0%, #fffdf6 100%);
+            --bb-bar-bg: rgba(251,247,236,0.93);
+            --bb-scrim: linear-gradient(180deg, rgba(20,20,20,0) 34%, rgba(20,20,20,0.8) 100%);
+        }
+        /* Blockier than Burger Bar: squarer pills and cards, bigger logo — the
+           brief asked for a heavier, more aggressive feel. */
+        [data-template="gochit_monster"] .cat-pill { border-radius: 6px; }
+        [data-template="gochit_monster"] .bb-card,
+        [data-template="gochit_monster"] .venue-chip { border-radius: 12px; }
+        [data-template="gochit_monster"] .tenant-logo { width: min(56vw, 230px); }
+        /* The signature price rides on a photo, so it takes the price colour
+           (yellow) rather than the secondary red, which is both dimmer on the
+           scrim and off-message for a template that commits to yellow. This is
+           a no-op for Burger Bar, whose price and secondary are the same value. */
+        [data-template="burger_bar"] .bb-card-price,
+        [data-template="gochit_monster"] .bb-card-price { color: var(--bb-price); }
+
+        [data-theme="night"][data-template="burger_bar"]{
             --bb-bg: #17161a;
             --bb-bg2: #0f0e11;
             --bb-glow: rgba(255,106,43,0.16);
@@ -2886,7 +3027,7 @@
             --bb-bar-bg: rgba(19,18,21,0.9);
             --bb-scrim: linear-gradient(180deg, rgba(15,14,17,0) 38%, rgba(15,14,17,0.86) 100%);
         }
-        [data-theme="day"][data-template="burger_bar"] {
+        [data-theme="day"][data-template="burger_bar"]{
             --bb-bg: #faf6ef;
             --bb-bg2: #f3ece0;
             --bb-glow: rgba(184,65,15,0.10);
@@ -2964,22 +3105,26 @@
             padding-right: 14px;
             box-sizing: border-box;
         }
-        [data-template="burger_bar"] .cat-pill {
+        [data-template="burger_bar"] .cat-pill,
+        [data-template="gochit_monster"] .cat-pill{
             border-radius: 10px;
             font-weight: 700;
             letter-spacing: 0.4px;
             border: 1px solid var(--bb-border);
             min-height: 44px;              /* brief: tappable targets >= 44px */
         }
-        [data-template="burger_bar"] .cat-pill.active {
+        [data-template="burger_bar"] .cat-pill.active,
+        [data-template="gochit_monster"] .cat-pill.active{
             border-color: transparent;
             color: var(--bb-accent-text);
         }
-        [data-template="burger_bar"] .category-header {
+        [data-template="burger_bar"] .category-header,
+        [data-template="gochit_monster"] .category-header{
             text-transform: uppercase;
             color: var(--bb-text);
         }
-        [data-template="burger_bar"] .item-name { text-transform: uppercase; }
+        [data-template="burger_bar"] .item-name,
+        [data-template="gochit_monster"] .item-name{ text-transform: uppercase; }
         /* Anton and other condensed display faces carry no Georgian glyphs, and
            _applyHeadingFontToMenu writes font_heading as an INLINE style, so a
            plain rule would lose. Same reasoning as the Grill House template. */
@@ -2993,7 +3138,8 @@
 
         /* ── Signature strip: promoted dishes as large photo-led cards ──── */
         .bb-featured { display: none; }
-        [data-template="burger_bar"] .bb-featured {
+        [data-template="burger_bar"] .bb-featured,
+        [data-template="gochit_monster"] .bb-featured{
             display: grid;
             width: 100%;
             max-width: 450px;
@@ -3002,13 +3148,15 @@
             gap: 12px;
             box-sizing: border-box;
         }
-        [data-template="burger_bar"] .bb-featured:empty { display: none; }
+        [data-template="burger_bar"] .bb-featured:empty,
+        [data-template="gochit_monster"] .bb-featured:empty{ display: none; }
         /* Desktop gets two signature cards side by side. The single column is
            right on a phone, but at full width one card per row leaves a very
            tall, mostly-empty strip above the menu. 760px is where two cards
            still hold a readable photo and a full name on one line. */
         @media (min-width: 760px) {
-            [data-template="burger_bar"] .bb-featured {
+            [data-template="burger_bar"] .bb-featured,
+        [data-template="gochit_monster"] .bb-featured{
                 grid-template-columns: repeat(2, minmax(0, 1fr));
                 max-width: 920px;
             }
@@ -3018,7 +3166,8 @@
                 grid-column: 1 / -1;
             }
         }
-        [data-template="burger_bar"] .bb-feat-head {
+        [data-template="burger_bar"] .bb-feat-head,
+        [data-template="gochit_monster"] .bb-feat-head{
             display: flex;
             align-items: center;
             gap: 10px;
@@ -3034,12 +3183,15 @@
             color: var(--bb-text);
         }
         html[lang="ka"] [data-template="burger_bar"] .bb-feat-head,
-        html[lang="ka"][data-template="burger_bar"] .bb-feat-head {
+        html[lang="ka"] [data-template="gochit_monster"] .bb-feat-head,
+        html[lang="ka"][data-template="burger_bar"] .bb-feat-head,
+        html[lang="ka"][data-template="gochit_monster"] .bb-feat-head{
             font-family: 'Nunito', sans-serif;
             text-transform: none;
             font-weight: 800;
         }
-        [data-template="burger_bar"] .bb-feat-head::before {
+        [data-template="burger_bar"] .bb-feat-head::before,
+        [data-template="gochit_monster"] .bb-feat-head::before{
             content: "";
             width: 26px;
             height: 3px;
@@ -3047,7 +3199,8 @@
             background: var(--bb-accent);
             flex: none;
         }
-        [data-template="burger_bar"] .bb-card {
+        [data-template="burger_bar"] .bb-card,
+        [data-template="gochit_monster"] .bb-card{
             position: relative;
             display: block;
             width: 100%;
@@ -3064,8 +3217,10 @@
             appearance: none;
             -webkit-appearance: none;
         }
-        [data-template="burger_bar"] .bb-card:active { opacity: 0.85; }
-        [data-template="burger_bar"] .bb-card-img {
+        [data-template="burger_bar"] .bb-card:active,
+        [data-template="gochit_monster"] .bb-card:active{ opacity: 0.85; }
+        [data-template="burger_bar"] .bb-card-img,
+        [data-template="gochit_monster"] .bb-card-img{
             display: block;
             width: 100%;
             aspect-ratio: 4 / 3;
@@ -3079,7 +3234,8 @@
                 repeating-linear-gradient(135deg, transparent 0 12px, rgba(255,181,71,0.06) 12px 24px),
                 var(--bb-thumb-bg);
         }
-        [data-template="burger_bar"] .bb-card-body {
+        [data-template="burger_bar"] .bb-card-body,
+        [data-template="gochit_monster"] .bb-card-body{
             position: absolute;
             inset: auto 0 0 0;
             padding: 44px 14px 12px;
@@ -3089,7 +3245,8 @@
             justify-content: space-between;
             gap: 12px;
         }
-        [data-template="burger_bar"] .bb-card-name {
+        [data-template="burger_bar"] .bb-card-name,
+        [data-template="gochit_monster"] .bb-card-name{
             font-family: 'Anton', 'Nunito', sans-serif;
             font-size: 1.15rem;
             line-height: 1.15;
@@ -3098,13 +3255,15 @@
             color: #fff;
             margin: 0 0 3px;
         }
-        html[lang="ka"][data-template="burger_bar"] .bb-card-name {
+        html[lang="ka"][data-template="burger_bar"] .bb-card-name,
+        html[lang="ka"][data-template="gochit_monster"] .bb-card-name{
             font-family: 'Nunito', sans-serif;
             text-transform: none;
             font-weight: 800;
             letter-spacing: 0.2px;
         }
-        [data-template="burger_bar"] .bb-card-desc {
+        [data-template="burger_bar"] .bb-card-desc,
+        [data-template="gochit_monster"] .bb-card-desc{
             font-size: 0.74rem;
             line-height: 1.35;
             color: rgba(255,255,255,0.82);
@@ -3114,7 +3273,8 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-        [data-template="burger_bar"] .bb-card-price {
+        [data-template="burger_bar"] .bb-card-price,
+        [data-template="gochit_monster"] .bb-card-price{
             flex: none;
             font-family: 'Anton', 'Nunito', sans-serif;
             font-size: 1.1rem;
@@ -3122,7 +3282,8 @@
             color: var(--bb-accent2);
             white-space: nowrap;
         }
-        [data-template="burger_bar"] .bb-card-price .price-was {
+        [data-template="burger_bar"] .bb-card-price .price-was,
+        [data-template="gochit_monster"] .bb-card-price .price-was{
             display: block;
             text-align: right;
             margin: 0 0 1px;
@@ -3133,7 +3294,8 @@
            Entirely theme_config-driven and hidden when unset, so no venue's
            address can appear on another venue's menu. */
         .venue-info { display: none; }
-        [data-template="burger_bar"] .venue-info {
+        [data-template="burger_bar"] .venue-info,
+        [data-template="gochit_monster"] .venue-info{
             display: block;
             width: 100%;
             max-width: 450px;
@@ -3142,8 +3304,10 @@
             box-sizing: border-box;
             border-top: 1px solid var(--bb-border);
         }
-        [data-template="burger_bar"] .venue-info[hidden] { display: none; }
-        [data-template="burger_bar"] .venue-kicker {
+        [data-template="burger_bar"] .venue-info[hidden],
+        [data-template="gochit_monster"] .venue-info[hidden]{ display: none; }
+        [data-template="burger_bar"] .venue-kicker,
+        [data-template="gochit_monster"] .venue-kicker{
             font-size: 0.68rem;
             letter-spacing: 1.6px;
             text-transform: uppercase;
@@ -3151,30 +3315,35 @@
             margin: 0 0 6px;
             font-weight: 700;
         }
-        [data-template="burger_bar"] .venue-title {
+        [data-template="burger_bar"] .venue-title,
+        [data-template="gochit_monster"] .venue-title{
             font-family: 'Anton', 'Nunito', sans-serif;
             font-size: 1.2rem;
             letter-spacing: 0.6px;
             color: var(--bb-text);
             margin: 0 0 8px;
         }
-        html[lang="ka"][data-template="burger_bar"] .venue-title {
+        html[lang="ka"][data-template="burger_bar"] .venue-title,
+        html[lang="ka"][data-template="gochit_monster"] .venue-title{
             font-family: 'Nunito', sans-serif;
             font-weight: 800;
         }
-        [data-template="burger_bar"] .venue-text {
+        [data-template="burger_bar"] .venue-text,
+        [data-template="gochit_monster"] .venue-text{
             font-size: 0.8rem;
             line-height: 1.5;
             color: var(--bb-dim);
             margin: 0 0 14px;
             white-space: pre-line;
         }
-        [data-template="burger_bar"] .venue-actions {
+        [data-template="burger_bar"] .venue-actions,
+        [data-template="gochit_monster"] .venue-actions{
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
         }
-        [data-template="burger_bar"] .venue-link {
+        [data-template="burger_bar"] .venue-link,
+        [data-template="gochit_monster"] .venue-link{
             display: inline-flex;
             align-items: center;
             min-height: 44px;
@@ -3186,12 +3355,14 @@
             font-size: 0.8rem;
             font-weight: 700;
         }
-        [data-template="burger_bar"] .venue-link.primary {
+        [data-template="burger_bar"] .venue-link.primary,
+        [data-template="gochit_monster"] .venue-link.primary{
             background: var(--bb-accent);
             border-color: transparent;
             color: var(--bb-accent-text);
         }
-        [data-template="burger_bar"] .venue-link[hidden] { display: none; }
+        [data-template="burger_bar"] .venue-link[hidden],
+        [data-template="gochit_monster"] .venue-link[hidden]{ display: none; }
 
         /* ── Mugsy tenant shell — exact restaurant + brand gate ───────── */
         [data-template="mugsy_street_diner"] {
@@ -3658,7 +3829,8 @@
             height: auto;
             margin: 4px auto 0;
         }
-        [data-template="burger_bar"] .tenant-logo[src] ~ #brand-title { display: none; }
+        [data-template="burger_bar"] .tenant-logo[src] ~ #brand-title,
+        [data-template="gochit_monster"] .tenant-logo[src] ~ #brand-title{ display: none; }
 
         /* ── Order / social links ───────────────────────────────────────
            A row of pills, each carrying the platform's own mark. Icon plus
@@ -3666,7 +3838,8 @@
            game for anyone who does not already use all five apps, and the
            label is what a screen reader announces. */
         .venue-links { display: none; }
-        [data-template="burger_bar"] .venue-links {
+        [data-template="burger_bar"] .venue-links,
+        [data-template="gochit_monster"] .venue-links{
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
@@ -3676,8 +3849,10 @@
             padding: 0 16px;
             box-sizing: border-box;
         }
-        [data-template="burger_bar"] .venue-links[hidden] { display: none; }
-        [data-template="burger_bar"] .venue-chip {
+        [data-template="burger_bar"] .venue-links[hidden],
+        [data-template="gochit_monster"] .venue-links[hidden]{ display: none; }
+        [data-template="burger_bar"] .venue-chip,
+        [data-template="gochit_monster"] .venue-chip{
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -3693,9 +3868,12 @@
             line-height: 1;
             transition: border-color .15s, transform .12s;
         }
-        [data-template="burger_bar"] .venue-chip:active { transform: scale(0.97); }
-        [data-template="burger_bar"] .venue-chip:hover { border-color: var(--bb-accent); }
-        [data-template="burger_bar"] .venue-chip img {
+        [data-template="burger_bar"] .venue-chip:active,
+        [data-template="gochit_monster"] .venue-chip:active{ transform: scale(0.97); }
+        [data-template="burger_bar"] .venue-chip:hover,
+        [data-template="gochit_monster"] .venue-chip:hover{ border-color: var(--bb-accent); }
+        [data-template="burger_bar"] .venue-chip img,
+        [data-template="gochit_monster"] .venue-chip img{
             width: 24px;
             height: 24px;
             border-radius: 6px;
@@ -3708,7 +3886,8 @@
            created until then, so no tenant pays for Google's payload by
            default. */
         .venue-map { display: none; }
-        [data-template="burger_bar"] .venue-map {
+        [data-template="burger_bar"] .venue-map,
+        [data-template="gochit_monster"] .venue-map{
             display: block;
             width: 100%;
             max-width: 450px;
@@ -3716,8 +3895,10 @@
             padding: 0 16px;
             box-sizing: border-box;
         }
-        [data-template="burger_bar"] .venue-map[hidden] { display: none; }
-        [data-template="burger_bar"] .venue-map iframe {
+        [data-template="burger_bar"] .venue-map[hidden],
+        [data-template="gochit_monster"] .venue-map[hidden]{ display: none; }
+        [data-template="burger_bar"] .venue-map iframe,
+        [data-template="gochit_monster"] .venue-map iframe{
             display: block;
             width: 100%;
             height: 210px;
@@ -3731,7 +3912,8 @@
             [data-template="burger_bar"] .bb-feat-head,
             [data-template="burger_bar"] .venue-info,
             [data-template="burger_bar"] .venue-map { max-width: 920px; }
-            [data-template="burger_bar"] .venue-map iframe { height: 300px; }
+            [data-template="burger_bar"] .venue-map iframe,
+        [data-template="gochit_monster"] .venue-map iframe{ height: 300px; }
         }
 
         /* ── Quantity stepper (add-to-basket control) ── */
@@ -7282,7 +7464,7 @@
         // Templates that render the generic visit/contact block. Mirrors
         // CONTENT_TEMPLATES in the admin app, which decides where the matching
         // editor fields appear.
-        const VENUE_INFO_TEMPLATES = new Set(['burger_bar']);
+        const VENUE_INFO_TEMPLATES = new Set(['burger_bar', 'gochit_monster']);
 
         // Paint the visit/contact block from theme_config. Every field is
         // optional: an empty value hides its element, and if nothing at all is

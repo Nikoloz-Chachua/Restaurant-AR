@@ -13,6 +13,7 @@ export type StarterTemplateKey =
   | 'baoma'
   | 'burger_lions'
   | 'burger_bar'
+  | 'gochit_monster'
   | 'mugsy_street_diner'
 
 export type ThemePreset = {
@@ -322,7 +323,31 @@ const TEMPLATE_VISUAL_TOKENS: Record<StarterTemplateKey, ThemeConfig> = {
     day_item_shadow: '0 8px 20px rgba(45,27,20,0.10)', day_item_hover_shadow: '0 14px 30px rgba(45,27,20,0.16)',
     day_modal_bg_image: 'linear-gradient(180deg, #FFFDF7 0%, #FFF7E7 100%)',
   },
+  // Transcribed from the --bb-* custom properties in index.html.
+  gochit_monster: {
+    night_bg_image: 'radial-gradient(86% 46% at 50% -8%, rgba(255,212,0,0.14) 0%, transparent 60%), radial-gradient(58% 36% at 88% 22%, rgba(225,29,29,0.14) 0%, transparent 68%), linear-gradient(180deg, #0d0d0e 0%, #0a0a0b 56%, #060607 100%)',
+    night_bg_size: 'auto, auto, auto', night_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    night_card_bg: 'linear-gradient(172deg, #1d1d1d 0%, #151515 100%)', night_card_radius: '12px', night_card_blur: '0px',
+    night_stage_bg: '#0a0a0b',
+    night_pill_bg: 'rgba(29,29,29,0.95)', night_pill_active_bg: '#ffd400',
+    night_cta_bg: '#ffd400', night_cta_shadow: '0 6px 20px rgba(255,212,0,0.28)',
+    night_hero_color: '#ffd400', night_hero_shadow: 'none', night_divider_bg: 'linear-gradient(90deg, transparent, #ffd400, transparent)',
+    night_accent_edge: 'linear-gradient(180deg, #ffd400, #ff4444)', night_thumb_vignette: 'linear-gradient(180deg, transparent 56%, rgba(6,6,7,0.46))',
+    night_item_shadow: '0 4px 16px rgba(0,0,0,0.6)', night_item_hover_shadow: '0 14px 34px rgba(0,0,0,0.7)',
+    night_modal_bg_image: 'radial-gradient(70% 46% at 50% 30%, rgba(255,212,0,0.16) 0%, transparent 64%), linear-gradient(180deg, #151515 0%, #060607 100%)',
+    day_bg_image: 'radial-gradient(86% 46% at 50% -8%, rgba(184,24,24,0.09) 0%, transparent 60%), radial-gradient(58% 36% at 88% 22%, rgba(138,99,0,0.08) 0%, transparent 68%), linear-gradient(180deg, #fbf7ec 0%, #f5efe0 56%, #fffdf6 100%)',
+    day_bg_size: 'auto, auto, auto', day_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    day_card_bg: 'linear-gradient(172deg, #ffffff 0%, #fbf6e9 100%)', day_card_radius: '12px', day_card_blur: '0px',
+    day_stage_bg: '#f0e9d7',
+    day_pill_bg: 'rgba(255,255,255,0.92)', day_pill_active_bg: '#b81818',
+    day_cta_bg: '#b81818', day_cta_shadow: '0 6px 18px rgba(184,24,24,0.22)',
+    day_hero_color: '#b81818', day_hero_shadow: 'none', day_divider_bg: 'linear-gradient(90deg, transparent, #8a6300, transparent)',
+    day_accent_edge: 'linear-gradient(180deg, #b81818, #8a6300)', day_thumb_vignette: 'linear-gradient(180deg, transparent 60%, rgba(40,30,10,0.10))',
+    day_item_shadow: '0 4px 14px rgba(40,30,10,0.12)', day_item_hover_shadow: '0 12px 30px rgba(40,30,10,0.18)',
+    day_modal_bg_image: 'radial-gradient(70% 46% at 50% 30%, rgba(184,24,24,0.09) 0%, transparent 64%), linear-gradient(180deg, #fbf7ec 0%, #fffdf6 100%)',
+  },
 }
+
 
 export const TEMPLATE_PRESETS: ThemePreset[] = [
   {
@@ -582,6 +607,32 @@ export const TEMPLATE_PRESETS: ThemePreset[] = [
       ...TEMPLATE_VISUAL_TOKENS.mugsy_street_diner,
       font_body: 'Nunito', font_heading: 'Bebas Neue', template_key: 'mugsy_street_diner',
       default_theme: 'day',
+    },
+  },
+  {
+    key: 'gochit_monster',
+    label: 'Monster Smash',
+    description: 'Near-black with electric yellow and red, blocky display type and signature hero cards — for smash-burger joints and loud street-food menus.',
+    primaryColor: '#ffd400',
+    secondaryColor: '#ff4444',
+    createStarterCategory: true,
+    // Electric yellow is 12.28:1 on the night card but only 1.43:1 on the day
+    // white, so day runs a deep red (#b81818, 6.60:1) rather than flattening
+    // both modes onto one accent. Anything sitting ON the yellow must be
+    // near-black: #0d0d0e is 13.57:1, white is 1.43:1.
+    preserveModeAccents: true,
+    values: {
+      night_bg: '#0d0d0e', night_bg2: '#060607', night_card: '#191919', night_card2: '#212121', night_border: 'rgba(255,212,0,0.20)',
+      night_text: '#f7f2e4', night_dim: '#a09a8d', night_accent: '#ffd400', night_accent2: '#ff4444', night_accent_text: '#0d0d0e', night_thumb_bg: '#0a0a0b', night_modal_bg: '#0d0d0e',
+      night_glow: 'rgba(255,212,0,0.13)', night_glow2: 'rgba(225,29,29,0.14)', night_shadow: 'rgba(0,0,0,0.68)',
+      night_price_color: '#ffd400', night_add_btn_color: '#ffd400',
+      day_bg: '#fbf7ec', day_bg2: '#f2ecdc', day_card: '#ffffff', day_card2: '#fbf6e9', day_border: 'rgba(40,30,10,0.17)',
+      day_text: '#141414', day_dim: '#6a6459', day_accent: '#b81818', day_accent2: '#8a6300', day_accent_text: '#ffffff', day_thumb_bg: '#f0e9d7', day_modal_bg: '#fffdf6',
+      day_glow: 'rgba(184,24,24,0.09)', day_glow2: 'rgba(138,99,0,0.08)', day_shadow: 'rgba(40,30,10,0.17)',
+      day_price_color: '#b81818', day_add_btn_color: '#b81818',
+      ...TEMPLATE_VISUAL_TOKENS.gochit_monster,
+      font_body: 'Inter', font_heading: 'Archivo Black', template_key: 'gochit_monster',
+      default_theme: 'night',
     },
   },
 ]
