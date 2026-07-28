@@ -4126,14 +4126,55 @@
             border-radius: 14px;
             background: var(--bb-thumb-bg);
         }
+        /* Item name gets its own full-width row instead of sharing the 108px
+           photo column. In the base grid the name sits in that narrow column,
+           so "THE MONSTER" broke mid-word as "THE MONSTE / R". Monday Greens
+           already solves this the same way. Declared here, after the earlier
+           .item-name rules, so it is not lost on source order. */
+        [data-template="burger_bar"] .menu-item:not(.no-image),
+        [data-template="gochit_monster"] .menu-item:not(.no-image) {
+            grid-template-columns: 108px minmax(0, 1fr);
+            grid-template-areas: "name  name" "left  right";
+            min-width: 0;
+        }
+        [data-template="burger_bar"] .item-name,
+        [data-template="gochit_monster"] .item-name {
+            /* anywhere, not break-word: only break a word that cannot fit on a
+               line by itself, rather than mid-word whenever the box is tight */
+            overflow-wrap: anywhere;
+            word-break: normal;
+            white-space: normal;
+            min-width: 0;
+        }
+
+        /* The embed swallows taps, so a transparent anchor sits over it and the
+           iframe stops receiving pointer events — tapping the map opens the
+           venue in Google Maps, which is what someone at a table actually
+           wants. Only added when a link is configured; without one the map
+           stays an ordinary interactive embed. */
+        [data-template="burger_bar"] .venue-map,
+        [data-template="gochit_monster"] .venue-map { position: relative; }
+        [data-template="burger_bar"] .venue-map.is-link iframe,
+        [data-template="gochit_monster"] .venue-map.is-link iframe { pointer-events: none; }
+        [data-template="burger_bar"] .venue-map-hit,
+        [data-template="gochit_monster"] .venue-map-hit {
+            position: absolute;
+            inset: 0 16px;
+            border-radius: 14px;
+            display: block;
+        }
+
         @media (min-width: 760px) {
             /* Declared here, after every base rule: an override placed earlier
                loses to the later base declaration on source order. */
             [data-template="burger_bar"] .bb-feat-head,
+            [data-template="gochit_monster"] .bb-feat-head,
             [data-template="burger_bar"] .venue-info,
-            [data-template="burger_bar"] .venue-map { max-width: 920px; }
+            [data-template="gochit_monster"] .venue-info,
+            [data-template="burger_bar"] .venue-map,
+            [data-template="gochit_monster"] .venue-map { max-width: 920px; }
             [data-template="burger_bar"] .venue-map iframe,
-        [data-template="gochit_monster"] .venue-map iframe{ height: 300px; }
+            [data-template="gochit_monster"] .venue-map iframe { height: 300px; }
         }
 
         /* ── Quantity stepper (add-to-basket control) ── */
@@ -7847,6 +7888,7 @@
                 src = 'https://www.google.com/maps?q=' + encodeURIComponent(query) + '&output=embed';
             }
             box.hidden = !src;
+            box.classList.remove('is-link');
             if (!src) return;
             const f = document.createElement('iframe');
             f.src = src;
@@ -7855,6 +7897,21 @@
             f.setAttribute('allowfullscreen', '');
             f.title = _cleanText(cfg.site_name) || 'Map';
             box.appendChild(f);
+            // Tapping the map opens the venue in Google Maps. info_map_link is
+            // the tenant's own share link when it has one (a maps.app.goo.gl
+            // short URL keeps the exact pin and place card); otherwise the
+            // directions URL already configured for the contact block.
+            const hit = _safeAssetUrl(cfg.info_map_link) || _safeAssetUrl(cfg.info_directions_url);
+            if (!hit) return;
+            const a = document.createElement('a');
+            a.className = 'venue-map-hit';
+            a.href = hit;
+            a.target = '_blank';
+            a.rel = 'noopener';
+            a.setAttribute('aria-label',
+                _cleanText(cfg.info_directions_label) || 'Open in Google Maps');
+            box.appendChild(a);
+            box.classList.add('is-link');
         }
 
         // Signature strip: up to three promoted dishes as large photo-led cards
