@@ -3,14 +3,12 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { themePreset, themePresetValuesWithAccents } from '@/lib/themePresets'
 import { cleanEmail, ensureAdminAuthUser, fetchStoredInitialPasswords, isPlatformRole, storeInitialPassword } from '@/lib/adminAccounts'
+import { deriveTenantCreationFields, nextTenantSlugCandidate, slugify } from '@/lib/adminUx'
 
 type TenantPlan = 'ar_menu' | 'full' | 'premium'
 
 type TenantRequest = {
   brandName?: string
-  brandSlug?: string
-  restaurantName?: string
-  restaurantSlug?: string
   plan?: TenantPlan
   templateKey?: string
   primaryColor?: string
@@ -61,11 +59,7 @@ const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const CUSTOMER_APP_URL = (process.env.NEXT_PUBLIC_CUSTOMER_APP_URL || 'https://restaurant-ar.pages.dev').replace(/\/$/, '')
 const TENANT_DOMAIN_BASE = (process.env.NEXT_PUBLIC_TENANT_DOMAIN_BASE || 'betareal.ge').replace(/^https?:\/\//, '').replace(/\/$/, '')
 function cleanSlug(value: string) {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
+  return slugify(value)
 }
 
 function isColor(value: unknown) {
@@ -213,10 +207,8 @@ export async function POST(req: NextRequest) {
   if (!body) {
     return NextResponse.json({ error: 'Invalid JSON request body' }, { status: 400 })
   }
-  const brandName = String(body.brandName ?? '').trim()
-  const restaurantName = String(body.restaurantName ?? '').trim()
-  const brandSlug = cleanSlug(String(body.brandSlug || brandName))
-  const restaurantSlug = cleanSlug(String(body.restaurantSlug || `${brandSlug}-main`))
+  const tenantFields = deriveTenantCreationFields(body)
+  const brandName = tenantFields.brandName
   const plan = body.plan === 'full' || body.plan === 'premium' ? body.plan : 'ar_menu'
   const preset = themePreset(body.templateKey)
   const templateKey = preset.key
@@ -225,10 +217,10 @@ export async function POST(req: NextRequest) {
   const adminEmail = cleanEmail(body.adminEmail)
   const adminPassword = String(body.adminPassword ?? '')
 
-  if (!brandName || !restaurantName) {
-    return NextResponse.json({ error: 'Brand name and first branch name are required' }, { status: 400 })
+  if (!brandName) {
+    return NextResponse.json({ error: 'Brand name is required' }, { status: 400 })
   }
-  if (!SLUG_RE.test(brandSlug) || !SLUG_RE.test(restaurantSlug)) {
+  if (!SLUG_RE.test(tenantFields.brandSlug) || !SLUG_RE.test(tenantFields.restaurantSlug)) {
     return NextResponse.json({ error: 'Slugs must use lowercase letters, numbers, and hyphens' }, { status: 400 })
   }
   if ((adminEmail || adminPassword) && (!adminEmail || adminPassword.length < 8)) {
@@ -238,24 +230,31 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Admin email is not valid' }, { status: 400 })
   }
 
-  const { data, error } = await supabase.rpc('create_platform_tenant', {
-    p_brand_name: brandName,
-    p_brand_slug: brandSlug,
-    p_restaurant_name: restaurantName,
-    p_restaurant_slug: restaurantSlug,
-    p_plan: plan,
-    p_primary_color: primaryColor,
-    p_secondary_color: secondaryColor,
-    p_create_starter_category: body.createStarterCategory ?? preset.createStarterCategory,
-  }).single()
+  let data: unknown = null
+  let error: { code?: string; message?: string } | null = null
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    const fields = attempt === 0 ? tenantFields : nextTenantSlugCandidate({ ...tenantFields, attempt })
+    const result = await supabase.rpc('create_platform_tenant', {
+      p_brand_name: fields.brandName,
+      p_brand_slug: fields.brandSlug,
+      p_restaurant_name: fields.restaurantName,
+      p_restaurant_slug: fields.restaurantSlug,
+      p_plan: plan,
+      p_primary_color: primaryColor,
+      p_secondary_color: secondaryColor,
+      p_create_starter_category: body.createStarterCategory ?? preset.createStarterCategory,
+    }).single()
+    data = result.data
+    error = result.error
+    if (!error || error.code !== '23505') break
+  }
 
   if (error) {
-    const duplicateSlug = error.code === '23505'
     return NextResponse.json({
-      error: duplicateSlug
-        ? 'Brand slug, branch slug, or custom domain already exists'
+      error: error.code === '23505'
+        ? 'Could not derive an available tenant URL slug; try a more specific brand name'
         : error.message || 'Tenant creation failed before any rows were committed',
-    }, { status: duplicateSlug ? 409 : 400 })
+    }, { status: error.code === '23505' ? 409 : 400 })
   }
 
   const created = data as TenantRpcRow | null

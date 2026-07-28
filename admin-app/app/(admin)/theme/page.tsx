@@ -6,6 +6,7 @@ import type { Translations } from '@/lib/i18n'
 import { usePlan } from '@/lib/usePlan'
 import LockedCard from '@/components/LockedCard'
 import { TEMPLATE_PRESETS, type ThemeConfig } from '@/lib/themePresets'
+import { isThemeTemplateActionAllowed, normalizeThemeTabForRole, themeTabsForRole } from '@/lib/adminUx'
 
 const BRANDING_KEYS = ['site_name', 'site_name_ka', 'logo_url', 'hero_logo_url', 'hero_image_url']
 
@@ -45,6 +46,8 @@ const GOOGLE_FONTS = [
   'Playfair Display', 'Montserrat', 'Raleway', 'Open Sans',
   'Source Sans 3', 'Oswald', 'PT Serif', 'Merriweather',
 ]
+
+type ThemeTabId = 'templates' | 'night' | 'day' | 'background' | 'fonts' | 'branding'
 
 function isColor(v: string) {
   return /^#[0-9a-fA-F]{3,8}$/.test(v) || v.startsWith('rgb')
@@ -162,7 +165,7 @@ export default function ThemePage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving]   = useState(false)
   const [msg, setMsg]         = useState('')
-  const [tab, setTab]         = useState<'templates' | 'night' | 'day' | 'background' | 'fonts' | 'branding'>('templates')
+  const [tab, setTab]         = useState<ThemeTabId>('templates')
   const [flashKey, setFlashKey]       = useState<string | null>(null)
   const [pendingPick, setPendingPick] = useState<string | null>(null)
   const text = useCallback((template: string, values: Record<string, string | number>) => (
@@ -193,6 +196,11 @@ export default function ThemePage() {
   }, [plan.canUseTheme, plan.loading, plan.restaurantId, supabase])
 
   useEffect(() => { void Promise.resolve().then(load) }, [load])
+  useEffect(() => {
+    queueMicrotask(() => {
+      setTab(current => normalizeThemeTabForRole(current, plan.role) as ThemeTabId)
+    })
+  }, [plan.role])
 
   // Leave guard #1 — warn on refresh / tab-close / external navigation.
   useEffect(() => {
@@ -361,14 +369,19 @@ export default function ThemePage() {
     return r != null ? `${T.contrastLow} (${r.toFixed(1)}:1)` : null
   }
 
-  const tabs = [
-    { id: 'templates', label: T.tabPresets },
-    { id: 'night',     label: T.tabNight },
-    { id: 'day',       label: T.tabDay },
-    { id: 'background', label: T.tabBackground },
-    { id: 'fonts',     label: T.tabFonts },
-    { id: 'branding',  label: T.tabBranding },
-  ] as const
+  const templateActionsAllowed = isThemeTemplateActionAllowed(plan.role)
+  const tabLabels: Record<ThemeTabId, string> = {
+    templates: T.tabPresets,
+    night: T.tabNight,
+    day: T.tabDay,
+    background: T.tabBackground,
+    fonts: T.tabFonts,
+    branding: T.tabBranding,
+  }
+  const tabs = themeTabsForRole(plan.role).map(item => ({
+    id: item.id as ThemeTabId,
+    label: tabLabels[item.id as ThemeTabId],
+  }))
 
   if (!plan.loading && !plan.restaurantId) {
     return (
@@ -456,13 +469,14 @@ export default function ThemePage() {
         <p style={{ color: 'var(--dim)' }}>{T.loading}</p>
       ) : (
         <div className="grid grid-cols-1 gap-4 max-w-2xl">
-          {tab === 'templates' && (
+          {tab === 'templates' && templateActionsAllowed && (
             <div className="grid grid-cols-1 gap-3">
               {TEMPLATE_PRESETS.map(preset => (
                 <button
                   key={preset.key}
                   type="button"
                   onClick={() => {
+                    if (!templateActionsAllowed) return
                     setConfig(current => ({ ...current, ...preset.values }))
                     setMsg(text(T.templateLoaded, { name: preset.label }))
                   }}
@@ -733,8 +747,10 @@ function ThemePreview({ config, activeTab, onPick }:
 
   // Follow the editor into the palette being edited (night/day tabs).
   useEffect(() => {
-    if (activeTab === 'day') setMode('day')
-    else if (activeTab === 'night') setMode('night')
+    queueMicrotask(() => {
+      if (activeTab === 'day') setMode('day')
+      else if (activeTab === 'night') setMode('night')
+    })
   }, [activeTab])
 
   // Load the chosen Google Fonts so the preview types in the real faces.
