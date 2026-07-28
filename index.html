@@ -2930,7 +2930,7 @@
            would otherwise leave a narrow floating strip on desktop. */
         [data-template="burger_bar"] .cat-bar {
             position: sticky;
-            top: 49px;
+            top: 0;
             z-index: 30;
             width: 100vw;
             max-width: none;
@@ -2938,19 +2938,16 @@
             margin-right: calc(50% - 50vw);
             background: var(--bb-bar-bg);
             backdrop-filter: blur(14px) saturate(140%);
-            padding: 8px 0;
+            /* The 49px of top padding is the seat for the two fixed toggles: once
+               the bar is pinned it fills the strip behind them, so they read as
+               part of the bar instead of floating over the menu. It is padding
+               rather than an ::before, because an absolutely positioned strip
+               anchored to bottom:100% would sit ABOVE the bar's own box and paint
+               over the restaurant name while the bar is still unpinned.
+               58px, not 49: #theme-toggle is a round icon button and measures
+               14->52px, so a 49px seat clipped it by 3px. */
+            padding: 58px 0 8px;
             border-bottom: 1px solid var(--bb-border);
-        }
-        [data-template="burger_bar"] .cat-bar::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 100%;
-            height: 49px;
-            background: var(--bb-bar-bg);
-            backdrop-filter: blur(14px) saturate(140%);
-            pointer-events: none;
         }
         /* Keep the pill row itself within the readable column. The full-bleed
            break-out above escapes the page container's side padding, so the row
