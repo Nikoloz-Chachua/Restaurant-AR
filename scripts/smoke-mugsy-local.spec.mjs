@@ -19,6 +19,11 @@ const railDesktopViewports = [
 ]
 const basketViewports = viewports.filter(viewport => ['320', '390', '430'].includes(viewport.label))
 const footerViewports = viewports
+const themeViewports = [
+  { label: '320', width: 320, height: 844 },
+  { label: '390', width: 390, height: 844 },
+  { label: '1440', width: 1440, height: 1000 },
+]
 
 test.use({ serviceWorkers: 'block' })
 
@@ -27,10 +32,544 @@ function overlap(a, b) {
     Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top))
 }
 
+function rgbParts(value) {
+  const match = String(value).match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/)
+  return match ? match.slice(1, 4).map(Number) : [0, 0, 0]
+}
+
+function brightness(value) {
+  const [r, g, b] = rgbParts(value)
+  return (r * 299 + g * 587 + b * 114) / 1000
+}
+
+function alphaPart(value) {
+  const match = String(value).match(/rgba?\(\d+,\s*\d+,\s*\d+(?:,\s*([0-9.]+))?/)
+  return match && match[1] != null ? Number(match[1]) : 1
+}
+
+function channel(v) {
+  const s = v / 255
+  return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4
+}
+
+function luminance(value) {
+  const [r, g, b] = rgbParts(value)
+  return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b)
+}
+
+function contrast(a, b) {
+  const la = luminance(a)
+  const lb = luminance(b)
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05)
+}
+
+async function gotoMugsyWithTheme(page, viewport, theme, route3d = false) {
+  if (route3d) {
+    await page.route('**/mugsy-menu.fixture.json', route => {
+      const fixture = structuredClone(mugsyFixture)
+      fixture.menu_items[0] = {
+        ...fixture.menu_items[0],
+        name_en: 'Cheesy 3D Table Preview',
+        name_ka: 'Cheesy 3D Table Preview',
+        is_3d: true,
+        model: 'food.glb',
+        model_usdz: 'food.usdz',
+        thumb_3d: false,
+      }
+      route.fulfill({ contentType: 'application/json', body: JSON.stringify(fixture) })
+    })
+  }
+  await page.setViewportSize({ width: viewport.width, height: viewport.height })
+  await page.addInitScript(mode => {
+    localStorage.clear()
+    if (mode === 'night') localStorage.setItem('bl-theme:mugsy-main', 'night')
+  }, theme)
+  await page.goto(`${baseUrl}/?tenant=mugsy-main&fixture=mugsy`, { waitUntil: 'networkidle' })
+}
+
+async function overlayState(page) {
+  return page.evaluate(() => {
+    const visible = el => {
+      if (!el) return false
+      const s = getComputedStyle(el)
+      const r = el.getBoundingClientRect()
+      return s.display !== 'none' && s.visibility !== 'hidden' && r.width > 0 && r.height > 0
+    }
+    const modal = document.querySelector('#modal')
+    const lightbox = document.querySelector('#img-lightbox')
+    const basketPanel = document.querySelector('#basket-panel')
+    return {
+      modalActive: modal?.classList.contains('active') || false,
+      modalDisplayed: visible(modal),
+      lightboxOpen: lightbox?.classList.contains('open') || false,
+      lightboxPanel: lightbox?.classList.contains('has-panel') || false,
+      lightboxDisplayed: visible(lightbox),
+      basketActive: basketPanel?.classList.contains('active') || false,
+      basketDisplayed: visible(basketPanel),
+    }
+  })
+}
+
+async function expectNoOpenOverlay(page) {
+  expect(await overlayState(page)).toEqual({
+    modalActive: false,
+    modalDisplayed: false,
+    lightboxOpen: false,
+    lightboxPanel: false,
+    lightboxDisplayed: false,
+    basketActive: false,
+    basketDisplayed: false,
+  })
+}
+
+function inside(outer, inner, tolerance = 1) {
+  return inner.left >= outer.left - tolerance &&
+    inner.right <= outer.right + tolerance &&
+    inner.top >= outer.top - tolerance &&
+    inner.bottom <= outer.bottom + tolerance
+}
+
+async function overlayVisualState(page, selector) {
+  return page.evaluate(sel => {
+    const root = document.querySelector(sel)
+    if (!root) return null
+    const style = getComputedStyle(root)
+    const animations = root.getAnimations({ subtree: true }).map(animation => ({
+      playState: animation.playState,
+      currentTime: animation.currentTime,
+      effectTarget: animation.effect?.target?.id || animation.effect?.target?.className || animation.effect?.target?.tagName || '',
+      transitionProperty: animation.transitionProperty || '',
+      animationName: animation.animationName || '',
+    }))
+    return {
+      opacity: Number(style.opacity),
+      backgroundColor: style.backgroundColor,
+      backgroundImage: style.backgroundImage,
+      display: style.display,
+      visibility: style.visibility,
+      animationCount: animations.length,
+      runningAnimations: animations.filter(animation => !['finished', 'idle'].includes(animation.playState)).length,
+      animations,
+    }
+  }, selector)
+}
+
+async function waitForOverlaySettled(page, selector) {
+  await page.evaluate(async sel => {
+    const root = document.querySelector(sel)
+    if (!root) return
+    const animations = root.getAnimations({ subtree: true })
+    await Promise.allSettled(animations.map(animation => animation.finished))
+    await new Promise(resolve => setTimeout(resolve, 380))
+  }, selector)
+  await page.waitForFunction(sel => {
+    const root = document.querySelector(sel)
+    if (!root) return false
+    const style = getComputedStyle(root)
+    return Number(style.opacity) === 1 &&
+      root.getAnimations({ subtree: true }).every(animation => ['finished', 'idle'].includes(animation.playState))
+  }, selector)
+}
+
 test.describe('Mugsy public visual QA', () => {
   test.beforeAll(() => {
     mkdirSync(outDir, { recursive: true })
   })
+
+  test('global night alone still yields Mugsy day, scoped night persists, other tenants keep global theme', async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' })
+    await context.addInitScript(() => {
+      if (sessionStorage.getItem('mugsy-seeded')) return
+      localStorage.clear()
+      localStorage.setItem('bl-theme', 'night')
+      sessionStorage.setItem('mugsy-seeded', '1')
+    })
+    const page = await context.newPage()
+    await page.goto(`${baseUrl}/?tenant=mugsy-main&fixture=mugsy`, { waitUntil: 'networkidle' })
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'day')
+    expect(await page.evaluate(() => localStorage.getItem('bl-theme:mugsy-main'))).toBeNull()
+    await page.locator('#theme-toggle').click()
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'night')
+    expect(await page.evaluate(() => ({
+      global: localStorage.getItem('bl-theme'),
+      scoped: localStorage.getItem('bl-theme:mugsy-main'),
+    }))).toEqual({ global: 'night', scoped: 'night' })
+    await page.reload({ waitUntil: 'networkidle' })
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'night')
+    await context.close()
+
+    const other = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' })
+    await other.addInitScript(() => {
+      localStorage.clear()
+      localStorage.setItem('bl-theme', 'night')
+    })
+    const otherPage = await other.newPage()
+    await otherPage.goto(`${baseUrl}/?tenant=burger-bar-main`, { waitUntil: 'domcontentloaded' })
+    await expect(otherPage.locator('html')).toHaveAttribute('data-theme', 'night')
+    await other.close()
+  })
+
+  for (const viewport of themeViewports) {
+    for (const theme of ['day', 'night']) {
+      test(`Mugsy ${theme} mode recolors primary journey surfaces at ${viewport.label}px`, async ({ page }) => {
+        const errors = []
+        page.on('console', message => {
+          if (message.type() === 'error') errors.push(message.text())
+        })
+        page.on('pageerror', error => errors.push(error.message))
+
+        await gotoMugsyWithTheme(page, viewport, theme, true)
+        await expect(page.locator('html')).toHaveAttribute('data-theme', theme)
+        await expect(page.locator('#theme-toggle')).toBeVisible()
+        await expect(page.locator('#theme-toggle')).toHaveAttribute('aria-label', /day|night|დღის|ღამის|მუქი|ნათელი/i)
+
+        await expectNoOpenOverlay(page)
+        await expect(page.locator('#basket-bar')).not.toHaveClass(/visible/)
+
+        const metrics = await page.evaluate(() => {
+          const styleForEl = el => {
+            const s = getComputedStyle(el)
+            const r = el.getBoundingClientRect()
+            return {
+              bg: s.backgroundColor,
+              bgImage: s.backgroundImage,
+              color: s.color,
+              border: s.borderTopColor,
+              display: s.display,
+              left: r.left,
+              right: r.right,
+              top: r.top,
+              bottom: r.bottom,
+              width: r.width,
+              height: r.height,
+            }
+          }
+          const styleFor = selector => styleForEl(document.querySelector(selector))
+          const cards = [...document.querySelectorAll('.menu-item')]
+          const phoneCards = cards
+            .slice(0, 2)
+            .map(el => {
+              const r = el.getBoundingClientRect()
+              return { left: r.left, right: r.right, top: r.top, width: r.width }
+            })
+          return {
+            overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+            phoneLayout: document.documentElement.dataset.phoneLayout,
+            body: styleFor('body'),
+            topbar: styleFor('.mugsy-topbar'),
+            themeToggle: styleFor('#theme-toggle'),
+            lang: styleFor('#lang-toggle'),
+            pill: styleFor('.cat-pill'),
+            ordinaryCard: styleForEl(cards[1]),
+            card3d: styleForEl(cards[0]),
+            stage: styleForEl(cards[0].querySelector('.thumb-wrap')),
+            description: styleForEl(cards[1].querySelector('.ingredients')),
+            price: styleForEl(cards[1].querySelector('.price')),
+            cart: styleForEl(cards[1].querySelector('.qty-stepper.visible, .qty-add-btn')),
+            cta: styleForEl(cards[0].querySelector('.ar-btn')),
+            badge: styleForEl(cards[0].querySelector('.badge-3d')),
+            location: styleFor('.mugsy-location'),
+            footer: styleFor('.site-footer'),
+            modal: styleFor('#modal'),
+            basketBarVisible: document.querySelector('#basket-bar').classList.contains('visible'),
+            overlayState: {
+              modalActive: document.querySelector('#modal').classList.contains('active'),
+              lightboxOpen: document.querySelector('#img-lightbox').classList.contains('open'),
+              lightboxPanel: document.querySelector('#img-lightbox').classList.contains('has-panel'),
+              basketActive: document.querySelector('#basket-panel').classList.contains('active'),
+            },
+            menuGridColumns: getComputedStyle(document.querySelector('.menu-list')).gridTemplateColumns.split(' ').length,
+            railDisplay: getComputedStyle(document.querySelector('#mugsy-delivery-rail')).display,
+            railHidden: document.querySelector('#mugsy-delivery-rail').hidden,
+            phoneCards,
+          }
+        })
+
+        expect(metrics.overflow).toBe(0)
+        expect(metrics.themeToggle.width).toBeGreaterThanOrEqual(44)
+        expect(metrics.themeToggle.height).toBeGreaterThanOrEqual(44)
+        expect(overlap(metrics.themeToggle, metrics.lang), 'theme/language overlap').toBe(0)
+        expect(metrics.basketBarVisible).toBe(false)
+        expect(metrics.overlayState).toEqual({
+          modalActive: false,
+          lightboxOpen: false,
+          lightboxPanel: false,
+          basketActive: false,
+        })
+        expect(errors).toEqual([])
+
+        if (theme === 'day') {
+          expect(brightness(metrics.body.bg)).toBeGreaterThan(210)
+          expect(brightness(metrics.topbar.bg)).toBeGreaterThan(210)
+          expect(brightness(metrics.location.bg)).toBeGreaterThan(210)
+        } else {
+          for (const [name, surface] of Object.entries({
+            body: metrics.body,
+            topbar: metrics.topbar,
+            ordinaryCard: metrics.ordinaryCard,
+            card3d: metrics.card3d,
+            stage: metrics.stage,
+            location: metrics.location,
+          })) {
+            const bg = surface.bg === 'rgba(0, 0, 0, 0)' ? surface.bgImage : surface.bg
+            expect(brightness(bg), `${name} should not remain cream in night`).toBeLessThan(120)
+          }
+          expect(metrics.modal.bgImage, 'modal should include the dark Mugsy night base').toMatch(/rgb\(22, 13, 10\)|rgb\(42, 26, 19\)/)
+          for (const [name, surface] of Object.entries({
+            description: metrics.description,
+            price: metrics.price,
+            cart: metrics.cart,
+            footer: metrics.footer,
+          })) {
+            expect(brightness(surface.color), `${name} text should be readable in night`).toBeGreaterThan(120)
+          }
+          for (const [name, surface] of Object.entries({
+            cta: metrics.cta,
+            badge: metrics.badge,
+          })) {
+            expect(contrast(surface.color, surface.bg), `${name} text should contrast its CTA surface`).toBeGreaterThan(3)
+          }
+        }
+
+        if (viewport.width < 640) {
+          expect(metrics.phoneLayout).toBe('twin')
+          expect(metrics.menuGridColumns).toBe(2)
+          expect(metrics.railHidden).toBe(true)
+        } else if (viewport.width >= 768) {
+          expect(metrics.railDisplay).toBe('flex')
+          expect(metrics.railHidden).toBe(false)
+        }
+
+        await page.screenshot({ path: `${outDir}/mugsy-theme-${theme}-${viewport.label}.png`, fullPage: false })
+        writeFileSync(`${outDir}/mugsy-theme-${theme}-${viewport.label}-metrics.json`, JSON.stringify(metrics, null, 2))
+      })
+    }
+  }
+
+  for (const viewport of themeViewports) {
+    for (const theme of ['day', 'night']) {
+      test(`Mugsy ${theme} 3D modal is opaque and contained at ${viewport.label}px`, async ({ page }) => {
+        const errors = []
+        page.on('console', message => {
+          if (message.type() === 'error') errors.push(message.text())
+        })
+        page.on('pageerror', error => errors.push(error.message))
+
+        await gotoMugsyWithTheme(page, viewport, theme, true)
+        await expectNoOpenOverlay(page)
+        await page.locator('.menu-item').first().locator('.ar-btn').click()
+        await expect(page.locator('#modal')).toHaveClass(/active/)
+        const immediateVisual = await overlayVisualState(page, '#modal')
+        await page.screenshot({ path: `${outDir}/mugsy-modal-3d-${theme}-${viewport.label}-immediate.png`, fullPage: false })
+        await waitForOverlaySettled(page, '#modal')
+        const settledVisual = await overlayVisualState(page, '#modal')
+        if (viewport.width >= 640) {
+          await page.locator('#modal-drawer').click()
+          await expect(page.locator('#modal-drawer')).toHaveClass(/expanded/)
+          await waitForOverlaySettled(page, '#modal')
+        }
+
+        const metrics = await page.evaluate(() => {
+          const rectForEl = el => {
+            const r = el.getBoundingClientRect()
+            const s = getComputedStyle(el)
+            const cx = Math.max(0, Math.min(innerWidth - 1, r.left + r.width / 2))
+            const cy = Math.max(0, Math.min(innerHeight - 1, r.top + r.height / 2))
+            const topEl = document.elementFromPoint(cx, cy)
+            return {
+              left: r.left,
+              right: r.right,
+              top: r.top,
+              bottom: r.bottom,
+              width: r.width,
+              height: r.height,
+              display: s.display,
+              visibility: s.visibility,
+              bg: s.backgroundColor,
+              bgImage: s.backgroundImage,
+              color: s.color,
+              text: el.textContent.trim(),
+              topmostInModal: !!topEl?.closest?.('#modal'),
+            }
+          }
+          const rectFor = selector => rectForEl(document.querySelector(selector))
+          const titleSelector = innerWidth < 640 ? '#modal-title' : '#modal-title-d'
+          const controls = [titleSelector, '#modal-price', '#modal-description', '#modal-qty-ctrl', '#modal-ar-btn']
+          const unrelated = [...document.querySelectorAll('.menu-item, .category-header')]
+            .filter(el => {
+              const r = el.getBoundingClientRect()
+              return r.bottom > 0 && r.top < innerHeight
+            })
+            .map(rectForEl)
+          return {
+            overlay: {
+              modalActive: document.querySelector('#modal').classList.contains('active'),
+              lightboxOpen: document.querySelector('#img-lightbox').classList.contains('open'),
+              basketActive: document.querySelector('#basket-panel').classList.contains('active'),
+              basketBarVisible: document.querySelector('#basket-bar').classList.contains('visible'),
+            },
+            modal: rectFor('#modal'),
+            panel: rectFor(innerWidth < 640 ? '#modal' : '#modal-drawer'),
+            title: rectFor(titleSelector),
+            price: rectFor('#modal-price'),
+            description: rectFor('#modal-description'),
+            qty: rectFor('#modal-qty-ctrl'),
+            ar: rectFor('#modal-ar-btn'),
+            closeButtons: [...document.querySelectorAll('#modal .close-btn')]
+              .filter(btn => getComputedStyle(btn).display !== 'none' && btn.getBoundingClientRect().width > 0)
+              .map(rectForEl),
+            controls: Object.fromEntries(controls.map(selector => [selector, rectFor(selector)])),
+            unrelated,
+            activeElementBlockedByModal: document.elementFromPoint(Math.floor(innerWidth / 2), Math.floor(innerHeight / 2))?.closest('#modal') != null,
+            visualTiming: { immediate: null, settled: null },
+          }
+        })
+        metrics.visualTiming = { immediate: immediateVisual, settled: settledVisual }
+
+        expect(metrics.overlay).toEqual({
+          modalActive: true,
+          lightboxOpen: false,
+          basketActive: false,
+          basketBarVisible: false,
+        })
+        expect(alphaPart(metrics.modal.bg)).toBe(1)
+        expect(alphaPart(metrics.panel.bg)).toBe(1)
+        expect(metrics.visualTiming.settled.opacity).toBe(1)
+        expect(alphaPart(metrics.visualTiming.settled.backgroundColor)).toBe(1)
+        expect(metrics.closeButtons).toHaveLength(1)
+        expect(metrics.title.text).toBe('Cheesy 3D Table Preview')
+        expect(metrics.description.text.length).toBeGreaterThan(0)
+        expect(metrics.price.text.length).toBeGreaterThan(0)
+        for (const [name, rect] of Object.entries(metrics.controls)) {
+          expect(rect.display, `${name} should be displayed`).not.toBe('none')
+          expect(rect.visibility, `${name} should be visible`).toBe('visible')
+          expect(rect.width, `${name} should have width`).toBeGreaterThan(0)
+          expect(rect.height, `${name} should have height`).toBeGreaterThan(0)
+          expect(inside(metrics.modal, rect), `${name} should fit inside modal`).toBe(true)
+          expect(inside(metrics.panel, rect), `${name} should fit inside visible panel`).toBe(true)
+          expect(rect.topmostInModal, `${name} center should be owned by modal`).toBe(true)
+          for (const underlying of metrics.unrelated) {
+            if (overlap(rect, underlying) > 0) {
+              expect(rect.topmostInModal, `${name} overlap must be visually covered by modal`).toBe(true)
+            }
+          }
+        }
+        expect(metrics.activeElementBlockedByModal).toBe(true)
+        expect(errors).toEqual([])
+
+        await page.screenshot({ path: `${outDir}/mugsy-modal-3d-${theme}-${viewport.label}.png`, fullPage: false })
+        writeFileSync(`${outDir}/mugsy-modal-3d-${theme}-${viewport.label}-metrics.json`, JSON.stringify(metrics, null, 2))
+      })
+
+      test(`Mugsy ${theme} photo detail lightbox is opaque and contained at ${viewport.label}px`, async ({ page }) => {
+        const errors = []
+        page.on('console', message => {
+          if (message.type() === 'error') errors.push(message.text())
+        })
+        page.on('pageerror', error => errors.push(error.message))
+
+        await gotoMugsyWithTheme(page, viewport, theme)
+        await expectNoOpenOverlay(page)
+        await page.locator('.menu-item').filter({
+          has: page.locator('.item-name', { hasText: /^Bacon Smash$/ }),
+        }).first().click()
+        await expect(page.locator('#img-lightbox')).toHaveClass(/open/)
+        await expect(page.locator('#img-lightbox')).toHaveClass(/has-panel/)
+        const immediateVisual = await overlayVisualState(page, '#img-lightbox')
+        await page.screenshot({ path: `${outDir}/mugsy-modal-photo-${theme}-${viewport.label}-immediate.png`, fullPage: false })
+        await waitForOverlaySettled(page, '#img-lightbox')
+        const settledVisual = await overlayVisualState(page, '#img-lightbox')
+
+        const metrics = await page.evaluate(() => {
+          const rectForEl = el => {
+            const r = el.getBoundingClientRect()
+            const s = getComputedStyle(el)
+            const cx = Math.max(0, Math.min(innerWidth - 1, r.left + r.width / 2))
+            const cy = Math.max(0, Math.min(innerHeight - 1, r.top + r.height / 2))
+            const topEl = document.elementFromPoint(cx, cy)
+            return {
+              left: r.left,
+              right: r.right,
+              top: r.top,
+              bottom: r.bottom,
+              width: r.width,
+              height: r.height,
+              display: s.display,
+              visibility: s.visibility,
+              bg: s.backgroundColor,
+              bgImage: s.backgroundImage,
+              color: s.color,
+              text: el.textContent.trim(),
+              topmostInLightbox: !!topEl?.closest?.('#img-lightbox'),
+            }
+          }
+          const rectFor = selector => rectForEl(document.querySelector(selector))
+          const controls = ['#lightbox-name', '#lightbox-img', '#lightbox-panel', '#lightbox-desc', '#lightbox-price', '#lightbox-qty']
+          const unrelated = [...document.querySelectorAll('.menu-item, .category-header')]
+            .filter(el => {
+              const r = el.getBoundingClientRect()
+              return r.bottom > 0 && r.top < innerHeight
+            })
+            .map(rectForEl)
+          return {
+            overlay: {
+              modalActive: document.querySelector('#modal').classList.contains('active'),
+              lightboxOpen: document.querySelector('#img-lightbox').classList.contains('open'),
+              lightboxPanel: document.querySelector('#img-lightbox').classList.contains('has-panel'),
+              basketActive: document.querySelector('#basket-panel').classList.contains('active'),
+              basketBarVisible: document.querySelector('#basket-bar').classList.contains('visible'),
+            },
+            lightbox: rectFor('#img-lightbox'),
+            panel: rectFor('#lightbox-panel'),
+            name: rectFor('#lightbox-name'),
+            desc: rectFor('#lightbox-desc'),
+            price: rectFor('#lightbox-price'),
+            qty: rectFor('#lightbox-qty'),
+            closeButtons: [...document.querySelectorAll('#img-lightbox .close-btn')]
+              .filter(btn => getComputedStyle(btn).display !== 'none' && btn.getBoundingClientRect().width > 0)
+              .map(rectForEl),
+            controls: Object.fromEntries(controls.map(selector => [selector, rectFor(selector)])),
+            unrelated,
+            visualTiming: { immediate: null, settled: null },
+          }
+        })
+        metrics.visualTiming = { immediate: immediateVisual, settled: settledVisual }
+
+        expect(metrics.overlay).toEqual({
+          modalActive: false,
+          lightboxOpen: true,
+          lightboxPanel: true,
+          basketActive: false,
+          basketBarVisible: false,
+        })
+        expect(alphaPart(metrics.lightbox.bg)).toBe(1)
+        expect(alphaPart(metrics.panel.bg)).toBe(1)
+        expect(metrics.visualTiming.settled.opacity).toBe(1)
+        expect(alphaPart(metrics.visualTiming.settled.backgroundColor)).toBe(1)
+        expect(metrics.closeButtons).toHaveLength(1)
+        expect(metrics.name.text).toBe('Bacon Smash')
+        expect(metrics.desc.text.length).toBeGreaterThan(0)
+        expect(metrics.price.text.length).toBeGreaterThan(0)
+        for (const [name, rect] of Object.entries(metrics.controls)) {
+          expect(rect.display, `${name} should be displayed`).not.toBe('none')
+          expect(rect.visibility, `${name} should be visible`).toBe('visible')
+          expect(rect.width, `${name} should have width`).toBeGreaterThan(0)
+          expect(rect.height, `${name} should have height`).toBeGreaterThan(0)
+          expect(inside(metrics.lightbox, rect), `${name} should fit inside lightbox`).toBe(true)
+          expect(rect.topmostInLightbox, `${name} center should be owned by lightbox`).toBe(true)
+          for (const underlying of metrics.unrelated) {
+            if (overlap(rect, underlying) > 0) {
+              expect(rect.topmostInLightbox, `${name} overlap must be visually covered by lightbox`).toBe(true)
+            }
+          }
+        }
+        expect(errors).toEqual([])
+
+        await page.screenshot({ path: `${outDir}/mugsy-modal-photo-${theme}-${viewport.label}.png`, fullPage: false })
+        writeFileSync(`${outDir}/mugsy-modal-photo-${theme}-${viewport.label}-metrics.json`, JSON.stringify(metrics, null, 2))
+      })
+    }
+  }
 
   for (const viewport of viewports) {
     test(`sticky header controls fit without overlap at ${viewport.label}px`, async ({ page }) => {

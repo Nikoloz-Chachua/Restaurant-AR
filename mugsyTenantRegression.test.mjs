@@ -81,7 +81,7 @@ test('Mugsy menu cards remain data sourced and photo-only items do not advertise
   assert.match(html, /Mugsy has not published menu items here yet/)
   assert.match(html, /const has3d = _isAREnabledMenuItem\(item\)/)
   assert.match(html, /\$\{has3d \? `<button class="ar-btn"/)
-  assert.doesNotMatch(html, /Mugsy.*Featured|Popular/i)
+  assert.doesNotMatch(html, /Mugsy (Featured|Popular)|Featured Mugsy|Popular Mugsy/i)
 })
 
 test('Mugsy exact tenant forces phone twin product cards without changing larger breakpoints', () => {
@@ -93,6 +93,36 @@ test('Mugsy exact tenant forces phone twin product cards without changing larger
   assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.menu-item:not\(\.no-image\) \.ar-btn \{[\s\S]*?min-height: 44px;[\s\S]*?white-space: normal;/)
   assert.match(html, /\(cfg\.phone_layout === 'twin' \|\| _isMugsyTenant\(\)\) \? 'twin' : 'list'/)
   assert.match(html, /@media \(min-width: 700px\) \{[\s\S]*?\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.menu-list,[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/)
+})
+
+test('Mugsy theme persistence is tenant scoped and ignores stale global night', () => {
+  assert.match(html, /mugsyScopedKey = bootSlug === 'mugsy-main' \? `bl-theme:\$\{bootSlug\}` : ''/)
+  assert.match(html, /document\.documentElement\.setAttribute\('data-theme',\s*\(mugsyScopedTheme === 'day' \|\| mugsyScopedTheme === 'night'\) \? mugsyScopedTheme : \(defaults\.theme \|\| 'day'\)\)/)
+  assert.match(html, /function _mugsyScopedThemeKey\(\)[\s\S]*?return `bl-theme:\$\{_MUGSY_RESTAURANT_SLUG\}`;/)
+  assert.match(html, /localStorage\.setItem\(_isMugsyThemeScope\(\) \? _mugsyScopedThemeKey\(\) : 'bl-theme', theme\)/)
+  assert.match(html, /_tenantSlugFromHost\(\) === _MUGSY_RESTAURANT_SLUG \? 'day' : 'night'/)
+  assert.doesNotMatch(html, /localStorage\.setItem\('bl-theme', theme\);/)
+})
+
+test('Mugsy day/night CSS is scoped to the Mugsy tenant slug and covers full journey surfaces', () => {
+  assert.match(html, /\[data-theme="night"\]\[data-tenant="mugsy-main"\]\[data-template="mugsy_street_diner"\] \{/)
+  assert.match(html, /\[data-theme="day"\]\[data-tenant="mugsy-main"\]\[data-template="mugsy_street_diner"\] \{/)
+  assert.doesNotMatch(html, /\[data-theme="night"\]\[data-template="mugsy_street_diner"\] \{/)
+  for (const token of [
+    '--mugsy-bg-image',
+    '--mugsy-topbar-bg',
+    '--mugsy-catbar-bg',
+    '--mugsy-card-bg',
+    '--mugsy-thumb',
+    '--mugsy-modal-bg-image',
+    '--mugsy-empty-bg',
+    '--mugsy-focus',
+  ]) {
+    assert.ok(html.includes(token), `missing ${token}`)
+  }
+  assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] #basket-panel/)
+  assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] #img-lightbox\.has-panel/)
+  assert.match(html, /\[data-theme="night"\]\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.footer-logo-white/)
 })
 
 test('Mugsy hero copy describes the interactive BetaReal menu without claiming current AR', () => {
@@ -121,9 +151,9 @@ test('service-worker cache was bumped for changed public assets', () => {
   assert.doesNotMatch(sw, /\.\/assets\/mugsy\/items-webp\//, 'Mugsy product thumbnails must lazy-load through runtime cache')
 })
 
-test('service-worker cache remains bumped exactly once on the current Mugsy delivery rail line', () => {
-  assert.match(sw, /const CACHE_NAME = 'bl-v136';/)
-  assert.doesNotMatch(sw, /bl-v137/)
+test('service-worker cache advances once beyond the rebased production line', () => {
+  assert.match(sw, /const CACHE_NAME = 'bl-v140';/)
+  assert.doesNotMatch(sw, /bl-v141/)
 })
 
 test('Mugsy basket rows render dynamic item thumbnails without affecting other tenants', () => {

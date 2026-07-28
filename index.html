@@ -74,9 +74,14 @@
             const bootTemplate = BOOT_TEMPLATE_BY_SLUG[bootSlug] || '';
         if (bootTemplate) {
             const defaults = BOOT_TEMPLATE_DEFAULTS[bootTemplate] || {};
+            const mugsyScopedKey = bootSlug === 'mugsy-main' ? `bl-theme:${bootSlug}` : '';
+            const mugsyScopedTheme = mugsyScopedKey ? localStorage.getItem(mugsyScopedKey) : '';
             document.documentElement.dataset.tenant = bootSlug;
             document.documentElement.dataset.template = bootTemplate;
-            if (defaults.theme && !localStorage.getItem('bl-theme')) {
+            if (mugsyScopedKey) {
+                document.documentElement.setAttribute('data-theme',
+                    (mugsyScopedTheme === 'day' || mugsyScopedTheme === 'night') ? mugsyScopedTheme : (defaults.theme || 'day'));
+            } else if (defaults.theme && !localStorage.getItem('bl-theme')) {
                 document.documentElement.setAttribute('data-theme', defaults.theme);
             }
             if (defaults.preload) {
@@ -948,6 +953,7 @@
         #modal {
             position: fixed;
             inset: 0;
+            background-color: var(--modal-bg);
             background: var(--modal-bg-image);
             z-index: 9999;
             display: none;
@@ -3384,72 +3390,160 @@
         [data-template="gochit_monster"] .venue-link[hidden]{ display: none; }
 
         /* ── Mugsy tenant shell — exact restaurant + brand gate ───────── */
-        [data-template="mugsy_street_diner"] {
-            --bg: #FFF7E7;
-            --bg2: #FFFDF7;
-            --glow: rgba(217,46,39,0.14);
-            --glow2: rgba(244,185,66,0.18);
-            --shadow: rgba(45,27,20,0.16);
-            --card: #ffffff;
-            --card2: #F8E8C9;
-            --border: rgba(45,27,20,0.16);
-            --text: #241A16;
-            --dim: #6C5A50;
-            --accent: #D92E27;
-            --accent2: #F4B942;
-            --accent-text: #FFFDF7;
-            --thumb-bg: #F8E8C9;
-            --modal-bg: #FFF7E7;
-            --modal-rgb: 255,247,231;
-            --bg-image:
+        [data-tenant="mugsy-main"][data-template="mugsy_street_diner"] {
+            --bg: var(--mugsy-bg);
+            --bg2: var(--mugsy-bg2);
+            --glow: var(--mugsy-glow);
+            --glow2: var(--mugsy-glow2);
+            --shadow: var(--mugsy-shadow);
+            --card: var(--mugsy-card);
+            --card2: var(--mugsy-card2);
+            --border: var(--mugsy-border);
+            --text: var(--mugsy-text);
+            --dim: var(--mugsy-dim);
+            --accent: var(--mugsy-accent);
+            --accent2: var(--mugsy-accent2);
+            --accent-text: var(--mugsy-accent-text);
+            --thumb-bg: var(--mugsy-thumb);
+            --modal-bg: var(--mugsy-modal);
+            --modal-rgb: var(--mugsy-modal-rgb);
+            --bg-image: var(--mugsy-bg-image);
+            --bg-size: 28px 28px, auto, auto;
+            --bg-repeat: repeat, no-repeat, no-repeat;
+            --card-bg: var(--mugsy-card-bg);
+            --card-blur: 0px;
+            --card-radius: 16px;
+            --item-shadow: var(--mugsy-shadow-card);
+            --item-hover-shadow: var(--mugsy-shadow-card-hover);
+            --accent-edge: linear-gradient(180deg, var(--mugsy-red), var(--mugsy-mustard));
+            --stage-bg: var(--mugsy-thumb);
+            --thumb-vignette: var(--mugsy-thumb-vignette);
+            --pill-bg: var(--mugsy-pill);
+            --pill-active-bg: var(--mugsy-red);
+            --cta-bg: var(--mugsy-red);
+            --cta-shadow: var(--mugsy-cta-shadow);
+            --hero-color: var(--mugsy-red);
+            --hero-shadow: none;
+            --divider-bg: linear-gradient(90deg, transparent, var(--mugsy-red), transparent);
+            --modal-bg-image: var(--mugsy-modal-bg-image);
+            --price-color: var(--mugsy-price);
+            --add-btn-color: var(--mugsy-red);
+            --badge-bg: var(--mugsy-red);
+        }
+        [data-theme="day"][data-tenant="mugsy-main"][data-template="mugsy_street_diner"] {
+            --mugsy-bg: #FFF7E7;
+            --mugsy-bg2: #FFFDF7;
+            --mugsy-glow: rgba(217,46,39,0.14);
+            --mugsy-glow2: rgba(244,185,66,0.18);
+            --mugsy-shadow: rgba(45,27,20,0.16);
+            --mugsy-card: #ffffff;
+            --mugsy-card2: #F8E8C9;
+            --mugsy-border: rgba(45,27,20,0.16);
+            --mugsy-text: #241A16;
+            --mugsy-dim: #6C5A50;
+            --mugsy-accent: #D92E27;
+            --mugsy-accent2: #F4B942;
+            --mugsy-accent-text: #FFFDF7;
+            --mugsy-red: #D92E27;
+            --mugsy-red-deep: #A91E1A;
+            --mugsy-mustard: #F4B942;
+            --mugsy-price: #D92E27;
+            --mugsy-thumb: #F8E8C9;
+            --mugsy-modal: #FFF7E7;
+            --mugsy-modal-rgb: 255,247,231;
+            --mugsy-bg-image:
                 linear-gradient(90deg, rgba(45,27,20,0.035) 1px, transparent 1px),
                 radial-gradient(68% 42% at 12% 4%, rgba(244,185,66,0.30), transparent 66%),
                 linear-gradient(180deg, #FFF7E7 0%, #FFFDF7 54%, #F8E8C9 100%);
-            --bg-size: 28px 28px, auto, auto;
-            --bg-repeat: repeat, no-repeat, no-repeat;
-            --card-bg: linear-gradient(180deg, #ffffff 0%, #FFFDF7 100%);
-            --card-blur: 0px;
-            --card-radius: 16px;
-            --item-shadow: 0 8px 20px rgba(45,27,20,0.10);
-            --item-hover-shadow: 0 14px 30px rgba(45,27,20,0.16);
-            --accent-edge: linear-gradient(180deg, #D92E27, #F4B942);
-            --stage-bg: #F8E8C9;
-            --thumb-vignette: linear-gradient(180deg, transparent 58%, rgba(45,27,20,0.12));
-            --pill-bg: #ffffff;
-            --pill-active-bg: #D92E27;
-            --cta-bg: #D92E27;
-            --cta-shadow: 0 8px 18px rgba(217,46,39,0.20);
-            --hero-color: #D92E27;
-            --hero-shadow: none;
-            --divider-bg: linear-gradient(90deg, transparent, #D92E27, transparent);
-            --modal-bg-image: linear-gradient(180deg, #FFFDF7 0%, #FFF7E7 100%);
-            --price-color: #A91E1A;
-            --add-btn-color: #D92E27;
+            --mugsy-card-bg: linear-gradient(180deg, #ffffff 0%, #FFFDF7 100%);
+            --mugsy-surface: #FFFDF7;
+            --mugsy-topbar-bg: rgba(255,253,247,0.92);
+            --mugsy-catbar-bg: rgba(255,253,247,0.94);
+            --mugsy-pill: #FFF7E7;
+            --mugsy-thumb-vignette: linear-gradient(180deg, transparent 58%, rgba(45,27,20,0.12));
+            --mugsy-shadow-card: 0 8px 20px rgba(45,27,20,0.10);
+            --mugsy-shadow-card-hover: 0 14px 30px rgba(45,27,20,0.16);
+            --mugsy-cta-shadow: 0 8px 18px rgba(217,46,39,0.20);
+            --mugsy-modal-bg-image: linear-gradient(180deg, #FFFDF7 0%, #FFF7E7 100%);
+            --mugsy-empty-bg: repeating-linear-gradient(45deg, rgba(217,46,39,0.08) 0 12px, transparent 12px 24px), #FFFDF7;
+            --mugsy-focus: #D92E27;
+        }
+        [data-theme="night"][data-tenant="mugsy-main"][data-template="mugsy_street_diner"] {
+            --mugsy-bg: #20140f;
+            --mugsy-bg2: #2A1A13;
+            --mugsy-glow: rgba(244,185,66,0.18);
+            --mugsy-glow2: rgba(217,46,39,0.13);
+            --mugsy-shadow: rgba(10,6,4,0.48);
+            --mugsy-card: #2D1B14;
+            --mugsy-card2: #382319;
+            --mugsy-border: rgba(255,232,188,0.17);
+            --mugsy-text: #FFF1D0;
+            --mugsy-dim: #D8BE92;
+            --mugsy-accent: #FF6A5E;
+            --mugsy-accent2: #FFC84A;
+            --mugsy-accent-text: #21130E;
+            --mugsy-red: #FF5A50;
+            --mugsy-red-deep: #FF756C;
+            --mugsy-mustard: #FFC84A;
+            --mugsy-price: #FFC84A;
+            --mugsy-thumb: #1A100C;
+            --mugsy-modal: #1C110D;
+            --mugsy-modal-rgb: 28,17,13;
+            --mugsy-bg-image:
+                linear-gradient(90deg, rgba(255,232,188,0.035) 1px, transparent 1px),
+                radial-gradient(68% 42% at 12% 4%, rgba(244,185,66,0.13), transparent 66%),
+                linear-gradient(180deg, #20140f 0%, #2A1A13 54%, #160D0A 100%);
+            --mugsy-card-bg: linear-gradient(180deg, #332016 0%, #26170F 100%);
+            --mugsy-surface: #2A1A13;
+            --mugsy-topbar-bg: rgba(32,20,15,0.94);
+            --mugsy-catbar-bg: rgba(32,20,15,0.95);
+            --mugsy-pill: #332016;
+            --mugsy-thumb-vignette: linear-gradient(180deg, transparent 52%, rgba(18,10,7,0.34));
+            --mugsy-shadow-card: 0 10px 26px rgba(8,4,3,0.34);
+            --mugsy-shadow-card-hover: 0 16px 38px rgba(8,4,3,0.46);
+            --mugsy-cta-shadow: 0 8px 20px rgba(255,90,80,0.20);
+            --mugsy-modal-bg-image: radial-gradient(70% 42% at 50% 14%, rgba(244,185,66,0.12), transparent 68%), linear-gradient(180deg, #2A1A13 0%, #160D0A 100%);
+            --mugsy-empty-bg: repeating-linear-gradient(45deg, rgba(255,200,74,0.08) 0 12px, transparent 12px 24px), #2A1A13;
+            --mugsy-focus: #FFC84A;
         }
         .mugsy-shell,
         .mugsy-locations,
         .mugsy-delivery-rail { display: none; }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] body {
             padding: 0 12px 42px;
-            background: #FFF7E7;
-            color: #241A16;
+            background: var(--mugsy-bg);
+            color: var(--mugsy-text);
             font-family: 'Nunito', 'Noto Sans Georgian', system-ui, -apple-system, sans-serif;
         }
-        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #theme-toggle {
-            display: none;
-        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #theme-toggle,
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #lang-toggle {
             top: calc(9px + env(safe-area-inset-top, 0px));
-            left: auto;
-            right: calc(12px + env(safe-area-inset-right, 0px));
             z-index: 1230;
             min-width: 44px;
             min-height: 44px;
             padding: 0 12px;
-            background: #FFFDF7;
-            color: #A91E1A;
-            border-color: rgba(45,27,20,0.16);
+            background: var(--mugsy-surface);
+            color: var(--mugsy-red-deep);
+            border-color: var(--mugsy-border);
             box-shadow: none;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #theme-toggle {
+            position: static;
+            grid-column: 3;
+            width: 44px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #lang-toggle {
+            position: static;
+            grid-column: 5;
+            width: 44px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .mg-hero,
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .baoma-shell,
@@ -3461,21 +3555,21 @@
             width: 100vw;
             margin-left: calc(50% - 50vw);
             margin-right: calc(50% - 50vw);
-            background: #FFF7E7;
+            background: var(--mugsy-bg);
         }
         .mugsy-topbar {
             position: sticky;
             top: 0;
             z-index: 1220;
             min-height: calc(58px + env(safe-area-inset-top, 0px));
-            padding: calc(8px + env(safe-area-inset-top, 0px)) calc(68px + env(safe-area-inset-right, 0px)) 8px calc(12px + env(safe-area-inset-left, 0px));
+            padding: calc(8px + env(safe-area-inset-top, 0px)) calc(12px + env(safe-area-inset-right, 0px)) 8px calc(12px + env(safe-area-inset-left, 0px));
             display: grid;
-            grid-template-columns: minmax(0, auto) 44px minmax(0, 1fr) minmax(44px, auto);
+            grid-template-columns: minmax(58px, 128px) 44px 44px minmax(58px, auto) 44px;
             align-items: center;
             gap: 10px;
             justify-content: start;
-            background: rgba(255,253,247,0.92);
-            border-bottom: 1px solid rgba(45,27,20,0.12);
+            background: var(--mugsy-topbar-bg);
+            border-bottom: 1px solid var(--mugsy-border);
             backdrop-filter: blur(14px) saturate(140%);
         }
         .mugsy-topbar-logo {
@@ -3491,11 +3585,11 @@
             align-items: center;
             justify-content: center;
             border-radius: 12px;
-            border: 1px solid rgba(45,27,20,0.16);
+            border: 1px solid var(--mugsy-border);
             text-decoration: none;
             font-weight: 900;
-            color: #241A16;
-            background: #FFFDF7;
+            color: var(--mugsy-text);
+            background: var(--mugsy-surface);
         }
         .mugsy-menu-jump {
             width: 44px;
@@ -3504,9 +3598,9 @@
         .mugsy-order-main {
             grid-column: 4;
             padding: 0 14px;
-            background: #D92E27;
+            background: var(--mugsy-red);
             border-color: transparent;
-            color: #FFFDF7;
+            color: var(--mugsy-accent-text);
             font-size: 0.78rem;
             white-space: nowrap;
         }
@@ -3516,7 +3610,7 @@
             display: flex;
             align-items: flex-end;
             overflow: hidden;
-            border-bottom: 1px solid rgba(45,27,20,0.14);
+            border-bottom: 1px solid var(--mugsy-border);
         }
         .mugsy-hero-img {
             position: absolute;
@@ -3586,7 +3680,7 @@
             margin-top: 18px;
         }
         .mugsy-link.primary {
-            background: #FFC84A;
+            background: var(--mugsy-mustard);
             border-color: transparent;
             color: #2D1B14;
             padding: 0 18px;
@@ -3616,14 +3710,14 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: #FFFDF7;
-            border: 1px solid rgba(45,27,20,0.16);
-            box-shadow: 0 10px 24px rgba(45,27,20,0.18);
+            background: var(--mugsy-surface);
+            border: 1px solid var(--mugsy-border);
+            box-shadow: var(--mugsy-shadow-card);
             overflow: hidden;
             touch-action: manipulation;
         }
         .mugsy-delivery-btn:focus-visible {
-            outline: 3px solid #D92E27;
+            outline: 3px solid var(--mugsy-focus);
             outline-offset: 3px;
         }
         .mugsy-delivery-icon {
@@ -3642,8 +3736,8 @@
             margin-left: calc(50% - 50vw);
             margin-right: calc(50% - 50vw);
             padding: 10px 0;
-            background: rgba(255,253,247,0.94);
-            border-bottom: 1px solid rgba(45,27,20,0.12);
+            background: var(--mugsy-catbar-bg);
+            border-bottom: 1px solid var(--mugsy-border);
             backdrop-filter: blur(12px) saturate(140%);
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .cat-scroll,
@@ -3663,15 +3757,15 @@
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .cat-pill {
             min-height: 44px;
             border-radius: 999px;
-            border-color: rgba(45,27,20,0.20);
-            background: #FFF7E7;
-            color: #241A16;
+            border-color: var(--mugsy-border);
+            background: var(--mugsy-pill);
+            color: var(--mugsy-text);
             font-weight: 900;
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .cat-pill.active {
-            background: #D92E27;
-            color: #FFFDF7;
-            box-shadow: 0 8px 18px rgba(217,46,39,0.20);
+            background: var(--mugsy-red);
+            color: var(--mugsy-accent-text);
+            box-shadow: var(--mugsy-cta-shadow);
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-list {
             max-width: 1180px;
@@ -3687,8 +3781,8 @@
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .category-header {
             grid-column: 1 / -1;
             max-width: none;
-            color: #A91E1A;
-            border-bottom: 3px solid #D92E27;
+            color: var(--mugsy-red-deep);
+            border-bottom: 3px solid var(--mugsy-red);
             font-family: 'Bebas Neue', 'Nunito', sans-serif;
             font-size: 1.75rem;
             letter-spacing: 0;
@@ -3700,23 +3794,23 @@
             grid-template-areas: "left name" "left right";
             padding: 10px;
             border-radius: 16px;
-            border-color: rgba(45,27,20,0.14);
+            border-color: var(--mugsy-border);
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item::before {
             width: 4px;
-            background: #D92E27;
+            background: var(--mugsy-red);
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .thumb-wrap {
             width: 126px;
             min-height: 126px;
             border-radius: 14px;
-            background: #F8E8C9;
+            background: var(--mugsy-thumb);
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .thumb-img {
             cursor: zoom-in;
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .item-name {
-            color: #A91E1A;
+            color: var(--mugsy-red-deep);
             font-family: 'Bebas Neue', 'Nunito', sans-serif;
             font-size: 1.45rem;
             letter-spacing: 0;
@@ -3724,21 +3818,21 @@
             text-transform: uppercase;
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .ingredients {
-            color: #6C5A50;
+            color: var(--mugsy-dim);
             font-size: 0.78rem;
             line-height: 1.38;
             font-weight: 700;
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .price {
-            color: #D92E27;
+            color: var(--mugsy-price);
             font-family: 'Bebas Neue', 'Nunito', sans-serif;
             font-size: 1.45rem;
             letter-spacing: 0;
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .qty-add-btn,
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .qty-stepper {
-            border-color: #D92E27;
-            color: #D92E27;
+            border-color: var(--mugsy-red);
+            color: var(--mugsy-red);
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .qty-add-btn {
             width: 44px;
@@ -3759,13 +3853,13 @@
             max-width: 1180px;
             margin: 26px auto 0;
             padding: 18px max(12px, env(safe-area-inset-right)) 4px 2px;
-            border-top: 1px solid rgba(45,27,20,0.16);
+            border-top: 1px solid var(--mugsy-border);
         }
         .mugsy-location-head {
             margin: 0 0 12px;
             font-size: 0.82rem;
             font-weight: 900;
-            color: #A91E1A;
+            color: var(--mugsy-red-deep);
             text-transform: uppercase;
         }
         .mugsy-location-list {
@@ -3781,9 +3875,9 @@
             min-height: 58px;
             padding: 12px 14px;
             border-radius: 16px;
-            background: #FFFDF7;
-            border: 1px solid rgba(45,27,20,0.14);
-            color: #241A16;
+            background: var(--mugsy-surface);
+            border: 1px solid var(--mugsy-border);
+            color: var(--mugsy-text);
             text-decoration: none;
             font-weight: 900;
             min-width: 0;
@@ -3795,7 +3889,7 @@
             overflow-wrap: anywhere;
         }
         .mugsy-location span:last-child {
-            color: #D92E27;
+            color: var(--mugsy-red);
             white-space: nowrap;
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .site-footer {
@@ -3811,28 +3905,107 @@
             outline-offset: 4px;
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .footer-brand-link:focus-visible {
-            outline: 3px solid #D92E27;
+            outline: 3px solid var(--mugsy-focus);
+        }
+        [data-theme="night"][data-tenant="mugsy-main"][data-brand-slug="mugsy"] .footer-logo-dark,
+        [data-theme="night"][data-tenant="mugsy-main"][data-brand-slug="mugsy"] .footer-logo-light {
+            display: none;
+        }
+        [data-theme="night"][data-tenant="mugsy-main"][data-brand-slug="mugsy"] .footer-logo-white {
+            display: block;
         }
         .mugsy-empty {
             grid-column: 1 / -1;
             padding: 26px 18px;
             border-radius: 16px;
-            background:
-                repeating-linear-gradient(45deg, rgba(217,46,39,0.08) 0 12px, transparent 12px 24px),
-                #FFFDF7;
-            border: 1px solid rgba(45,27,20,0.14);
+            background: var(--mugsy-empty-bg);
+            border: 1px solid var(--mugsy-border);
         }
         .mugsy-empty-title {
             margin: 0 0 8px;
-            color: #A91E1A;
+            color: var(--mugsy-red-deep);
             font-size: 1.25rem;
             font-weight: 900;
         }
         .mugsy-empty-copy {
             margin: 0;
-            color: #6C5A50;
+            color: var(--mugsy-dim);
             line-height: 1.5;
             font-weight: 700;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .badge-3d,
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .ar-featured-banner {
+            border-color: var(--mugsy-border);
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #basket-panel,
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #basket-close {
+            background: var(--mugsy-bg);
+            color: var(--mugsy-text);
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #basket-clear,
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .basket-qty,
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #basket-close {
+            border-color: var(--mugsy-border);
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .basket-qty,
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #basket-close {
+            background: var(--mugsy-surface);
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #img-lightbox.has-panel {
+            background-color: var(--mugsy-modal);
+            background-image: var(--mugsy-modal-bg-image);
+            isolation: isolate;
+            z-index: 10001;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #img-lightbox.has-panel #lightbox-name,
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #img-lightbox.has-panel #lightbox-panel {
+            background: var(--mugsy-modal);
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #modal {
+            background-color: var(--mugsy-modal);
+            isolation: isolate;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #modal::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background: var(--mugsy-modal-bg-image);
+            pointer-events: none;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #modal > * {
+            z-index: 1;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #modal .close-btn,
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #modal .nav-arrow,
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #modal .spin-btn {
+            z-index: 3;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #modal-viewer-wrap,
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #modal-drawer {
+            background: var(--mugsy-modal);
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #img-lightbox.has-panel #lightbox-desc {
+            color: var(--mugsy-dim);
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #img-lightbox.has-panel #lightbox-price {
+            background: none;
+            -webkit-text-fill-color: var(--mugsy-price);
+            color: var(--mugsy-price);
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #waiter-card {
+            background: var(--mugsy-surface);
+            color: var(--mugsy-text);
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #waiter-overlay-title {
+            color: var(--mugsy-text);
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #waiter-overlay-hint {
+            color: var(--mugsy-dim);
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] :focus-visible {
+            outline: 3px solid var(--mugsy-focus);
+            outline-offset: 3px;
         }
         html[lang="ka"][data-tenant="mugsy-main"][data-brand-slug="mugsy"] .mugsy-title,
         html[lang="ka"][data-tenant="mugsy-main"][data-brand-slug="mugsy"] .category-header,
@@ -3894,12 +4067,15 @@
         @media (max-width: 380px) {
             .mugsy-topbar {
                 gap: 6px;
+                padding-left: calc(8px + env(safe-area-inset-left, 0px));
+                padding-right: calc(8px + env(safe-area-inset-right, 0px));
+                grid-template-columns: minmax(58px, 1fr) 44px 44px minmax(58px, auto) 44px;
             }
             .mugsy-topbar-logo {
-                max-width: 92px;
+                max-width: 86px;
             }
             .mugsy-order-main {
-                padding: 0 9px;
+                padding: 0 8px;
                 font-size: 0.72rem;
             }
             [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-list {
@@ -3956,7 +4132,7 @@
                 min-height: 0;
                 aspect-ratio: 1 / 0.82;
                 border-radius: 14px 14px 0 0;
-                border-bottom: 1px solid rgba(45,27,20,0.10);
+                border-bottom: 1px solid var(--mugsy-border);
             }
             [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .thumb-img,
             [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) model-viewer {
@@ -4447,8 +4623,8 @@
             flex: 0 0 52px;
             border-radius: 8px;
             overflow: hidden;
-            border: 1px solid rgba(128, 28, 23, 0.22);
-            background: #f7ead6;
+            border: 1px solid var(--mugsy-border);
+            background: var(--mugsy-thumb);
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .basket-item-thumb {
             display: block;
@@ -6276,6 +6452,16 @@
         function _applyMugsyCopy() {
             if (!_isMugsyTenant()) return;
             const cfg = _themeConfig || {};
+            const themeToggle = document.getElementById('theme-toggle');
+            const langToggle = document.getElementById('lang-toggle');
+            const menuJump = document.querySelector('.mugsy-menu-jump');
+            const topbarOrder = document.getElementById('mugsy-order-main');
+            if (themeToggle && menuJump && themeToggle.parentElement !== menuJump.parentElement) {
+                menuJump.insertAdjacentElement('afterend', themeToggle);
+            }
+            if (langToggle && topbarOrder && langToggle.parentElement !== topbarOrder.parentElement) {
+                topbarOrder.insertAdjacentElement('afterend', langToggle);
+            }
             _applyMugsyFooterBrandLink();
             document.querySelectorAll('[data-mugsy]').forEach(el => {
                 const key = el.dataset.mugsy;
@@ -6976,21 +7162,34 @@
         const _SVG_SUN  = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
         const _SVG_MOON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
 
-        // persist=true only for an explicit user toggle, so localStorage['bl-theme'] is a
-        // true "the visitor chose this" flag. Initial/tenant/template defaults are applied
-        // WITHOUT persisting, so a template default can still take over on a later visit and
-        // never masquerades as a user choice.
+        function _mugsyScopedThemeKey() {
+            return `bl-theme:${_MUGSY_RESTAURANT_SLUG}`;
+        }
+        function _isMugsyThemeScope() {
+            return _isMugsyTenant() || _tenantSlugFromHost() === _MUGSY_RESTAURANT_SLUG;
+        }
+        function _storedThemeForCurrentScope() {
+            const key = _isMugsyThemeScope() ? _mugsyScopedThemeKey() : 'bl-theme';
+            const value = localStorage.getItem(key);
+            return (value === 'day' || value === 'night') ? value : null;
+        }
+        function _hasStoredThemeForCurrentScope() {
+            return !!_storedThemeForCurrentScope();
+        }
+
+        // persist=true only for an explicit user toggle. Mugsy writes a scoped
+        // restaurant key; all other tenants keep the legacy global bl-theme key.
         function applyTheme(theme, persist = true) {
             html.setAttribute('data-theme', theme);
             themeBtn.innerHTML    = theme === 'night' ? _SVG_SUN : _SVG_MOON;
             themeBtn.setAttribute('aria-label', theme === 'night' ? UI[window.__lang].themeDay : UI[window.__lang].themeNight);
-            if (persist) localStorage.setItem('bl-theme', theme);
+            if (persist) {
+                localStorage.setItem(_isMugsyThemeScope() ? _mugsyScopedThemeKey() : 'bl-theme', theme);
+            }
         }
         const _DEFAULT_THEME_BY_TENANT_SLUG = { 'rhythm-main': 'day', 'b-main': 'day' };
-        // Did the visitor explicitly pick a theme? (captured before we apply any default,
-        // so applyRemoteTheme can let a template default win only when they haven't.)
-        const _userChoseTheme = !!localStorage.getItem('bl-theme');
-        applyTheme(localStorage.getItem('bl-theme') || _DEFAULT_THEME_BY_TENANT_SLUG[_tenantSlugFromHost()] || 'night', false);
+        const _initialStoredTheme = _storedThemeForCurrentScope();
+        applyTheme(_initialStoredTheme || _DEFAULT_THEME_BY_TENANT_SLUG[_tenantSlugFromHost()] || (_tenantSlugFromHost() === _MUGSY_RESTAURANT_SLUG ? 'day' : 'night'), false);
         themeBtn.addEventListener('click', () => {
             const _from = html.getAttribute('data-theme'), _to = _from === 'night' ? 'day' : 'night';
             track('theme_change', null, { from: _from, to: _to });
@@ -8113,7 +8312,7 @@
                 const _tplDefaultTheme =
                     (cfg.default_theme === 'day' || cfg.default_theme === 'night') ? cfg.default_theme
                     : (templateKey === 'monday_greens' ? 'day' : null);
-                if (!_userChoseTheme && _tplDefaultTheme) {
+                if (!_hasStoredThemeForCurrentScope() && _tplDefaultTheme) {
                     applyTheme(_tplDefaultTheme, false);
                 }
                 // Font overrides
