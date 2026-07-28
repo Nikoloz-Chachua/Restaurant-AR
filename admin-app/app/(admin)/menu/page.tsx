@@ -18,7 +18,7 @@ type MenuItem = {
   id: number; name_en: string; name_ka: string
   description_en: string; description_ka: string
   price: string; category_id: number | null; model: string; model_usdz: string
-  sort_order: number; visible: boolean; ar_scale: number; thumbnail_url: string; thumb_3d: boolean; is_3d: boolean; text_only: boolean
+  sort_order: number; visible: boolean; ar_scale: number; thumbnail_url: string; thumb_3d: boolean; is_3d: boolean; text_only: boolean; featured: boolean
 }
 type MenuItemPayload = Partial<Omit<MenuItem, 'id'>> & Pick<
   Omit<MenuItem, 'id'>,
@@ -34,7 +34,7 @@ type MenuFilters = {
 }
 const EMPTY_ITEM: Omit<MenuItem, 'id'> = {
   name_en: '', name_ka: '', description_en: '', description_ka: '',
-  price: '', category_id: null, model: '', model_usdz: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '', thumb_3d: false, is_3d: true, text_only: false,
+  price: '', category_id: null, model: '', model_usdz: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '', thumb_3d: false, is_3d: true, text_only: false, featured: false,
 }
 
 function isActiveArItem(item: Pick<MenuItem, 'visible' | 'model' | 'is_3d'>) {
@@ -254,6 +254,7 @@ export default function MenuPage() {
       visible: normalized.visible,
       thumbnail_url: normalized.thumbnail_url,
       text_only: normalized.text_only,
+      featured: normalized.featured,
     }
 
     if (!editItem || normalized.text_only) {
@@ -288,7 +289,7 @@ export default function MenuPage() {
       description_en: item.description_en, description_ka: item.description_ka,
       price: item.price, category_id: item.category_id, model: item.model, model_usdz: item.model_usdz ?? '',
       sort_order: item.sort_order, visible: item.visible, ar_scale: item.ar_scale ?? 1.0,
-      thumbnail_url: item.thumbnail_url ?? '', thumb_3d: item.thumb_3d ?? false, is_3d: item.is_3d ?? true,
+      thumbnail_url: item.thumbnail_url ?? '', thumb_3d: item.thumb_3d ?? false, is_3d: item.is_3d ?? true, featured: item.featured ?? false,
       text_only: item.text_only ?? (!item.is_3d && !item.thumbnail_url && !item.model && !item.model_usdz) })
     setItemMenuGroup(groupForCategory(item.category_id))
     setViewForm(parseItemView(itemViews[item.id]))
@@ -1053,6 +1054,14 @@ export default function MenuPage() {
                 <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>{T.viewAngleHint}</p>
               </Field>
             )}
+            <Field label={T.featured} className="col-span-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={itemForm.featured} style={{ width: 'auto' }}
+                       onChange={e => setItemForm({ ...itemForm, featured: e.target.checked })} />
+                <span className="text-sm" style={{ color: 'var(--dim)' }}>{T.featuredOnMenu}</span>
+              </label>
+              <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>{T.featuredHint}</p>
+            </Field>
             <Field label={T.visibility} className="col-span-2">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={itemForm.visible} style={{ width: 'auto' }}
