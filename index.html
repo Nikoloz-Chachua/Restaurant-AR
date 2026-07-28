@@ -3415,7 +3415,6 @@
             right: calc(6px + env(safe-area-inset-right, 0px));
             top: 50svh;
             z-index: 1210;
-            display: flex;
             flex-direction: column;
             gap: 8px;
             transform: translateY(-50%);
@@ -3490,7 +3489,7 @@
             grid-template-columns: 1fr;
             gap: 14px;
             padding-top: 16px;
-            padding-right: calc(54px + env(safe-area-inset-right, 0px));
+            padding-right: max(12px, env(safe-area-inset-right));
         }
         [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .cat-section {
             display: contents;
@@ -3569,7 +3568,7 @@
             width: 100%;
             max-width: 1180px;
             margin: 26px auto 0;
-            padding: 18px calc(54px + env(safe-area-inset-right, 0px)) 4px 2px;
+            padding: 18px max(12px, env(safe-area-inset-right)) 4px 2px;
             border-top: 1px solid rgba(45,27,20,0.16);
         }
         .mugsy-location-head {
@@ -3680,6 +3679,11 @@
                 min-height: 0;
             }
         }
+        @media (min-width: 768px) {
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .mugsy-delivery-rail {
+                display: flex;
+            }
+        }
         @media (min-width: 1040px) {
             [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-list {
                 grid-template-columns: repeat(3, 1fr);
@@ -3709,10 +3713,10 @@
                 font-size: 0.72rem;
             }
             [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-list {
-                padding-right: 50px;
+                padding-right: max(12px, env(safe-area-inset-right));
             }
             [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .mugsy-locations {
-                padding-right: 50px;
+                padding-right: max(12px, env(safe-area-inset-right));
             }
             .mugsy-delivery-btn {
                 width: 38px;
@@ -5947,6 +5951,10 @@
                 const rail = document.getElementById('mugsy-delivery-rail');
                 if (!rail) return;
                 rail.textContent = '';
+                if (!window.matchMedia('(min-width: 768px)').matches) {
+                    rail.hidden = true;
+                    return;
+                }
                 orderLinks.forEach(link => {
                     const safe = _safeAssetUrl(link.url);
                     const key = String(link.label || '').trim().toLowerCase();
@@ -5973,6 +5981,11 @@
             };
             renderOrders('mugsy-order-links');
             renderDeliveryRail();
+            const desktopRailQuery = window.matchMedia('(min-width: 768px)');
+            if (!window.__mugsyDeliveryRailQuery) {
+                window.__mugsyDeliveryRailQuery = desktopRailQuery;
+                desktopRailQuery.addEventListener('change', () => _applyMugsyCopy());
+            }
             const locs = _parseConfigList(cfg.mugsy_locations);
             const locations = locs.length ? locs : _MUGSY_DEFAULT_LOCATIONS;
             const head = document.getElementById('mugsy-location-head');

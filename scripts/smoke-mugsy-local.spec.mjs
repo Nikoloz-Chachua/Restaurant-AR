@@ -9,6 +9,11 @@ const viewports = [
   { label: '430', width: 430, height: 844 },
   { label: '1440', width: 1440, height: 1000 },
 ]
+const phoneViewports = viewports.filter(viewport => ['320', '390', '430'].includes(viewport.label))
+const railDesktopViewports = [
+  { label: '768', width: 768, height: 844 },
+  { label: '1440', width: 1440, height: 1000 },
+]
 const basketViewports = viewports.filter(viewport => ['320', '390', '430'].includes(viewport.label))
 const footerViewports = viewports
 
@@ -257,8 +262,69 @@ test.describe('Mugsy public visual QA', () => {
     })
   }
 
-  for (const viewport of viewports) {
-    test(`delivery rail uses local icons and avoids key controls at ${viewport.label}px`, async ({ page }) => {
+  for (const viewport of phoneViewports) {
+    test(`delivery rail is removed from phone interaction space at ${viewport.label}px`, async ({ page }) => {
+      const errors = []
+      const deliveryAssetRequests = []
+      page.on('console', message => {
+        if (message.type() === 'error') errors.push(message.text())
+      })
+      page.on('pageerror', error => errors.push(error.message))
+      page.on('request', request => {
+        if (/assets\/mugsy\/deliveries\/(wolt|glovo)\.(jpg|png)/.test(request.url())) {
+          deliveryAssetRequests.push(request.url())
+        }
+      })
+
+      await page.setViewportSize({ width: viewport.width, height: viewport.height })
+      await page.goto(`${baseUrl}/?tenant=mugsy-main&fixture=mugsy`, { waitUntil: 'networkidle' })
+
+      const metrics = await page.evaluate(async () => {
+        const rectFor = selector => {
+          const el = document.querySelector(selector)
+          if (!el) return null
+          const r = el.getBoundingClientRect()
+          return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height }
+        }
+        const rail = document.querySelector('#mugsy-delivery-rail')
+        const links = [...document.querySelectorAll('#mugsy-delivery-rail a')]
+        const focusables = [...document.querySelectorAll('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+          .filter(el => !el.disabled && getComputedStyle(el).display !== 'none' && getComputedStyle(el).visibility !== 'hidden')
+        return {
+          overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          railHidden: rail ? rail.hidden : null,
+          rail: rectFor('#mugsy-delivery-rail'),
+          links: links.map(a => ({ href: a.href, ariaLabel: a.getAttribute('aria-label'), tabIndex: a.tabIndex })),
+          imgs: [...document.querySelectorAll('#mugsy-delivery-rail img')].map(img => img.getAttribute('src')),
+          sideDeliveryFocusables: focusables
+            .filter(el => el.closest('#mugsy-delivery-rail'))
+            .map(el => ({ tag: el.tagName, href: el.href || '', ariaLabel: el.getAttribute('aria-label') || '' })),
+        }
+      })
+
+      await page.keyboard.press('Tab')
+      const activeDeliveryControl = await page.evaluate(() => {
+        const el = document.activeElement
+        return Boolean(el && el.closest('#mugsy-delivery-rail'))
+      })
+
+      expect(metrics.overflow).toBe(0)
+      expect(metrics.railHidden).toBe(true)
+      expect(metrics.rail).toEqual(expect.objectContaining({ width: 0, height: 0 }))
+      expect(metrics.links).toEqual([])
+      expect(metrics.imgs).toEqual([])
+      expect(metrics.sideDeliveryFocusables).toEqual([])
+      expect(activeDeliveryControl).toBe(false)
+      expect(deliveryAssetRequests).toEqual([])
+      expect(errors).toEqual([])
+
+      await page.screenshot({ path: `${outDir}/mugsy-delivery-rail-hidden-${viewport.label}x844.png`, fullPage: false })
+      writeFileSync(`${outDir}/mugsy-delivery-rail-hidden-${viewport.label}-metrics.json`, JSON.stringify(metrics, null, 2))
+    })
+  }
+
+  for (const viewport of railDesktopViewports) {
+    test(`delivery rail uses local icons and keeps desktop links at ${viewport.label}px`, async ({ page }) => {
       const errors = []
       page.on('console', message => {
         if (message.type() === 'error') errors.push(message.text())
@@ -283,6 +349,8 @@ test.describe('Mugsy public visual QA', () => {
         const links = [...document.querySelectorAll('#mugsy-delivery-rail a')]
         return {
           overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          railHidden: rail ? rail.hidden : null,
+          railDisplay: rail ? getComputedStyle(rail).display : '',
           rail: rectFor('#mugsy-delivery-rail'),
           header: rectFor('.mugsy-topbar'),
           lang: rectFor('#lang-toggle'),
@@ -298,8 +366,10 @@ test.describe('Mugsy public visual QA', () => {
       })
 
       expect(initialMetrics.overflow).toBe(0)
+      expect(initialMetrics.railHidden).toBe(false)
+      expect(initialMetrics.railDisplay).toBe('flex')
       expect(initialMetrics.rail).toBeTruthy()
-      expect(Math.abs(initialMetrics.rail.centerY - viewport.height / 2)).toBeLessThanOrEqual(viewport.width <= 380 ? 72 : 4)
+      expect(Math.abs(initialMetrics.rail.centerY - viewport.height / 2)).toBeLessThanOrEqual(4)
       expect(initialMetrics.rail.right).toBeLessThanOrEqual(viewport.width)
       expect(initialMetrics.rail.left).toBeGreaterThanOrEqual(0)
       expect(initialMetrics.links).toHaveLength(2)

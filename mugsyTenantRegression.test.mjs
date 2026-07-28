@@ -54,8 +54,10 @@ test('Mugsy footer signature is centered and BetaReal-linked only for the exact 
 test('Mugsy delivery services render from config into a local-asset side rail', () => {
   assert.match(html, /<nav id="mugsy-delivery-rail" class="mugsy-delivery-rail" aria-label="Delivery services" hidden><\/nav>/)
   assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.mugsy-delivery-rail \{[\s\S]*?position: fixed;[\s\S]*?top: 50svh;[\s\S]*?transform: translateY\(-50%\);/)
+  assert.match(html, /@media \(min-width: 768px\) \{[\s\S]*?\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.mugsy-delivery-rail \{[\s\S]*?display: flex;/)
   assert.match(html, /const _MUGSY_DELIVERY_ICONS = \{[\s\S]*?wolt: '\.\/assets\/mugsy\/deliveries\/wolt\.jpg'[\s\S]*?glovo: '\.\/assets\/mugsy\/deliveries\/glovo\.png'/)
   assert.match(html, /function _applyMugsyCopy\(\)[\s\S]*?const orders = _parseConfigList\(cfg\.mugsy_order_links\);[\s\S]*?const orderLinks = orders\.length \? orders : _MUGSY_DEFAULT_ORDER_LINKS;/)
+  assert.match(html, /const renderDeliveryRail = \(\) => \{[\s\S]*?window\.matchMedia\('\(min-width: 768px\)'\)\.matches[\s\S]*?rail\.hidden = true;[\s\S]*?return;/)
   assert.match(html, /const renderDeliveryRail = \(\) => \{[\s\S]*?const safe = _safeAssetUrl\(link\.url\);[\s\S]*?const icon = _MUGSY_DELIVERY_ICONS\[key\];[\s\S]*?a\.href = safe;[\s\S]*?img\.src = icon;/)
   assert.match(html, /https:\/\/wolt\.com\/en\/geo\/tbilisi\/restaurant\/magsys-burger/)
   assert.match(html, /https:\/\/glovoapp\.com\/en\/ge\/tbilisi\/stores\/mugsy-s-burger-tbi/)
@@ -100,7 +102,7 @@ test('Mugsy street-diner template is superadmin-loadable and tenant admins stay 
 test('service-worker cache was bumped for changed public assets', () => {
   const cacheMatch = sw.match(/CACHE_NAME\s*=\s*'bl-v(\d+)'/)
   assert.ok(cacheMatch, 'service worker cache version must use bl-vNNN format')
-  assert.ok(Number(cacheMatch[1]) >= 134, 'Mugsy footer runtime changes require a bl-v134+ cache')
+  assert.ok(Number(cacheMatch[1]) >= 135, 'Mugsy delivery rail runtime changes require a bl-v135+ cache')
   assert.match(sw, /\.\/assets\/mugsy\/logo\.svg/)
   assert.match(sw, /\.\/assets\/mugsy\/hero-/)
   assert.match(sw, /\.\/assets\/mugsy\/deliveries\/wolt\.jpg/)
@@ -108,9 +110,9 @@ test('service-worker cache was bumped for changed public assets', () => {
   assert.doesNotMatch(sw, /\.\/assets\/mugsy\/items-webp\//, 'Mugsy product thumbnails must lazy-load through runtime cache')
 })
 
-test('service-worker cache remains bumped exactly once on the current Mugsy footer line', () => {
-  assert.match(sw, /const CACHE_NAME = 'bl-v134';/)
-  assert.doesNotMatch(sw, /bl-v135/)
+test('service-worker cache remains bumped exactly once on the current Mugsy delivery rail line', () => {
+  assert.match(sw, /const CACHE_NAME = 'bl-v135';/)
+  assert.doesNotMatch(sw, /bl-v136/)
 })
 
 test('Mugsy basket rows render dynamic item thumbnails without affecting other tenants', () => {
