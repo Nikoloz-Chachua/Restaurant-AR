@@ -3660,6 +3660,49 @@
         }
         [data-template="burger_bar"] .tenant-logo[src] ~ #brand-title { display: none; }
 
+        /* ── Order / social links ───────────────────────────────────────
+           A row of pills, each carrying the platform's own mark. Icon plus
+           label rather than icon-only: five unlabelled marks are a guessing
+           game for anyone who does not already use all five apps, and the
+           label is what a screen reader announces. */
+        .venue-links { display: none; }
+        [data-template="burger_bar"] .venue-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto 18px;
+            padding: 0 16px;
+            box-sizing: border-box;
+        }
+        [data-template="burger_bar"] .venue-links[hidden] { display: none; }
+        [data-template="burger_bar"] .venue-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 44px;
+            padding: 0 14px 0 10px;
+            border-radius: 12px;
+            border: 1px solid var(--bb-border);
+            background: var(--bb-card);
+            color: var(--bb-text);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            line-height: 1;
+            transition: border-color .15s, transform .12s;
+        }
+        [data-template="burger_bar"] .venue-chip:active { transform: scale(0.97); }
+        [data-template="burger_bar"] .venue-chip:hover { border-color: var(--bb-accent); }
+        [data-template="burger_bar"] .venue-chip img {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: block;
+            flex: none;
+        }
+
         /* ── Map ────────────────────────────────────────────────────────
            Rendered only when the tenant sets a map URL, and the iframe is not
            created until then, so no tenant pays for Google's payload by
@@ -4533,6 +4576,10 @@
         <h2 id="mugsy-location-head" class="mugsy-location-head">Locations</h2>
         <div id="mugsy-location-list" class="mugsy-location-list"></div>
     </section>
+
+    <!-- Order / social links. Built from theme_config; empty for tenants that
+         set none. -->
+    <div id="venue-links" class="venue-links" hidden></div>
 
     <!-- Map. The iframe is built at runtime only when the tenant configures a
          location, so tenants without one never load Google's embed. -->
@@ -7271,7 +7318,56 @@
                 link('venue-instagram', txt('info_instagram_label'), cfg.info_instagram_url),
             ].filter(Boolean);
             sec.hidden = filled.length === 0;
+            _applyVenueLinks(cfg);
             _applyVenueMap(cfg);
+        }
+
+        // Platform marks live in img/brands/ and are shared by every tenant —
+        // any restaurant can be on Wolt. Keyed by a slug derived from the link
+        // label, so a tenant just writes {"label":"Wolt","url":"…"} and gets the
+        // icon; an unrecognised label still renders, just without a mark.
+        const VENUE_LINK_ICONS = {
+            facebook: 'facebook', fb: 'facebook',
+            instagram: 'instagram', ig: 'instagram',
+            wolt: 'wolt',
+            glovo: 'glovo',
+            bolt: 'bolt-food', boltfood: 'bolt-food'
+        };
+
+        function _applyVenueLinks(cfg) {
+            const wrap = document.getElementById('venue-links');
+            if (!wrap) return;
+            wrap.textContent = '';
+            const list = _parseConfigList(cfg.venue_links);
+            let shown = 0;
+            list.forEach(entry => {
+                const url = _safeAssetUrl(entry && entry.url);
+                const label = _cleanText(entry && (window.__lang === 'ka' && entry.label_ka ? entry.label_ka : entry.label));
+                if (!url || !label) return;
+                const a = document.createElement('a');
+                a.className = 'venue-chip';
+                a.href = url;
+                a.target = '_blank';
+                a.rel = 'noopener';
+                const key = label.toLowerCase().replace(/[^a-z]/g, '');
+                const icon = VENUE_LINK_ICONS[key];
+                if (icon) {
+                    const img = document.createElement('img');
+                    img.src = './img/brands/' + icon + '.webp';
+                    img.alt = '';
+                    img.loading = 'lazy';
+                    img.decoding = 'async';
+                    img.width = 24;
+                    img.height = 24;
+                    // a missing mark must not leave a broken-image box
+                    img.addEventListener('error', () => img.remove(), { once: true });
+                    a.appendChild(img);
+                }
+                a.appendChild(document.createTextNode(label));
+                wrap.appendChild(a);
+                shown++;
+            });
+            wrap.hidden = shown === 0;
         }
 
         // Build the map embed. `info_map_query` is a plain place/address string
