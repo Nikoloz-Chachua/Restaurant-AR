@@ -4,6 +4,7 @@ import test from 'node:test'
 
 const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8')
 const sw = readFileSync(new URL('./sw.js', import.meta.url), 'utf8')
+const mugsyFixture = JSON.parse(readFileSync(new URL('./data/fixtures/mugsy-menu.fixture.json', import.meta.url), 'utf8'))
 const presets = readFileSync(new URL('./admin-app/lib/themePresets.ts', import.meta.url), 'utf8')
 const adminUxTest = readFileSync(new URL('./admin-app/lib/adminUx.test.mjs', import.meta.url), 'utf8')
 
@@ -63,8 +64,25 @@ test('Mugsy street-diner template is superadmin-loadable and tenant admins stay 
 test('service-worker cache was bumped for changed public assets', () => {
   const cacheMatch = sw.match(/CACHE_NAME\s*=\s*'bl-v(\d+)'/)
   assert.ok(cacheMatch, 'service worker cache version must use bl-vNNN format')
-  assert.ok(Number(cacheMatch[1]) >= 131, 'Mugsy asset/runtime changes require a bl-v131+ cache')
+  assert.ok(Number(cacheMatch[1]) >= 133, 'Mugsy basket runtime changes require a bl-v133+ cache')
   assert.match(sw, /\.\/assets\/mugsy\/logo\.svg/)
   assert.match(sw, /\.\/assets\/mugsy\/hero-/)
   assert.doesNotMatch(sw, /\.\/assets\/mugsy\/items-webp\//, 'Mugsy product thumbnails must lazy-load through runtime cache')
+})
+
+test('Mugsy basket rows render dynamic item thumbnails without affecting other tenants', () => {
+  const cheesy = mugsyFixture.menu_items.find(item => item.id === 'mugsy-cheesy')
+  assert.equal(cheesy?.thumbnail_url, './assets/mugsy/items-webp/cheesy.webp')
+
+  assert.match(html, /function _basketCurrentItem\(entry, key\)/)
+  assert.match(html, /const current = Number\.isFinite\(idx\) \? menuItems\[idx\] : null/)
+  assert.match(html, /function _basketItemMediaHtml\(entry, key, altText\)/)
+  assert.match(html, /_safeAssetUrl\(item && item\.thumbnail_url\)/)
+  assert.match(html, /class="basket-item-thumb" src="\$\{_escapeHtml\(src\)\}" alt="\$\{_escapeHtml\(altText\)\}" loading="eager" decoding="async"/)
+  assert.match(html, /onerror="this\.closest\('\.basket-item-media'\)\?\.remove\(\)"/)
+  assert.match(html, /const mediaHtml = _isMugsyTenant\(\) \? _basketItemMediaHtml\(entry, key, itemName\) : ''/)
+  assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.basket-item-media/)
+  assert.doesNotMatch(html, /\[data-template="mugsy_street_diner"\] \.basket-item-media/)
+  assert.doesNotMatch(html, /\[data-template="monday_greens"\][^{]*\.basket-item-media/)
+  assert.doesNotMatch(html, /\[data-template="baoma"\][^{]*\.basket-item-media/)
 })

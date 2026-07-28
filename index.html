@@ -3876,6 +3876,39 @@
             text-align: right;
             transition: color var(--t);
         }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .basket-item {
+            gap: 8px;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .basket-item-media {
+            width: 52px;
+            height: 52px;
+            flex: 0 0 52px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(128, 28, 23, 0.22);
+            background: #f7ead6;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .basket-item-thumb {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center center;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .basket-item-info {
+            min-width: 0;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .basket-item-name {
+            overflow-wrap: anywhere;
+            line-height: 1.05;
+        }
+        @media (min-width: 640px) {
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .basket-item-media {
+                width: 60px;
+                height: 60px;
+                flex-basis: 60px;
+            }
+        }
 .basket-footer {
             padding: 16px 20px;
             border-top: 2px solid var(--border);
@@ -8125,6 +8158,17 @@
             return _parsePrice(item.price);
         }
         function _lineUnit(entry) { return _lineBase(entry) + _addonSum(entry); }
+        function _basketCurrentItem(entry, key) {
+            const idx = parseInt(key, 10);
+            const current = Number.isFinite(idx) ? menuItems[idx] : null;
+            return current || entry.item;
+        }
+        function _basketItemMediaHtml(entry, key, altText) {
+            const item = _basketCurrentItem(entry, key);
+            const src = _safeAssetUrl(item && item.thumbnail_url);
+            if (!src) return '';
+            return `<div class="basket-item-media"><img class="basket-item-thumb" src="${_escapeHtml(src)}" alt="${_escapeHtml(altText)}" loading="eager" decoding="async" onerror="this.closest('.basket-item-media')?.remove()"></div>`;
+        }
         function _basketTotal() {
             let s = 0;
             _basket.forEach(entry => { s += _lineUnit(entry) * entry.qty; });
@@ -8219,9 +8263,12 @@
                         : '';
                     const row  = document.createElement('div');
                     row.className = 'basket-item';
+                    const itemName = t(item, 'name');
+                    const mediaHtml = _isMugsyTenant() ? _basketItemMediaHtml(entry, key, itemName) : '';
                     row.innerHTML = `
+                        ${mediaHtml}
                         <div class="basket-item-info">
-                            <span class="basket-item-name">${t(item, 'name')}</span>
+                            <span class="basket-item-name">${_escapeHtml(itemName)}</span>
                             ${varTxt ? `<span class="basket-item-addons">${_escapeHtml(varTxt)}</span>` : ''}
                             ${addTxt ? `<span class="basket-item-addons">+ ${_escapeHtml(addTxt)}</span>` : ''}
                         </div>
