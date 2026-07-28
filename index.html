@@ -2984,12 +2984,6 @@
         [data-template="gochit_monster"] .bb-card,
         [data-template="gochit_monster"] .venue-chip { border-radius: 12px; }
         [data-template="gochit_monster"] .tenant-logo { width: min(56vw, 230px); }
-        /* The signature price rides on a photo, so it takes the price colour
-           (yellow) rather than the secondary red, which is both dimmer on the
-           scrim and off-message for a template that commits to yellow. This is
-           a no-op for Burger Bar, whose price and secondary are the same value. */
-        [data-template="burger_bar"] .bb-card-price,
-        [data-template="gochit_monster"] .bb-card-price { color: var(--bb-price); }
 
         [data-theme="night"][data-template="burger_bar"]{
             --bb-bg: #17161a;
@@ -3282,6 +3276,13 @@
             color: var(--bb-accent2);
             white-space: nowrap;
         }
+        /* The signature price rides on a photo, so it takes the price colour
+           rather than the secondary. Declared after the base rule above — put
+           earlier it loses on source order. A no-op for Burger Bar, whose price
+           and secondary are the same value; for Gochit's it is the difference
+           between yellow and a dimmer red on the scrim. */
+        [data-template="burger_bar"] .bb-card-price,
+        [data-template="gochit_monster"] .bb-card-price { color: var(--bb-price); }
         [data-template="burger_bar"] .bb-card-price .price-was,
         [data-template="gochit_monster"] .bb-card-price .price-was{
             display: block;
