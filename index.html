@@ -620,6 +620,26 @@
             color: #ffffff;
             border-color: transparent;
         }
+        /* RESPUBLIKA (r-main): the basket panel sits on the theme's own --bg,
+           which is light in Day mode — the white pin above is unreadable there.
+           Fall back to the theme's own text color instead. Scoped to r-main;
+           Monday Greens (dark-enough backgrounds in both themes) is untouched. */
+        [data-template="monday_greens"][data-tenant="r-main"] #basket-panel .basket-item-name,
+        [data-template="monday_greens"][data-tenant="r-main"] #basket-panel .basket-item-price,
+        [data-template="monday_greens"][data-tenant="r-main"] #basket-total-label,
+        [data-template="monday_greens"][data-tenant="r-main"] #basket-total,
+        [data-template="monday_greens"][data-tenant="r-main"] #basket-waiter-btn,
+        [data-template="monday_greens"][data-tenant="r-main"] #basket-clear {
+            -webkit-text-fill-color: var(--text);
+            color: var(--text);
+        }
+        [data-template="monday_greens"][data-tenant="r-main"] #basket-panel .basket-item-addons {
+            -webkit-text-fill-color: var(--dim);
+            color: var(--dim);
+        }
+        [data-template="monday_greens"][data-tenant="r-main"] #basket-waiter-btn {
+            border-color: var(--text);
+        }
         [data-template="monday_greens"] #basket-panel .basket-qty {
             background: transparent;
             border: 0;
@@ -885,6 +905,15 @@
            the teal day bg and the dark night bg. Scoped to monday_greens so every
            other tenant keeps accent-coloured headings. */
         [data-template="monday_greens"] .category-header { color: #ffffff; }
+        /* RESPUBLIKA (r-main): its own brand red has plenty of contrast against
+           both its Day (stone) and Night (charcoal) backgrounds, unlike Monday
+           Greens' teal — so this tenant doesn't need (and is broken by) the
+           white pin above. Scoped to r-main only; Monday Greens is untouched. */
+        [data-template="monday_greens"][data-tenant="r-main"] .category-header {
+            color: var(--accent);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
 
         /* ── Footer ── */
         .site-footer {
