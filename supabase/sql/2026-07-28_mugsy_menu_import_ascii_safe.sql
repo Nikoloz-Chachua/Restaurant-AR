@@ -1,5 +1,6 @@
 -- Mugsy's Burgers official menu import — brand_id 53 / restaurant_id 59.
 -- Sources: https://mugsy.ge/ka and https://mugsy.ge/en Inertia data-page JSON, extracted 2026-07-28.
+-- Dashboard-safe variant: Georgian U+10A0-U+10FF and lari U+20BE characters inside JSON payloads are JSON \uXXXX escapes.
 -- Default safety is ROLLBACK. To execute after review, change only the final line from ROLLBACK; to COMMIT;
 
 BEGIN;
@@ -51,22 +52,22 @@ with src as (
   from jsonb_to_recordset($mugsy_categories$[
   {
     "name_en": "Burgers",
-    "name_ka": "ბურგერები",
+    "name_ka": "\u10d1\u10e3\u10e0\u10d2\u10d4\u10e0\u10d4\u10d1\u10d8",
     "sort_order": 1
   },
   {
     "name_en": "Boxes",
-    "name_ka": "ბოქსები",
+    "name_ka": "\u10d1\u10dd\u10e5\u10e1\u10d4\u10d1\u10d8",
     "sort_order": 2
   },
   {
     "name_en": "Sides & Fries",
-    "name_ka": "საიდები",
+    "name_ka": "\u10e1\u10d0\u10d8\u10d3\u10d4\u10d1\u10d8",
     "sort_order": 3
   },
   {
     "name_en": "Drinks & Sauces",
-    "name_ka": "სასმელები",
+    "name_ka": "\u10e1\u10d0\u10e1\u10db\u10d4\u10da\u10d4\u10d1\u10d8",
     "sort_order": 4
   }
 ]$mugsy_categories$::jsonb)
@@ -87,8 +88,8 @@ with src as (
     "name_en": "Cheesy",
     "name_ka": "Cheesy",
     "description_en": "Bun, beef, tomato, lettuce, cheddar cheese, signature sauce",
-    "description_ka": "ფუნთუშა, საქონლის ხორცი, პომიდორი, სალათის ფოთოლი აისბერგი, ყველი ჩედარი, საფირმო სოუსი",
-    "price": "7.9 ₾",
+    "description_ka": "\u10e4\u10e3\u10dc\u10d7\u10e3\u10e8\u10d0, \u10e1\u10d0\u10e5\u10dd\u10dc\u10da\u10d8\u10e1 \u10ee\u10dd\u10e0\u10ea\u10d8, \u10de\u10dd\u10db\u10d8\u10d3\u10dd\u10e0\u10d8, \u10e1\u10d0\u10da\u10d0\u10d7\u10d8\u10e1 \u10e4\u10dd\u10d7\u10dd\u10da\u10d8 \u10d0\u10d8\u10e1\u10d1\u10d4\u10e0\u10d2\u10d8, \u10e7\u10d5\u10d4\u10da\u10d8 \u10e9\u10d4\u10d3\u10d0\u10e0\u10d8, \u10e1\u10d0\u10e4\u10d8\u10e0\u10db\u10dd \u10e1\u10dd\u10e3\u10e1\u10d8",
+    "price": "7.9 \u20be",
     "price_old": "",
     "category_name_en": "Burgers",
     "sort_order": 1,
@@ -108,8 +109,8 @@ with src as (
     "name_en": "Bacon Burger",
     "name_ka": "Bacon Smash",
     "description_en": "Bun, bacon, beef, cheddar cheese, signature sauce",
-    "description_ka": "ფუნთუშა, ბეკონი, საქონლის ხორცი, ყველი ჩედარი, საფირმო სოუსი",
-    "price": "10.6 ₾",
+    "description_ka": "\u10e4\u10e3\u10dc\u10d7\u10e3\u10e8\u10d0, \u10d1\u10d4\u10d9\u10dd\u10dc\u10d8, \u10e1\u10d0\u10e5\u10dd\u10dc\u10da\u10d8\u10e1 \u10ee\u10dd\u10e0\u10ea\u10d8, \u10e7\u10d5\u10d4\u10da\u10d8 \u10e9\u10d4\u10d3\u10d0\u10e0\u10d8, \u10e1\u10d0\u10e4\u10d8\u10e0\u10db\u10dd \u10e1\u10dd\u10e3\u10e1\u10d8",
+    "price": "10.6 \u20be",
     "price_old": "",
     "category_name_en": "Burgers",
     "sort_order": 2,
@@ -129,8 +130,8 @@ with src as (
     "name_en": "BBQ Smoker",
     "name_ka": "BBQ Smoker",
     "description_en": "Bun, BBQ sauce, lettuce, tomato, beef, cheddar slice, red BBQ smoky sauce",
-    "description_ka": "ფუნთუშა, ბბქ სოუსი, აისბერგი, პომიდორი, საქონლის ხორცი, ჩედარის ფირფიტა, წითელი ბბქ სმოუქი სოუსი",
-    "price": "9.4 ₾",
+    "description_ka": "\u10e4\u10e3\u10dc\u10d7\u10e3\u10e8\u10d0, \u10d1\u10d1\u10e5 \u10e1\u10dd\u10e3\u10e1\u10d8, \u10d0\u10d8\u10e1\u10d1\u10d4\u10e0\u10d2\u10d8, \u10de\u10dd\u10db\u10d8\u10d3\u10dd\u10e0\u10d8, \u10e1\u10d0\u10e5\u10dd\u10dc\u10da\u10d8\u10e1 \u10ee\u10dd\u10e0\u10ea\u10d8, \u10e9\u10d4\u10d3\u10d0\u10e0\u10d8\u10e1 \u10e4\u10d8\u10e0\u10e4\u10d8\u10e2\u10d0, \u10ec\u10d8\u10d7\u10d4\u10da\u10d8 \u10d1\u10d1\u10e5 \u10e1\u10db\u10dd\u10e3\u10e5\u10d8 \u10e1\u10dd\u10e3\u10e1\u10d8",
+    "price": "9.4 \u20be",
     "price_old": "",
     "category_name_en": "Burgers",
     "sort_order": 3,
@@ -150,8 +151,8 @@ with src as (
     "name_en": "Mugsys Signature",
     "name_ka": "Bacon Melt",
     "description_en": "Bun, BBQ sauce, crispy bacon, beef, cheddar slice, red BBQ smoky sauce, cheese sauce, fried mozzarella",
-    "description_ka": "ფუნთუშა, ბბქ სოუსი, შემწვარი ბეკონი, საქონლის ხორცი, ჩედარის ფირფიტა, წითელი ბბქ სმოუქი სოუსი, ყველის სოუსი, შემწვარი მოცარელა",
-    "price": "17.9 ₾",
+    "description_ka": "\u10e4\u10e3\u10dc\u10d7\u10e3\u10e8\u10d0, \u10d1\u10d1\u10e5 \u10e1\u10dd\u10e3\u10e1\u10d8, \u10e8\u10d4\u10db\u10ec\u10d5\u10d0\u10e0\u10d8 \u10d1\u10d4\u10d9\u10dd\u10dc\u10d8, \u10e1\u10d0\u10e5\u10dd\u10dc\u10da\u10d8\u10e1 \u10ee\u10dd\u10e0\u10ea\u10d8, \u10e9\u10d4\u10d3\u10d0\u10e0\u10d8\u10e1 \u10e4\u10d8\u10e0\u10e4\u10d8\u10e2\u10d0, \u10ec\u10d8\u10d7\u10d4\u10da\u10d8 \u10d1\u10d1\u10e5 \u10e1\u10db\u10dd\u10e3\u10e5\u10d8 \u10e1\u10dd\u10e3\u10e1\u10d8, \u10e7\u10d5\u10d4\u10da\u10d8\u10e1 \u10e1\u10dd\u10e3\u10e1\u10d8, \u10e8\u10d4\u10db\u10ec\u10d5\u10d0\u10e0\u10d8 \u10db\u10dd\u10ea\u10d0\u10e0\u10d4\u10da\u10d0",
+    "price": "17.9 \u20be",
     "price_old": "",
     "category_name_en": "Burgers",
     "sort_order": 4,
@@ -171,8 +172,8 @@ with src as (
     "name_en": "Mozzarella",
     "name_ka": "Mozzarella",
     "description_en": "Bun, Mugsy's sauce, lettuce, tomato, fried mozzarella, cheese sauce",
-    "description_ka": "ფუნთუშა, მაგსის სოუსი, აისბერგი, პომიდორი, შემწვარი მოცარელა, ყველის სოუსი",
-    "price": "9.7 ₾",
+    "description_ka": "\u10e4\u10e3\u10dc\u10d7\u10e3\u10e8\u10d0, \u10db\u10d0\u10d2\u10e1\u10d8\u10e1 \u10e1\u10dd\u10e3\u10e1\u10d8, \u10d0\u10d8\u10e1\u10d1\u10d4\u10e0\u10d2\u10d8, \u10de\u10dd\u10db\u10d8\u10d3\u10dd\u10e0\u10d8, \u10e8\u10d4\u10db\u10ec\u10d5\u10d0\u10e0\u10d8 \u10db\u10dd\u10ea\u10d0\u10e0\u10d4\u10da\u10d0, \u10e7\u10d5\u10d4\u10da\u10d8\u10e1 \u10e1\u10dd\u10e3\u10e1\u10d8",
+    "price": "9.7 \u20be",
     "price_old": "",
     "category_name_en": "Burgers",
     "sort_order": 5,
@@ -192,8 +193,8 @@ with src as (
     "name_en": "Chicken Cheesy",
     "name_ka": "Chicken Cheesy",
     "description_en": "Bun, chicken, tomato, lettuce, cheddar cheese, signature sauce",
-    "description_ka": "ფუნთუშა, ქათმის ხორცი, პომიდორი, სალათის ფოთოლი აისბერგი, ყველი ჩედარი, საფირმო სოუსი",
-    "price": "7.8 ₾",
+    "description_ka": "\u10e4\u10e3\u10dc\u10d7\u10e3\u10e8\u10d0, \u10e5\u10d0\u10d7\u10db\u10d8\u10e1 \u10ee\u10dd\u10e0\u10ea\u10d8, \u10de\u10dd\u10db\u10d8\u10d3\u10dd\u10e0\u10d8, \u10e1\u10d0\u10da\u10d0\u10d7\u10d8\u10e1 \u10e4\u10dd\u10d7\u10dd\u10da\u10d8 \u10d0\u10d8\u10e1\u10d1\u10d4\u10e0\u10d2\u10d8, \u10e7\u10d5\u10d4\u10da\u10d8 \u10e9\u10d4\u10d3\u10d0\u10e0\u10d8, \u10e1\u10d0\u10e4\u10d8\u10e0\u10db\u10dd \u10e1\u10dd\u10e3\u10e1\u10d8",
+    "price": "7.8 \u20be",
     "price_old": "",
     "category_name_en": "Burgers",
     "sort_order": 6,
@@ -211,10 +212,10 @@ with src as (
   },
   {
     "name_en": "Two Burger Box",
-    "name_ka": "ორი ბურგერის ბოქსი",
+    "name_ka": "\u10dd\u10e0\u10d8 \u10d1\u10e3\u10e0\u10d2\u10d4\u10e0\u10d8\u10e1 \u10d1\u10dd\u10e5\u10e1\u10d8",
     "description_en": "Two classic burgers, nuggets, fries",
-    "description_ka": "ორი კლასიკური ბურგერი, ნაგეთსი, კარტოფილი ფრი",
-    "price": "33.9 ₾",
+    "description_ka": "\u10dd\u10e0\u10d8 \u10d9\u10da\u10d0\u10e1\u10d8\u10d9\u10e3\u10e0\u10d8 \u10d1\u10e3\u10e0\u10d2\u10d4\u10e0\u10d8, \u10dc\u10d0\u10d2\u10d4\u10d7\u10e1\u10d8, \u10d9\u10d0\u10e0\u10e2\u10dd\u10e4\u10d8\u10da\u10d8 \u10e4\u10e0\u10d8",
+    "price": "33.9 \u20be",
     "price_old": "",
     "category_name_en": "Boxes",
     "sort_order": 1,
@@ -232,10 +233,10 @@ with src as (
   },
   {
     "name_en": "Chicken Box",
-    "name_ka": "ქათმის ბოქსი",
+    "name_ka": "\u10e5\u10d0\u10d7\u10db\u10d8\u10e1 \u10d1\u10dd\u10e5\u10e1\u10d8",
     "description_en": "Six chicken burgers, fries",
-    "description_ka": "ექვსი ქათმის ბურგერი, კარტოფილი ფრი",
-    "price": "54.9 ₾",
+    "description_ka": "\u10d4\u10e5\u10d5\u10e1\u10d8 \u10e5\u10d0\u10d7\u10db\u10d8\u10e1 \u10d1\u10e3\u10e0\u10d2\u10d4\u10e0\u10d8, \u10d9\u10d0\u10e0\u10e2\u10dd\u10e4\u10d8\u10da\u10d8 \u10e4\u10e0\u10d8",
+    "price": "54.9 \u20be",
     "price_old": "",
     "category_name_en": "Boxes",
     "sort_order": 2,
@@ -253,10 +254,10 @@ with src as (
   },
   {
     "name_en": "Cheesy Box",
-    "name_ka": "ჩიზის ბოქსი",
+    "name_ka": "\u10e9\u10d8\u10d6\u10d8\u10e1 \u10d1\u10dd\u10e5\u10e1\u10d8",
     "description_en": "Cheesy box combo",
-    "description_ka": "ჩიზის ბოქსი",
-    "price": "58.7 ₾",
+    "description_ka": "\u10e9\u10d8\u10d6\u10d8\u10e1 \u10d1\u10dd\u10e5\u10e1\u10d8",
+    "price": "58.7 \u20be",
     "price_old": "",
     "category_name_en": "Boxes",
     "sort_order": 3,
@@ -276,8 +277,8 @@ with src as (
     "name_en": "Chicken Snack Box",
     "name_ka": "Chicken Snack Box",
     "description_en": "Fries, chicken popcorn, chicken nuggets, ketchup, cheese sauce",
-    "description_ka": "კარტოფილი ფრი, ქათმის პოპკორნი, ქათმის ნაგეთსი, კეჩუპი, ყველის სოუსი",
-    "price": "29.8 ₾",
+    "description_ka": "\u10d9\u10d0\u10e0\u10e2\u10dd\u10e4\u10d8\u10da\u10d8 \u10e4\u10e0\u10d8, \u10e5\u10d0\u10d7\u10db\u10d8\u10e1 \u10de\u10dd\u10de\u10d9\u10dd\u10e0\u10dc\u10d8, \u10e5\u10d0\u10d7\u10db\u10d8\u10e1 \u10dc\u10d0\u10d2\u10d4\u10d7\u10e1\u10d8, \u10d9\u10d4\u10e9\u10e3\u10de\u10d8, \u10e7\u10d5\u10d4\u10da\u10d8\u10e1 \u10e1\u10dd\u10e3\u10e1\u10d8",
+    "price": "29.8 \u20be",
     "price_old": "",
     "category_name_en": "Boxes",
     "sort_order": 4,
@@ -295,10 +296,10 @@ with src as (
   },
   {
     "name_en": "Fries with Bacon & Cheese Sauce",
-    "name_ka": "ფრი ბეკონით და ყველის სოუსით",
+    "name_ka": "\u10e4\u10e0\u10d8 \u10d1\u10d4\u10d9\u10dd\u10dc\u10d8\u10d7 \u10d3\u10d0 \u10e7\u10d5\u10d4\u10da\u10d8\u10e1 \u10e1\u10dd\u10e3\u10e1\u10d8\u10d7",
     "description_en": "Fries with bacon and cheese sauce",
-    "description_ka": "ფრი ბეკონით და ყველის სოუსით",
-    "price": "10.4 ₾",
+    "description_ka": "\u10e4\u10e0\u10d8 \u10d1\u10d4\u10d9\u10dd\u10dc\u10d8\u10d7 \u10d3\u10d0 \u10e7\u10d5\u10d4\u10da\u10d8\u10e1 \u10e1\u10dd\u10e3\u10e1\u10d8\u10d7",
+    "price": "10.4 \u20be",
     "price_old": "",
     "category_name_en": "Sides & Fries",
     "sort_order": 1,
@@ -316,10 +317,10 @@ with src as (
   },
   {
     "name_en": "Fries",
-    "name_ka": "ფრი",
+    "name_ka": "\u10e4\u10e0\u10d8",
     "description_en": "French fries",
-    "description_ka": "კარტოფილი ფრი",
-    "price": "4.4 ₾",
+    "description_ka": "\u10d9\u10d0\u10e0\u10e2\u10dd\u10e4\u10d8\u10da\u10d8 \u10e4\u10e0\u10d8",
+    "price": "4.4 \u20be",
     "price_old": "",
     "category_name_en": "Sides & Fries",
     "sort_order": 2,
@@ -337,10 +338,10 @@ with src as (
   },
   {
     "name_en": "Fries with Jalapeño & Cheese Sauce",
-    "name_ka": "ფრი ჰალაპენიოთი და ყველის სოუსით",
+    "name_ka": "\u10e4\u10e0\u10d8 \u10f0\u10d0\u10da\u10d0\u10de\u10d4\u10dc\u10d8\u10dd\u10d7\u10d8 \u10d3\u10d0 \u10e7\u10d5\u10d4\u10da\u10d8\u10e1 \u10e1\u10dd\u10e3\u10e1\u10d8\u10d7",
     "description_en": "Fries with jalapeño and cheese sauce",
-    "description_ka": "ფრი ჰალაპენიოთი და ყველის სოუსით",
-    "price": "9.9 ₾",
+    "description_ka": "\u10e4\u10e0\u10d8 \u10f0\u10d0\u10da\u10d0\u10de\u10d4\u10dc\u10d8\u10dd\u10d7\u10d8 \u10d3\u10d0 \u10e7\u10d5\u10d4\u10da\u10d8\u10e1 \u10e1\u10dd\u10e3\u10e1\u10d8\u10d7",
+    "price": "9.9 \u20be",
     "price_old": "",
     "category_name_en": "Sides & Fries",
     "sort_order": 3,
@@ -358,10 +359,10 @@ with src as (
   },
   {
     "name_en": "Chicken Popcorn 50pcs",
-    "name_ka": "ქათმის პოპკორნი 50ც",
+    "name_ka": "\u10e5\u10d0\u10d7\u10db\u10d8\u10e1 \u10de\u10dd\u10de\u10d9\u10dd\u10e0\u10dc\u10d8 50\u10ea",
     "description_en": "Chicken popcorn 50 pieces",
-    "description_ka": "ქათმის პოპკორნი 50 ცალი",
-    "price": "9.4 ₾",
+    "description_ka": "\u10e5\u10d0\u10d7\u10db\u10d8\u10e1 \u10de\u10dd\u10de\u10d9\u10dd\u10e0\u10dc\u10d8 50 \u10ea\u10d0\u10da\u10d8",
+    "price": "9.4 \u20be",
     "price_old": "",
     "category_name_en": "Sides & Fries",
     "sort_order": 4,
@@ -379,10 +380,10 @@ with src as (
   },
   {
     "name_en": "Caesar with Chicken",
-    "name_ka": "ცეზარი ქათმით",
+    "name_ka": "\u10ea\u10d4\u10d6\u10d0\u10e0\u10d8 \u10e5\u10d0\u10d7\u10db\u10d8\u10d7",
     "description_en": "Caesar salad with chicken",
-    "description_ka": "ცეზარი ქათმით",
-    "price": "7.8 ₾",
+    "description_ka": "\u10ea\u10d4\u10d6\u10d0\u10e0\u10d8 \u10e5\u10d0\u10d7\u10db\u10d8\u10d7",
+    "price": "7.8 \u20be",
     "price_old": "",
     "category_name_en": "Sides & Fries",
     "sort_order": 5,
@@ -400,10 +401,10 @@ with src as (
   },
   {
     "name_en": "Pepsi 0.33L",
-    "name_ka": "პეპსი 0.33ლ",
+    "name_ka": "\u10de\u10d4\u10de\u10e1\u10d8 0.33\u10da",
     "description_en": "Pepsi 0.33L",
-    "description_ka": "პეპსი 0.33ლ",
-    "price": "3.7 ₾",
+    "description_ka": "\u10de\u10d4\u10de\u10e1\u10d8 0.33\u10da",
+    "price": "3.7 \u20be",
     "price_old": "",
     "category_name_en": "Drinks & Sauces",
     "sort_order": 1,
@@ -421,10 +422,10 @@ with src as (
   },
   {
     "name_en": "Pepsi 0.5L",
-    "name_ka": "პეპსი 0.5ლ",
+    "name_ka": "\u10de\u10d4\u10de\u10e1\u10d8 0.5\u10da",
     "description_en": "Pepsi 0.5L",
-    "description_ka": "პეპსი 0.5ლ",
-    "price": "4.3 ₾",
+    "description_ka": "\u10de\u10d4\u10de\u10e1\u10d8 0.5\u10da",
+    "price": "4.3 \u20be",
     "price_old": "",
     "category_name_en": "Drinks & Sauces",
     "sort_order": 2,
@@ -442,10 +443,10 @@ with src as (
   },
   {
     "name_en": "Mugsy's Sauce",
-    "name_ka": "მაგსის სოუსი",
+    "name_ka": "\u10db\u10d0\u10d2\u10e1\u10d8\u10e1 \u10e1\u10dd\u10e3\u10e1\u10d8",
     "description_en": "Mugsy's signature sauce",
-    "description_ka": "მაგსის სოუსი",
-    "price": "2.5 ₾",
+    "description_ka": "\u10db\u10d0\u10d2\u10e1\u10d8\u10e1 \u10e1\u10dd\u10e3\u10e1\u10d8",
+    "price": "2.5 \u20be",
     "price_old": "",
     "category_name_en": "Drinks & Sauces",
     "sort_order": 3,
@@ -463,10 +464,10 @@ with src as (
   },
   {
     "name_en": "Large Cheese Sauce",
-    "name_ka": "დიდი ყველის სოუსი",
+    "name_ka": "\u10d3\u10d8\u10d3\u10d8 \u10e7\u10d5\u10d4\u10da\u10d8\u10e1 \u10e1\u10dd\u10e3\u10e1\u10d8",
     "description_en": "Large cheese sauce",
-    "description_ka": "დიდი ყველის სოუსი",
-    "price": "4.7 ₾",
+    "description_ka": "\u10d3\u10d8\u10d3\u10d8 \u10e7\u10d5\u10d4\u10da\u10d8\u10e1 \u10e1\u10dd\u10e3\u10e1\u10d8",
+    "price": "4.7 \u20be",
     "price_old": "",
     "category_name_en": "Drinks & Sauces",
     "sort_order": 4,
@@ -484,10 +485,10 @@ with src as (
   },
   {
     "name_en": "Ketchup",
-    "name_ka": "კეტჩუპი",
+    "name_ka": "\u10d9\u10d4\u10e2\u10e9\u10e3\u10de\u10d8",
     "description_en": "Ketchup",
-    "description_ka": "კეტჩუპი",
-    "price": "2.5 ₾",
+    "description_ka": "\u10d9\u10d4\u10e2\u10e9\u10e3\u10de\u10d8",
+    "price": "2.5 \u20be",
     "price_old": "",
     "category_name_en": "Drinks & Sauces",
     "sort_order": 5,
@@ -505,10 +506,10 @@ with src as (
   },
   {
     "name_en": "Small Cheese Sauce",
-    "name_ka": "პატარა ყველის სოუსი",
+    "name_ka": "\u10de\u10d0\u10e2\u10d0\u10e0\u10d0 \u10e7\u10d5\u10d4\u10da\u10d8\u10e1 \u10e1\u10dd\u10e3\u10e1\u10d8",
     "description_en": "Small cheese sauce",
-    "description_ka": "პატარა ყველის სოუსი",
-    "price": "3 ₾",
+    "description_ka": "\u10de\u10d0\u10e2\u10d0\u10e0\u10d0 \u10e7\u10d5\u10d4\u10da\u10d8\u10e1 \u10e1\u10dd\u10e3\u10e1\u10d8",
+    "price": "3 \u20be",
     "price_old": "",
     "category_name_en": "Drinks & Sauces",
     "sort_order": 6,
@@ -640,7 +641,7 @@ with src as (
   },
   {
     "key": "hero_kicker_ka",
-    "value": "სმეშ ბურგერები თბილისში"
+    "value": "\u10e1\u10db\u10d4\u10e8 \u10d1\u10e3\u10e0\u10d2\u10d4\u10e0\u10d4\u10d1\u10d8 \u10d7\u10d1\u10d8\u10da\u10d8\u10e1\u10e8\u10d8"
   },
   {
     "key": "hero_copy",
@@ -648,7 +649,7 @@ with src as (
   },
   {
     "key": "hero_copy_ka",
-    "value": "სწრაფი, სოუსიანი ბურგერები, ბოქსები, საიდები, სასმელები და BetaReal-ის ინტერაქტიული მენიუს გამოცდილება."
+    "value": "\u10e1\u10ec\u10e0\u10d0\u10e4\u10d8, \u10e1\u10dd\u10e3\u10e1\u10d8\u10d0\u10dc\u10d8 \u10d1\u10e3\u10e0\u10d2\u10d4\u10e0\u10d4\u10d1\u10d8, \u10d1\u10dd\u10e5\u10e1\u10d4\u10d1\u10d8, \u10e1\u10d0\u10d8\u10d3\u10d4\u10d1\u10d8, \u10e1\u10d0\u10e1\u10db\u10d4\u10da\u10d4\u10d1\u10d8 \u10d3\u10d0 BetaReal-\u10d8\u10e1 \u10d8\u10dc\u10e2\u10d4\u10e0\u10d0\u10e5\u10e2\u10d8\u10e3\u10da\u10d8 \u10db\u10d4\u10dc\u10d8\u10e3\u10e1 \u10d2\u10d0\u10db\u10dd\u10ea\u10d3\u10d8\u10da\u10d4\u10d1\u10d0."
   },
   {
     "key": "hero_cta",
@@ -656,7 +657,7 @@ with src as (
   },
   {
     "key": "hero_cta_ka",
-    "value": "მენიუს ნახვა"
+    "value": "\u10db\u10d4\u10dc\u10d8\u10e3\u10e1 \u10dc\u10d0\u10ee\u10d5\u10d0"
   },
   {
     "key": "info_kicker",
@@ -664,7 +665,7 @@ with src as (
   },
   {
     "key": "info_kicker_ka",
-    "value": "იპოვე Mugsy"
+    "value": "\u10d8\u10de\u10dd\u10d5\u10d4 Mugsy"
   },
   {
     "key": "info_title",
@@ -672,7 +673,7 @@ with src as (
   },
   {
     "key": "info_title_ka",
-    "value": "ორი ლოკაცია თბილისში"
+    "value": "\u10dd\u10e0\u10d8 \u10da\u10dd\u10d9\u10d0\u10ea\u10d8\u10d0 \u10d7\u10d1\u10d8\u10da\u10d8\u10e1\u10e8\u10d8"
   },
   {
     "key": "info_text",
@@ -680,7 +681,7 @@ with src as (
   },
   {
     "key": "info_text_ka",
-    "value": "პეტრე მელიქიშვილის ქუჩა 8/2\nვაჟა-ფშაველას გამზირი 63"
+    "value": "\u10de\u10d4\u10e2\u10e0\u10d4 \u10db\u10d4\u10da\u10d8\u10e5\u10d8\u10e8\u10d5\u10d8\u10da\u10d8\u10e1 \u10e5\u10e3\u10e9\u10d0 8/2\n\u10d5\u10d0\u10df\u10d0-\u10e4\u10e8\u10d0\u10d5\u10d4\u10da\u10d0\u10e1 \u10d2\u10d0\u10db\u10d6\u10d8\u10e0\u10d8 63"
   },
   {
     "key": "mugsy_order_links",
@@ -688,7 +689,7 @@ with src as (
   },
   {
     "key": "mugsy_locations",
-    "value": "[{\"label\":\"8/2 Petre Melikishvili Street\",\"label_ka\":\"პეტრე მელიქიშვილის ქუჩა 8/2\",\"url\":\"https://www.google.com/maps/search/?api=1&query=8%2F2%20Petre%20Melikishvili%20Street%2C%20Tbilisi\"},{\"label\":\"63 Vazha Pshavela Avenue\",\"label_ka\":\"ვაჟა-ფშაველას გამზირი 63\",\"url\":\"https://www.google.com/maps/search/?api=1&query=63%20Vazha%20Pshavela%20Avenue%2C%20Tbilisi\"}]"
+    "value": "[{\"label\":\"8/2 Petre Melikishvili Street\",\"label_ka\":\"\u10de\u10d4\u10e2\u10e0\u10d4 \u10db\u10d4\u10da\u10d8\u10e5\u10d8\u10e8\u10d5\u10d8\u10da\u10d8\u10e1 \u10e5\u10e3\u10e9\u10d0 8/2\",\"url\":\"https://www.google.com/maps/search/?api=1&query=8%2F2%20Petre%20Melikishvili%20Street%2C%20Tbilisi\"},{\"label\":\"63 Vazha Pshavela Avenue\",\"label_ka\":\"\u10d5\u10d0\u10df\u10d0-\u10e4\u10e8\u10d0\u10d5\u10d4\u10da\u10d0\u10e1 \u10d2\u10d0\u10db\u10d6\u10d8\u10e0\u10d8 63\",\"url\":\"https://www.google.com/maps/search/?api=1&query=63%20Vazha%20Pshavela%20Avenue%2C%20Tbilisi\"}]"
   },
   {
     "key": "empty_title",
@@ -696,7 +697,7 @@ with src as (
   },
   {
     "key": "empty_title_ka",
-    "value": "მენიუ მალე გამოჩნდება BetaReal-ში"
+    "value": "\u10db\u10d4\u10dc\u10d8\u10e3 \u10db\u10d0\u10da\u10d4 \u10d2\u10d0\u10db\u10dd\u10e9\u10dc\u10d3\u10d4\u10d1\u10d0 BetaReal-\u10e8\u10d8"
   },
   {
     "key": "empty_copy",
@@ -704,7 +705,7 @@ with src as (
   },
   {
     "key": "empty_copy_ka",
-    "value": "Mugsy-ს კერძები აქ ჯერ გამოქვეყნებული არ არის. მონაცემების ჩატვირთვის შემდეგ ოფიციალური კერძები და ფასები ავტომატურად გამოჩნდება."
+    "value": "Mugsy-\u10e1 \u10d9\u10d4\u10e0\u10eb\u10d4\u10d1\u10d8 \u10d0\u10e5 \u10ef\u10d4\u10e0 \u10d2\u10d0\u10db\u10dd\u10e5\u10d5\u10d4\u10e7\u10dc\u10d4\u10d1\u10e3\u10da\u10d8 \u10d0\u10e0 \u10d0\u10e0\u10d8\u10e1. \u10db\u10dd\u10dc\u10d0\u10ea\u10d4\u10db\u10d4\u10d1\u10d8\u10e1 \u10e9\u10d0\u10e2\u10d5\u10d8\u10e0\u10d7\u10d5\u10d8\u10e1 \u10e8\u10d4\u10db\u10d3\u10d4\u10d2 \u10dd\u10e4\u10d8\u10ea\u10d8\u10d0\u10da\u10e3\u10e0\u10d8 \u10d9\u10d4\u10e0\u10eb\u10d4\u10d1\u10d8 \u10d3\u10d0 \u10e4\u10d0\u10e1\u10d4\u10d1\u10d8 \u10d0\u10d5\u10e2\u10dd\u10db\u10d0\u10e2\u10e3\u10e0\u10d0\u10d3 \u10d2\u10d0\u10db\u10dd\u10e9\u10dc\u10d3\u10d4\u10d1\u10d0."
   },
   {
     "key": "meta_description",
@@ -712,7 +713,7 @@ with src as (
   },
   {
     "key": "meta_description_ka",
-    "value": "დაათვალიერეთ Mugsy's Burgers თბილისში BetaReal-ის მობილურ მენიუში."
+    "value": "\u10d3\u10d0\u10d0\u10d7\u10d5\u10d0\u10da\u10d8\u10d4\u10e0\u10d4\u10d7 Mugsy's Burgers \u10d7\u10d1\u10d8\u10da\u10d8\u10e1\u10e8\u10d8 BetaReal-\u10d8\u10e1 \u10db\u10dd\u10d1\u10d8\u10da\u10e3\u10e0 \u10db\u10d4\u10dc\u10d8\u10e3\u10e8\u10d8."
   }
 ]$mugsy_theme$::jsonb) as x(key text, value text)
 )
