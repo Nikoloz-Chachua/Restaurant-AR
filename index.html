@@ -7588,23 +7588,58 @@
         });
 
         // ── AR capability detection ────────────────────────────────────
+        // Function declarations, not consts: detectAR() and the cached-capability
+        // restore both run before the `const _isIOS` line further down would be
+        // initialised, so anything they call has to be hoisted.
+        function _looksIOS() {
+            return /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        }
+
+        // Handheld AR needs a camera the guest can point at their table. A device
+        // with no touch input and only a fine pointer is a desktop and cannot do
+        // it, whatever a user agent claims. Used to stop "VIEW ON TABLE" ever
+        // being offered where tapping it could only fail.
+        function _deviceCouldDoAR() {
+            try {
+                if ((navigator.maxTouchPoints || 0) > 0) return true;
+                if (window.matchMedia && window.matchMedia('(any-pointer: coarse)').matches) return true;
+                return false;
+            } catch (_) {
+                return true;   // can't tell — don't block a real phone
+            }
+        }
+
+        // A cached capability is a claim about the device running the page right
+        // now. localStorage is per-ORIGIN and every ?tenant= menu shares one
+        // origin, so a value written on one tenant — or while a phone was being
+        // emulated in devtools — is otherwise replayed on the desktop for the
+        // next seven days. Re-validate before trusting it.
+        function _capStillPlausible(cap) {
+            if (!cap || cap === 'none') return false;
+            if (!_deviceCouldDoAR()) return false;
+            if (cap === 'arkit') return _looksIOS();
+            if (cap === 'webxr') return !!navigator.xr;
+            return false;
+        }
+
         async function detectAR() {
             const cached = localStorage.getItem('bl-ar-cap');
             const ts = parseInt(localStorage.getItem('bl-ar-cap-ts') || '0');
-            if (cached && cached !== 'none' && (Date.now() - ts < 7 * 24 * 60 * 60 * 1000)) {
+            if (_capStillPlausible(cached) && (Date.now() - ts < 7 * 24 * 60 * 60 * 1000)) {
                 window.__arCap = cached;
                 return cached;
             }
 
-            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
-                          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
             let cap = 'none';
-            if (navigator.xr) {
-                try {
-                    if (await navigator.xr.isSessionSupported('immersive-ar')) cap = 'webxr';
-                } catch {}
+            if (_deviceCouldDoAR()) {
+                if (navigator.xr) {
+                    try {
+                        if (await navigator.xr.isSessionSupported('immersive-ar')) cap = 'webxr';
+                    } catch {}
+                }
+                if (cap === 'none' && _looksIOS()) cap = 'arkit';
             }
-            if (cap === 'none' && isIOS) cap = 'arkit';
             window.__arCap = cap;
             localStorage.setItem('bl-ar-cap', cap);
             localStorage.setItem('bl-ar-cap-ts', String(Date.now()));
@@ -7755,9 +7790,11 @@
             return _arLaunchers[key];
         }
 
-        const _isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
-            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        if (_isIOS && !window.__arCap) window.__arCap = 'arkit';
+        const _isIOS = _looksIOS();
+        // Seeding arkit from the user agent alone would offer "VIEW ON TABLE" on
+        // any machine that merely looks iOS-ish; gate it on the device actually
+        // being able to run a handheld session.
+        if (_isIOS && _deviceCouldDoAR() && !window.__arCap) window.__arCap = 'arkit';
 
         function _launchIOSAR(launcher, localIdx) {
             // activateAR() silently does nothing if the model hasn't finished loading.
@@ -8442,8 +8479,10 @@
                 { name: 'Classic Dessert',     name_ka: 'კლასიკური დესერტი',  category: 'Desserts', category_ka: 'დესერტები',       description: 'A simple sweet finish for the table.',                          description_ka: 'მარტივი ტკბილი დასასრული სუფრისთვის.',                          price: '11 ₾', model: 'food.glb' },
             ];
 
+            // Seeds the label before detection resolves. Validated, because the
+            // cache is shared by every tenant on this origin.
             const cachedCap = localStorage.getItem('bl-ar-cap');
-            if (cachedCap && cachedCap !== 'none') window.__arCap = cachedCap;
+            if (_capStillPlausible(cachedCap)) window.__arCap = cachedCap;
             // Start detection in background — don't block menu render on it
             const arCapPromise = detectAR();
 
