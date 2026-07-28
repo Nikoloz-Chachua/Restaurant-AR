@@ -77,5 +77,7 @@ assert.ok(!html.includes('tel:'), 'Public menu must not add a hardcoded phone li
 assert.ok(!/reservation/i.test(html), 'BAOMA implementation must not invent reservation functionality');
 assert.ok(sw.includes('./img/baoma/interior-hero-maps.webp') && sw.includes('./img/baoma/interior-terrace.jpg'), 'BAOMA local images should be included in the service worker cache');
 assert.ok(!sw.includes('./data/fixtures/baoma-menu.fixture.json'), 'BAOMA localhost fixture must not be precached for production visitors');
+assert.ok(sw.includes('./assets/mugsy/logo.svg') && sw.includes('./assets/mugsy/hero-burger.webp') && sw.includes('./assets/mugsy/hero-official.webp'), 'Mugsy logo/hero resources should remain precached');
+assert.ok(!sw.includes('./assets/mugsy/items-webp/'), 'Mugsy product thumbnails must lazy-load through runtime cache');
 
 console.log('Public menu regression assertions passed');

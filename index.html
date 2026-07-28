@@ -37,8 +37,8 @@
     <link rel="preconnect" href="https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev" crossorigin>
     <!-- Fonts loaded non-render-blocking: the print->all swap drops the stylesheet off
          the critical path. display=swap means text shows immediately in a fallback. -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@600;700&family=Nunito:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@600;700&family=Nunito:wght@400;600;700&display=swap"></noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@600;700&family=Noto+Sans+Georgian:wght@400;600;700;800;900&family=Nunito:wght@400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@600;700&family=Noto+Sans+Georgian:wght@400;600;700;800;900&family=Nunito:wght@400;600;700;800;900&display=swap"></noscript>
     <script>
         {
             // Anti-flash template hint. The real template_key only arrives with the
@@ -50,7 +50,8 @@
             const BOOT_TEMPLATE_BY_SLUG = {
                 'b-main': 'baoma',
                 'burgervazha': 'burger_lions',
-                'burger-bar-main': 'burger_bar'
+                'burger-bar-main': 'burger_bar',
+                'mugsy-main': 'mugsy_street_diner'
             };
             const BOOT_TEMPLATE_DEFAULTS = {
                 baoma: { theme: 'day', preload: './img/baoma/interior-hero-maps.webp' },
@@ -58,7 +59,8 @@
                 // stale 'day' left in localStorage. The hero photo is a tenant upload,
                 // unknown at boot, so there is nothing to preload here.
                 burger_lions: { theme: 'night' },
-                burger_bar: { theme: 'night' }
+                burger_bar: { theme: 'night' },
+                mugsy_street_diner: { theme: 'day', preload: './assets/mugsy/hero-burger.webp' }
             };
             const params = new URLSearchParams(location.search);
             const host = location.hostname.toLowerCase();
@@ -3176,6 +3178,461 @@
         }
         [data-template="burger_bar"] .venue-link[hidden] { display: none; }
 
+        /* ── Mugsy tenant shell — exact restaurant + brand gate ───────── */
+        [data-template="mugsy_street_diner"] {
+            --bg: #FFF7E7;
+            --bg2: #FFFDF7;
+            --glow: rgba(217,46,39,0.14);
+            --glow2: rgba(244,185,66,0.18);
+            --shadow: rgba(45,27,20,0.16);
+            --card: #ffffff;
+            --card2: #F8E8C9;
+            --border: rgba(45,27,20,0.16);
+            --text: #241A16;
+            --dim: #6C5A50;
+            --accent: #D92E27;
+            --accent2: #F4B942;
+            --accent-text: #FFFDF7;
+            --thumb-bg: #F8E8C9;
+            --modal-bg: #FFF7E7;
+            --modal-rgb: 255,247,231;
+            --bg-image:
+                linear-gradient(90deg, rgba(45,27,20,0.035) 1px, transparent 1px),
+                radial-gradient(68% 42% at 12% 4%, rgba(244,185,66,0.30), transparent 66%),
+                linear-gradient(180deg, #FFF7E7 0%, #FFFDF7 54%, #F8E8C9 100%);
+            --bg-size: 28px 28px, auto, auto;
+            --bg-repeat: repeat, no-repeat, no-repeat;
+            --card-bg: linear-gradient(180deg, #ffffff 0%, #FFFDF7 100%);
+            --card-blur: 0px;
+            --card-radius: 16px;
+            --item-shadow: 0 8px 20px rgba(45,27,20,0.10);
+            --item-hover-shadow: 0 14px 30px rgba(45,27,20,0.16);
+            --accent-edge: linear-gradient(180deg, #D92E27, #F4B942);
+            --stage-bg: #F8E8C9;
+            --thumb-vignette: linear-gradient(180deg, transparent 58%, rgba(45,27,20,0.12));
+            --pill-bg: #ffffff;
+            --pill-active-bg: #D92E27;
+            --cta-bg: #D92E27;
+            --cta-shadow: 0 8px 18px rgba(217,46,39,0.20);
+            --hero-color: #D92E27;
+            --hero-shadow: none;
+            --divider-bg: linear-gradient(90deg, transparent, #D92E27, transparent);
+            --modal-bg-image: linear-gradient(180deg, #FFFDF7 0%, #FFF7E7 100%);
+            --price-color: #A91E1A;
+            --add-btn-color: #D92E27;
+        }
+        .mugsy-shell,
+        .mugsy-locations { display: none; }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] body {
+            padding: 0 12px 42px;
+            background: #FFF7E7;
+            color: #241A16;
+            font-family: 'Nunito', 'Noto Sans Georgian', system-ui, -apple-system, sans-serif;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #theme-toggle {
+            display: none;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] #lang-toggle {
+            top: calc(9px + env(safe-area-inset-top, 0px));
+            left: auto;
+            right: calc(12px + env(safe-area-inset-right, 0px));
+            z-index: 1230;
+            min-width: 44px;
+            min-height: 44px;
+            padding: 0 12px;
+            background: #FFFDF7;
+            color: #A91E1A;
+            border-color: rgba(45,27,20,0.16);
+            box-shadow: none;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .mg-hero,
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .baoma-shell,
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .header {
+            display: none;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .mugsy-shell {
+            display: block;
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+            background: #FFF7E7;
+        }
+        .mugsy-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 1220;
+            min-height: calc(58px + env(safe-area-inset-top, 0px));
+            padding: calc(8px + env(safe-area-inset-top, 0px)) calc(68px + env(safe-area-inset-right, 0px)) 8px calc(12px + env(safe-area-inset-left, 0px));
+            display: grid;
+            grid-template-columns: minmax(0, auto) 44px minmax(0, 1fr) minmax(44px, auto);
+            align-items: center;
+            gap: 10px;
+            justify-content: start;
+            background: rgba(255,253,247,0.92);
+            border-bottom: 1px solid rgba(45,27,20,0.12);
+            backdrop-filter: blur(14px) saturate(140%);
+        }
+        .mugsy-topbar-logo {
+            height: 38px;
+            max-width: 128px;
+            object-fit: contain;
+        }
+        .mugsy-menu-jump,
+        .mugsy-order-main,
+        .mugsy-link {
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            border: 1px solid rgba(45,27,20,0.16);
+            text-decoration: none;
+            font-weight: 900;
+            color: #241A16;
+            background: #FFFDF7;
+        }
+        .mugsy-menu-jump {
+            width: 44px;
+            font-size: 1.25rem;
+        }
+        .mugsy-order-main {
+            grid-column: 4;
+            padding: 0 14px;
+            background: #D92E27;
+            border-color: transparent;
+            color: #FFFDF7;
+            font-size: 0.78rem;
+            white-space: nowrap;
+        }
+        .mugsy-hero {
+            position: relative;
+            min-height: clamp(320px, 52svh, 500px);
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(45,27,20,0.14);
+        }
+        .mugsy-hero-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        .mugsy-hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(29,29,29,0.10) 0%, rgba(29,29,29,0.12) 38%, rgba(29,29,29,0.76) 100%),
+                linear-gradient(135deg, rgba(217,46,39,0.22), transparent 46%);
+        }
+        .mugsy-hero-copy {
+            position: relative;
+            z-index: 1;
+            width: min(100%, 1120px);
+            margin: 0 auto;
+            padding: 86px 18px 28px;
+            color: #FFFDF7;
+        }
+        .mugsy-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 10px;
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #FFC84A;
+        }
+        .mugsy-kicker::before {
+            content: "";
+            width: 18px;
+            height: 18px;
+            border: 3px solid currentColor;
+            border-radius: 50%;
+            box-shadow: inset 0 0 0 3px rgba(29,29,29,0.34);
+        }
+        .mugsy-title {
+            max-width: 780px;
+            font-family: 'Bebas Neue', 'Nunito', sans-serif;
+            font-size: clamp(3.2rem, 14vw, 6.4rem);
+            line-height: 0.88;
+            letter-spacing: 0;
+            text-transform: uppercase;
+            margin: 0;
+            text-shadow: 0 8px 24px rgba(0,0,0,0.34);
+        }
+        .mugsy-copy {
+            max-width: 560px;
+            margin: 12px 0 0;
+            font-size: clamp(0.92rem, 2.5vw, 1.06rem);
+            line-height: 1.45;
+            font-weight: 800;
+        }
+        .mugsy-actions,
+        .mugsy-footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+        .mugsy-link.primary {
+            background: #FFC84A;
+            border-color: transparent;
+            color: #2D1B14;
+            padding: 0 18px;
+        }
+        .mugsy-order-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .mugsy-link {
+            padding: 0 16px;
+            font-size: 0.82rem;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .cat-bar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            width: 100vw;
+            max-width: none;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+            padding: 10px 0;
+            background: rgba(255,253,247,0.94);
+            border-bottom: 1px solid rgba(45,27,20,0.12);
+            backdrop-filter: blur(12px) saturate(140%);
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .cat-scroll,
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .cat-filter {
+            max-width: 1180px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: max(12px, env(safe-area-inset-left));
+            padding-right: max(12px, env(safe-area-inset-right));
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .cat-filter {
+            scrollbar-width: none;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .cat-filter::-webkit-scrollbar {
+            display: none;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .cat-pill {
+            min-height: 44px;
+            border-radius: 999px;
+            border-color: rgba(45,27,20,0.20);
+            background: #FFF7E7;
+            color: #241A16;
+            font-weight: 900;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .cat-pill.active {
+            background: #D92E27;
+            color: #FFFDF7;
+            box-shadow: 0 8px 18px rgba(217,46,39,0.20);
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-list {
+            max-width: 1180px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            padding-top: 16px;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .cat-section {
+            display: contents;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .category-header {
+            grid-column: 1 / -1;
+            max-width: none;
+            color: #A91E1A;
+            border-bottom: 3px solid #D92E27;
+            font-family: 'Bebas Neue', 'Nunito', sans-serif;
+            font-size: 1.75rem;
+            letter-spacing: 0;
+            text-transform: uppercase;
+            padding: 18px 2px 8px;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) {
+            grid-template-columns: 126px minmax(0, 1fr);
+            grid-template-areas: "left name" "left right";
+            padding: 10px;
+            border-radius: 16px;
+            border-color: rgba(45,27,20,0.14);
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item::before {
+            width: 4px;
+            background: #D92E27;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .thumb-wrap {
+            width: 126px;
+            min-height: 126px;
+            border-radius: 14px;
+            background: #F8E8C9;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .thumb-img {
+            cursor: zoom-in;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .item-name {
+            color: #A91E1A;
+            font-family: 'Bebas Neue', 'Nunito', sans-serif;
+            font-size: 1.45rem;
+            letter-spacing: 0;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .ingredients {
+            color: #6C5A50;
+            font-size: 0.78rem;
+            line-height: 1.38;
+            font-weight: 700;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .price {
+            color: #D92E27;
+            font-family: 'Bebas Neue', 'Nunito', sans-serif;
+            font-size: 1.45rem;
+            letter-spacing: 0;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .qty-add-btn,
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .qty-stepper {
+            border-color: #D92E27;
+            color: #D92E27;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .qty-add-btn {
+            width: 44px;
+            height: 44px;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .qty-stepper {
+            min-height: 44px;
+            height: 44px;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .qty-dec,
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .qty-inc {
+            min-width: 44px;
+            justify-content: center;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .mugsy-locations {
+            display: block;
+            width: 100%;
+            max-width: 1180px;
+            margin: 26px auto 0;
+            padding: 18px 2px 4px;
+            border-top: 1px solid rgba(45,27,20,0.16);
+        }
+        .mugsy-location-head {
+            margin: 0 0 12px;
+            font-size: 0.82rem;
+            font-weight: 900;
+            color: #A91E1A;
+            text-transform: uppercase;
+        }
+        .mugsy-location-list {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 10px;
+        }
+        .mugsy-location {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 58px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: #FFFDF7;
+            border: 1px solid rgba(45,27,20,0.14);
+            color: #241A16;
+            text-decoration: none;
+            font-weight: 900;
+            min-width: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .mugsy-location span:first-child {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+        .mugsy-location span:last-child {
+            color: #D92E27;
+            white-space: nowrap;
+        }
+        [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .site-footer {
+            max-width: 1180px;
+            align-items: flex-start;
+            text-align: left;
+        }
+        .mugsy-empty {
+            grid-column: 1 / -1;
+            padding: 26px 18px;
+            border-radius: 16px;
+            background:
+                repeating-linear-gradient(45deg, rgba(217,46,39,0.08) 0 12px, transparent 12px 24px),
+                #FFFDF7;
+            border: 1px solid rgba(45,27,20,0.14);
+        }
+        .mugsy-empty-title {
+            margin: 0 0 8px;
+            color: #A91E1A;
+            font-size: 1.25rem;
+            font-weight: 900;
+        }
+        .mugsy-empty-copy {
+            margin: 0;
+            color: #6C5A50;
+            line-height: 1.5;
+            font-weight: 700;
+        }
+        html[lang="ka"][data-tenant="mugsy-main"][data-brand-slug="mugsy"] .mugsy-title,
+        html[lang="ka"][data-tenant="mugsy-main"][data-brand-slug="mugsy"] .category-header,
+        html[lang="ka"][data-tenant="mugsy-main"][data-brand-slug="mugsy"] .item-name {
+            font-family: 'Noto Sans Georgian', 'Nunito', system-ui, sans-serif !important;
+            font-weight: 900;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        @media (min-width: 700px) {
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-list,
+            .mugsy-location-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) {
+                grid-template-columns: 1fr;
+                grid-template-areas: "left" "name" "right";
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .thumb-wrap {
+                width: 100%;
+                aspect-ratio: 4 / 3;
+                min-height: 0;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .thumb-img {
+                min-height: 0;
+            }
+        }
+        @media (min-width: 1040px) {
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-list {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 380px) {
+            .mugsy-topbar {
+                gap: 6px;
+            }
+            .mugsy-topbar-logo {
+                max-width: 92px;
+            }
+            .mugsy-order-main {
+                padding: 0 9px;
+                font-size: 0.72rem;
+            }
+        }
+        @media (max-height: 560px) {
+            .mugsy-hero {
+                min-height: 300px;
+            }
+        }
+
         /* ── Quantity stepper (add-to-basket control) ── */
         .qty-ctrl { flex-shrink: 0; }
 
@@ -3927,6 +4384,26 @@
         </section>
     </section>
 
+    <section class="mugsy-shell" aria-label="Mugsy's Burgers">
+        <div class="mugsy-topbar">
+            <img id="mugsy-topbar-logo" class="mugsy-topbar-logo" src="./assets/mugsy/logo.svg" alt="Mugsy's Burgers" decoding="async">
+            <a class="mugsy-menu-jump" href="#cat-filter" aria-label="Menu">&#9776;</a>
+            <a id="mugsy-order-main" class="mugsy-order-main" href="https://wolt.com/en/geo/tbilisi/restaurant/magsys-burger?srsltid=AfmBOor5reRoicmEFy72EUVGZI728ljsK4D7Hgb7NPpE_PPSjNq7Z9At" target="_blank" rel="noopener">Order</a>
+        </div>
+        <section class="mugsy-hero">
+            <img id="mugsy-hero-img" class="mugsy-hero-img" src="./assets/mugsy/hero-burger.webp" alt="Mugsy's burger" width="1600" height="900" decoding="async">
+            <div class="mugsy-hero-copy">
+                <p class="mugsy-kicker" data-mugsy="kicker">Smash burgers in Tbilisi</p>
+                <h1 class="mugsy-title" data-brand>Mugsy's Burgers</h1>
+                <p class="mugsy-copy" data-mugsy="heroCopy">Fast, saucy burgers, boxes, sides, drinks, and an interactive BetaReal menu experience.</p>
+                <div class="mugsy-actions">
+                    <a class="mugsy-link primary" href="#cat-filter" data-mugsy="explore">See menu</a>
+                    <div id="mugsy-order-links" class="mugsy-order-links"></div>
+                </div>
+            </div>
+        </section>
+    </section>
+
     <div class="header">
         <img id="tenant-logo" class="tenant-logo" alt="" decoding="async">
         <h1 id="brand-title" data-brand>Restaurant Menu</h1>
@@ -3961,6 +4438,11 @@
         </div>
     </section>
 
+    <section id="mugsy-locations" class="mugsy-locations" aria-labelledby="mugsy-location-head">
+        <h2 id="mugsy-location-head" class="mugsy-location-head">Locations</h2>
+        <div id="mugsy-location-list" class="mugsy-location-list"></div>
+    </section>
+
     <section class="baoma-info" aria-labelledby="baoma-info-title">
         <div class="baoma-info-inner">
             <div>
@@ -3980,6 +4462,7 @@
         <img class="footer-logo footer-logo-dark"  src="./img/betareal-logo-dark.png"  alt="BetaReal" width="333" height="110" loading="lazy" decoding="async">
         <img class="footer-logo footer-logo-light" src="./img/betareal-logo-light.png" alt="BetaReal" width="366" height="110" loading="lazy" decoding="async">
         <img class="footer-logo footer-logo-white" src="./img/betareal-logo-white.png" alt="BetaReal" width="333" height="110" loading="lazy" decoding="async">
+        <div id="mugsy-footer-links" class="mugsy-footer-links"></div>
         <a class="footer-email" href="mailto:betareal.ar@gmail.com">betareal.ar@gmail.com</a>
         <p class="footer-copy">&copy; 2026 BetaReal &middot; Augmented Reality Menus</p>
     </footer>
@@ -5010,11 +5493,23 @@
         const _SUPA_KEY = 'sb_publishable_65dKKpb-lxOr8JTjdj7yxw_LZzcJp5h';
         const _supaHeaders = { 'apikey': _SUPA_KEY, 'Authorization': 'Bearer ' + _SUPA_KEY };
         const _FAVICON_BY_TENANT_SLUG = {
-            'monday-greens': './img/monday-greens-favicon.svg'
+            'monday-greens': './img/monday-greens-favicon.svg',
+            'mugsy-main': './assets/mugsy/logo.svg'
         };
         const _DEFAULT_FAVICON = './img/betareal-favicon.svg';
         const _BAOMA_TEMPLATE_KEY = 'baoma';
         const _BAOMA_HERO_IMAGE = './img/baoma/interior-hero-maps.webp';
+        const _MUGSY_RESTAURANT_SLUG = 'mugsy-main';
+        const _MUGSY_BRAND_SLUG = 'mugsy';
+        const _MUGSY_TEMPLATE_KEY = 'mugsy_street_diner';
+        const _MUGSY_DEFAULT_ORDER_LINKS = [
+            { label: 'Wolt', url: 'https://wolt.com/en/geo/tbilisi/restaurant/magsys-burger?srsltid=AfmBOor5reRoicmEFy72EUVGZI728ljsK4D7Hgb7NPpE_PPSjNq7Z9At' },
+            { label: 'Glovo', url: 'https://glovoapp.com/en/ge/tbilisi/stores/mugsy-s-burger-tbi' }
+        ];
+        const _MUGSY_DEFAULT_LOCATIONS = [
+            { label: '8/2 Petre Melikishvili Street', label_ka: 'პეტრე მელიქიშვილის ქუჩა 8/2', url: 'https://www.google.com/maps/search/?api=1&query=8%2F2%20Petre%20Melikishvili%20Street%2C%20Tbilisi' },
+            { label: '63 Vazha Pshavela Avenue', label_ka: 'ვაჟა-ფშაველას გამზირი 63', url: 'https://www.google.com/maps/search/?api=1&query=63%20Vazha%20Pshavela%20Avenue%2C%20Tbilisi' }
+        ];
         // theme_config key that overrides each copy slot. Georgian reads the same key
         // with a `_ka` suffix. Anything a tenant leaves unset falls back to the
         // template defaults below, so an unconfigured tenant still renders complete.
@@ -5069,6 +5564,45 @@
         function _isBaomaTenant() {
             return document.documentElement.dataset.template === _BAOMA_TEMPLATE_KEY;
         }
+        function _isMugsyTenant() {
+            const tenant = window.__tenant || _tenant || {};
+            const restaurant_slug = tenant.restaurant_slug || _tenantSlugFromHost();
+            const brand = Array.isArray(tenant.brand) ? tenant.brand[0] : tenant.brand;
+            const brandSlug = brand?.slug || document.documentElement.dataset.brandSlug || '';
+            return restaurant_slug === _MUGSY_RESTAURANT_SLUG && brandSlug === _MUGSY_BRAND_SLUG;
+        }
+        const _MUGSY_COPY_TOKENS = {
+            kicker: 'hero_kicker',
+            heroCopy: 'hero_copy',
+            explore: 'hero_cta',
+            emptyTitle: 'empty_title',
+            emptyCopy: 'empty_copy',
+            metaDescription: 'meta_description'
+        };
+        const _MUGSY_COPY = {
+            en: {
+                kicker: 'Smash burgers in Tbilisi',
+                heroCopy: 'Fast, saucy burgers, boxes, sides, drinks, and an interactive BetaReal menu experience.',
+                explore: 'See menu',
+                emptyTitle: 'Menu is coming to BetaReal',
+                emptyCopy: 'Mugsy has not published menu items here yet. When data is seeded, official dishes and prices appear automatically.',
+                metaDescription: "Browse Mugsy's Burgers in Tbilisi with a mobile-first BetaReal digital menu.",
+                order: 'Order',
+                locations: 'Locations',
+                directions: 'Directions'
+            },
+            ka: {
+                kicker: 'სმეშ ბურგერები თბილისში',
+                heroCopy: 'სწრაფი, სოუსიანი ბურგერები, ბოქსები, საიდები, სასმელები და BetaReal-ის ინტერაქტიული მენიუს გამოცდილება.',
+                explore: 'მენიუს ნახვა',
+                emptyTitle: 'მენიუ მალე გამოჩნდება BetaReal-ში',
+                emptyCopy: 'Mugsy-ს კერძები აქ ჯერ გამოქვეყნებული არ არის. მონაცემების ჩატვირთვის შემდეგ ოფიციალური კერძები და ფასები ავტომატურად გამოჩნდება.',
+                metaDescription: "დაათვალიერეთ Mugsy's Burgers თბილისში BetaReal-ის მობილურ მენიუში.",
+                order: 'შეკვეთა',
+                locations: 'ლოკაციები',
+                directions: 'მიმართულება'
+            }
+        };
         // Copy slots naming THIS restaurant — its name, address, social handle, the
         // sentences written about it. Generic UI labels ("Explore Menu", "Get
         // Directions") are safe for anyone on the template; these are not. They stay as
@@ -5109,6 +5643,98 @@
             return window.__lang === 'ka'
                 ? `${brandTitle} · მენიუ`
                 : `${brandTitle} · Georgian Restaurant Menu`;
+        }
+        function _mugsyText(key) {
+            const token = _MUGSY_COPY_TOKENS[key];
+            const cfg = _themeConfig || {};
+            if (token) {
+                const localized = window.__lang === 'ka' ? cfg[`${token}_ka`] : cfg[token];
+                if (localized) return localized;
+                if (window.__lang !== 'ka' && cfg[token]) return cfg[token];
+            }
+            const pack = _MUGSY_COPY[window.__lang] || _MUGSY_COPY.en;
+            return pack[key] || _MUGSY_COPY.en[key] || '';
+        }
+        function _parseConfigList(raw) {
+            const s = String(raw || '').trim();
+            if (!s) return [];
+            try {
+                const list = JSON.parse(s);
+                return Array.isArray(list) ? list : [];
+            } catch (_) {
+                return [];
+            }
+        }
+        function _applyMugsyCopy() {
+            if (!_isMugsyTenant()) return;
+            const cfg = _themeConfig || {};
+            document.querySelectorAll('[data-mugsy]').forEach(el => {
+                const key = el.dataset.mugsy;
+                const txt = _mugsyText(key);
+                if (txt) el.textContent = txt;
+            });
+            const logoUrl = _safeAssetUrl(cfg.logo_url) || './assets/mugsy/logo.svg';
+            const logo = document.getElementById('mugsy-topbar-logo');
+            if (logo) {
+                logo.src = logoUrl;
+                logo.alt = _localizedBrandTitle();
+            }
+            const hero = document.getElementById('mugsy-hero-img');
+            const heroUrl = _safeAssetUrl(cfg.hero_image_url) || './assets/mugsy/hero-burger.webp';
+            if (hero) {
+                hero.src = heroUrl;
+                hero.alt = _localizedBrandTitle();
+            }
+            const orders = _parseConfigList(cfg.mugsy_order_links);
+            const orderLinks = orders.length ? orders : _MUGSY_DEFAULT_ORDER_LINKS;
+            const orderMain = document.getElementById('mugsy-order-main');
+            const primaryOrder = orderLinks.find(link => /wolt/i.test(link.label || '')) || orderLinks[0];
+            if (orderMain) {
+                const safe = _safeAssetUrl(primaryOrder?.url);
+                orderMain.textContent = _MUGSY_COPY[window.__lang]?.order || 'Order';
+                orderMain.hidden = !safe;
+                if (safe) orderMain.href = safe;
+            }
+            const renderOrders = (id) => {
+                const wrap = document.getElementById(id);
+                if (!wrap) return;
+                wrap.textContent = '';
+                orderLinks.forEach(link => {
+                    const safe = _safeAssetUrl(link.url);
+                    if (!safe) return;
+                    const a = document.createElement('a');
+                    a.className = 'mugsy-link';
+                    a.href = safe;
+                    a.target = '_blank';
+                    a.rel = 'noopener';
+                    a.textContent = link.label || 'Order';
+                    wrap.appendChild(a);
+                });
+            };
+            renderOrders('mugsy-order-links');
+            renderOrders('mugsy-footer-links');
+            const locs = _parseConfigList(cfg.mugsy_locations);
+            const locations = locs.length ? locs : _MUGSY_DEFAULT_LOCATIONS;
+            const head = document.getElementById('mugsy-location-head');
+            if (head) head.textContent = _MUGSY_COPY[window.__lang]?.locations || 'Locations';
+            const list = document.getElementById('mugsy-location-list');
+            const sec = document.getElementById('mugsy-locations');
+            if (list && sec) {
+                list.textContent = '';
+                locations.forEach(loc => {
+                    const safe = _safeAssetUrl(loc.url);
+                    if (!safe) return;
+                    const a = document.createElement('a');
+                    a.className = 'mugsy-location';
+                    a.href = safe;
+                    a.target = '_blank';
+                    a.rel = 'noopener';
+                    const label = (window.__lang === 'ka' && loc.label_ka) ? loc.label_ka : loc.label;
+                    a.innerHTML = `<span>${_escapeHtml(label || '')}</span><span>${_escapeHtml(_MUGSY_COPY[window.__lang]?.directions || 'Directions')}</span>`;
+                    list.appendChild(a);
+                });
+                sec.hidden = list.children.length === 0;
+            }
         }
         // GET /rest/v1/<query> → resolves to the row array, or throws on non-2xx.
         async function _supaSelect(query) {
@@ -5157,6 +5783,11 @@
                 && _tenantSlugFromHost() === _BAOMA_FIXTURE_SLUG
                 && new URLSearchParams(location.search).get('fixture') === 'baoma';
         }
+        function _mugsyFixtureRequested() {
+            return _isLocalhost()
+                && _tenantSlugFromHost() === _MUGSY_RESTAURANT_SLUG
+                && new URLSearchParams(location.search).get('fixture') === 'mugsy';
+        }
         let _baomaFixturePromise = null;
         async function _loadBaomaFixture() {
             if (!_baomaFixtureRequested()) return null;
@@ -5169,15 +5800,28 @@
             }
             return _baomaFixturePromise;
         }
+        let _mugsyFixturePromise = null;
+        async function _loadMugsyFixture() {
+            if (!_mugsyFixtureRequested()) return null;
+            if (!_mugsyFixturePromise) {
+                _mugsyFixturePromise = fetch('./data/fixtures/mugsy-menu.fixture.json', { cache: 'no-store' })
+                    .then(r => {
+                        if (!r.ok) throw new Error('mugsy fixture ' + r.status);
+                        return r.json();
+                    });
+            }
+            return _mugsyFixturePromise;
+        }
         const _requestedTenantSlug = _tenantSlugFromHost();
         const _previewAccessAllowed = true;
-        const _analyticsEnabled = !_baomaFixtureRequested();
+        const _analyticsEnabled = !_baomaFixtureRequested() && !_mugsyFixtureRequested();
         _applyTenantFavicon(_requestedTenantSlug);
         async function _resolveTenant() {
             if (_tenant) return _tenant;
             const slug = _tenantSlugFromHost();
-            if (_baomaFixtureRequested() && slug === _BAOMA_FIXTURE_SLUG) {
-                const fixture = await _loadBaomaFixture();
+            if ((_baomaFixtureRequested() && slug === _BAOMA_FIXTURE_SLUG) ||
+                (_mugsyFixtureRequested() && slug === _MUGSY_RESTAURANT_SLUG)) {
+                const fixture = _mugsyFixtureRequested() ? await _loadMugsyFixture() : await _loadBaomaFixture();
                 const restaurant = fixture.restaurant;
                 const brand = Array.isArray(restaurant.brands) ? restaurant.brands[0] : restaurant.brands;
                 _tenant = {
@@ -5189,9 +5833,11 @@
                 };
                 window.__tenant = _tenant;
                 document.documentElement.dataset.tenant = _tenant.restaurant_slug || '';
+                document.documentElement.dataset.brandSlug = brand?.slug || '';
                 _applyTenantFavicon(_tenant);
                 _applyBrandTitle();
                 _applyBaomaCopy();
+                _applyMugsyCopy();
                 return _tenant;
             }
             const isDefaultHost = Boolean(_DEFAULT_RESTAURANT_SLUG) && slug === _DEFAULT_RESTAURANT_SLUG;
@@ -5217,9 +5863,11 @@
             // tenant currently resolves to template_key "monday_greens", so
             // [data-template="monday_greens"] matches the whole estate.
             document.documentElement.dataset.tenant = _tenant.restaurant_slug || '';
+            document.documentElement.dataset.brandSlug = brand?.slug || '';
             _applyTenantFavicon(_tenant);
             _applyBrandTitle();
             _applyBaomaCopy();
+            _applyMugsyCopy();
             return _tenant;
         }
         // POST /rest/v1/<table> — fire-and-forget insert (analytics). Never throws.
@@ -5486,12 +6134,16 @@
             });
             const pageTitle = _isBaomaTenant()
                 ? _baomaPageTitle(brandTitle)
+                : _isMugsyTenant()
+                    ? `${brandTitle} · Menu`
                 : `${brandTitle} · Menu`;
             document.title = pageTitle;
             const ogTitle = document.querySelector('meta[property="og:title"]');
             if (ogTitle) ogTitle.setAttribute('content', pageTitle);
             const desc = _isBaomaTenant()
                 ? _baomaText('metaDescription')
+                : _isMugsyTenant()
+                    ? _mugsyText('metaDescription')
                 : 'Restaurant menu. View dishes in Augmented Reality before you order.';
             const metaDesc = document.querySelector('meta[name="description"]');
             const ogDesc = document.querySelector('meta[property="og:description"]');
@@ -5600,6 +6252,7 @@
 
             _applyBrandTitle();
             _applyBaomaCopy();
+            _applyMugsyCopy();
             document.getElementById('lang-toggle').textContent   = u.langBtn;
             const _themeToggle = document.getElementById('theme-toggle');
             _themeToggle.innerHTML = theme === 'night' ? _SVG_SUN : _SVG_MOON;
@@ -6632,7 +7285,9 @@
         async function applyRemoteTheme() {
             try {
                 const tenant = await _resolveTenant();
-                const fixture = _baomaFixtureRequested() ? await _loadBaomaFixture() : null;
+                const fixture = _mugsyFixtureRequested()
+                    ? await _loadMugsyFixture()
+                    : (_baomaFixtureRequested() ? await _loadBaomaFixture() : null);
                 const data = fixture
                     ? fixture.theme_config
                     : await _supaSelect(`theme_config?select=key,value&restaurant_id=eq.${tenant.restaurant_id}`);
@@ -6669,7 +7324,7 @@
                 // per-tenant colour choice: an owner editing palette colours must not be
                 // able to knock out the layered background the template is built on.
                 // Every other token stays editable from the CMS as normal.
-                const _bgOwnedByTemplate = ['monday_greens', 'baoma'].includes(templateKey);
+                const _bgOwnedByTemplate = ['monday_greens', 'baoma', 'mugsy_street_diner'].includes(templateKey);
                 // Inject a <style> block that overrides both themes regardless of which is active
                 let css = '[data-theme="night"] {';
                 Object.entries(varMap).forEach(([k, cssVar]) => {
@@ -6727,6 +7382,7 @@
                 // Re-run now that theme_config is in hand: the earlier calls painted the
                 // template defaults, this one applies whatever the tenant configured.
                 _applyBaomaCopy();
+                _applyMugsyCopy();
                 const logoUrl = _safeAssetUrl(cfg.logo_url);
                 const logo = document.getElementById('tenant-logo');
                 if (logo && logoUrl) {
@@ -6788,11 +7444,17 @@
                 // Runs here, ahead of the throw below, for the same reason as
                 // the block above.
                 if (VENUE_INFO_TEMPLATES.has(templateKey)) _applyVenueInfo(cfg);
+                if (_isMugsyTenant()) {
+                    const mugsyHeroImg = document.getElementById('mugsy-hero-img');
+                    if (mugsyHeroImg && heroShots.length) mugsyHeroImg.src = heroShots[0];
+                    _applyMugsyCopy();
+                }
                 if (isBaomaTenant && heroShots.length) {
                     const baomaHeroImg = document.querySelector('.baoma-hero-img');
                     if (baomaHeroImg) baomaHeroImg.src = heroShots[0];
                 }
-                if (HERO_GALLERY_TEMPLATES.has(templateKey) && heroShots.length > 1) _startHeroGallery(heroShots);
+                if (templateKey === 'monday_greens' && heroShots.length > 1) _startHeroGallery(heroShots);
+                else if (HERO_GALLERY_TEMPLATES.has(templateKey) && heroShots.length > 1) _startHeroGallery(heroShots);
                 // Optional per-tenant hero height (e.g. "56.25vw" for a full 16:9 banner).
                 if (cfg.hero_min_h) {
                     document.documentElement.style.setProperty('--mg-hero-h', cfg.hero_min_h);
@@ -6838,7 +7500,9 @@
                 try {
                     const tenant = await _resolveTenant();
                     track('page_load', null, { return_visitor: _isReturnVisitor });
-                    const fixture = _baomaFixtureRequested() ? await _loadBaomaFixture() : null;
+                    const fixture = _mugsyFixtureRequested()
+                        ? await _loadMugsyFixture()
+                        : (_baomaFixtureRequested() ? await _loadBaomaFixture() : null);
                     const data = fixture
                         ? fixture.menu_items
                         : await _supaSelect(
@@ -6962,6 +7626,16 @@
                 return empty;
             }
 
+            function renderMugsyEmptyState() {
+                const empty = document.createElement('section');
+                empty.className = 'mugsy-empty';
+                empty.setAttribute('aria-live', 'polite');
+                empty.innerHTML = `
+                    <h2 class="mugsy-empty-title">${_escapeHtml(_mugsyText('emptyTitle'))}</h2>
+                    <p class="mugsy-empty-copy">${_escapeHtml(_mugsyText('emptyCopy'))}</p>`;
+                return empty;
+            }
+
             function renderCategoryHeader(cat) {
                 const header = document.createElement('div');
                 header.className = 'category-header';
@@ -7070,7 +7744,7 @@
                     card.querySelector('.item-right').addEventListener('click', () => openModal(globalIdx, menuItems));
                     card.querySelector('.item-name').addEventListener('click', () => openModal(globalIdx, menuItems));
                     card.querySelector('.ar-btn')?.addEventListener('click', e => { e.stopPropagation(); openAR(globalIdx, menuItems); });
-                } else if (_isBaomaTenant()) {
+                } else if (_isBaomaTenant() || _isMugsyTenant()) {
                     card.addEventListener('click', e => {
                         if (e.target.closest('.qty-ctrl, .variant, .addon, .ar-btn')) return;
                         openLightbox(thumbSrc, itemName, item, globalIdx);
@@ -7184,6 +7858,10 @@
                 list.innerHTML = '';
                 if (!items.length && _isBaomaTenant()) {
                     list.appendChild(renderBaomaEmptyState());
+                    return;
+                }
+                if (!items.length && _isMugsyTenant()) {
+                    list.appendChild(renderMugsyEmptyState());
                     return;
                 }
 

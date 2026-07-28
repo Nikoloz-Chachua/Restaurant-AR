@@ -32,9 +32,14 @@ const CONTENT_FIELDS = [
 ] as const
 
 // Templates that render the editorial copy above.
-const CONTENT_TEMPLATES = new Set(['baoma', 'burger_bar'])
+const CONTENT_TEMPLATES = new Set(['baoma', 'burger_bar', 'mugsy_street_diner'])
 
-const CONTENT_KEYS = [...CONTENT_FIELDS.map(f => f.key), 'info_image_url']
+const MUGSY_CONFIG_FIELDS = [
+  { key: 'mugsy_order_links', label: 'Mugsy order links JSON' },
+  { key: 'mugsy_locations', label: 'Mugsy locations JSON' },
+] as const
+
+const CONTENT_KEYS = [...CONTENT_FIELDS.map(f => f.key), 'info_image_url', ...MUGSY_CONFIG_FIELDS.map(f => f.key)]
 
 // Content survives a template switch — it describes the restaurant, not the look.
 const BRANDING_KEYS = ['site_name', 'site_name_ka', 'logo_url', 'hero_logo_url', 'hero_image_url', 'hero_images', ...CONTENT_KEYS]
@@ -685,6 +690,10 @@ export default function ThemePage() {
                   </div>
                   {CONTENT_FIELDS.map(f => (
                     <BrandRow key={f.key} label={T[f.label]} value={config[f.key] ?? ''}
+                              onChange={v => set(f.key, v)} />
+                  ))}
+                  {config.template_key === 'mugsy_street_diner' && MUGSY_CONFIG_FIELDS.map(f => (
+                    <BrandRow key={f.key} label={f.label} value={config[f.key] ?? ''}
                               onChange={v => set(f.key, v)} />
                   ))}
                   <ImageUploadRow label={T.contentInfoImage} hint={T.contentInfoImageHint}

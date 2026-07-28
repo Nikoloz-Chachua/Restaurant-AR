@@ -13,6 +13,7 @@ export type StarterTemplateKey =
   | 'baoma'
   | 'burger_lions'
   | 'burger_bar'
+  | 'mugsy_street_diner'
 
 export type ThemePreset = {
   key: StarterTemplateKey
@@ -299,6 +300,28 @@ const TEMPLATE_VISUAL_TOKENS: Record<StarterTemplateKey, ThemeConfig> = {
     day_item_shadow: '0 4px 14px rgba(60,38,20,0.12)', day_item_hover_shadow: '0 12px 30px rgba(60,38,20,0.18)',
     day_modal_bg_image: 'radial-gradient(70% 46% at 50% 30%, rgba(184,65,15,0.10) 0%, transparent 64%), linear-gradient(180deg, #faf6ef 0%, #fffdf8 100%)',
   },
+  mugsy_street_diner: {
+    night_bg_image: 'linear-gradient(90deg, rgba(255,200,74,0.035) 1px, transparent 1px), radial-gradient(64% 40% at 18% 0%, rgba(217,46,39,0.22) 0%, transparent 66%), linear-gradient(180deg, #1D1D1D 0%, #2D1B14 62%, #1D1D1D 100%)',
+    night_bg_size: '28px 28px, auto, auto', night_bg_repeat: 'repeat, no-repeat, no-repeat',
+    night_card_bg: 'linear-gradient(180deg, #2D1B14 0%, #241A16 100%)', night_card_radius: '16px', night_card_blur: '0px',
+    night_stage_bg: '#1D1D1D',
+    night_pill_bg: 'rgba(45,27,20,0.92)', night_pill_active_bg: '#D92E27',
+    night_cta_bg: '#D92E27', night_cta_shadow: '0 8px 18px rgba(217,46,39,0.22)',
+    night_hero_color: '#FFC84A', night_hero_shadow: 'none', night_divider_bg: 'linear-gradient(90deg, transparent, #D92E27, transparent)',
+    night_accent_edge: 'linear-gradient(180deg, #D92E27, #F4B942)', night_thumb_vignette: 'linear-gradient(180deg, transparent 58%, rgba(0,0,0,0.28))',
+    night_item_shadow: '0 8px 20px rgba(0,0,0,0.22)', night_item_hover_shadow: '0 14px 30px rgba(0,0,0,0.30)',
+    night_modal_bg_image: 'linear-gradient(180deg, #241A16 0%, #1D1D1D 100%)',
+    day_bg_image: 'linear-gradient(90deg, rgba(45,27,20,0.035) 1px, transparent 1px), radial-gradient(68% 42% at 12% 4%, rgba(244,185,66,0.30), transparent 66%), linear-gradient(180deg, #FFF7E7 0%, #FFFDF7 54%, #F8E8C9 100%)',
+    day_bg_size: '28px 28px, auto, auto', day_bg_repeat: 'repeat, no-repeat, no-repeat',
+    day_card_bg: 'linear-gradient(180deg, #ffffff 0%, #FFFDF7 100%)', day_card_radius: '16px', day_card_blur: '0px',
+    day_stage_bg: '#F8E8C9',
+    day_pill_bg: '#ffffff', day_pill_active_bg: '#D92E27',
+    day_cta_bg: '#D92E27', day_cta_shadow: '0 8px 18px rgba(217,46,39,0.20)',
+    day_hero_color: '#D92E27', day_hero_shadow: 'none', day_divider_bg: 'linear-gradient(90deg, transparent, #D92E27, transparent)',
+    day_accent_edge: 'linear-gradient(180deg, #D92E27, #F4B942)', day_thumb_vignette: 'linear-gradient(180deg, transparent 58%, rgba(45,27,20,0.12))',
+    day_item_shadow: '0 8px 20px rgba(45,27,20,0.10)', day_item_hover_shadow: '0 14px 30px rgba(45,27,20,0.16)',
+    day_modal_bg_image: 'linear-gradient(180deg, #FFFDF7 0%, #FFF7E7 100%)',
+  },
 }
 
 export const TEMPLATE_PRESETS: ThemePreset[] = [
@@ -537,6 +560,28 @@ export const TEMPLATE_PRESETS: ThemePreset[] = [
       ...TEMPLATE_VISUAL_TOKENS.burger_bar,
       font_body: 'Inter', font_heading: 'Anton', template_key: 'burger_bar',
       default_theme: 'night',
+    },
+  },
+  {
+    key: 'mugsy_street_diner',
+    label: 'Mugsy Street Diner',
+    description: 'Cream, tomato red, mustard, and food-poster cards for youthful burger shops and street-food menus.',
+    primaryColor: '#D92E27',
+    secondaryColor: '#F4B942',
+    createStarterCategory: true,
+    preserveModeAccents: true,
+    values: {
+      night_bg: '#1D1D1D', night_bg2: '#2D1B14', night_card: '#2D1B14', night_card2: '#241A16', night_border: 'rgba(255,200,74,0.20)',
+      night_text: '#FFF7E7', night_dim: '#D8C8B9', night_accent: '#FFC84A', night_accent2: '#D92E27', night_accent_text: '#FFFDF7', night_thumb_bg: '#1D1D1D', night_modal_bg: '#1D1D1D',
+      night_glow: 'rgba(217,46,39,0.20)', night_glow2: 'rgba(244,185,66,0.16)', night_shadow: 'rgba(0,0,0,0.32)',
+      night_price_color: '#FFC84A', night_add_btn_color: '#FFC84A',
+      day_bg: '#FFF7E7', day_bg2: '#FFFDF7', day_card: '#ffffff', day_card2: '#F8E8C9', day_border: 'rgba(45,27,20,0.16)',
+      day_text: '#241A16', day_dim: '#6C5A50', day_accent: '#D92E27', day_accent2: '#F4B942', day_accent_text: '#FFFDF7', day_thumb_bg: '#F8E8C9', day_modal_bg: '#FFF7E7',
+      day_glow: 'rgba(217,46,39,0.14)', day_glow2: 'rgba(244,185,66,0.18)', day_shadow: 'rgba(45,27,20,0.16)',
+      day_price_color: '#A91E1A', day_add_btn_color: '#D92E27',
+      ...TEMPLATE_VISUAL_TOKENS.mugsy_street_diner,
+      font_body: 'Nunito', font_heading: 'Bebas Neue', template_key: 'mugsy_street_diner',
+      default_theme: 'day',
     },
   },
 ]

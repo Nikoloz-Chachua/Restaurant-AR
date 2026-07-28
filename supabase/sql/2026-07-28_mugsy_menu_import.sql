@@ -1,0 +1,772 @@
+-- Mugsy's Burgers official menu import — brand_id 53 / restaurant_id 59.
+-- Sources: https://mugsy.ge/ka and https://mugsy.ge/en Inertia data-page JSON, extracted 2026-07-28.
+-- Default safety is ROLLBACK. To execute after review, change only the final line from ROLLBACK; to COMMIT;
+
+BEGIN;
+
+do $$
+declare
+  v_restaurant record;
+begin
+  select r.id, r.slug, r.name, r.brand_id, b.slug as brand_slug
+    into v_restaurant
+    from public.restaurants r
+    join public.brands b on b.id = r.brand_id
+   where r.id = 59
+     and r.slug = 'mugsy-main'
+     and r.brand_id = 53
+     and b.slug = 'mugsy';
+
+  if not found then
+    raise exception 'Mugsy identity assertion failed for restaurant %, slug %, brand %, brand slug %',
+      59, 'mugsy-main', 53, 'mugsy';
+  end if;
+end $$;
+
+-- Import expects the current public menu schema used by tenant admin and the public renderer.
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.columns
+     where table_schema = 'public' and table_name = 'menu_items' and column_name = 'price_old'
+  ) then
+    raise exception 'menu_items.price_old is missing — apply 2026-07-28_menu_item_price_old.sql first';
+  end if;
+
+  if not exists (
+    select 1 from information_schema.columns
+     where table_schema = 'public' and table_name = 'menu_items' and column_name = 'featured'
+  ) then
+    raise exception 'menu_items.featured is missing — apply 2026-07-28_menu_item_featured.sql first';
+  end if;
+end $$;
+
+-- Destructive behavior is limited to Mugsy rows only: remove old imported Mugsy categories/items before replacing with official rows.
+delete from public.menu_items where restaurant_id = 59;
+delete from public.categories where restaurant_id = 59;
+
+-- ── categories ──────────────────────────────────────────────────────────
+with src as (
+  select *
+  from jsonb_to_recordset($mugsy_categories$[
+  {
+    "name_en": "Burgers",
+    "name_ka": "ბურგერები",
+    "sort_order": 1
+  },
+  {
+    "name_en": "Boxes",
+    "name_ka": "ბოქსები",
+    "sort_order": 2
+  },
+  {
+    "name_en": "Sides & Fries",
+    "name_ka": "საიდები",
+    "sort_order": 3
+  },
+  {
+    "name_en": "Drinks & Sauces",
+    "name_ka": "სასმელები",
+    "sort_order": 4
+  }
+]$mugsy_categories$::jsonb)
+    as t(name_en text, name_ka text, sort_order int)
+)
+insert into public.categories (restaurant_id, name_en, name_ka, sort_order)
+select 59, src.name_en, src.name_ka, src.sort_order
+from src
+on conflict (restaurant_id, name_en) do update
+set name_ka = excluded.name_ka,
+    sort_order = excluded.sort_order;
+
+-- ── menu items ──────────────────────────────────────────────────────────
+with src as (
+  select *
+  from jsonb_to_recordset($mugsy_items$[
+  {
+    "name_en": "Cheesy",
+    "name_ka": "Cheesy",
+    "description_en": "Bun, beef, tomato, lettuce, cheddar cheese, signature sauce",
+    "description_ka": "ფუნთუშა, საქონლის ხორცი, პომიდორი, სალათის ფოთოლი აისბერგი, ყველი ჩედარი, საფირმო სოუსი",
+    "price": "7.9 ₾",
+    "price_old": "",
+    "category_name_en": "Burgers",
+    "sort_order": 1,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/cheesy.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Bacon Burger",
+    "name_ka": "Bacon Smash",
+    "description_en": "Bun, bacon, beef, cheddar cheese, signature sauce",
+    "description_ka": "ფუნთუშა, ბეკონი, საქონლის ხორცი, ყველი ჩედარი, საფირმო სოუსი",
+    "price": "10.6 ₾",
+    "price_old": "",
+    "category_name_en": "Burgers",
+    "sort_order": 2,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/bacon-burger.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "BBQ Smoker",
+    "name_ka": "BBQ Smoker",
+    "description_en": "Bun, BBQ sauce, lettuce, tomato, beef, cheddar slice, red BBQ smoky sauce",
+    "description_ka": "ფუნთუშა, ბბქ სოუსი, აისბერგი, პომიდორი, საქონლის ხორცი, ჩედარის ფირფიტა, წითელი ბბქ სმოუქი სოუსი",
+    "price": "9.4 ₾",
+    "price_old": "",
+    "category_name_en": "Burgers",
+    "sort_order": 3,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/bbq-smoker.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Mugsys Signature",
+    "name_ka": "Bacon Melt",
+    "description_en": "Bun, BBQ sauce, crispy bacon, beef, cheddar slice, red BBQ smoky sauce, cheese sauce, fried mozzarella",
+    "description_ka": "ფუნთუშა, ბბქ სოუსი, შემწვარი ბეკონი, საქონლის ხორცი, ჩედარის ფირფიტა, წითელი ბბქ სმოუქი სოუსი, ყველის სოუსი, შემწვარი მოცარელა",
+    "price": "17.9 ₾",
+    "price_old": "",
+    "category_name_en": "Burgers",
+    "sort_order": 4,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/bacon-melt.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Mozzarella",
+    "name_ka": "Mozzarella",
+    "description_en": "Bun, Mugsy's sauce, lettuce, tomato, fried mozzarella, cheese sauce",
+    "description_ka": "ფუნთუშა, მაგსის სოუსი, აისბერგი, პომიდორი, შემწვარი მოცარელა, ყველის სოუსი",
+    "price": "9.7 ₾",
+    "price_old": "",
+    "category_name_en": "Burgers",
+    "sort_order": 5,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/mozzarella.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Chicken Cheesy",
+    "name_ka": "Chicken Cheesy",
+    "description_en": "Bun, chicken, tomato, lettuce, cheddar cheese, signature sauce",
+    "description_ka": "ფუნთუშა, ქათმის ხორცი, პომიდორი, სალათის ფოთოლი აისბერგი, ყველი ჩედარი, საფირმო სოუსი",
+    "price": "7.8 ₾",
+    "price_old": "",
+    "category_name_en": "Burgers",
+    "sort_order": 6,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/chicken-cheesy.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Two Burger Box",
+    "name_ka": "ორი ბურგერის ბოქსი",
+    "description_en": "Two classic burgers, nuggets, fries",
+    "description_ka": "ორი კლასიკური ბურგერი, ნაგეთსი, კარტოფილი ფრი",
+    "price": "33.9 ₾",
+    "price_old": "",
+    "category_name_en": "Boxes",
+    "sort_order": 1,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/two-burger-box.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Chicken Box",
+    "name_ka": "ქათმის ბოქსი",
+    "description_en": "Six chicken burgers, fries",
+    "description_ka": "ექვსი ქათმის ბურგერი, კარტოფილი ფრი",
+    "price": "54.9 ₾",
+    "price_old": "",
+    "category_name_en": "Boxes",
+    "sort_order": 2,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/chicken-box.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Cheesy Box",
+    "name_ka": "ჩიზის ბოქსი",
+    "description_en": "Cheesy box combo",
+    "description_ka": "ჩიზის ბოქსი",
+    "price": "58.7 ₾",
+    "price_old": "",
+    "category_name_en": "Boxes",
+    "sort_order": 3,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/cheesy-box.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Chicken Snack Box",
+    "name_ka": "Chicken Snack Box",
+    "description_en": "Fries, chicken popcorn, chicken nuggets, ketchup, cheese sauce",
+    "description_ka": "კარტოფილი ფრი, ქათმის პოპკორნი, ქათმის ნაგეთსი, კეჩუპი, ყველის სოუსი",
+    "price": "29.8 ₾",
+    "price_old": "",
+    "category_name_en": "Boxes",
+    "sort_order": 4,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/chicken-snack-box.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Fries with Bacon & Cheese Sauce",
+    "name_ka": "ფრი ბეკონით და ყველის სოუსით",
+    "description_en": "Fries with bacon and cheese sauce",
+    "description_ka": "ფრი ბეკონით და ყველის სოუსით",
+    "price": "10.4 ₾",
+    "price_old": "",
+    "category_name_en": "Sides & Fries",
+    "sort_order": 1,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/fries-with-bacon-cheese-sauce.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Fries",
+    "name_ka": "ფრი",
+    "description_en": "French fries",
+    "description_ka": "კარტოფილი ფრი",
+    "price": "4.4 ₾",
+    "price_old": "",
+    "category_name_en": "Sides & Fries",
+    "sort_order": 2,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/fries.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Fries with Jalapeño & Cheese Sauce",
+    "name_ka": "ფრი ჰალაპენიოთი და ყველის სოუსით",
+    "description_en": "Fries with jalapeño and cheese sauce",
+    "description_ka": "ფრი ჰალაპენიოთი და ყველის სოუსით",
+    "price": "9.9 ₾",
+    "price_old": "",
+    "category_name_en": "Sides & Fries",
+    "sort_order": 3,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/fries-with-jalapeno-cheese-sauce.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Chicken Popcorn 50pcs",
+    "name_ka": "ქათმის პოპკორნი 50ც",
+    "description_en": "Chicken popcorn 50 pieces",
+    "description_ka": "ქათმის პოპკორნი 50 ცალი",
+    "price": "9.4 ₾",
+    "price_old": "",
+    "category_name_en": "Sides & Fries",
+    "sort_order": 4,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/chicken-popcorn-50pcs.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Caesar with Chicken",
+    "name_ka": "ცეზარი ქათმით",
+    "description_en": "Caesar salad with chicken",
+    "description_ka": "ცეზარი ქათმით",
+    "price": "7.8 ₾",
+    "price_old": "",
+    "category_name_en": "Sides & Fries",
+    "sort_order": 5,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/caesar-with-chicken.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Pepsi 0.33L",
+    "name_ka": "პეპსი 0.33ლ",
+    "description_en": "Pepsi 0.33L",
+    "description_ka": "პეპსი 0.33ლ",
+    "price": "3.7 ₾",
+    "price_old": "",
+    "category_name_en": "Drinks & Sauces",
+    "sort_order": 1,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/pepsi-033l.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Pepsi 0.5L",
+    "name_ka": "პეპსი 0.5ლ",
+    "description_en": "Pepsi 0.5L",
+    "description_ka": "პეპსი 0.5ლ",
+    "price": "4.3 ₾",
+    "price_old": "",
+    "category_name_en": "Drinks & Sauces",
+    "sort_order": 2,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/pepsi-0l.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Mugsy's Sauce",
+    "name_ka": "მაგსის სოუსი",
+    "description_en": "Mugsy's signature sauce",
+    "description_ka": "მაგსის სოუსი",
+    "price": "2.5 ₾",
+    "price_old": "",
+    "category_name_en": "Drinks & Sauces",
+    "sort_order": 3,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/mugsys-sauce.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Large Cheese Sauce",
+    "name_ka": "დიდი ყველის სოუსი",
+    "description_en": "Large cheese sauce",
+    "description_ka": "დიდი ყველის სოუსი",
+    "price": "4.7 ₾",
+    "price_old": "",
+    "category_name_en": "Drinks & Sauces",
+    "sort_order": 4,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/large-cheese-sauce.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Ketchup",
+    "name_ka": "კეტჩუპი",
+    "description_en": "Ketchup",
+    "description_ka": "კეტჩუპი",
+    "price": "2.5 ₾",
+    "price_old": "",
+    "category_name_en": "Drinks & Sauces",
+    "sort_order": 5,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/ketchup.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  },
+  {
+    "name_en": "Small Cheese Sauce",
+    "name_ka": "პატარა ყველის სოუსი",
+    "description_en": "Small cheese sauce",
+    "description_ka": "პატარა ყველის სოუსი",
+    "price": "3 ₾",
+    "price_old": "",
+    "category_name_en": "Drinks & Sauces",
+    "sort_order": 6,
+    "visible": true,
+    "model": "",
+    "model_usdz": "",
+    "ar_scale": 1,
+    "thumbnail_url": "./assets/mugsy/items-webp/small-cheese-sauce.webp",
+    "thumb_3d": false,
+    "is_3d": false,
+    "text_only": false,
+    "featured": false,
+    "addons": [],
+    "variants": []
+  }
+]$mugsy_items$::jsonb)
+    as t(
+      name_en text,
+      name_ka text,
+      description_en text,
+      description_ka text,
+      price text,
+      price_old text,
+      category_name_en text,
+      sort_order integer,
+      visible boolean,
+      model text,
+      model_usdz text,
+      ar_scale numeric,
+      thumbnail_url text,
+      thumb_3d boolean,
+      is_3d boolean,
+      text_only boolean,
+      featured boolean,
+      addons jsonb,
+      variants jsonb
+    )
+)
+insert into public.menu_items (
+  restaurant_id, name_en, name_ka, description_en, description_ka, price, price_old,
+  category_id, model, model_usdz, sort_order, visible, ar_scale,
+  thumbnail_url, thumb_3d, is_3d, text_only, featured, addons, variants
+)
+select
+  59,
+  src.name_en,
+  src.name_ka,
+  src.description_en,
+  src.description_ka,
+  src.price,
+  nullif(src.price_old, ''),
+  (
+    select c.id
+      from public.categories c
+     where c.restaurant_id = 59
+       and c.name_en = src.category_name_en
+  ),
+  src.model,
+  src.model_usdz,
+  src.sort_order,
+  src.visible,
+  src.ar_scale,
+  src.thumbnail_url,
+  src.thumb_3d,
+  src.is_3d,
+  src.text_only,
+  src.featured,
+  coalesce(src.addons, '[]'::jsonb),
+  coalesce(src.variants, '[]'::jsonb)
+from src
+on conflict (restaurant_id, name_en) do update
+set name_ka = excluded.name_ka,
+    description_en = excluded.description_en,
+    description_ka = excluded.description_ka,
+    price = excluded.price,
+    price_old = excluded.price_old,
+    category_id = excluded.category_id,
+    model = excluded.model,
+    model_usdz = excluded.model_usdz,
+    sort_order = excluded.sort_order,
+    visible = excluded.visible,
+    ar_scale = excluded.ar_scale,
+    thumbnail_url = excluded.thumbnail_url,
+    thumb_3d = excluded.thumb_3d,
+    is_3d = excluded.is_3d,
+    text_only = excluded.text_only,
+    featured = excluded.featured,
+    addons = excluded.addons,
+    variants = excluded.variants;
+
+-- ── theme config ────────────────────────────────────────────────────────
+with src as (
+  select * from jsonb_to_recordset($mugsy_theme$[
+  {
+    "key": "template_key",
+    "value": "mugsy_street_diner"
+  },
+  {
+    "key": "default_theme",
+    "value": "day"
+  },
+  {
+    "key": "site_name",
+    "value": "Mugsy's Burgers"
+  },
+  {
+    "key": "site_name_ka",
+    "value": "Mugsy's Burgers"
+  },
+  {
+    "key": "logo_url",
+    "value": "./assets/mugsy/logo.svg"
+  },
+  {
+    "key": "hero_logo_url",
+    "value": "./assets/mugsy/logo.svg"
+  },
+  {
+    "key": "hero_image_url",
+    "value": "./assets/mugsy/hero-burger.webp"
+  },
+  {
+    "key": "hero_images",
+    "value": "[\"./assets/mugsy/hero-burger.webp\",\"./assets/mugsy/hero-official.webp\"]"
+  },
+  {
+    "key": "hero_kicker",
+    "value": "Smash burgers in Tbilisi"
+  },
+  {
+    "key": "hero_kicker_ka",
+    "value": "სმეშ ბურგერები თბილისში"
+  },
+  {
+    "key": "hero_copy",
+    "value": "Fast, saucy burgers, boxes, sides, drinks, and an interactive BetaReal menu experience."
+  },
+  {
+    "key": "hero_copy_ka",
+    "value": "სწრაფი, სოუსიანი ბურგერები, ბოქსები, საიდები, სასმელები და BetaReal-ის ინტერაქტიული მენიუს გამოცდილება."
+  },
+  {
+    "key": "hero_cta",
+    "value": "See menu"
+  },
+  {
+    "key": "hero_cta_ka",
+    "value": "მენიუს ნახვა"
+  },
+  {
+    "key": "info_kicker",
+    "value": "Find Mugsy"
+  },
+  {
+    "key": "info_kicker_ka",
+    "value": "იპოვე Mugsy"
+  },
+  {
+    "key": "info_title",
+    "value": "Two Tbilisi locations"
+  },
+  {
+    "key": "info_title_ka",
+    "value": "ორი ლოკაცია თბილისში"
+  },
+  {
+    "key": "info_text",
+    "value": "8/2 Petre Melikishvili Street\n63 Vazha Pshavela Avenue"
+  },
+  {
+    "key": "info_text_ka",
+    "value": "პეტრე მელიქიშვილის ქუჩა 8/2\nვაჟა-ფშაველას გამზირი 63"
+  },
+  {
+    "key": "mugsy_order_links",
+    "value": "[{\"label\":\"Wolt\",\"url\":\"https://wolt.com/en/geo/tbilisi/restaurant/magsys-burger?srsltid=AfmBOor5reRoicmEFy72EUVGZI728ljsK4D7Hgb7NPpE_PPSjNq7Z9At\"},{\"label\":\"Glovo\",\"url\":\"https://glovoapp.com/en/ge/tbilisi/stores/mugsy-s-burger-tbi\"}]"
+  },
+  {
+    "key": "mugsy_locations",
+    "value": "[{\"label\":\"8/2 Petre Melikishvili Street\",\"label_ka\":\"პეტრე მელიქიშვილის ქუჩა 8/2\",\"url\":\"https://www.google.com/maps/search/?api=1&query=8%2F2%20Petre%20Melikishvili%20Street%2C%20Tbilisi\"},{\"label\":\"63 Vazha Pshavela Avenue\",\"label_ka\":\"ვაჟა-ფშაველას გამზირი 63\",\"url\":\"https://www.google.com/maps/search/?api=1&query=63%20Vazha%20Pshavela%20Avenue%2C%20Tbilisi\"}]"
+  },
+  {
+    "key": "empty_title",
+    "value": "Menu is coming to BetaReal"
+  },
+  {
+    "key": "empty_title_ka",
+    "value": "მენიუ მალე გამოჩნდება BetaReal-ში"
+  },
+  {
+    "key": "empty_copy",
+    "value": "Mugsy has not published menu items here yet. When data is seeded, official dishes and prices appear automatically."
+  },
+  {
+    "key": "empty_copy_ka",
+    "value": "Mugsy-ს კერძები აქ ჯერ გამოქვეყნებული არ არის. მონაცემების ჩატვირთვის შემდეგ ოფიციალური კერძები და ფასები ავტომატურად გამოჩნდება."
+  },
+  {
+    "key": "meta_description",
+    "value": "Browse Mugsy's Burgers in Tbilisi with a mobile-first BetaReal digital menu."
+  },
+  {
+    "key": "meta_description_ka",
+    "value": "დაათვალიერეთ Mugsy's Burgers თბილისში BetaReal-ის მობილურ მენიუში."
+  }
+]$mugsy_theme$::jsonb) as x(key text, value text)
+)
+insert into public.theme_config (restaurant_id, key, value)
+select 59, key, value from src
+on conflict (restaurant_id, key) do update
+set value = excluded.value,
+    updated_at = now();
+
+notify pgrst, 'reload schema';
+
+-- Validation queries: inspect these before switching to COMMIT.
+select 'mugsy_category_count' as check_name, count(*) as value
+  from public.categories
+ where restaurant_id = 59;
+
+select 'mugsy_visible_menu_item_count' as check_name, count(*) as value
+  from public.menu_items
+ where restaurant_id = 59
+   and visible = true;
+
+select 'mugsy_photo_item_count' as check_name, count(*) as value
+  from public.menu_items
+ where restaurant_id = 59
+   and visible = true
+   and coalesce(thumbnail_url, '') <> '';
+
+select 'mugsy_3d_item_count' as check_name, count(*) as value
+  from public.menu_items
+ where restaurant_id = 59
+   and visible = true
+   and (coalesce(is_3d, false) = true
+        or coalesce(thumb_3d, false) = true
+        or coalesce(model, '') <> ''
+        or coalesce(model_usdz, '') <> '');
+
+select restaurant_id, name_en, count(*) as duplicate_count
+  from public.menu_items
+ where restaurant_id = 59
+ group by restaurant_id, name_en
+having count(*) > 1;
+
+select mi.id, mi.name_en, mi.category_id
+  from public.menu_items mi
+  left join public.categories c
+    on c.id = mi.category_id
+ where mi.restaurant_id = 59
+   and (mi.category_id is null or c.id is null);
+
+select mi.id, mi.name_en, mi.category_id, c.restaurant_id as category_restaurant_id
+  from public.menu_items mi
+  join public.categories c on c.id = mi.category_id
+ where mi.restaurant_id = 59
+   and c.restaurant_id <> 59;
+
+-- COMMIT switch: replace the next line with COMMIT; after validation and approval.
+ROLLBACK;

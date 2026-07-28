@@ -1,0 +1,198 @@
+{
+  "source": {
+    "ka": "https://mugsy.ge/ka",
+    "en": "https://mugsy.ge/en",
+    "extracted_at": "2026-07-28T10:30:11.215Z"
+  },
+  "assets": [
+    {
+      "role": "logo",
+      "source_url": "https://mugsy.ge/storage/logos/01KK9EAP6TS43RT85BTRKBZAS7.svg",
+      "local_path": "assets/mugsy/logo.svg",
+      "bytes": 42189
+    },
+    {
+      "role": "hero",
+      "source_url": "https://mugsy.ge/storage/og-images/01KKA46PWFKTDZEMX3J4B6915W.png",
+      "local_path": "assets/mugsy/hero-official.webp",
+      "bytes": 23088,
+      "original_local_path": "assets/mugsy/hero-official.png"
+    },
+    {
+      "role": "hero_burger",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX6B5Q63PZB2SC2HD9RMPAT.jpg",
+      "local_path": "assets/mugsy/hero-burger.webp",
+      "bytes": 75272,
+      "original_local_path": "assets/mugsy/hero-burger.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "cheesy",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX6B5Q63PZB2SC2HD9RMPAT.jpg",
+      "local_path": "assets/mugsy/items-webp/cheesy.webp",
+      "bytes": 36110,
+      "original_local_path": "assets/mugsy/items/cheesy.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "bacon-burger",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX5DJR6A89BM20S4PFSA043.jpg",
+      "local_path": "assets/mugsy/items-webp/bacon-burger.webp",
+      "bytes": 36288,
+      "original_local_path": "assets/mugsy/items/bacon-burger.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "bbq-smoker",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX5H2JVF67YQV59YCDWCJSJ.jpg",
+      "local_path": "assets/mugsy/items-webp/bbq-smoker.webp",
+      "bytes": 35104,
+      "original_local_path": "assets/mugsy/items/bbq-smoker.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "bacon-melt",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX69CC365B2F7KMHRBKVZ0Y.jpg",
+      "local_path": "assets/mugsy/items-webp/bacon-melt.webp",
+      "bytes": 37678,
+      "original_local_path": "assets/mugsy/items/bacon-melt.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "mozzarella",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX6D98QRBSAJ4YA5RWB3GDB.jpg",
+      "local_path": "assets/mugsy/items-webp/mozzarella.webp",
+      "bytes": 36712,
+      "original_local_path": "assets/mugsy/items/mozzarella.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "chicken-cheesy",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX6F6W0YHVVRHRPXB2X3JGC.jpg",
+      "local_path": "assets/mugsy/items-webp/chicken-cheesy.webp",
+      "bytes": 33190,
+      "original_local_path": "assets/mugsy/items/chicken-cheesy.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "two-burger-box",
+      "source_url": "https://mugsy.ge/storage/products/two-burger-box.jpeg",
+      "local_path": "assets/mugsy/items-webp/two-burger-box.webp",
+      "bytes": 19300,
+      "original_local_path": "assets/mugsy/items/two-burger-box.jpeg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "chicken-box",
+      "source_url": "https://mugsy.ge/storage/products/chicken-box.jpeg",
+      "local_path": "assets/mugsy/items-webp/chicken-box.webp",
+      "bytes": 35970,
+      "original_local_path": "assets/mugsy/items/chicken-box.jpeg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "cheesy-box",
+      "source_url": "https://mugsy.ge/storage/products/cheesy-box.jpeg",
+      "local_path": "assets/mugsy/items-webp/cheesy-box.webp",
+      "bytes": 36924,
+      "original_local_path": "assets/mugsy/items/cheesy-box.jpeg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "chicken-snack-box",
+      "source_url": "https://mugsy.ge/storage/products/chicken-snack-box.jpeg",
+      "local_path": "assets/mugsy/items-webp/chicken-snack-box.webp",
+      "bytes": 17664,
+      "original_local_path": "assets/mugsy/items/chicken-snack-box.jpeg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "fries-with-bacon-cheese-sauce",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX567Y7Z67MWAEZ3B0N78JM.jpg",
+      "local_path": "assets/mugsy/items-webp/fries-with-bacon-cheese-sauce.webp",
+      "bytes": 41942,
+      "original_local_path": "assets/mugsy/items/fries-with-bacon-cheese-sauce.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "fries",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX5F34VGHK6VXZWKSD7DV37.jpg",
+      "local_path": "assets/mugsy/items-webp/fries.webp",
+      "bytes": 34638,
+      "original_local_path": "assets/mugsy/items/fries.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "fries-with-jalapeno-cheese-sauce",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX662JQS6JEN12FKCT9T6WE.jpg",
+      "local_path": "assets/mugsy/items-webp/fries-with-jalapeno-cheese-sauce.webp",
+      "bytes": 42384,
+      "original_local_path": "assets/mugsy/items/fries-with-jalapeno-cheese-sauce.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "chicken-popcorn-50pcs",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX6AFWRBR7J8QA4M4NXTG8J.jpg",
+      "local_path": "assets/mugsy/items-webp/chicken-popcorn-50pcs.webp",
+      "bytes": 39868,
+      "original_local_path": "assets/mugsy/items/chicken-popcorn-50pcs.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "caesar-with-chicken",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX6GNPPC45AE3Q5W1D5PSRA.jpg",
+      "local_path": "assets/mugsy/items-webp/caesar-with-chicken.webp",
+      "bytes": 41382,
+      "original_local_path": "assets/mugsy/items/caesar-with-chicken.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "pepsi-033l",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX5ZE1FYPQ06JC6DDH152Y2.jpg",
+      "local_path": "assets/mugsy/items-webp/pepsi-033l.webp",
+      "bytes": 32402,
+      "original_local_path": "assets/mugsy/items/pepsi-033l.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "pepsi-0l",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX5G4Z30AC3Q4PGWSXQ2R8W.jpg",
+      "local_path": "assets/mugsy/items-webp/pepsi-0l.webp",
+      "bytes": 32402,
+      "original_local_path": "assets/mugsy/items/pepsi-0l.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "mugsys-sauce",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX67SEVK2G0E4GYEW3BZH0B.jpg",
+      "local_path": "assets/mugsy/items-webp/mugsys-sauce.webp",
+      "bytes": 31766,
+      "original_local_path": "assets/mugsy/items/mugsys-sauce.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "large-cheese-sauce",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX6C30736BHWNZ2ZN2N9439.jpg",
+      "local_path": "assets/mugsy/items-webp/large-cheese-sauce.webp",
+      "bytes": 32078,
+      "original_local_path": "assets/mugsy/items/large-cheese-sauce.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "ketchup",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX6EB2DA6DTREV3Q8R3GP98.jpg",
+      "local_path": "assets/mugsy/items-webp/ketchup.webp",
+      "bytes": 31766,
+      "original_local_path": "assets/mugsy/items/ketchup.jpg"
+    },
+    {
+      "role": "product_thumbnail",
+      "product_slug": "small-cheese-sauce",
+      "source_url": "https://mugsy.ge/storage/products/featured/01KRX6HA3GDPX05R63FJC7YAT9.jpg",
+      "local_path": "assets/mugsy/items-webp/small-cheese-sauce.webp",
+      "bytes": 32078,
+      "original_local_path": "assets/mugsy/items/small-cheese-sauce.jpg"
+    }
+  ],
+  "notes": "Official Mugsy logo, OG/hero image, and product photos downloaded from mugsy.ge storage on 2026-07-28 for tenant-scoped prospect build. Product photos are optimized local WebP copies; source URLs and original temporary paths are retained for provenance."
+}

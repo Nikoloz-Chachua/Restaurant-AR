@@ -1,0 +1,655 @@
+{
+  "restaurant": {
+    "id": 59,
+    "slug": "mugsy-main",
+    "name": "Mugsy's Burgers",
+    "brand_id": 53,
+    "brands": {
+      "id": 53,
+      "slug": "mugsy",
+      "name": "Mugsy's Burgers",
+      "plan": "free"
+    }
+  },
+  "theme_config": [
+    {
+      "key": "template_key",
+      "value": "mugsy_street_diner"
+    },
+    {
+      "key": "default_theme",
+      "value": "day"
+    },
+    {
+      "key": "site_name",
+      "value": "Mugsy's Burgers"
+    },
+    {
+      "key": "site_name_ka",
+      "value": "Mugsy's Burgers"
+    },
+    {
+      "key": "logo_url",
+      "value": "./assets/mugsy/logo.svg"
+    },
+    {
+      "key": "hero_logo_url",
+      "value": "./assets/mugsy/logo.svg"
+    },
+    {
+      "key": "hero_image_url",
+      "value": "./assets/mugsy/hero-burger.webp"
+    },
+    {
+      "key": "hero_images",
+      "value": "[\"./assets/mugsy/hero-burger.webp\",\"./assets/mugsy/hero-official.webp\"]"
+    },
+    {
+      "key": "hero_kicker",
+      "value": "Smash burgers in Tbilisi"
+    },
+    {
+      "key": "hero_kicker_ka",
+      "value": "სმეშ ბურგერები თბილისში"
+    },
+    {
+      "key": "hero_copy",
+      "value": "Fast, saucy burgers, boxes, sides, drinks, and an interactive BetaReal menu experience."
+    },
+    {
+      "key": "hero_copy_ka",
+      "value": "სწრაფი, სოუსიანი ბურგერები, ბოქსები, საიდები, სასმელები და BetaReal-ის ინტერაქტიული მენიუს გამოცდილება."
+    },
+    {
+      "key": "hero_cta",
+      "value": "See menu"
+    },
+    {
+      "key": "hero_cta_ka",
+      "value": "მენიუს ნახვა"
+    },
+    {
+      "key": "info_kicker",
+      "value": "Find Mugsy"
+    },
+    {
+      "key": "info_kicker_ka",
+      "value": "იპოვე Mugsy"
+    },
+    {
+      "key": "info_title",
+      "value": "Two Tbilisi locations"
+    },
+    {
+      "key": "info_title_ka",
+      "value": "ორი ლოკაცია თბილისში"
+    },
+    {
+      "key": "info_text",
+      "value": "8/2 Petre Melikishvili Street\n63 Vazha Pshavela Avenue"
+    },
+    {
+      "key": "info_text_ka",
+      "value": "პეტრე მელიქიშვილის ქუჩა 8/2\nვაჟა-ფშაველას გამზირი 63"
+    },
+    {
+      "key": "mugsy_order_links",
+      "value": "[{\"label\":\"Wolt\",\"url\":\"https://wolt.com/en/geo/tbilisi/restaurant/magsys-burger?srsltid=AfmBOor5reRoicmEFy72EUVGZI728ljsK4D7Hgb7NPpE_PPSjNq7Z9At\"},{\"label\":\"Glovo\",\"url\":\"https://glovoapp.com/en/ge/tbilisi/stores/mugsy-s-burger-tbi\"}]"
+    },
+    {
+      "key": "mugsy_locations",
+      "value": "[{\"label\":\"8/2 Petre Melikishvili Street\",\"label_ka\":\"პეტრე მელიქიშვილის ქუჩა 8/2\",\"url\":\"https://www.google.com/maps/search/?api=1&query=8%2F2%20Petre%20Melikishvili%20Street%2C%20Tbilisi\"},{\"label\":\"63 Vazha Pshavela Avenue\",\"label_ka\":\"ვაჟა-ფშაველას გამზირი 63\",\"url\":\"https://www.google.com/maps/search/?api=1&query=63%20Vazha%20Pshavela%20Avenue%2C%20Tbilisi\"}]"
+    },
+    {
+      "key": "empty_title",
+      "value": "Menu is coming to BetaReal"
+    },
+    {
+      "key": "empty_title_ka",
+      "value": "მენიუ მალე გამოჩნდება BetaReal-ში"
+    },
+    {
+      "key": "empty_copy",
+      "value": "Mugsy has not published menu items here yet. When data is seeded, official dishes and prices appear automatically."
+    },
+    {
+      "key": "empty_copy_ka",
+      "value": "Mugsy-ს კერძები აქ ჯერ გამოქვეყნებული არ არის. მონაცემების ჩატვირთვის შემდეგ ოფიციალური კერძები და ფასები ავტომატურად გამოჩნდება."
+    },
+    {
+      "key": "meta_description",
+      "value": "Browse Mugsy's Burgers in Tbilisi with a mobile-first BetaReal digital menu."
+    },
+    {
+      "key": "meta_description_ka",
+      "value": "დაათვალიერეთ Mugsy's Burgers თბილისში BetaReal-ის მობილურ მენიუში."
+    }
+  ],
+  "menu_items": [
+    {
+      "id": "mugsy-cheesy",
+      "name_en": "Cheesy",
+      "name_ka": "Cheesy",
+      "description_en": "Bun, beef, tomato, lettuce, cheddar cheese, signature sauce",
+      "description_ka": "ფუნთუშა, საქონლის ხორცი, პომიდორი, სალათის ფოთოლი აისბერგი, ყველი ჩედარი, საფირმო სოუსი",
+      "price": "7.9 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Burgers",
+        "name_ka": "ბურგერები"
+      },
+      "category_name_en": "Burgers",
+      "visible": true,
+      "sort_order": 1,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/cheesy.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-bacon-burger",
+      "name_en": "Bacon Burger",
+      "name_ka": "Bacon Smash",
+      "description_en": "Bun, bacon, beef, cheddar cheese, signature sauce",
+      "description_ka": "ფუნთუშა, ბეკონი, საქონლის ხორცი, ყველი ჩედარი, საფირმო სოუსი",
+      "price": "10.6 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Burgers",
+        "name_ka": "ბურგერები"
+      },
+      "category_name_en": "Burgers",
+      "visible": true,
+      "sort_order": 2,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/bacon-burger.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-bbq-smoker",
+      "name_en": "BBQ Smoker",
+      "name_ka": "BBQ Smoker",
+      "description_en": "Bun, BBQ sauce, lettuce, tomato, beef, cheddar slice, red BBQ smoky sauce",
+      "description_ka": "ფუნთუშა, ბბქ სოუსი, აისბერგი, პომიდორი, საქონლის ხორცი, ჩედარის ფირფიტა, წითელი ბბქ სმოუქი სოუსი",
+      "price": "9.4 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Burgers",
+        "name_ka": "ბურგერები"
+      },
+      "category_name_en": "Burgers",
+      "visible": true,
+      "sort_order": 3,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/bbq-smoker.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-bacon-melt",
+      "name_en": "Mugsys Signature",
+      "name_ka": "Bacon Melt",
+      "description_en": "Bun, BBQ sauce, crispy bacon, beef, cheddar slice, red BBQ smoky sauce, cheese sauce, fried mozzarella",
+      "description_ka": "ფუნთუშა, ბბქ სოუსი, შემწვარი ბეკონი, საქონლის ხორცი, ჩედარის ფირფიტა, წითელი ბბქ სმოუქი სოუსი, ყველის სოუსი, შემწვარი მოცარელა",
+      "price": "17.9 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Burgers",
+        "name_ka": "ბურგერები"
+      },
+      "category_name_en": "Burgers",
+      "visible": true,
+      "sort_order": 4,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/bacon-melt.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-mozzarella",
+      "name_en": "Mozzarella",
+      "name_ka": "Mozzarella",
+      "description_en": "Bun, Mugsy's sauce, lettuce, tomato, fried mozzarella, cheese sauce",
+      "description_ka": "ფუნთუშა, მაგსის სოუსი, აისბერგი, პომიდორი, შემწვარი მოცარელა, ყველის სოუსი",
+      "price": "9.7 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Burgers",
+        "name_ka": "ბურგერები"
+      },
+      "category_name_en": "Burgers",
+      "visible": true,
+      "sort_order": 5,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/mozzarella.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-chicken-cheesy",
+      "name_en": "Chicken Cheesy",
+      "name_ka": "Chicken Cheesy",
+      "description_en": "Bun, chicken, tomato, lettuce, cheddar cheese, signature sauce",
+      "description_ka": "ფუნთუშა, ქათმის ხორცი, პომიდორი, სალათის ფოთოლი აისბერგი, ყველი ჩედარი, საფირმო სოუსი",
+      "price": "7.8 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Burgers",
+        "name_ka": "ბურგერები"
+      },
+      "category_name_en": "Burgers",
+      "visible": true,
+      "sort_order": 6,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/chicken-cheesy.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-two-burger-box",
+      "name_en": "Two Burger Box",
+      "name_ka": "ორი ბურგერის ბოქსი",
+      "description_en": "Two classic burgers, nuggets, fries",
+      "description_ka": "ორი კლასიკური ბურგერი, ნაგეთსი, კარტოფილი ფრი",
+      "price": "33.9 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Boxes",
+        "name_ka": "ბოქსები"
+      },
+      "category_name_en": "Boxes",
+      "visible": true,
+      "sort_order": 1,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/two-burger-box.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-chicken-box",
+      "name_en": "Chicken Box",
+      "name_ka": "ქათმის ბოქსი",
+      "description_en": "Six chicken burgers, fries",
+      "description_ka": "ექვსი ქათმის ბურგერი, კარტოფილი ფრი",
+      "price": "54.9 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Boxes",
+        "name_ka": "ბოქსები"
+      },
+      "category_name_en": "Boxes",
+      "visible": true,
+      "sort_order": 2,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/chicken-box.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-cheesy-box",
+      "name_en": "Cheesy Box",
+      "name_ka": "ჩიზის ბოქსი",
+      "description_en": "Cheesy box combo",
+      "description_ka": "ჩიზის ბოქსი",
+      "price": "58.7 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Boxes",
+        "name_ka": "ბოქსები"
+      },
+      "category_name_en": "Boxes",
+      "visible": true,
+      "sort_order": 3,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/cheesy-box.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-chicken-snack-box",
+      "name_en": "Chicken Snack Box",
+      "name_ka": "Chicken Snack Box",
+      "description_en": "Fries, chicken popcorn, chicken nuggets, ketchup, cheese sauce",
+      "description_ka": "კარტოფილი ფრი, ქათმის პოპკორნი, ქათმის ნაგეთსი, კეჩუპი, ყველის სოუსი",
+      "price": "29.8 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Boxes",
+        "name_ka": "ბოქსები"
+      },
+      "category_name_en": "Boxes",
+      "visible": true,
+      "sort_order": 4,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/chicken-snack-box.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-fries-with-bacon-cheese-sauce",
+      "name_en": "Fries with Bacon & Cheese Sauce",
+      "name_ka": "ფრი ბეკონით და ყველის სოუსით",
+      "description_en": "Fries with bacon and cheese sauce",
+      "description_ka": "ფრი ბეკონით და ყველის სოუსით",
+      "price": "10.4 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Sides & Fries",
+        "name_ka": "საიდები"
+      },
+      "category_name_en": "Sides & Fries",
+      "visible": true,
+      "sort_order": 1,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/fries-with-bacon-cheese-sauce.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-fries",
+      "name_en": "Fries",
+      "name_ka": "ფრი",
+      "description_en": "French fries",
+      "description_ka": "კარტოფილი ფრი",
+      "price": "4.4 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Sides & Fries",
+        "name_ka": "საიდები"
+      },
+      "category_name_en": "Sides & Fries",
+      "visible": true,
+      "sort_order": 2,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/fries.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-fries-with-jalapeno-cheese-sauce",
+      "name_en": "Fries with Jalapeño & Cheese Sauce",
+      "name_ka": "ფრი ჰალაპენიოთი და ყველის სოუსით",
+      "description_en": "Fries with jalapeño and cheese sauce",
+      "description_ka": "ფრი ჰალაპენიოთი და ყველის სოუსით",
+      "price": "9.9 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Sides & Fries",
+        "name_ka": "საიდები"
+      },
+      "category_name_en": "Sides & Fries",
+      "visible": true,
+      "sort_order": 3,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/fries-with-jalapeno-cheese-sauce.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-chicken-popcorn-50pcs",
+      "name_en": "Chicken Popcorn 50pcs",
+      "name_ka": "ქათმის პოპკორნი 50ც",
+      "description_en": "Chicken popcorn 50 pieces",
+      "description_ka": "ქათმის პოპკორნი 50 ცალი",
+      "price": "9.4 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Sides & Fries",
+        "name_ka": "საიდები"
+      },
+      "category_name_en": "Sides & Fries",
+      "visible": true,
+      "sort_order": 4,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/chicken-popcorn-50pcs.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-caesar-with-chicken",
+      "name_en": "Caesar with Chicken",
+      "name_ka": "ცეზარი ქათმით",
+      "description_en": "Caesar salad with chicken",
+      "description_ka": "ცეზარი ქათმით",
+      "price": "7.8 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Sides & Fries",
+        "name_ka": "საიდები"
+      },
+      "category_name_en": "Sides & Fries",
+      "visible": true,
+      "sort_order": 5,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/caesar-with-chicken.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-pepsi-033l",
+      "name_en": "Pepsi 0.33L",
+      "name_ka": "პეპსი 0.33ლ",
+      "description_en": "Pepsi 0.33L",
+      "description_ka": "პეპსი 0.33ლ",
+      "price": "3.7 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Drinks & Sauces",
+        "name_ka": "სასმელები"
+      },
+      "category_name_en": "Drinks & Sauces",
+      "visible": true,
+      "sort_order": 1,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/pepsi-033l.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-pepsi-0l",
+      "name_en": "Pepsi 0.5L",
+      "name_ka": "პეპსი 0.5ლ",
+      "description_en": "Pepsi 0.5L",
+      "description_ka": "პეპსი 0.5ლ",
+      "price": "4.3 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Drinks & Sauces",
+        "name_ka": "სასმელები"
+      },
+      "category_name_en": "Drinks & Sauces",
+      "visible": true,
+      "sort_order": 2,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/pepsi-0l.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-mugsys-sauce",
+      "name_en": "Mugsy's Sauce",
+      "name_ka": "მაგსის სოუსი",
+      "description_en": "Mugsy's signature sauce",
+      "description_ka": "მაგსის სოუსი",
+      "price": "2.5 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Drinks & Sauces",
+        "name_ka": "სასმელები"
+      },
+      "category_name_en": "Drinks & Sauces",
+      "visible": true,
+      "sort_order": 3,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/mugsys-sauce.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-large-cheese-sauce",
+      "name_en": "Large Cheese Sauce",
+      "name_ka": "დიდი ყველის სოუსი",
+      "description_en": "Large cheese sauce",
+      "description_ka": "დიდი ყველის სოუსი",
+      "price": "4.7 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Drinks & Sauces",
+        "name_ka": "სასმელები"
+      },
+      "category_name_en": "Drinks & Sauces",
+      "visible": true,
+      "sort_order": 4,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/large-cheese-sauce.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-ketchup",
+      "name_en": "Ketchup",
+      "name_ka": "კეტჩუპი",
+      "description_en": "Ketchup",
+      "description_ka": "კეტჩუპი",
+      "price": "2.5 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Drinks & Sauces",
+        "name_ka": "სასმელები"
+      },
+      "category_name_en": "Drinks & Sauces",
+      "visible": true,
+      "sort_order": 5,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/ketchup.webp",
+      "addons": [],
+      "variants": []
+    },
+    {
+      "id": "mugsy-small-cheese-sauce",
+      "name_en": "Small Cheese Sauce",
+      "name_ka": "პატარა ყველის სოუსი",
+      "description_en": "Small cheese sauce",
+      "description_ka": "პატარა ყველის სოუსი",
+      "price": "3 ₾",
+      "price_old": "",
+      "categories": {
+        "name_en": "Drinks & Sauces",
+        "name_ka": "სასმელები"
+      },
+      "category_name_en": "Drinks & Sauces",
+      "visible": true,
+      "sort_order": 6,
+      "model": "",
+      "model_usdz": "",
+      "is_3d": false,
+      "thumb_3d": false,
+      "text_only": false,
+      "ar_scale": 1,
+      "thumbnail_url": "./assets/mugsy/items-webp/small-cheese-sauce.webp",
+      "addons": [],
+      "variants": []
+    }
+  ]
+}

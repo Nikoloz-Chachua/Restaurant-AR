@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bl-v131';
+const CACHE_NAME = 'bl-v132';
 
 const SUPABASE_URL  = 'https://lwdpegloznhpcecivhfy.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_65dKKpb-lxOr8JTjdj7yxw_LZzcJp5h';
@@ -18,6 +18,9 @@ const PRECACHE = [
     './img/monday-greens-favicon.svg',
     './img/baoma/interior-hero-maps.webp',
     './img/baoma/interior-terrace.jpg',
+    './assets/mugsy/logo.svg',
+    './assets/mugsy/hero-burger.webp',
+    './assets/mugsy/hero-official.webp',
 ];
 
 // NOTE: models are intentionally NOT mass-precached on install anymore.

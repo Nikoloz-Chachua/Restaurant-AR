@@ -1,0 +1,349 @@
+{
+  "source": {
+    "ka": "https://mugsy.ge/ka",
+    "en": "https://mugsy.ge/en",
+    "extracted_at": "2026-07-28T10:30:11.215Z"
+  },
+  "siteSettings": {
+    "ka": {
+      "site_name": "Mugsy's Burgers",
+      "favicon": null,
+      "og_image": "https://mugsy.ge/storage/og-images/01KKA46PWFKTDZEMX3J4B6915W.png",
+      "main_logo": "https://mugsy.ge/storage/logos/01KK9EAP6W92RDHQ1GNEBNRQGE.svg",
+      "footer_logo": null,
+      "address": null,
+      "phone": null,
+      "email": null,
+      "seo_title": "Mugsy's Burgers",
+      "seo_description": "Mugsy's Burgers",
+      "seo_keywords": "Mugsy's Burgers",
+      "deliveries": [
+        {
+          "name": "ვოლტი",
+          "link": "https://wolt.com/en/geo/tbilisi/restaurant/magsys-burger?srsltid=AfmBOor5reRoicmEFy72EUVGZI728ljsK4D7Hgb7NPpE_PPSjNq7Z9At",
+          "icon": "https://mugsy.ge/storage/deliveries/01KKBKA1ZAXQXHBJ9APHZ4TGN7.jpg"
+        },
+        {
+          "name": "გლოვო",
+          "link": "https://glovoapp.com/en/ge/tbilisi/stores/mugsy-s-burger-tbi",
+          "icon": "https://mugsy.ge/storage/deliveries/01KKBKB42ZBBQYEXT1BYAP8GDK.png"
+        }
+      ]
+    },
+    "en": {
+      "site_name": "Mugsy's Burgers",
+      "favicon": null,
+      "og_image": "https://mugsy.ge/storage/og-images/01KKA46PWFKTDZEMX3J4B6915W.png",
+      "main_logo": "https://mugsy.ge/storage/logos/01KK9EAP6TS43RT85BTRKBZAS7.svg",
+      "footer_logo": null,
+      "address": null,
+      "phone": null,
+      "email": null,
+      "seo_title": "Mugsy's Burgers",
+      "seo_description": "Mugsy's Burgers",
+      "seo_keywords": "Mugsy's Burgers",
+      "deliveries": [
+        {
+          "name": "Wolt",
+          "link": "https://wolt.com/en/geo/tbilisi/restaurant/magsys-burger?srsltid=AfmBOor5reRoicmEFy72EUVGZI728ljsK4D7Hgb7NPpE_PPSjNq7Z9At",
+          "icon": "https://mugsy.ge/storage/deliveries/01KKBKA1ZAXQXHBJ9APHZ4TGN7.jpg"
+        },
+        {
+          "name": "Glovo",
+          "link": "https://glovoapp.com/en/ge/tbilisi/stores/mugsy-s-burger-tbi",
+          "icon": "https://mugsy.ge/storage/deliveries/01KKBKB42ZBBQYEXT1BYAP8GDK.png"
+        }
+      ]
+    }
+  },
+  "categories": [
+    {
+      "slug": "burgers",
+      "name_ka": "ბურგერები",
+      "name_en": "Burgers",
+      "sort_order": 1,
+      "image": "product-categories/01KKA311ZQ93JDC5DYFQVYYRZT.svg",
+      "products": [
+        {
+          "source_id": 1,
+          "slug": "cheesy",
+          "name_ka": "Cheesy",
+          "name_en": "Cheesy",
+          "description_ka": "ფუნთუშა, საქონლის ხორცი, პომიდორი, სალათის ფოთოლი აისბერგი, ყველი ჩედარი, საფირმო სოუსი",
+          "description_en": "Bun, beef, tomato, lettuce, cheddar cheese, signature sauce",
+          "price": 7.9,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX6B5Q63PZB2SC2HD9RMPAT.jpg",
+          "sort_order": 1
+        },
+        {
+          "source_id": 2,
+          "slug": "bacon-burger",
+          "name_ka": "Bacon Smash",
+          "name_en": "Bacon Burger",
+          "description_ka": "ფუნთუშა, ბეკონი, საქონლის ხორცი, ყველი ჩედარი, საფირმო სოუსი",
+          "description_en": "Bun, bacon, beef, cheddar cheese, signature sauce",
+          "price": 10.6,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX5DJR6A89BM20S4PFSA043.jpg",
+          "sort_order": 2
+        },
+        {
+          "source_id": 3,
+          "slug": "bbq-smoker",
+          "name_ka": "BBQ Smoker",
+          "name_en": "BBQ Smoker",
+          "description_ka": "ფუნთუშა, ბბქ სოუსი, აისბერგი, პომიდორი, საქონლის ხორცი, ჩედარის ფირფიტა, წითელი ბბქ სმოუქი სოუსი",
+          "description_en": "Bun, BBQ sauce, lettuce, tomato, beef, cheddar slice, red BBQ smoky sauce",
+          "price": 9.4,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX5H2JVF67YQV59YCDWCJSJ.jpg",
+          "sort_order": 3
+        },
+        {
+          "source_id": 4,
+          "slug": "bacon-melt",
+          "name_ka": "Bacon Melt",
+          "name_en": "Mugsys Signature",
+          "description_ka": "ფუნთუშა, ბბქ სოუსი, შემწვარი ბეკონი, საქონლის ხორცი, ჩედარის ფირფიტა, წითელი ბბქ სმოუქი სოუსი, ყველის სოუსი, შემწვარი მოცარელა",
+          "description_en": "Bun, BBQ sauce, crispy bacon, beef, cheddar slice, red BBQ smoky sauce, cheese sauce, fried mozzarella",
+          "price": 17.9,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX69CC365B2F7KMHRBKVZ0Y.jpg",
+          "sort_order": 4
+        },
+        {
+          "source_id": 5,
+          "slug": "mozzarella",
+          "name_ka": "Mozzarella",
+          "name_en": "Mozzarella",
+          "description_ka": "ფუნთუშა, მაგსის სოუსი, აისბერგი, პომიდორი, შემწვარი მოცარელა, ყველის სოუსი",
+          "description_en": "Bun, Mugsy&#039;s sauce, lettuce, tomato, fried mozzarella, cheese sauce",
+          "price": 9.7,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX6D98QRBSAJ4YA5RWB3GDB.jpg",
+          "sort_order": 5
+        },
+        {
+          "source_id": 6,
+          "slug": "chicken-cheesy",
+          "name_ka": "Chicken Cheesy",
+          "name_en": "Chicken Cheesy",
+          "description_ka": "ფუნთუშა, ქათმის ხორცი, პომიდორი, სალათის ფოთოლი აისბერგი, ყველი ჩედარი, საფირმო სოუსი",
+          "description_en": "Bun, chicken, tomato, lettuce, cheddar cheese, signature sauce",
+          "price": 7.8,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX6F6W0YHVVRHRPXB2X3JGC.jpg",
+          "sort_order": 6
+        }
+      ]
+    },
+    {
+      "slug": "boxes",
+      "name_ka": "ბოქსები",
+      "name_en": "Boxes",
+      "sort_order": 2,
+      "image": "product-categories/01KKA31P4F04PAE8KAZRMRP832.svg",
+      "products": [
+        {
+          "source_id": 7,
+          "slug": "two-burger-box",
+          "name_ka": "ორი ბურგერის ბოქსი",
+          "name_en": "Two Burger Box",
+          "description_ka": "ორი კლასიკური ბურგერი, ნაგეთსი, კარტოფილი ფრი",
+          "description_en": "Two classic burgers, nuggets, fries",
+          "price": 33.9,
+          "price_old": null,
+          "featured_image": "products/two-burger-box.jpeg",
+          "sort_order": 1
+        },
+        {
+          "source_id": 8,
+          "slug": "chicken-box",
+          "name_ka": "ქათმის ბოქსი",
+          "name_en": "Chicken Box",
+          "description_ka": "ექვსი ქათმის ბურგერი, კარტოფილი ფრი",
+          "description_en": "Six chicken burgers, fries",
+          "price": 54.9,
+          "price_old": null,
+          "featured_image": "products/chicken-box.jpeg",
+          "sort_order": 2
+        },
+        {
+          "source_id": 9,
+          "slug": "cheesy-box",
+          "name_ka": "ჩიზის ბოქსი",
+          "name_en": "Cheesy Box",
+          "description_ka": "ჩიზის ბოქსი",
+          "description_en": "Cheesy box combo",
+          "price": 58.7,
+          "price_old": null,
+          "featured_image": "products/cheesy-box.jpeg",
+          "sort_order": 3
+        },
+        {
+          "source_id": 10,
+          "slug": "chicken-snack-box",
+          "name_ka": "Chicken Snack Box",
+          "name_en": "Chicken Snack Box",
+          "description_ka": "კარტოფილი ფრი, ქათმის პოპკორნი, ქათმის ნაგეთსი, კეჩუპი, ყველის სოუსი",
+          "description_en": "Fries, chicken popcorn, chicken nuggets, ketchup, cheese sauce",
+          "price": 29.8,
+          "price_old": null,
+          "featured_image": "products/chicken-snack-box.jpeg",
+          "sort_order": 4
+        }
+      ]
+    },
+    {
+      "slug": "sides",
+      "name_ka": "საიდები",
+      "name_en": "Sides & Fries",
+      "sort_order": 3,
+      "image": "product-categories/01KKA3333T6MWZ4HETJG8M71GB.svg",
+      "products": [
+        {
+          "source_id": 11,
+          "slug": "fries-with-bacon-cheese-sauce",
+          "name_ka": "ფრი ბეკონით და ყველის სოუსით",
+          "name_en": "Fries with Bacon & Cheese Sauce",
+          "description_ka": "ფრი ბეკონით და ყველის სოუსით",
+          "description_en": "Fries with bacon and cheese sauce",
+          "price": 10.4,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX567Y7Z67MWAEZ3B0N78JM.jpg",
+          "sort_order": 1
+        },
+        {
+          "source_id": 12,
+          "slug": "fries",
+          "name_ka": "ფრი",
+          "name_en": "Fries",
+          "description_ka": "კარტოფილი ფრი",
+          "description_en": "French fries",
+          "price": 4.4,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX5F34VGHK6VXZWKSD7DV37.jpg",
+          "sort_order": 2
+        },
+        {
+          "source_id": 13,
+          "slug": "fries-with-jalapeno-cheese-sauce",
+          "name_ka": "ფრი ჰალაპენიოთი და ყველის სოუსით",
+          "name_en": "Fries with Jalapeño & Cheese Sauce",
+          "description_ka": "ფრი ჰალაპენიოთი და ყველის სოუსით",
+          "description_en": "Fries with jalapeño and cheese sauce",
+          "price": 9.9,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX662JQS6JEN12FKCT9T6WE.jpg",
+          "sort_order": 3
+        },
+        {
+          "source_id": 14,
+          "slug": "chicken-popcorn-50pcs",
+          "name_ka": "ქათმის პოპკორნი 50ც",
+          "name_en": "Chicken Popcorn 50pcs",
+          "description_ka": "ქათმის პოპკორნი 50 ცალი",
+          "description_en": "Chicken popcorn 50 pieces",
+          "price": 9.4,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX6AFWRBR7J8QA4M4NXTG8J.jpg",
+          "sort_order": 4
+        },
+        {
+          "source_id": 16,
+          "slug": "caesar-with-chicken",
+          "name_ka": "ცეზარი ქათმით",
+          "name_en": "Caesar with Chicken",
+          "description_ka": "ცეზარი ქათმით",
+          "description_en": "Caesar salad with chicken",
+          "price": 7.8,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX6GNPPC45AE3Q5W1D5PSRA.jpg",
+          "sort_order": 5
+        }
+      ]
+    },
+    {
+      "slug": "drinks",
+      "name_ka": "სასმელები",
+      "name_en": "Drinks & Sauces",
+      "sort_order": 4,
+      "image": "product-categories/01KKA34JPJ0TJFSZQ1N2ZHGSQT.svg",
+      "products": [
+        {
+          "source_id": 17,
+          "slug": "pepsi-033l",
+          "name_ka": "პეპსი 0.33ლ",
+          "name_en": "Pepsi 0.33L",
+          "description_ka": "პეპსი 0.33ლ",
+          "description_en": "Pepsi 0.33L",
+          "price": 3.7,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX5ZE1FYPQ06JC6DDH152Y2.jpg",
+          "sort_order": 1
+        },
+        {
+          "source_id": 18,
+          "slug": "pepsi-0l",
+          "name_ka": "პეპსი 0.5ლ",
+          "name_en": "Pepsi 0.5L",
+          "description_ka": "პეპსი 0.5ლ",
+          "description_en": "Pepsi 0.5L",
+          "price": 4.3,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX5G4Z30AC3Q4PGWSXQ2R8W.jpg",
+          "sort_order": 2
+        },
+        {
+          "source_id": 19,
+          "slug": "mugsys-sauce",
+          "name_ka": "მაგსის სოუსი",
+          "name_en": "Mugsy's Sauce",
+          "description_ka": "მაგსის სოუსი",
+          "description_en": "Mugsy&#039;s signature sauce",
+          "price": 2.5,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX67SEVK2G0E4GYEW3BZH0B.jpg",
+          "sort_order": 3
+        },
+        {
+          "source_id": 20,
+          "slug": "large-cheese-sauce",
+          "name_ka": "დიდი ყველის სოუსი",
+          "name_en": "Large Cheese Sauce",
+          "description_ka": "დიდი ყველის სოუსი",
+          "description_en": "Large cheese sauce",
+          "price": 4.7,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX6C30736BHWNZ2ZN2N9439.jpg",
+          "sort_order": 4
+        },
+        {
+          "source_id": 21,
+          "slug": "ketchup",
+          "name_ka": "კეტჩუპი",
+          "name_en": "Ketchup",
+          "description_ka": "კეტჩუპი",
+          "description_en": "Ketchup",
+          "price": 2.5,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX6EB2DA6DTREV3Q8R3GP98.jpg",
+          "sort_order": 5
+        },
+        {
+          "source_id": 22,
+          "slug": "small-cheese-sauce",
+          "name_ka": "პატარა ყველის სოუსი",
+          "name_en": "Small Cheese Sauce",
+          "description_ka": "პატარა ყველის სოუსი",
+          "description_en": "Small cheese sauce",
+          "price": 3,
+          "price_old": null,
+          "featured_image": "products/featured/01KRX6HA3GDPX05R63FJC7YAT9.jpg",
+          "sort_order": 6
+        }
+      ]
+    }
+  ]
+}

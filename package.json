@@ -4,8 +4,9 @@
   "scripts": {
     "dev": "npx --yes serve -p 3000 .",
     "build": "echo 'No build step for raw HTML'",
-    "test": "node --test publicMenu3dThumbnail.test.mjs",
+    "test": "node --test publicMenu3dThumbnail.test.mjs mugsyTenantRegression.test.mjs mugsyMenuImport.test.mjs",
     "smoke:baoma": "playwright test scripts/smoke-baoma-local.spec.mjs",
+    "smoke:mugsy": "playwright test scripts/smoke-mugsy-local.spec.mjs",
     "preview": "npx --yes serve -p 3000 .",
     "compress": "npx --yes gltf-pipeline -i food.glb -o food.glb --draco.compressionLevel 10 && npx gltf-pipeline -i Druidi.glb -o Druidi.glb --draco.compressionLevel 10"
   },
