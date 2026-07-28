@@ -8467,7 +8467,7 @@
                             name:           _cleanText(r.name_en),
                             name_ka:        _cleanText(r.name_ka),
                             category:       _cleanText(r.categories?.name_en, 'Other'),
-                            category_ka:    _cleanText(r.categories?.name_ka, 'სხვა'),
+                            category_ka:    _cleanText(r.categories?.name_ka),
                             description:    _cleanText(r.description_en),
                             description_ka: _cleanText(r.description_ka),
                             price:          _cleanText(r.price),
@@ -8500,6 +8500,21 @@
 
             menuItems = items;
             window.__menuItems = items;
+
+            // "Most ordered" pinned filter — opt-in per tenant via theme_config.featured_items,
+            // a JSON array of menu_items.id in display order. No schema change: reuses the
+            // existing generic theme_config key/value table (already used for theme colors).
+            let _mostOrderedIds = [];
+            try {
+                const tenant = await _resolveTenant();
+                const cfgRows = await _supaSelect(
+                    `theme_config?select=value&restaurant_id=eq.${tenant.restaurant_id}&key=eq.featured_items`
+                );
+                const raw = cfgRows && cfgRows[0] && cfgRows[0].value;
+                const parsed = raw ? JSON.parse(raw) : [];
+                if (Array.isArray(parsed)) _mostOrderedIds = parsed;
+            } catch (_) {}
+
             // iOS native AR prefers the uploaded USDZ (seated + scaled at upload time).
             // GLB-only items still get iOS AR via on-device seated conversion as a fallback
             // (see openAR's arkit branch), so no iPhone item is left without AR.
@@ -8807,6 +8822,24 @@
                 arEntries.forEach(({ item, globalIdx }) => parent.appendChild(renderMenuCard(item, globalIdx, true)));
             }
 
+            // Sentinel for the virtual "Most ordered" category — cross-listed items that
+            // also keep their real category (see AR_CAT above for the same pattern).
+            const FEATURED_CAT = '__most_ordered';
+
+            function _mostOrderedEntries() {
+                return _mostOrderedIds
+                    .map(id => items.findIndex(it => it.id === id))
+                    .filter(globalIdx => globalIdx !== -1)
+                    .map(globalIdx => ({ item: items[globalIdx], globalIdx }));
+            }
+
+            function renderMostOrderedBlock(parent) {
+                const entries = _mostOrderedEntries();
+                if (!entries.length) return;
+                parent.appendChild(renderCategoryHeader({ name: 'Most ordered', name_ka: 'Most ordered' }));
+                entries.forEach(({ item, globalIdx }) => parent.appendChild(renderMenuCard(item, globalIdx, false)));
+            }
+
             function renderMenuList(cat = '') {
                 list.innerHTML = '';
                 if (!items.length && _isBaomaTenant()) {
@@ -8820,6 +8853,8 @@
 
                 if (cat === AR_CAT) {
                     renderARFeaturedBlock(list);
+                } else if (cat === FEATURED_CAT) {
+                    renderMostOrderedBlock(list);
                 } else if (cat) {
                     const selected = categoryMap.get(cat);
                     if (selected) {
@@ -8827,6 +8862,7 @@
                     }
                 } else {
                     renderARFeaturedBlock(list);
+                    renderMostOrderedBlock(list);
                     // Every category keeps ALL its items (3D ones included), in menu order —
                     // a 3D dish appears both in the virtual 3D block above and here. When
                     // grouping is on, only the active group's categories are shown.
@@ -8852,6 +8888,15 @@
             allPill.textContent   = window.__lang === 'ka' ? 'ყველა' : 'All';
             filterDiv.appendChild(allPill);
 
+            if (_mostOrderedEntries().length) {
+                const featPill = document.createElement('button');
+                featPill.className     = 'cat-pill';
+                featPill.dataset.cat   = FEATURED_CAT;
+                featPill.dataset.catKa = 'Most ordered';
+                featPill.textContent   = 'Most ordered';
+                filterDiv.appendChild(featPill);
+            }
+
             if (items.some(item => _isAREnabledMenuItem(item))) {
                 const arPill = document.createElement('button');
                 arPill.className    = 'cat-pill';
@@ -8873,6 +8918,7 @@
 
             function _filterIsValid(cat) {
                 if (cat === AR_CAT) return _hasARForActiveGroup();
+                if (cat === FEATURED_CAT) return _mostOrderedEntries().length > 0;
                 if (cat && _groupingOn()) return _groupOf(cat) === _activeGroup;
                 return true;
             }
@@ -8891,7 +8937,7 @@
             filterDiv.addEventListener('click', e => {
                 const pill = e.target.closest('.cat-pill');
                 if (pill) {
-                    track('category_filter', null, { category: pill.dataset.cat === AR_CAT ? '3D' : (pill.dataset.cat || 'All') });
+                    track('category_filter', null, { category: pill.dataset.cat === AR_CAT ? '3D' : pill.dataset.cat === FEATURED_CAT ? 'Most ordered' : (pill.dataset.cat || 'All') });
                     applyFilter(pill.dataset.cat);
                 }
             });
@@ -8934,7 +8980,7 @@
             function _updateGroupPillVisibility() {
                 document.querySelectorAll('.cat-pill').forEach(p => {
                     const c = p.dataset.cat;
-                    if (c === '') {
+                    if (c === '' || c === FEATURED_CAT) {
                         p.hidden = false;
                     } else if (c === AR_CAT) {
                         p.hidden = !_hasARForActiveGroup();
