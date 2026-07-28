@@ -14,6 +14,7 @@ export type StarterTemplateKey =
   | 'burger_lions'
   | 'burger_bar'
   | 'mugsy_street_diner'
+  | 'betareal'
 
 export type ThemePreset = {
   key: StarterTemplateKey
@@ -322,6 +323,36 @@ const TEMPLATE_VISUAL_TOKENS: Record<StarterTemplateKey, ThemeConfig> = {
     day_item_shadow: '0 8px 20px rgba(45,27,20,0.10)', day_item_hover_shadow: '0 14px 30px rgba(45,27,20,0.16)',
     day_modal_bg_image: 'linear-gradient(180deg, #FFFDF7 0%, #FFF7E7 100%)',
   },
+  // BetaReal's own house palette — gold on warm near-black, the same values the
+  // customer app ships as its default theme and the brand mark uses (#e7b15a on
+  // #14100b). Transcribed literally so the preset and the in-app default can't drift.
+  // Intended for BetaReal's own demo/showcase tenants, not for clients.
+  betareal: {
+    night_bg_image: 'url("./img/grain.png"), radial-gradient(95% 55% at 50% -8%, rgba(231,177,90,0.22) 0%, transparent 60%), radial-gradient(70% 50% at 85% 35%, rgba(201,138,60,0.13) 0%, transparent 72%), radial-gradient(140% 120% at 50% 40%, transparent 58%, rgba(0,0,0,0.55) 130%), linear-gradient(175deg, #14100b 0%, #1e1711 60%, #14100b 100%)',
+    night_bg_size: '64px 64px, auto, auto, auto, auto', night_bg_repeat: 'repeat, no-repeat, no-repeat, no-repeat, no-repeat',
+    night_card_bg: 'linear-gradient(158deg, #211a12 0%, #2b2218 100%)', night_card_radius: '20px', night_card_blur: '0px',
+    night_stage_bg: '#0d0a07',
+    night_pill_bg: '#211a12', night_pill_active_bg: 'linear-gradient(120deg, #e7b15a, #c98a3c)',
+    night_cta_bg: 'linear-gradient(120deg, #e7b15a, #c98a3c)', night_cta_shadow: '0 4px 14px rgba(231,177,90,0.22)',
+    night_hero_color: '#e7b15a', night_hero_shadow: '0 2px 16px rgba(231,177,90,0.22)',
+    night_divider_bg: 'linear-gradient(90deg, transparent, #c98a3c, transparent)',
+    night_accent_edge: 'linear-gradient(180deg, #e7b15a, #c98a3c)',
+    night_thumb_vignette: 'radial-gradient(ellipse at center, transparent 32%, #211a12 100%)',
+    night_item_shadow: '0 3px 10px rgba(0,0,0,0.55)', night_item_hover_shadow: '0 10px 22px rgba(0,0,0,0.55)',
+    night_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(231,177,90,0.22) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #1e1711 0%, #14100b 72%)',
+    day_bg_image: 'url("./img/grain.png"), radial-gradient(95% 55% at 50% -8%, rgba(176,122,30,0.18) 0%, transparent 60%), radial-gradient(70% 50% at 85% 35%, rgba(154,100,24,0.11) 0%, transparent 72%), radial-gradient(140% 120% at 50% 40%, transparent 58%, rgba(120,80,10,0.18) 130%), linear-gradient(175deg, #f3e9d6 0%, #ead9bd 60%, #f3e9d6 100%)',
+    day_bg_size: '64px 64px, auto, auto, auto, auto', day_bg_repeat: 'repeat, no-repeat, no-repeat, no-repeat, no-repeat',
+    day_card_bg: 'linear-gradient(158deg, #fbf4e4 0%, #ecdcc0 100%)', day_card_radius: '20px', day_card_blur: '0px',
+    day_stage_bg: '#c8b898',
+    day_pill_bg: '#fbf4e4', day_pill_active_bg: 'linear-gradient(120deg, #8c6014, #86560f)',
+    day_cta_bg: 'linear-gradient(120deg, #8c6014, #86560f)', day_cta_shadow: '0 4px 14px rgba(176,122,30,0.18)',
+    day_hero_color: '#8c6014', day_hero_shadow: '0 2px 16px rgba(176,122,30,0.18)',
+    day_divider_bg: 'linear-gradient(90deg, transparent, #86560f, transparent)',
+    day_accent_edge: 'linear-gradient(180deg, #8c6014, #86560f)',
+    day_thumb_vignette: 'radial-gradient(ellipse at center, transparent 32%, #fbf4e4 100%)',
+    day_item_shadow: '0 3px 10px rgba(120,80,10,0.18)', day_item_hover_shadow: '0 10px 22px rgba(120,80,10,0.18)',
+    day_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(176,122,30,0.18) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #ead9bd 0%, #f3e9d6 72%)',
+  },
 }
 
 export const TEMPLATE_PRESETS: ThemePreset[] = [
@@ -582,6 +613,26 @@ export const TEMPLATE_PRESETS: ThemePreset[] = [
       ...TEMPLATE_VISUAL_TOKENS.mugsy_street_diner,
       font_body: 'Nunito', font_heading: 'Bebas Neue', template_key: 'mugsy_street_diner',
       default_theme: 'day',
+    },
+  },
+  {
+    key: 'betareal',
+    label: 'BetaReal House',
+    description: "BetaReal's own gold-on-black palette — for demo and showcase tenants, not client sites. Dark surfaces keep the dish the brightest thing on screen.",
+    primaryColor: '#e7b15a',
+    secondaryColor: '#c98a3c',
+    createStarterCategory: true,
+    preserveModeAccents: true,
+    values: {
+      night_bg: '#14100b', night_bg2: '#1e1711', night_card: '#211a12', night_card2: '#2b2218', night_border: 'rgba(231,177,90,0.20)',
+      night_text: '#f1e7d4', night_dim: '#9a8a70', night_accent: '#e7b15a', night_accent2: '#c98a3c', night_accent_text: '#14100b', night_thumb_bg: '#0d0a07', night_modal_bg: '#14100b',
+      night_glow: 'rgba(231,177,90,0.22)', night_glow2: 'rgba(201,138,60,0.13)', night_shadow: 'rgba(0,0,0,0.55)',
+      day_bg: '#f3e9d6', day_bg2: '#ead9bd', day_card: '#fbf4e4', day_card2: '#ecdcc0', day_border: 'rgba(176,122,30,0.22)',
+      day_text: '#221a0e', day_dim: '#6b5a3c', day_accent: '#8c6014', day_accent2: '#86560f', day_accent_text: '#ffffff', day_thumb_bg: '#c8b898', day_modal_bg: '#f3e9d6',
+      day_glow: 'rgba(176,122,30,0.18)', day_glow2: 'rgba(154,100,24,0.11)', day_shadow: 'rgba(120,80,10,0.18)',
+      ...TEMPLATE_VISUAL_TOKENS.betareal,
+      font_body: 'Nunito', font_heading: 'Bebas Neue', template_key: 'betareal',
+      default_theme: 'night',
     },
   },
 ]
