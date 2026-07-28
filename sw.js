@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bl-v143';
+const CACHE_NAME = 'bl-v144';
 
 const SUPABASE_URL  = 'https://lwdpegloznhpcecivhfy.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_65dKKpb-lxOr8JTjdj7yxw_LZzcJp5h';
@@ -23,6 +23,7 @@ const PRECACHE = [
     './assets/mugsy/hero-official.webp',
     './assets/mugsy/deliveries/wolt.jpg',
     './assets/mugsy/deliveries/glovo.png',
+    './assets/pipes/items-webp/pipes-signature-burger.webp',
 ];
 
 // NOTE: models are intentionally NOT mass-precached on install anymore.

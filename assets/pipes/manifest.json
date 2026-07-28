@@ -1,0 +1,122 @@
+{
+  "tenant": "pipes-burger-main",
+  "brand": "pipes-burger",
+  "generated_from": [
+    "data/research/pipes/wolt-assortment-en.json",
+    "data/research/pipes/wolt-assortment-ka.json"
+  ],
+  "assets": [
+    {
+      "id": "5ae5ad7fe11ac8000cb4f0dc",
+      "role": "menu_item",
+      "item_name_en": "Cheeseburger",
+      "item_name_ka": "ჩიზბურგერი",
+      "source_url": "https://wolt-menu-images-cdn.wolt.com/menu-images/1aaac352-4b9f-11e8-a631-0a586464bc08_cheeseburger.jpeg",
+      "local_path": "assets/pipes/items-webp/cheeseburger.webp"
+    },
+    {
+      "id": "5ae5ad7fe11ac8000cb4f0de",
+      "role": "menu_item",
+      "item_name_en": "Uptown Burger",
+      "item_name_ka": "აფთაუნი",
+      "source_url": "https://wolt-menu-images-cdn.wolt.com/menu-images/2b9aedf4-4b9f-11e8-b21e-0a586464bd14_uptown_burger.jpeg",
+      "local_path": "assets/pipes/items-webp/uptown-burger.webp"
+    },
+    {
+      "id": "5ae5ad7fe11ac8000cb4f0e2",
+      "role": "menu_item",
+      "item_name_en": "Caesar Burger",
+      "item_name_ka": "ცეზარი",
+      "source_url": "https://wolt-menu-images-cdn.wolt.com/menu-images/3af2ca38-4b9f-11e8-a0a1-0a586464bc0f_caesar_burger.jpeg",
+      "local_path": "assets/pipes/items-webp/caesar-burger.webp"
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0e6",
+      "role": "menu_item",
+      "item_name_en": "Stakehouse",
+      "item_name_ka": "სტეიკჰაუსი",
+      "source_url": "https://wolt-menu-images-cdn.wolt.com/menu-images/4d6501d6-4b9f-11e8-813d-0a586464b717_steakhouse_burger.jpeg",
+      "local_path": "assets/pipes/items-webp/stakehouse.webp"
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0e8",
+      "role": "hero_signature_item",
+      "item_name_en": "Pipes Signature Burger",
+      "item_name_ka": "პაიპსი საფირმო ბურგერი",
+      "source_url": "https://wolt-menu-images-cdn.wolt.com/menu-images/6bee65de-4b9f-11e8-9cd1-0a5864640fb3_pipes_signature_burger.jpeg",
+      "local_path": "assets/pipes/items-webp/pipes-signature-burger.webp"
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0ea",
+      "role": "menu_item",
+      "item_name_en": "Burgazm",
+      "item_name_ka": "ბურგაზმი",
+      "source_url": "https://wolt-menu-images-cdn.wolt.com/menu-images/72a5205c-4b9f-11e8-93e9-0a586464be0f_burgazm.jpeg",
+      "local_path": "assets/pipes/items-webp/burgazm.webp"
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0ec",
+      "role": "menu_item",
+      "item_name_en": "Kimchi Burger",
+      "item_name_ka": "კიმჩი",
+      "source_url": "https://wolt-menu-images-cdn.wolt.com/menu-images/7bb7a368-4b9f-11e8-af07-0a586464825c_kimchi.jpeg",
+      "local_path": "assets/pipes/items-webp/kimchi-burger.webp"
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0f2",
+      "role": "menu_item",
+      "item_name_en": "Aloha",
+      "item_name_ka": "ალოჰა",
+      "source_url": "https://wolt-menu-images-cdn.wolt.com/menu-images/9bb92cd6-4b9f-11e8-b8ee-0a5864640fb3_aloha.jpeg",
+      "local_path": "assets/pipes/items-webp/aloha.webp"
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0ee",
+      "role": "menu_item",
+      "item_name_en": "Genovese",
+      "item_name_ka": "ჯენოვეზე",
+      "source_url": "https://wolt-menu-images-cdn.wolt.com/menu-images/856a5d2e-4b9f-11e8-b1bd-0a5864646f82_genovese.jpeg",
+      "local_path": "assets/pipes/items-webp/genovese.webp"
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0f0",
+      "role": "menu_item",
+      "item_name_en": "Falafel Burger",
+      "item_name_ka": "ფალაფელ ბურგერი",
+      "source_url": "https://wolt-menu-images-cdn.wolt.com/menu-images/8e12939c-4b9f-11e8-97ee-0a586464bc0b_falafel_burger.jpeg",
+      "local_path": "assets/pipes/items-webp/falafel-burger.webp"
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0e4",
+      "role": "menu_item",
+      "item_name_en": "Veggie Burger",
+      "item_name_ka": "ვეჯი",
+      "source_url": "https://wolt-menu-images-cdn.wolt.com/menu-images/43b00bd6-4b9f-11e8-b607-0a586464be0d_veggie_burger.jpeg",
+      "local_path": "assets/pipes/items-webp/veggie-burger.webp"
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0fd",
+      "role": "menu_item",
+      "item_name_en": "Quesadilla",
+      "item_name_ka": "კესადია",
+      "source_url": "https://wolt-menu-images-cdn.wolt.com/menu-images/0bd53050-4ba0-11e8-a001-0a586464812d_quesadilla.jpeg",
+      "local_path": "assets/pipes/items-webp/quesadilla.webp"
+    },
+    {
+      "id": "5ae5ad7fe11ac8000cb4f0e0",
+      "role": "menu_item",
+      "item_name_en": "Tex-mex Burger",
+      "item_name_ka": "ტექს-მექსი",
+      "source_url": "https://wolt-menu-images-cdn.wolt.com/menu-images/31c9305a-4b9f-11e8-94ea-0a5864648242_tex-mex_burger.jpeg",
+      "local_path": "assets/pipes/items-webp/tex-mex-burger.webp"
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0fc",
+      "role": "menu_item",
+      "item_name_en": "Hot Chicken Soup",
+      "item_name_ka": "ქათმის ცხარე სუპი",
+      "source_url": "https://wolt-menu-images-cdn.wolt.com/menu-images/034209fe-4ba0-11e8-b733-0a5864648244_hot_chicken_soup.jpeg",
+      "local_path": "assets/pipes/items-webp/hot-chicken-soup.webp"
+    }
+  ]
+}

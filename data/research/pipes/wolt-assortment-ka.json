@@ -1,0 +1,3240 @@
+{
+  "assortment_id": "5ae1d988b32775000c3ef5a7",
+  "loading_strategy": "full",
+  "primary_language": "ka",
+  "selected_language": "ka",
+  "available_languages": [
+    {
+      "autotranslated": true,
+      "language": "de",
+      "name": "გერმანული"
+    },
+    {
+      "autotranslated": true,
+      "language": "en",
+      "name": "ინგლისური"
+    },
+    {
+      "autotranslated": true,
+      "language": "fr",
+      "name": "ფრანგული"
+    },
+    {
+      "autotranslated": false,
+      "language": "ka",
+      "name": "ქართული"
+    },
+    {
+      "autotranslated": true,
+      "language": "ru",
+      "name": "რუსული"
+    }
+  ],
+  "compliance_info": {
+    "badges": [],
+    "disclaimers": null,
+    "how_search_works": null,
+    "lowest_price_calculation_interval_in_days": 30,
+    "should_display_original_price_for_unit_price": false,
+    "should_display_price_by_subtracting_deposit": false
+  },
+  "categories": [
+    {
+      "id": "507ef5373479b7191bcdce34",
+      "description": "ყველა პროდუქტის ფასი შეიცავს მომსახურების 10%",
+      "images": [
+        {
+          "url": "https://wolt-menu-images-cdn.wolt.com/menu-images/1aaac352-4b9f-11e8-a631-0a586464bc08_cheeseburger.jpeg",
+          "blurhash": "j3zTtx001fXkTJlkllqqvsKXgQd5"
+        }
+      ],
+      "name": "ბურგერები",
+      "slug": "menucategory-2",
+      "subcategories": [],
+      "item_ids": [
+        "5ae5ad7fe11ac8000cb4f0dc",
+        "5ae5ad7fe11ac8000cb4f0de",
+        "5ae5ad7fe11ac8000cb4f0e2",
+        "5ae5ad80e11ac8000cb4f0e6",
+        "5ae5ad80e11ac8000cb4f0e8",
+        "5ae5ad80e11ac8000cb4f0ea",
+        "5ae5ad80e11ac8000cb4f0ec",
+        "5ae5ad80e11ac8000cb4f0f2",
+        "5ae5ad80e11ac8000cb4f0ee",
+        "5ae5ad80e11ac8000cb4f0f0",
+        "5ae5ad80e11ac8000cb4f0e4",
+        "5ae5ad80e11ac8000cb4f0fd",
+        "5ae5ad7fe11ac8000cb4f0e0"
+      ]
+    },
+    {
+      "id": "0f369b0b7612626488c629d0",
+      "description": "",
+      "images": [
+        {
+          "url": "https://wolt-menu-images-cdn.wolt.com/menu-images/034209fe-4ba0-11e8-b733-0a5864648244_hot_chicken_soup.jpeg",
+          "blurhash": "j5FVC5000IJ3NAllndplX;KX8xPt"
+        }
+      ],
+      "name": "სუპი",
+      "slug": "menucategory-4",
+      "subcategories": [],
+      "item_ids": [
+        "5ae5ad80e11ac8000cb4f0fc"
+      ]
+    },
+    {
+      "id": "653cdda7ce4ba43ec0f313cb",
+      "description": "",
+      "images": [],
+      "name": "საიდი",
+      "slug": "menucategory-5",
+      "subcategories": [],
+      "item_ids": [
+        "5b5aefe18ca0cd000d9390fb",
+        "5b5aefeef3b633000c3c1caf"
+      ]
+    },
+    {
+      "id": "68993df8f0079cebb0b2d9b5",
+      "description": "",
+      "images": [],
+      "name": "სოუსები",
+      "slug": "menucategory-6",
+      "subcategories": [],
+      "item_ids": [
+        "5b29131207ef22000dfe2eb5",
+        "5b29131cba053a000d834402",
+        "5b2912698bc46a000c41d406",
+        "5f3f87d70ca68d5b5f3cc2ef"
+      ]
+    },
+    {
+      "id": "7801f0cc060cc35df668c4d4",
+      "description": "",
+      "images": [],
+      "name": "სასმელი",
+      "slug": "menucategory-7",
+      "subcategories": [],
+      "item_ids": [
+        "5ae5ad80e11ac8000cb4f0ff",
+        "5ae5ad80e11ac8000cb4f100",
+        "5ae5ad80e11ac8000cb4f101",
+        "5b05446afa931d000bb3f128",
+        "5e6f826acf423ccf0f9df056",
+        "5e6f827669a709d165f7f11f",
+        "5e8c32b8bd6c8db318c1511d"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "5ae5ad7fe11ac8000cb4f0dc",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "eatin",
+        "takeaway",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "b1bec84f521d35bde572da3a022dbf83",
+      "description": "ხახვის მარინადი, პომიდორი, ყველი ჩედარი სალათის ფოთოლი, მჟავე კიტრი, ადგილზე დამზადებული ცხარე საფირმო მაიონეზი",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [
+        {
+          "url": "https://wolt-menu-images-cdn.wolt.com/menu-images/1aaac352-4b9f-11e8-a631-0a586464bc08_cheeseburger.jpeg",
+          "blurhash": "j3zTtx001fXkTJlkllqqvsKXgQd5"
+        }
+      ],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "ჩიზბურგერი",
+      "options": [
+        {
+          "id": "9766b6681dd4e5716120fac7",
+          "option_id": "5b521cf1476127000ddd03de",
+          "name": "ხორცის შეწვის დონე ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "882604d9934f90bdfb559874",
+          "option_id": "5ae5ad7fe11ac8000cb4f0d6",
+          "name": "აირჩიეთ ექსტრა სოუსი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 10
+            },
+            "max_single_selections": 10,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "fccb76dbaf2348de3eeb86cf",
+          "option_id": "5afbf8eb191bd6000bd1ec71",
+          "name": "ხალაპენიო ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "cea19ead26672658d0d151cc",
+          "option_id": "5b6079fab189d9000b1a5950",
+          "name": "ექსტრა ბეკონი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "9bfbb674c370c19972d47a22",
+          "option_id": "5b607a1a60188d000bd2b6ea",
+          "name": "ექსტრა ყველი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        }
+      ],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 1639,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5ae5ad7fe11ac8000cb4f0de",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "eatin",
+        "takeaway",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "a939507577c8687a8e4f98d419a3e6ae",
+      "description": "პილპილის და ნაღების სოუსი, ყველი ჩედარი, სალათის ფოთოლი, მჟავე კიტრი",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [
+        {
+          "url": "https://wolt-menu-images-cdn.wolt.com/menu-images/2b9aedf4-4b9f-11e8-b21e-0a586464bd14_uptown_burger.jpeg",
+          "blurhash": "jaIpG38zfLX5qYGmKWtCTryHd5ll"
+        }
+      ],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "აფთაუნი",
+      "options": [
+        {
+          "id": "e57f95f13df88db89e13c3ce",
+          "option_id": "5b521cf1476127000ddd03de",
+          "name": "ხორცის შეწვის დონე ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "508a7934264ea50099dd9ac3",
+          "option_id": "5ae5ad7fe11ac8000cb4f0d6",
+          "name": "აირჩიეთ ექსტრა სოუსი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 10
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "1265fdc5201483760a496549",
+          "option_id": "5afbf8eb191bd6000bd1ec71",
+          "name": "ხალაპენიო ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "2a60ecd4c9cb6e2a6ad3dc6a",
+          "option_id": "5b6079fab189d9000b1a5950",
+          "name": "ექსტრა ბეკონი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "040341439250da53da5ec783",
+          "option_id": "5b607a1a60188d000bd2b6ea",
+          "name": "ექსტრა ყველი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        }
+      ],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 1705,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5ae5ad7fe11ac8000cb4f0e0",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "takeaway",
+        "eatin",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "2f0466ea28b76235e9b6931bed557835",
+      "description": "გუაკამოლე, ყველი ჩედარი, ტორტილას ჩიფსი, სალათის ფოთოლი, სალსა, ხალაპენოს მარინადი (ცხარე წიწაკა)",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [
+        {
+          "url": "https://wolt-menu-images-cdn.wolt.com/menu-images/31c9305a-4b9f-11e8-94ea-0a5864648242_tex-mex_burger.jpeg",
+          "blurhash": "j4BnJA4h1vLbPdl4PsTtXJKXcQh6"
+        }
+      ],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "ტექს-მექსი",
+      "options": [
+        {
+          "id": "dfbb20e8743b98e6668ed165",
+          "option_id": "5b521cf1476127000ddd03de",
+          "name": "ხორცის შეწვის დონე ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "387963dd29dafaf96efe2787",
+          "option_id": "5ae5ad7fe11ac8000cb4f0d6",
+          "name": "აირჩიეთ ექსტრა სოუსი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 10
+            },
+            "max_single_selections": 10,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "1f0fc2a226066c2713c40907",
+          "option_id": "5b6079fab189d9000b1a5950",
+          "name": "ექსტრა ბეკონი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "dabaeb159414e58cb00271e4",
+          "option_id": "5b607a1a60188d000bd2b6ea",
+          "name": "ექსტრა ყველი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        }
+      ],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 1749,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5ae5ad7fe11ac8000cb4f0e2",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "takeaway",
+        "homedelivery",
+        "eatin"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "9d31d167d3619d1a4ef42ad9ed683ae5",
+      "description": "ქათმის პეტი, პარმეზანი, ცეზარის სოუსი, რომანო, პომიდორი",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [
+        {
+          "url": "https://wolt-menu-images-cdn.wolt.com/menu-images/3af2ca38-4b9f-11e8-a0a1-0a586464bc0f_caesar_burger.jpeg",
+          "blurhash": "j4FUVP0h0;WQOIpkPsPd;GqH8Yh4"
+        }
+      ],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "ცეზარი",
+      "options": [
+        {
+          "id": "a36998678cda4d36bb17756d",
+          "option_id": "5b521cf1476127000ddd03de",
+          "name": "ხორცის შეწვის დონე ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "11cb231c1f428428026b55f1",
+          "option_id": "5ae5ad7fe11ac8000cb4f0d6",
+          "name": "აირჩიეთ ექსტრა სოუსი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 10
+            },
+            "max_single_selections": 10,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "77711d950075da63b8f617e9",
+          "option_id": "5afbf8eb191bd6000bd1ec71",
+          "name": "ხალაპენიო ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "20c82dd008fd99670efbb7a7",
+          "option_id": "5b6079fab189d9000b1a5950",
+          "name": "ექსტრა ბეკონი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "3764043443c42545a28195aa",
+          "option_id": "5b607a1a60188d000bd2b6ea",
+          "name": "ექსტრა ყველი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        }
+      ],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 1650,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0e4",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "eatin",
+        "takeaway",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "7f976be091cbf135093cb659978b9836",
+      "description": "ტემპურაში ამოვლებული ლობიოს პეტი, სალსათი ხალაპენიო (ცხარე წიწაკა), ყველი ჩედარი, სალათის ფოთოლი და საფირმო მაიონეზი",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [
+        {
+          "url": "https://wolt-menu-images-cdn.wolt.com/menu-images/43b00bd6-4b9f-11e8-b607-0a586464be0d_veggie_burger.jpeg",
+          "blurhash": "j5G8FJ0h1L;jFbh5PsT6TIKXgRll"
+        }
+      ],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "ვეჯი",
+      "options": [
+        {
+          "id": "240e6a6c82e70af551d2fbe6",
+          "option_id": "5ae5ad7fe11ac8000cb4f0d6",
+          "name": "აირჩიეთ ექსტრა სოუსი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 10
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "4b53b9bafe8239541d64e041",
+          "option_id": "5b607a1a60188d000bd2b6ea",
+          "name": "ექსტრა ყველი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        }
+      ],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 1650,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0e6",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "takeaway",
+        "eatin",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "dc7fc0b1bcd36a979608b3b955496a44",
+      "description": "ყველი ჩედარი, მოთუშული სოკო, ბეკონი, გამომცხვარი ნივრის მაიონეზი და ხრაშუნა ხახვის რგოლები",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [
+        {
+          "url": "https://wolt-menu-images-cdn.wolt.com/menu-images/4d6501d6-4b9f-11e8-813d-0a586464b717_steakhouse_burger.jpeg",
+          "blurhash": "j6GoVR4i3vWPCHBBPcKYTJpGcAhl"
+        }
+      ],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "სტეიკჰაუსი",
+      "options": [
+        {
+          "id": "200b5dcb01ebc1be886a18ff",
+          "option_id": "5b521cf1476127000ddd03de",
+          "name": "ხორცის შეწვის დონე ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "afb66bc5b55572309e256b6f",
+          "option_id": "5ae5ad7fe11ac8000cb4f0d6",
+          "name": "აირჩიეთ ექსტრა სოუსი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 10
+            },
+            "max_single_selections": 10,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "9e524f9e9d152b8c9f072f3e",
+          "option_id": "5afbf8eb191bd6000bd1ec71",
+          "name": "ხალაპენიო ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "bfb362f9766dd4c830721d5f",
+          "option_id": "5b6079fab189d9000b1a5950",
+          "name": "ექსტრა ბეკონი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "9242cc9987d0c276bca125fe",
+          "option_id": "5b607a1a60188d000bd2b6ea",
+          "name": "ექსტრა ყველი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        }
+      ],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 1859,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0e8",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "eatin",
+        "takeaway",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "ce6c4bde3d414e544b9c76c7d7607cee",
+      "description": "ყველი ჩედარი 230 გრამიანი პეტის შუაგულში, ხახვის ჯემი, მჟავე კიტრი, ბეკონი, სალათის ფოთოლი, პომიდორი, პაიპს მაიონეზი",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [
+        {
+          "url": "https://wolt-menu-images-cdn.wolt.com/menu-images/6bee65de-4b9f-11e8-9cd1-0a5864640fb3_pipes_signature_burger.jpeg",
+          "blurhash": "j6FUVS8y3vNjKYplPcPcPsGGh5h6"
+        }
+      ],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "პაიპსი საფირმო ბურგერი",
+      "options": [
+        {
+          "id": "db4aa2b0676f6dc7640248a9",
+          "option_id": "5b521cf1476127000ddd03de",
+          "name": "ხორცის შეწვის დონე ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "cf87f84db74382c5f5baae21",
+          "option_id": "5ae5ad7fe11ac8000cb4f0d6",
+          "name": "აირჩიეთ ექსტრა სოუსი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 10
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "c9725b646cd03f2dda1e9002",
+          "option_id": "5afbf8eb191bd6000bd1ec71",
+          "name": "ხალაპენიო ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "56726041ea4948e12409b10f",
+          "option_id": "5b6079fab189d9000b1a5950",
+          "name": "ექსტრა ბეკონი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "54ef42ff2446fb8ad22d5b3f",
+          "option_id": "5b607a1a60188d000bd2b6ea",
+          "name": "ექსტრა ყველი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        }
+      ],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 2079,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0ea",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "takeaway",
+        "homedelivery",
+        "eatin"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "8e2c7fd482b2ccd8ed9267be14cbfa1b",
+      "description": "ყველი ჩედარი 230 გრამიანის პეტის შუაგულში, ბეკონის მარმელატი, გრილზე შემწვარი ხახვი, ხალაპენიო (ცხარე წიწაკა), პომიდორი და პაიპსის ბბქ სოუსი",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [
+        {
+          "url": "https://wolt-menu-images-cdn.wolt.com/menu-images/72a5205c-4b9f-11e8-93e9-0a586464be0f_burgazm.jpeg",
+          "blurhash": "j6Gp1O0i3f;SJSplPcPbTIpFcRKW"
+        }
+      ],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "ბურგაზმი",
+      "options": [
+        {
+          "id": "b5efb352fabed9f5fc037f96",
+          "option_id": "5b521cf1476127000ddd03de",
+          "name": "ხორცის შეწვის დონე ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "ab604db9544e34d92bf39366",
+          "option_id": "5ae5ad7fe11ac8000cb4f0d6",
+          "name": "აირჩიეთ ექსტრა სოუსი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 10
+            },
+            "max_single_selections": 10,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "e430df9bded2a774e6b4d2e3",
+          "option_id": "5b6079fab189d9000b1a5950",
+          "name": "ექსტრა ბეკონი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "c53fb69862d336fcc8906550",
+          "option_id": "5b607a1a60188d000bd2b6ea",
+          "name": "ექსტრა ყველი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        }
+      ],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 2035,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0ec",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "takeaway",
+        "homedelivery",
+        "eatin"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "3054eee8d6a62882b84e05ea4a4bf2fd",
+      "description": "ჩედარი ყველი, სალათის ფოთოლი, პომიდორი და პაიპსის საფირმო კიმჩი",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [
+        {
+          "url": "https://wolt-menu-images-cdn.wolt.com/menu-images/7bb7a368-4b9f-11e8-af07-0a586464825c_kimchi.jpeg",
+          "blurhash": "j6GVhS4h1LXllGh4TsPbPclmcRll"
+        }
+      ],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "კიმჩი",
+      "options": [
+        {
+          "id": "94ba5191eab2b00217ba876f",
+          "option_id": "5ae5ad7fe11ac8000cb4f0d6",
+          "name": "აირჩიეთ ექსტრა სოუსი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 10
+            },
+            "max_single_selections": 10,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "1c7b091122ffec28b60c97e5",
+          "option_id": "5afbf8eb191bd6000bd1ec71",
+          "name": "ხალაპენიო ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "6fcddd1fc42913188a4ca7e2",
+          "option_id": "5b6079fab189d9000b1a5950",
+          "name": "ექსტრა ბეკონი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "e977a18696d67939b2d02d1c",
+          "option_id": "5b607a1a60188d000bd2b6ea",
+          "name": "ექსტრა ყველი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        }
+      ],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 1760,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0ee",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "eatin",
+        "takeaway",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "448e1800acc249a3d4a1fc786bf90e8c",
+      "description": "ჩედარის ყველი, კაპერსების და მზეზე გამომშრალი პომიდორის აიოლი, რუკოლა, პომიდორი ჩერი, საფირმო ლიმნისა და ბაზილიკის პესტო",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [
+        {
+          "url": "https://wolt-menu-images-cdn.wolt.com/menu-images/856a5d2e-4b9f-11e8-b1bd-0a5864646f82_genovese.jpeg",
+          "blurhash": "j8HpG34ybv;lPdFlKXPcTJllcQqG"
+        }
+      ],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "ჯენოვეზე",
+      "options": [
+        {
+          "id": "ca3d205b2b9805672517b84c",
+          "option_id": "5b521cf1476127000ddd03de",
+          "name": "ხორცის შეწვის დონე ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "10e9f7dc82ae3099de6aa6f5",
+          "option_id": "5ae5ad7fe11ac8000cb4f0d6",
+          "name": "აირჩიეთ ექსტრა სოუსი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 10
+            },
+            "max_single_selections": 10,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "1e0a232806f033557b771587",
+          "option_id": "5afbf8eb191bd6000bd1ec71",
+          "name": "ხალაპენიო ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "895f693ec13a609a90724c88",
+          "option_id": "5b6079fab189d9000b1a5950",
+          "name": "ექსტრა ბეკონი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "2e77227cf316bdc6e1aa7d84",
+          "option_id": "5b607a1a60188d000bd2b6ea",
+          "name": "ექსტრა ყველი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        }
+      ],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 1925,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0f0",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "eatin",
+        "takeaway",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "02db9f0955ed6fce97772c7940ed2a27",
+      "description": "ფალაფელის პეტი, საფირმო ჰუმუსი, რომანო, პომიდორი და ცაციკის სოუსი.",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [
+        {
+          "url": "https://wolt-menu-images-cdn.wolt.com/menu-images/8e12939c-4b9f-11e8-97ee-0a586464bc0b_falafel_burger.jpeg",
+          "blurhash": "j7HFu04h7vOQPcFBpClmTsKYcRh4"
+        }
+      ],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "ფალაფელ ბურგერი",
+      "options": [
+        {
+          "id": "260e2a80c244c77c64d0ce5e",
+          "option_id": "5ae5ad7fe11ac8000cb4f0d6",
+          "name": "აირჩიეთ ექსტრა სოუსი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 10
+            },
+            "max_single_selections": 10,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "0ea766622e01e7aec2a4a734",
+          "option_id": "5afbf8eb191bd6000bd1ec71",
+          "name": "ხალაპენიო ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "d3058d90e915de538e89546e",
+          "option_id": "5b607a1a60188d000bd2b6ea",
+          "name": "ექსტრა ყველი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        }
+      ],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 1430,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0f2",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "takeaway",
+        "homedelivery",
+        "eatin"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "ff87c03a0c2ca3b6329830c1ddc844e6",
+      "description": "ყველი ჩედარი, სალათის ფოთოლი, პომიდორი, გრილზე შემწავარი ანანასი, საფირმო ტერიაკის სოუსი",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [
+        {
+          "url": "https://wolt-menu-images-cdn.wolt.com/menu-images/9bb92cd6-4b9f-11e8-b8ee-0a5864640fb3_aloha.jpeg",
+          "blurhash": "jaI9t;8ybLTrlrpCPbKGTqKXd6h5"
+        }
+      ],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "ალოჰა",
+      "options": [
+        {
+          "id": "18c3b50ee3355e2822b09b7a",
+          "option_id": "5b521cf1476127000ddd03de",
+          "name": "ხორცის შეწვის დონე ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "de831356cf8600081e7e4472",
+          "option_id": "5ae5ad7fe11ac8000cb4f0d6",
+          "name": "აირჩიეთ ექსტრა სოუსი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 10
+            },
+            "max_single_selections": 10,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "29e31a9c76eb63190dd13ca8",
+          "option_id": "5afbf8eb191bd6000bd1ec71",
+          "name": "ხალაპენიო ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "54c32e605ec77cac5561791a",
+          "option_id": "5b6079fab189d9000b1a5950",
+          "name": "ექსტრა ბეკონი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "042c6e67907070fb960aa655",
+          "option_id": "5b607a1a60188d000bd2b6ea",
+          "name": "ექსტრა ყველი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        }
+      ],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 1859,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0fc",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "eatin",
+        "takeaway",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "b9133929feb2a927998b5f3f666c82d6",
+      "description": "სოკო, ბევრი წიწაკა, ლემონგრასი, კოჭა და ქოქოსის რძე",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [
+        {
+          "url": "https://wolt-menu-images-cdn.wolt.com/menu-images/034209fe-4ba0-11e8-b733-0a5864648244_hot_chicken_soup.jpeg",
+          "blurhash": "j5FVC5000IJ3NAllndplX;KX8xPt"
+        }
+      ],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "ქათმის ცხარე სუპი",
+      "options": [],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 830,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0fd",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "eatin",
+        "takeaway",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "72b340262883bee360f7b2e3c1f68935",
+      "description": "დაძენძილი ქათმით ან ჩილი კონ კარნეთი, საფირმო BBQ სოუსი, ჩედარი, სალსა და არაჟანი",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [
+        {
+          "url": "https://wolt-menu-images-cdn.wolt.com/menu-images/0bd53050-4ba0-11e8-a001-0a586464812d_quesadilla.jpeg",
+          "blurhash": "j2IWus009b4hiZX4TK0A01mH;;XK"
+        }
+      ],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "კესადია",
+      "options": [
+        {
+          "id": "d9668109c7ab2ca79c1d2ba4",
+          "option_id": "5ae5ad7fe11ac8000cb4f0d6",
+          "name": "აირჩიეთ ექსტრა სოუსი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 10
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "334235b0fe76fe2fee8d5ff4",
+          "option_id": "5afbf8eb191bd6000bd1ec71",
+          "name": "ხალაპენიო ",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "0ba54154e5f33b32af840305",
+          "option_id": "5b6079fab189d9000b1a5950",
+          "name": "ექსტრა ბეკონი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        },
+        {
+          "id": "ed85a64a241a621a2786e59b",
+          "option_id": "5b607a1a60188d000bd2b6ea",
+          "name": "ექსტრა ყველი",
+          "prerequisite_values": [],
+          "multi_choice_config": {
+            "total_range": {
+              "min": 1,
+              "max": 1
+            },
+            "max_single_selections": 1,
+            "free_selections": 0
+          }
+        }
+      ],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 1430,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f0ff",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "takeaway",
+        "eatin",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "35f3ac92e1a33f35939c7784955f8ec2",
+      "description": "",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "კოკა კოლა 0.33 L",
+      "options": [],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 275,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f100",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "takeaway",
+        "homedelivery",
+        "eatin"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "572f780a58b403524e4cfb9ca00d4beb",
+      "description": "",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "წყალი 0.5 L",
+      "options": [],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 165,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5ae5ad80e11ac8000cb4f101",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "takeaway",
+        "homedelivery",
+        "eatin"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "996fc5aa64371fc7f98f31716d27c92f",
+      "description": "",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "მინერალური წყალი 0.5 L",
+      "options": [],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 220,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5b05446afa931d000bb3f128",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "eatin",
+        "takeaway",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "20849ba7b9606a39b9ca66a6ac286133",
+      "description": "სვია, ალაო, წყალი. ალკოჰოლის შემცველობა: 4.8%",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "ლუდი არგო 0.5 L",
+      "options": [],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 550,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5b2912698bc46a000c41d406",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "eatin",
+        "takeaway",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "7ecaf399240e9434e891d52a8566bccd",
+      "description": "",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "BBQ",
+      "options": [],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 275,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5b29131207ef22000dfe2eb5",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "eatin",
+        "takeaway",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "6cb0ac0c86f7adee14b2e25d20671647",
+      "description": "",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "კეტჩუპი",
+      "options": [],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 220,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5b29131cba053a000d834402",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "eatin",
+        "takeaway",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "7730dbc813110626301344ccde23e8dc",
+      "description": "",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "მაიონეზი",
+      "options": [],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 220,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5b5aefe18ca0cd000d9390fb",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "takeaway",
+        "eatin",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "2d97b8cc064f578fdafbb86420aebffb",
+      "description": "",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "კარტოფილი ფრი",
+      "options": [],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 440,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5b5aefeef3b633000c3c1caf",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "takeaway",
+        "eatin",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "1aa7583de74d82d4e6150d4de0a6ab97",
+      "description": "",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "ხახვის რგოლები",
+      "options": [],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 770,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5e6f826acf423ccf0f9df056",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "eatin",
+        "takeaway",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "1a4da1066b8f415a4b108a92f0963ccc",
+      "description": "",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "სპრაიტი 0.33 L",
+      "options": [],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 275,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 0,
+      "vat_percentage_decimal": null,
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5e6f827669a709d165f7f11f",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "eatin",
+        "takeaway",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "16471e2cb95231d8e5a2f82882a8f141",
+      "description": "",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "ფანტა 0.33 L",
+      "options": [],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 275,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 0,
+      "vat_percentage_decimal": null,
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5e8c32b8bd6c8db318c1511d",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "eatin",
+        "takeaway",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "db03bbfd90f150ae2472b8fcca1a4bd8",
+      "description": "",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "კოკა კოლა ზერო 0.33 L",
+      "options": [],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 275,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    },
+    {
+      "id": "5f3f87d70ca68d5b5f3cc2ef",
+      "advertising_info": null,
+      "alcohol_permille": 0,
+      "allowed_delivery_methods": [
+        "eatin",
+        "takeaway",
+        "homedelivery"
+      ],
+      "available_times": [
+        {
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "start_time": 0,
+          "end_time": 86400000
+        }
+      ],
+      "barcode_gtin": null,
+      "caffeine_info": null,
+      "can_be_promoted": {
+        "basket": true,
+        "venue": true,
+        "credits": true
+      },
+      "checksum": "6809f793933b810b16c8d3410ed11775",
+      "description": "",
+      "deposit": null,
+      "dietary_preferences": [],
+      "disabled_info": null,
+      "fulfillment_lead_time": null,
+      "has_extra_info": false,
+      "images": [],
+      "videos": [],
+      "is_cutlery": false,
+      "is_no_contact_delivery_allowed": true,
+      "is_wolt_plus_only": false,
+      "lowest_price": null,
+      "lowest_price_v2": null,
+      "max_quantity_per_purchase": null,
+      "min_quantity_per_purchase": null,
+      "name": "მდოგვი ",
+      "options": [],
+      "original_price": null,
+      "original_net_price": null,
+      "item_price_discount_validity_period": null,
+      "price": 275,
+      "net_price": null,
+      "product_hierarchy_level_id": null,
+      "product_hierarchy_tags": null,
+      "purchasable_balance": null,
+      "restrictions": [],
+      "return_policy": null,
+      "sell_by_weight_config": null,
+      "should_display_purchasable_balance": false,
+      "tags": [],
+      "unit_info": null,
+      "unit_price": null,
+      "variant": null,
+      "vat_category_code": null,
+      "vat_percentage": 18,
+      "vat_percentage_decimal": "18.0",
+      "external_compliance_link": null,
+      "consent_info": {
+        "ask_consent": false,
+        "blur_image": false
+      }
+    }
+  ],
+  "options": [
+    {
+      "id": "5ae5ad7fe11ac8000cb4f0d6",
+      "name": "აირჩიეთ ექსტრა სოუსი",
+      "type": "multi_choice",
+      "values": [
+        {
+          "id": "40619de775d5a99c57d77009",
+          "deposit": null,
+          "dietary_preferences": [],
+          "name": "კეტჩუპი",
+          "price": 150,
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 10
+            }
+          }
+        },
+        {
+          "id": "4a892c9653754383132d1167",
+          "deposit": null,
+          "dietary_preferences": [],
+          "name": "მაიონეზი ",
+          "price": 150,
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 10
+            }
+          }
+        },
+        {
+          "id": "21b7798e24c3dd5efe565cb6",
+          "deposit": null,
+          "dietary_preferences": [],
+          "name": "BBQ ",
+          "price": 200,
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 10
+            }
+          }
+        },
+        {
+          "id": "e92eb86e43d8d51c35be71c2",
+          "deposit": null,
+          "dietary_preferences": [],
+          "name": "სოუსის გარეშე",
+          "price": 0,
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 1
+            }
+          }
+        }
+      ],
+      "default_value": "40619de775d5a99c57d77009",
+      "has_extra_info": false
+    },
+    {
+      "id": "5afbf8eb191bd6000bd1ec71",
+      "name": "ხალაპენიო ",
+      "type": "bool",
+      "values": [
+        {
+          "id": "3f3f08b2071d4db2bc0fa30c",
+          "deposit": null,
+          "dietary_preferences": [],
+          "name": "ხალაპენიოს გარეშე",
+          "price": 0,
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 1
+            }
+          }
+        },
+        {
+          "id": "811ae338b6493bc3edfecade",
+          "deposit": null,
+          "dietary_preferences": [],
+          "name": "ხალაპენიო",
+          "price": 200,
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 1
+            }
+          }
+        }
+      ],
+      "default_value": "3f3f08b2071d4db2bc0fa30c",
+      "has_extra_info": false
+    },
+    {
+      "id": "5b521cf1476127000ddd03de",
+      "name": "ხორცის შეწვის დონე ",
+      "type": "choice",
+      "values": [
+        {
+          "id": "261f6f95745b8d713ad33ab7",
+          "deposit": null,
+          "dietary_preferences": [],
+          "name": "Rare",
+          "price": 0,
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 1
+            }
+          }
+        },
+        {
+          "id": "80403857786c7b89f188ea50",
+          "deposit": null,
+          "dietary_preferences": [],
+          "name": "Medium rare",
+          "price": 0,
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 1
+            }
+          }
+        },
+        {
+          "id": "70485cce27956cb0d8f6cec7",
+          "deposit": null,
+          "dietary_preferences": [],
+          "name": "Medium",
+          "price": 0,
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 1
+            }
+          }
+        },
+        {
+          "id": "53eca95c913ea4fcceb2eb12",
+          "deposit": null,
+          "dietary_preferences": [],
+          "name": "Medium well",
+          "price": 0,
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 1
+            }
+          }
+        },
+        {
+          "id": "21c326769fdeb077d5141dcf",
+          "deposit": null,
+          "dietary_preferences": [],
+          "name": "Well done",
+          "price": 0,
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 1
+            }
+          }
+        }
+      ],
+      "default_value": "70485cce27956cb0d8f6cec7",
+      "has_extra_info": false
+    },
+    {
+      "id": "5b6079fab189d9000b1a5950",
+      "name": "ექსტრა ბეკონი",
+      "type": "choice",
+      "values": [
+        {
+          "id": "66234ec88c68cbeaa2a0d252",
+          "deposit": null,
+          "dietary_preferences": [],
+          "name": "ექსტრა ბეკონის გარეშე",
+          "price": 0,
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 1
+            }
+          }
+        },
+        {
+          "id": "bdcc41c00b1afa4b30f10f18",
+          "deposit": null,
+          "dietary_preferences": [],
+          "name": "ექსტრა ბეკონით",
+          "price": 200,
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 1
+            }
+          }
+        }
+      ],
+      "default_value": "66234ec88c68cbeaa2a0d252",
+      "has_extra_info": false
+    },
+    {
+      "id": "5b607a1a60188d000bd2b6ea",
+      "name": "ექსტრა ყველი",
+      "type": "choice",
+      "values": [
+        {
+          "id": "6e5988c8e89cb65126554dd5",
+          "deposit": null,
+          "dietary_preferences": [],
+          "name": "ექსტრა ყველის გარეშე",
+          "price": 0,
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 1
+            }
+          }
+        },
+        {
+          "id": "e3be097702c918facda6a4a9",
+          "deposit": null,
+          "dietary_preferences": [],
+          "name": "ექსტრა ყველით",
+          "price": 200,
+          "multi_choice_config": {
+            "total_range": {
+              "min": 0,
+              "max": 1
+            }
+          }
+        }
+      ],
+      "default_value": "6e5988c8e89cb65126554dd5",
+      "has_extra_info": false
+    }
+  ],
+  "variant_groups": []
+}

@@ -15,6 +15,7 @@ export type StarterTemplateKey =
   | 'burger_bar'
   | 'gochit_monster'
   | 'mugsy_street_diner'
+  | 'pipes_fabrika'
   | 'betareal'
   | 'respublika_grill'
 
@@ -324,6 +325,28 @@ const TEMPLATE_VISUAL_TOKENS: Record<StarterTemplateKey, ThemeConfig> = {
     day_accent_edge: 'linear-gradient(180deg, #D92E27, #F4B942)', day_thumb_vignette: 'linear-gradient(180deg, transparent 58%, rgba(45,27,20,0.12))',
     day_item_shadow: '0 8px 20px rgba(45,27,20,0.10)', day_item_hover_shadow: '0 14px 30px rgba(45,27,20,0.16)',
     day_modal_bg_image: 'linear-gradient(180deg, #FFFDF7 0%, #FFF7E7 100%)',
+  },
+  pipes_fabrika: {
+    night_bg_image: 'linear-gradient(90deg, rgba(248,244,234,0.04) 1px, transparent 1px), linear-gradient(180deg, #171717 0%, #24211b 55%, #171717 100%)',
+    night_bg_size: '24px 24px, auto', night_bg_repeat: 'repeat, no-repeat',
+    night_card_bg: '#24211b', night_card_radius: '8px', night_card_blur: '0px',
+    night_stage_bg: '#171717',
+    night_pill_bg: '#24211b', night_pill_active_bg: '#F05A28',
+    night_cta_bg: '#F05A28', night_cta_shadow: '4px 4px 0 #000000',
+    night_hero_color: '#F4C542', night_hero_shadow: 'none', night_divider_bg: '#F05A28',
+    night_accent_edge: 'linear-gradient(180deg, #F05A28, #F4C542)', night_thumb_vignette: 'linear-gradient(180deg, transparent 58%, rgba(23,23,23,0.26))',
+    night_item_shadow: '5px 5px 0 rgba(0,0,0,0.32)', night_item_hover_shadow: '7px 7px 0 rgba(0,0,0,0.40)',
+    night_modal_bg_image: 'linear-gradient(180deg, #24211b 0%, #171717 100%)',
+    day_bg_image: 'linear-gradient(90deg, rgba(23,23,23,0.035) 1px, transparent 1px), linear-gradient(180deg, #E9E3D7 0%, #F5F0E6 50%, #E9E3D7 100%)',
+    day_bg_size: '24px 24px, auto', day_bg_repeat: 'repeat, no-repeat',
+    day_card_bg: '#FFFDF7', day_card_radius: '8px', day_card_blur: '0px',
+    day_stage_bg: '#E9E3D7',
+    day_pill_bg: '#FFFDF7', day_pill_active_bg: '#171717',
+    day_cta_bg: '#F05A28', day_cta_shadow: '4px 4px 0 #171717',
+    day_hero_color: '#171717', day_hero_shadow: 'none', day_divider_bg: '#F05A28',
+    day_accent_edge: 'linear-gradient(180deg, #F05A28, #F4C542)', day_thumb_vignette: 'linear-gradient(180deg, transparent 58%, rgba(23,23,23,0.10))',
+    day_item_shadow: '5px 5px 0 rgba(23,23,23,0.18)', day_item_hover_shadow: '7px 7px 0 rgba(23,23,23,0.24)',
+    day_modal_bg_image: 'linear-gradient(180deg, #F5F0E6 0%, #E9E3D7 100%)',
   },
   // Transcribed from the --bb-* custom properties in index.html.
   gochit_monster: {
@@ -663,6 +686,28 @@ export const TEMPLATE_PRESETS: ThemePreset[] = [
       day_price_color: '#A91E1A', day_add_btn_color: '#D92E27',
       ...TEMPLATE_VISUAL_TOKENS.mugsy_street_diner,
       font_body: 'Nunito', font_heading: 'Bebas Neue', template_key: 'mugsy_street_diner',
+      default_theme: 'day',
+    },
+  },
+  {
+    key: 'pipes_fabrika',
+    label: 'PIPES Fabrika',
+    description: 'Concrete, paper, orange, poster-tape energy and photo-led cards for fast casual burger menus.',
+    primaryColor: '#F05A28',
+    secondaryColor: '#B7D936',
+    createStarterCategory: true,
+    preserveModeAccents: true,
+    values: {
+      night_bg: '#171717', night_bg2: '#24211b', night_card: '#24211b', night_card2: '#171717', night_border: '#F8F4EA',
+      night_text: '#F8F4EA', night_dim: '#C9A97C', night_accent: '#F4C542', night_accent2: '#F05A28', night_accent_text: '#171717', night_thumb_bg: '#171717', night_modal_bg: '#24211b',
+      night_glow: 'rgba(240,90,40,0.18)', night_glow2: 'rgba(183,217,54,0.10)', night_shadow: 'rgba(0,0,0,0.42)',
+      night_price_color: '#F4C542', night_add_btn_color: '#F4C542',
+      day_bg: '#E9E3D7', day_bg2: '#F5F0E6', day_card: '#FFFDF7', day_card2: '#F5F0E6', day_border: '#171717',
+      day_text: '#171717', day_dim: '#555555', day_accent: '#F05A28', day_accent2: '#B7D936', day_accent_text: '#FFFDF7', day_thumb_bg: '#E9E3D7', day_modal_bg: '#F5F0E6',
+      day_glow: 'rgba(240,90,40,0.14)', day_glow2: 'rgba(183,217,54,0.10)', day_shadow: 'rgba(23,23,23,0.18)',
+      day_price_color: '#C7431C', day_add_btn_color: '#F05A28',
+      ...TEMPLATE_VISUAL_TOKENS.pipes_fabrika,
+      font_body: 'Nunito', font_heading: 'Anton', template_key: 'pipes_fabrika',
       default_theme: 'day',
     },
   },

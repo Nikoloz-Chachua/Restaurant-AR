@@ -37,8 +37,8 @@
     <link rel="preconnect" href="https://pub-3c68559de18f4aee94d127e180937bdd.r2.dev" crossorigin>
     <!-- Fonts loaded non-render-blocking: the print->all swap drops the stylesheet off
          the critical path. display=swap means text shows immediately in a fallback. -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@600;700&family=Noto+Sans+Georgian:wght@400;600;700;800;900&family=Nunito:wght@400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@600;700&family=Noto+Sans+Georgian:wght@400;600;700;800;900&family=Nunito:wght@400;600;700;800;900&display=swap"></noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cormorant+Garamond:wght@600;700&family=Noto+Sans+Georgian:wght@400;600;700;800;900&family=Nunito:wght@400;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cormorant+Garamond:wght@600;700&family=Noto+Sans+Georgian:wght@400;600;700;800;900&family=Nunito:wght@400;600;700;800;900&display=swap"></noscript>
     <script>
         {
             // Anti-flash template hint. The real template_key only arrives with the
@@ -52,6 +52,7 @@
                 'burgervazha': 'burger_lions',
                 'burger-bar-main': 'burger_bar',
                 'mugsy-main': 'mugsy_street_diner',
+                'pipes-burger-main': 'pipes_fabrika',
                 'gochit-s-burger-main': 'gochit_monster',
                 'r-main': 'respublika_grill'
             };
@@ -64,6 +65,7 @@
                 burger_bar: { theme: 'night' },
                 gochit_monster: { theme: 'night' },
                 mugsy_street_diner: { theme: 'day', preload: './assets/mugsy/hero-burger.webp' },
+                pipes_fabrika: { theme: 'day', preload: './assets/pipes/items-webp/pipes-signature-burger.webp' },
                 respublika_grill: { theme: 'night' }
             };
             const params = new URLSearchParams(location.search);
@@ -4501,6 +4503,434 @@
             }
         }
 
+        /* ── PIPES Fabrika shell — exact restaurant + brand gate ─────── */
+        .pipes-shell,
+        .pipes-signature,
+        .pipes-location,
+        .pipes-footer { display: none; }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"][data-template="pipes_fabrika"] {
+            --bg: #E9E3D7; --bg2: #F5F0E6; --card: #FFFDF7; --card2: #F5F0E6;
+            --border: #171717; --text: #171717; --dim: #555; --accent: #F05A28;
+            --accent2: #B7D936; --accent-text: #FFFDF7; --thumb-bg: #E9E3D7;
+            --modal-bg: #F5F0E6; --modal-rgb: 245,240,230;
+            --bg-image: linear-gradient(90deg, rgba(23,23,23,0.035) 1px, transparent 1px), linear-gradient(180deg, #E9E3D7 0%, #F5F0E6 50%, #E9E3D7 100%);
+            --bg-size: 24px 24px, auto; --bg-repeat: repeat, no-repeat;
+            --card-bg: #FFFDF7; --card-radius: 8px; --stage-bg: #E9E3D7;
+            --pill-bg: #FFFDF7; --pill-active-bg: #171717; --cta-bg: #F05A28;
+            --cta-shadow: 4px 4px 0 #171717; --item-shadow: 5px 5px 0 rgba(23,23,23,0.18);
+            --item-hover-shadow: 7px 7px 0 rgba(23,23,23,0.24);
+            --price-color: #C7431C; --add-btn-color: #F05A28;
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] body {
+            padding: 0;
+            background: #E9E3D7;
+            color: #171717;
+            font-family: 'Nunito', 'Noto Sans Georgian', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .header,
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .mg-hero,
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .baoma-shell,
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .mugsy-shell,
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .site-footer { display: none; }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .pipes-shell {
+            display: block;
+            width: 100%;
+            background: radial-gradient(circle at 16% 14%, rgba(244,197,66,0.34), transparent 20%), linear-gradient(180deg, #E9E3D7 0%, #F5F0E6 100%);
+            border-bottom: 3px solid #171717;
+        }
+        .pipes-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 1220;
+            min-height: calc(58px + env(safe-area-inset-top, 0px));
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 12px;
+            padding: calc(8px + env(safe-area-inset-top, 0px)) calc(max(12px, env(safe-area-inset-right)) + 58px) 8px max(12px, env(safe-area-inset-left));
+            background: rgba(245,240,230,0.94);
+            border-bottom: 2px solid #171717;
+            backdrop-filter: blur(10px);
+        }
+        .pipes-brand,
+        .pipes-links a,
+        .pipes-cta,
+        .pipes-map-link,
+        .pipes-footer a,
+        .pipes-footer button {
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: inherit;
+            text-decoration: none;
+        }
+        .pipes-brand { gap: 8px; font-weight: 900; }
+        .pipes-mark,
+        .pipes-title,
+        .pipes-section-head h2,
+        .pipes-signature-name,
+        .pipes-location h2,
+        .pipes-footer-brand {
+            font-family: 'Anton', 'Nunito', sans-serif;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+        .pipes-mark { font-size: 1.42rem; line-height: 1; }
+        .pipes-branch {
+            padding: 4px 7px;
+            background: #F4C542;
+            border: 2px solid #171717;
+            transform: rotate(-2deg);
+            font-size: 0.7rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+        .pipes-links { display: none; justify-content: center; gap: 4px; }
+        .pipes-links a { padding: 0 12px; font-size: 0.76rem; font-weight: 900; text-transform: uppercase; }
+        .pipes-tools { display: flex; align-items: center; justify-content: flex-end; min-width: 0; gap: 6px; }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] #theme-toggle { display: none; }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] #lang-toggle {
+            position: fixed;
+            z-index: 1230;
+            top: calc(8px + env(safe-area-inset-top, 0px));
+            left: auto;
+            right: max(12px, env(safe-area-inset-right));
+            width: 44px;
+            height: 44px;
+            border-radius: 0;
+            border: 2px solid #171717;
+            background: #FFFDF7;
+            color: #171717;
+            box-shadow: 3px 3px 0 #171717;
+            font-weight: 900;
+        }
+        .pipes-search {
+            width: min(42vw, 250px);
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 48px 0 10px;
+            border: 2px solid #171717;
+            background: #FFFDF7;
+            box-shadow: 3px 3px 0 rgba(23,23,23,0.14);
+        }
+        .pipes-search input {
+            width: 100%;
+            min-height: 44px;
+            min-width: 0;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: #171717;
+            font: inherit;
+            font-size: 16px;
+            font-weight: 800;
+        }
+        .pipes-search-icon { font-size: 1.2rem; font-weight: 900; }
+        .pipes-search-clear {
+            position: absolute;
+            right: calc(max(12px, env(safe-area-inset-right)) + 51px);
+            width: 34px;
+            height: 34px;
+            border: 0;
+            background: transparent;
+            color: #171717;
+            font-size: 1.6rem;
+            font-weight: 900;
+        }
+        .pipes-hero {
+            min-height: clamp(400px, 72svh, 620px);
+            display: grid;
+            grid-template-rows: minmax(190px, 1fr) auto;
+            align-items: end;
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 16px max(14px, env(safe-area-inset-right)) 28px max(14px, env(safe-area-inset-left));
+            position: relative;
+            overflow: hidden;
+        }
+        .pipes-hero-art { position: relative; min-height: 210px; isolation: isolate; }
+        .pipes-hero-img {
+            position: absolute;
+            right: -22px;
+            bottom: -6px;
+            width: min(84vw, 520px);
+            max-height: 330px;
+            object-fit: contain;
+            filter: drop-shadow(12px 14px 0 rgba(23,23,23,0.18));
+            z-index: 2;
+        }
+        .pipes-poster {
+            position: absolute;
+            z-index: 1;
+            border: 2px solid #171717;
+            background: #F4C542;
+            color: #171717;
+            font-weight: 900;
+            text-transform: uppercase;
+            box-shadow: 5px 5px 0 rgba(23,23,23,0.18);
+        }
+        .poster-one { left: 4px; top: 16px; padding: 12px 16px; transform: rotate(-4deg); }
+        .poster-two { left: 58px; bottom: 28px; padding: 8px 12px; background: #B7D936; transform: rotate(3deg); font-size: 0.74rem; }
+        .pipes-hero-copy { position: relative; z-index: 3; max-width: 720px; }
+        .pipes-kicker,
+        .pipes-section-head p,
+        .pipes-location-kicker {
+            margin: 0 0 8px;
+            color: #C7431C;
+            font-size: 0.74rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+        .pipes-title {
+            margin: 0;
+            max-width: 12ch;
+            font-size: clamp(3rem, 13vw, 7rem);
+            line-height: 0.9;
+        }
+        .pipes-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+        .pipes-cta,
+        .pipes-map-link {
+            padding: 0 18px;
+            border: 2px solid #171717;
+            background: #F05A28;
+            color: #FFFDF7;
+            box-shadow: 4px 4px 0 #171717;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+        .pipes-cta.secondary { background: #FFFDF7; color: #171717; }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] #pipes-hero-3d[hidden] {
+            display: none !important;
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .cat-bar {
+            position: sticky;
+            top: calc(58px + env(safe-area-inset-top, 0px));
+            z-index: 1000;
+            width: 100%;
+            max-width: none;
+            padding: 8px 0;
+            margin: 0;
+            background: rgba(245,240,230,0.96);
+            border-bottom: 2px solid #171717;
+            backdrop-filter: blur(10px);
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .cat-scroll,
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .cat-filter {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding-left: max(12px, env(safe-area-inset-left));
+            padding-right: max(12px, env(safe-area-inset-right));
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .cat-pill {
+            min-height: 44px;
+            border-radius: 0;
+            border: 2px solid #171717;
+            background: #FFFDF7;
+            color: #171717;
+            font-weight: 900;
+            box-shadow: 3px 3px 0 rgba(23,23,23,0.16);
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .cat-pill.active {
+            background: #171717;
+            color: #FFFDF7;
+            box-shadow: 3px 3px 0 #F05A28;
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .menu-list {
+            width: 100%;
+            max-width: 1180px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            padding: 18px max(14px, env(safe-area-inset-right)) 8px max(14px, env(safe-area-inset-left));
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .cat-section { display: contents; }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .category-header {
+            grid-column: 1 / -1;
+            max-width: none;
+            padding: 16px 0 6px;
+            border-bottom: 3px solid #171717;
+            color: #171717;
+            font-family: 'Anton', 'Nunito', sans-serif;
+            font-size: 1.7rem;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .menu-item {
+            border: 2px solid #171717;
+            border-radius: 8px;
+            background: #FFFDF7;
+            box-shadow: 5px 5px 0 rgba(23,23,23,0.18);
+            overflow: hidden;
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .menu-item::before { background: #F05A28; width: 5px; }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .menu-item:not(.no-image) {
+            grid-template-columns: 1fr;
+            grid-template-areas: "left" "name" "right";
+            padding: 0;
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .menu-item:not(.no-image) .thumb-wrap {
+            width: 100%;
+            min-height: 0;
+            aspect-ratio: 1.25 / 1;
+            border: 0;
+            border-bottom: 2px solid #171717;
+            border-radius: 0;
+            background: #E9E3D7;
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .thumb-img { object-fit: cover; cursor: zoom-in; }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .item-name {
+            padding: 12px 12px 0;
+            color: #171717;
+            font-family: 'Anton', 'Nunito', sans-serif;
+            font-size: 1.28rem;
+            line-height: 1.04;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .item-right { padding: 8px 12px 12px; }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .ingredients { color: #555; font-weight: 700; line-height: 1.4; }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .price {
+            color: #C7431C;
+            font-family: 'Anton', 'Nunito', sans-serif;
+            font-size: 1.28rem;
+            letter-spacing: 0;
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .qty-add-btn,
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .qty-stepper {
+            min-height: 44px;
+            border: 2px solid #171717;
+            border-radius: 0;
+            color: #171717;
+            background: #F4C542;
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .qty-add-btn { width: 44px; height: 44px; }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .menu-item.no-image { padding: 14px 12px 12px; }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .menu-item.no-image .item-name,
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .menu-item.no-image .item-right { padding: 0; }
+        .pipes-signature { max-width: 1180px; margin: 24px auto 0; padding: 0 max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left)); }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .pipes-signature:not([hidden]) { display: block; }
+        .pipes-section-head { margin-bottom: 10px; }
+        .pipes-section-head h2 { margin: 0; }
+        .pipes-signature-card {
+            display: grid;
+            grid-template-columns: 42% minmax(0, 1fr);
+            gap: 14px;
+            align-items: stretch;
+            border: 2px solid #171717;
+            background: #171717;
+            color: #FFFDF7;
+            box-shadow: 6px 6px 0 #F05A28;
+            overflow: hidden;
+        }
+        .pipes-signature-card img { width: 100%; height: 100%; min-height: 180px; object-fit: cover; background: #E9E3D7; }
+        .pipes-signature-body { padding: 16px 16px 16px 0; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+        .pipes-signature-name { margin: 0; font-size: clamp(1.7rem, 7vw, 3rem); line-height: 1; }
+        .pipes-signature-desc { margin: 0; color: #F8F4EA; line-height: 1.45; font-weight: 700; }
+        .pipes-signature-price { margin: 0; color: #F4C542; font-family: 'Anton', 'Nunito', sans-serif; font-size: 1.35rem; }
+        .pipes-empty {
+            grid-column: 1 / -1;
+            padding: 24px 16px;
+            border: 2px solid #171717;
+            background: #FFFDF7;
+            box-shadow: 5px 5px 0 rgba(23,23,23,0.18);
+            font-weight: 800;
+        }
+        .pipes-location { background: #171717; color: #F8F4EA; margin-top: 28px; border-top: 4px solid #F05A28; }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .pipes-location { display: block; }
+        .pipes-location-inner { max-width: 1180px; margin: 0 auto; padding: 28px max(14px, env(safe-area-inset-right)) 30px max(14px, env(safe-area-inset-left)); }
+        .pipes-location-kicker { color: #F4C542; }
+        .pipes-location h2 { margin: 0 0 8px; }
+        .pipes-location-address { margin: 0 0 16px; color: #E9E3D7; font-weight: 800; }
+        .pipes-footer {
+            background: #171717;
+            color: #F8F4EA;
+            border-top: 2px solid #F05A28;
+            padding: 16px max(14px, env(safe-area-inset-right)) calc(22px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left));
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px 14px;
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .pipes-footer { display: flex; }
+        .pipes-footer-brand { color: #F4C542; font-size: 1.2rem; }
+        .pipes-footer-sep { width: 36px; height: 4px; background: #F05A28; }
+        .pipes-footer a,
+        .pipes-footer button { min-width: 44px; border: 0; padding: 0; background: transparent; color: #F4C542; font: inherit; text-transform: uppercase; }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] #basket-bar-delete {
+            min-width: 44px;
+            min-height: 44px;
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] #basket-bar,
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] #basket-waiter-btn { background: #F05A28; color: #FFFDF7; }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] #basket-panel,
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] #modal,
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] #img-lightbox.has-panel {
+            background-color: #F5F0E6;
+            color: #171717;
+        }
+        [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] :focus-visible { outline: 3px solid #2878C8; outline-offset: 3px; }
+        html[lang="ka"][data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .pipes-title,
+        html[lang="ka"][data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .pipes-mark,
+        html[lang="ka"][data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .category-header,
+        html[lang="ka"][data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .item-name,
+        html[lang="ka"][data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .pipes-signature-name,
+        html[lang="ka"][data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .pipes-location h2 {
+            font-family: 'Noto Sans Georgian', 'Nunito', system-ui, sans-serif !important;
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: 900;
+        }
+        html[lang="ka"][data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .pipes-title {
+            max-width: 10ch;
+            font-size: clamp(2.55rem, 10vw, 5.2rem);
+            line-height: 1;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] *,
+            [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] *::before,
+            [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] *::after {
+                animation-duration: 0.001ms !important;
+                transition-duration: 0.001ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+        @media (min-width: 700px) {
+            .pipes-links { display: flex; }
+            .pipes-search { width: min(24vw, 280px); }
+            [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .menu-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .pipes-hero {
+                grid-template-columns: minmax(0, 0.95fr) minmax(360px, 1.05fr);
+                grid-template-rows: 1fr;
+                min-height: clamp(480px, 64svh, 620px);
+            }
+            .pipes-hero-copy { grid-column: 1; grid-row: 1; align-self: end; }
+            .pipes-hero-art { grid-column: 2; grid-row: 1; align-self: stretch; }
+            .pipes-hero-img { right: 0; bottom: 26px; width: min(44vw, 580px); max-height: 440px; }
+        }
+        @media (min-width: 1020px) {
+            [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .menu-list {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 18px;
+            }
+        }
+        @media (max-width: 520px) {
+            .pipes-topbar { grid-template-columns: auto minmax(0, 1fr) 44px; gap: 8px; }
+            .pipes-tools { grid-column: 1 / 4; grid-row: 2; justify-content: stretch; }
+            .pipes-search { width: 100%; }
+            .pipes-search-clear { right: calc(max(12px, env(safe-area-inset-right)) + 6px); bottom: 13px; }
+            [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"] .cat-bar {
+                top: calc(110px + env(safe-area-inset-top, 0px));
+            }
+            .pipes-signature-card { grid-template-columns: 1fr; }
+            .pipes-signature-body { padding: 0 14px 16px; }
+        }
+
         /* The brand mark is a circular badge that already contains the words
            "BURGER BAR", so the text title beneath it would just repeat itself.
            Hidden only when a logo actually loaded — a tenant with no logo keeps
@@ -5445,6 +5875,42 @@
 
     <nav id="mugsy-delivery-rail" class="mugsy-delivery-rail" aria-label="Delivery services" hidden></nav>
 
+    <section class="pipes-shell" aria-label="Pipes Burger">
+        <header class="pipes-topbar">
+            <a class="pipes-brand" href="#cat-filter" aria-label="Pipes Burger menu">
+                <span class="pipes-mark">PIPES</span>
+                <span class="pipes-branch">Fabrika</span>
+            </a>
+            <nav class="pipes-links" aria-label="Pipes navigation">
+                <a href="#cat-filter" data-pipes="navMenu">Menu</a>
+                <a href="#pipes-signature" data-pipes="navSignature">Signature</a>
+                <a href="#pipes-location" data-pipes="navLocation">Location</a>
+            </nav>
+            <div class="pipes-tools">
+                <label class="pipes-search" for="pipes-search">
+                    <span class="pipes-search-icon" aria-hidden="true">⌕</span>
+                    <input id="pipes-search" type="search" autocomplete="off" data-pipes-placeholder="search" placeholder="Search menu">
+                </label>
+                <button id="pipes-search-clear" class="pipes-search-clear" type="button" aria-label="Clear search" hidden>×</button>
+            </div>
+        </header>
+        <section class="pipes-hero">
+            <div class="pipes-hero-art">
+                <div class="pipes-poster poster-one" aria-hidden="true">Fabrika</div>
+                <div class="pipes-poster poster-two" aria-hidden="true">PIPES</div>
+                <img id="pipes-hero-img" class="pipes-hero-img" src="./assets/pipes/items-webp/pipes-signature-burger.webp" alt="Pipes Signature Burger" width="960" height="640" decoding="async">
+            </div>
+            <div class="pipes-hero-copy">
+                <p class="pipes-kicker" data-pipes="kicker">Fabrika burger joint</p>
+                <h1 class="pipes-title" data-pipes="heroCopy">BURGERS. FRIENDS. FABRIKA.</h1>
+                <div class="pipes-actions">
+                    <a class="pipes-cta" href="#cat-filter" data-pipes="explore">Menu</a>
+                    <button id="pipes-hero-3d" class="pipes-cta secondary" type="button" hidden>3D</button>
+                </div>
+            </div>
+        </section>
+    </section>
+
     <div class="header">
         <img id="tenant-logo" class="tenant-logo" alt="" decoding="async">
         <h1 id="brand-title" data-brand>Restaurant Menu</h1>
@@ -5464,7 +5930,24 @@
     <h2 id="bb-feat-head" class="bb-feat-head" hidden></h2>
     <div id="bb-featured" class="bb-featured"></div>
 
+    <section id="pipes-signature" class="pipes-signature" aria-labelledby="pipes-signature-title" hidden>
+        <div class="pipes-section-head">
+            <p data-pipes="signatureKicker">PIPES Signature</p>
+            <h2 id="pipes-signature-title" data-pipes="signatureTitle">Signature</h2>
+        </div>
+        <div id="pipes-signature-card" class="pipes-signature-card"></div>
+    </section>
+
     <div class="menu-list" id="menu-list"></div>
+
+    <section id="pipes-location" class="pipes-location" aria-labelledby="pipes-location-title">
+        <div class="pipes-location-inner">
+            <p class="pipes-location-kicker" data-pipes="locationKicker">Fabrika location</p>
+            <h2 id="pipes-location-title" data-pipes="locationTitle">PIPES Burger Joint / Fabrika</h2>
+            <p class="pipes-location-address" data-pipes="locationAddress">Fabrika, 8 Egnate Ninoshvili Street, Tbilisi</p>
+            <a class="pipes-map-link" href="https://www.google.com/maps/dir/?api=1&destination=41.7095131,44.8025001&destination_place_id=PIPES%20Burger%20Joint" target="_blank" rel="noopener" data-pipes="directions">Directions</a>
+        </div>
+    </section>
 
     <!-- Visit / contact block. Every field comes from theme_config; the whole
          section stays hidden until a tenant fills it in, so it can never show
@@ -5513,6 +5996,15 @@
         <img class="footer-logo footer-logo-white" src="./img/betareal-logo-white.png" alt="BetaReal" width="333" height="110" loading="lazy" decoding="async">
         <a class="footer-email" href="mailto:betareal.ar@gmail.com">betareal.ar@gmail.com</a>
         <p class="footer-copy">&copy; 2026 BetaReal &middot; Augmented Reality Menus</p>
+    </footer>
+
+    <footer class="pipes-footer">
+        <span class="pipes-footer-brand">PIPES</span>
+        <span class="pipes-footer-address" data-pipes="locationAddress">Fabrika, 8 Egnate Ninoshvili Street, Tbilisi</span>
+        <span class="pipes-footer-sep" aria-hidden="true"></span>
+        <a href="#cat-filter" data-pipes="navMenu">Menu</a>
+        <button id="pipes-footer-lang" type="button" data-pipes="language">Language</button>
+        <span>Interactive menu powered by BetaReal</span>
     </footer>
 
     <!-- Fullscreen image lightbox for photo (non-3D) items. Plain image by
@@ -6550,6 +7042,10 @@
         const _MUGSY_RESTAURANT_SLUG = 'mugsy-main';
         const _MUGSY_BRAND_SLUG = 'mugsy';
         const _MUGSY_TEMPLATE_KEY = 'mugsy_street_diner';
+        const _PIPES_RESTAURANT_SLUG = 'pipes-burger-main';
+        const _PIPES_BRAND_SLUG = 'pipes-burger';
+        const _PIPES_TEMPLATE_KEY = 'pipes_fabrika';
+        const _PIPES_DIRECTIONS_URL = 'https://www.google.com/maps/dir/?api=1&destination=41.7095131,44.8025001&destination_place_id=PIPES%20Burger%20Joint';
         const _MUGSY_DEFAULT_ORDER_LINKS = [
             { label: 'Wolt', url: 'https://wolt.com/en/geo/tbilisi/restaurant/magsys-burger?srsltid=AfmBOor5reRoicmEFy72EUVGZI728ljsK4D7Hgb7NPpE_PPSjNq7Z9At' },
             { label: 'Glovo', url: 'https://glovoapp.com/en/ge/tbilisi/stores/mugsy-s-burger-tbi' }
@@ -6623,6 +7119,66 @@
             const brandSlug = brand?.slug || document.documentElement.dataset.brandSlug || '';
             return restaurant_slug === _MUGSY_RESTAURANT_SLUG && brandSlug === _MUGSY_BRAND_SLUG;
         }
+        function _isPipesTenant() {
+            const tenant = window.__tenant || _tenant || {};
+            const restaurant_slug = tenant.restaurant_slug || _tenantSlugFromHost();
+            const brand = Array.isArray(tenant.brand) ? tenant.brand[0] : tenant.brand;
+            const brandSlug = brand?.slug || document.documentElement.dataset.brandSlug || '';
+            return restaurant_slug === _PIPES_RESTAURANT_SLUG && brandSlug === _PIPES_BRAND_SLUG;
+        }
+        const _PIPES_COPY_TOKENS = {
+            kicker: 'hero_kicker',
+            heroCopy: 'hero_copy',
+            explore: 'hero_cta',
+            signatureKicker: 'signature_kicker',
+            signatureTitle: 'signature_title',
+            locationKicker: 'info_kicker',
+            locationTitle: 'info_title',
+            locationAddress: 'location_address',
+            documentTitleSuffix: 'document_title_suffix',
+            directions: 'info_directions_label',
+            search: 'search_placeholder',
+            navMenu: 'nav_menu',
+            navSignature: 'nav_signature',
+            navLocation: 'nav_location',
+            language: 'footer_language'
+        };
+        const _PIPES_COPY = {
+            en: {
+                kicker: 'Fabrika burger joint',
+                heroCopy: 'BURGERS. FRIENDS. FABRIKA.',
+                explore: 'Menu',
+                signatureKicker: 'PIPES Signature',
+                signatureTitle: 'Signature',
+                locationKicker: 'Fabrika location',
+                locationTitle: 'Find us in Fabrika',
+                locationAddress: 'Fabrika, 8 Egnate Ninoshvili Street, Tbilisi',
+                documentTitleSuffix: 'Fabrika Menu',
+                directions: 'Directions',
+                search: 'Search menu',
+                navMenu: 'Menu',
+                navSignature: 'Signature',
+                navLocation: 'Location',
+                language: 'Language'
+            },
+            ka: {
+                kicker: 'ბურგერები ფაბრიკაში',
+                heroCopy: 'ბურგერი. მეგობრები. ფაბრიკა.',
+                explore: 'მენიუ',
+                signatureKicker: 'PIPES საფირმო',
+                signatureTitle: 'საფირმო',
+                locationKicker: 'ფაბრიკის ლოკაცია',
+                locationTitle: 'გვიპოვე ფაბრიკაში',
+                locationAddress: 'ფაბრიკა, ეგნატე ნინოშვილის ქუჩა 8, თბილისი',
+                documentTitleSuffix: 'ფაბრიკის მენიუ',
+                directions: 'მიმართულება',
+                search: 'მენიუში ძებნა',
+                navMenu: 'მენიუ',
+                navSignature: 'საფირმო',
+                navLocation: 'ლოკაცია',
+                language: 'ენა'
+            }
+        };
         const _MUGSY_COPY_TOKENS = {
             kicker: 'hero_kicker',
             heroCopy: 'hero_copy',
@@ -6706,6 +7262,36 @@
             }
             const pack = _MUGSY_COPY[window.__lang] || _MUGSY_COPY.en;
             return pack[key] || _MUGSY_COPY.en[key] || '';
+        }
+        function _pipesText(key) {
+            const token = _PIPES_COPY_TOKENS[key];
+            const cfg = _themeConfig || {};
+            if (token) {
+                const localized = window.__lang === 'ka' ? cfg[`${token}_ka`] : cfg[token];
+                if (localized) return localized;
+                if (window.__lang !== 'ka' && cfg[token]) return cfg[token];
+            }
+            const pack = _PIPES_COPY[window.__lang] || _PIPES_COPY.en;
+            return pack[key] || _PIPES_COPY.en[key] || '';
+        }
+        function _applyPipesCopy() {
+            if (!_isPipesTenant()) return;
+            document.querySelectorAll('[data-pipes]').forEach(el => {
+                const key = el.dataset.pipes;
+                const txt = _pipesText(key);
+                if (txt) el.textContent = txt;
+            });
+            document.querySelectorAll('[data-pipes-placeholder]').forEach(el => {
+                const txt = _pipesText(el.dataset.pipesPlaceholder);
+                if (txt) el.setAttribute('placeholder', txt);
+            });
+            const langFooter = document.getElementById('pipes-footer-lang');
+            if (langFooter && !langFooter.__pipesBound) {
+                langFooter.__pipesBound = true;
+                langFooter.addEventListener('click', () => document.getElementById('lang-toggle')?.click());
+            }
+            const directions = document.querySelector('.pipes-map-link');
+            if (directions) directions.href = _safeAssetUrl((_themeConfig || {}).info_directions_url) || _PIPES_DIRECTIONS_URL;
         }
         function _parseConfigList(raw) {
             const s = String(raw || '').trim();
@@ -6901,6 +7487,11 @@
                 && _tenantSlugFromHost() === _MUGSY_RESTAURANT_SLUG
                 && new URLSearchParams(location.search).get('fixture') === 'mugsy';
         }
+        function _pipesFixtureRequested() {
+            return _isLocalhost()
+                && _tenantSlugFromHost() === _PIPES_RESTAURANT_SLUG
+                && new URLSearchParams(location.search).get('fixture') === 'pipes';
+        }
         let _baomaFixturePromise = null;
         async function _loadBaomaFixture() {
             if (!_baomaFixtureRequested()) return null;
@@ -6925,16 +7516,31 @@
             }
             return _mugsyFixturePromise;
         }
+        let _pipesFixturePromise = null;
+        async function _loadPipesFixture() {
+            if (!_pipesFixtureRequested()) return null;
+            if (!_pipesFixturePromise) {
+                _pipesFixturePromise = fetch('./data/fixtures/pipes-menu.fixture.json', { cache: 'no-store' })
+                    .then(r => {
+                        if (!r.ok) throw new Error('pipes fixture ' + r.status);
+                        return r.json();
+                    });
+            }
+            return _pipesFixturePromise;
+        }
         const _requestedTenantSlug = _tenantSlugFromHost();
         const _previewAccessAllowed = true;
-        const _analyticsEnabled = !_baomaFixtureRequested() && !_mugsyFixtureRequested();
+        const _analyticsEnabled = !_baomaFixtureRequested() && !_mugsyFixtureRequested() && !_pipesFixtureRequested();
         _applyTenantFavicon(_requestedTenantSlug);
         async function _resolveTenant() {
             if (_tenant) return _tenant;
             const slug = _tenantSlugFromHost();
             if ((_baomaFixtureRequested() && slug === _BAOMA_FIXTURE_SLUG) ||
-                (_mugsyFixtureRequested() && slug === _MUGSY_RESTAURANT_SLUG)) {
-                const fixture = _mugsyFixtureRequested() ? await _loadMugsyFixture() : await _loadBaomaFixture();
+                (_mugsyFixtureRequested() && slug === _MUGSY_RESTAURANT_SLUG) ||
+                (_pipesFixtureRequested() && slug === _PIPES_RESTAURANT_SLUG)) {
+                const fixture = _pipesFixtureRequested()
+                    ? await _loadPipesFixture()
+                    : (_mugsyFixtureRequested() ? await _loadMugsyFixture() : await _loadBaomaFixture());
                 const restaurant = fixture.restaurant;
                 const brand = Array.isArray(restaurant.brands) ? restaurant.brands[0] : restaurant.brands;
                 _tenant = {
@@ -6951,6 +7557,7 @@
                 _applyBrandTitle();
                 _applyBaomaCopy();
                 _applyMugsyCopy();
+                _applyPipesCopy();
                 return _tenant;
             }
             const isDefaultHost = Boolean(_DEFAULT_RESTAURANT_SLUG) && slug === _DEFAULT_RESTAURANT_SLUG;
@@ -6981,6 +7588,7 @@
             _applyBrandTitle();
             _applyBaomaCopy();
             _applyMugsyCopy();
+            _applyPipesCopy();
             return _tenant;
         }
         // POST /rest/v1/<table> — fire-and-forget insert (analytics). Never throws.
@@ -7249,6 +7857,8 @@
                 ? _baomaPageTitle(brandTitle)
                 : _isMugsyTenant()
                     ? `${brandTitle} · Menu`
+                : _isPipesTenant()
+                    ? `${brandTitle} · ${_pipesText('documentTitleSuffix')}`
                 : `${brandTitle} · Menu`;
             document.title = pageTitle;
             const ogTitle = document.querySelector('meta[property="og:title"]');
@@ -7257,6 +7867,8 @@
                 ? _baomaText('metaDescription')
                 : _isMugsyTenant()
                     ? _mugsyText('metaDescription')
+                : _isPipesTenant()
+                    ? 'Browse the Pipes Burger Fabrika menu with official dish photos and BetaReal interaction.'
                 : 'Restaurant menu. View dishes in Augmented Reality before you order.';
             const metaDesc = document.querySelector('meta[name="description"]');
             const ogDesc = document.querySelector('meta[property="og:description"]');
@@ -7265,6 +7877,8 @@
             if (ogDesc) ogDesc.setAttribute('content', desc);
             if (ogImage) ogImage.setAttribute('content', _isBaomaTenant()
                 ? new URL(_baomaLink('hero_image_url', _BAOMA_HERO_IMAGE), location.href).href
+                : _isPipesTenant()
+                    ? new URL('./assets/pipes/items-webp/pipes-signature-burger.webp', location.href).href
                 : '');
         }
 
@@ -7366,6 +7980,7 @@
             _applyBrandTitle();
             _applyBaomaCopy();
             _applyMugsyCopy();
+            _applyPipesCopy();
             document.getElementById('lang-toggle').textContent   = u.langBtn;
             const _themeToggle = document.getElementById('theme-toggle');
             _themeToggle.innerHTML = theme === 'night' ? _SVG_SUN : _SVG_MOON;
@@ -7401,6 +8016,7 @@
             if (typeof window._updateGroupLabels === 'function') window._updateGroupLabels(lang);
             if (typeof window._updateCatNav === 'function') window._updateCatNav();
             if (typeof window._renderMenuList === 'function') window._renderMenuList();
+            if (typeof window._renderPipesSignature === 'function') window._renderPipesSignature();
             if (modal.classList.contains('active')) updateModal();
             const _mArBtn = document.getElementById('modal-ar-btn');
             if (_mArBtn) _mArBtn.textContent = _arButtonLabel(modalItems[modalIndex]);
@@ -8545,7 +9161,9 @@
                 const tenant = await _resolveTenant();
                 const fixture = _mugsyFixtureRequested()
                     ? await _loadMugsyFixture()
-                    : (_baomaFixtureRequested() ? await _loadBaomaFixture() : null);
+                    : (_baomaFixtureRequested()
+                        ? await _loadBaomaFixture()
+                        : (_pipesFixtureRequested() ? await _loadPipesFixture() : null));
                 const data = fixture
                     ? fixture.theme_config
                     : await _supaSelect(`theme_config?select=key,value&restaurant_id=eq.${tenant.restaurant_id}`);
@@ -8582,7 +9200,7 @@
                 // per-tenant colour choice: an owner editing palette colours must not be
                 // able to knock out the layered background the template is built on.
                 // Every other token stays editable from the CMS as normal.
-                const _bgOwnedByTemplate = ['monday_greens', 'baoma', 'mugsy_street_diner'].includes(templateKey);
+                const _bgOwnedByTemplate = ['monday_greens', 'baoma', 'mugsy_street_diner', 'pipes_fabrika'].includes(templateKey);
                 // Inject a <style> block that overrides both themes regardless of which is active
                 let css = '[data-theme="night"] {';
                 Object.entries(varMap).forEach(([k, cssVar]) => {
@@ -8707,6 +9325,11 @@
                     if (mugsyHeroImg && heroShots.length) mugsyHeroImg.src = heroShots[0];
                     _applyMugsyCopy();
                 }
+                if (_isPipesTenant()) {
+                    const pipesHeroImg = document.getElementById('pipes-hero-img');
+                    if (pipesHeroImg && heroShots.length) pipesHeroImg.src = heroShots[0];
+                    _applyPipesCopy();
+                }
                 if (isBaomaTenant && heroShots.length) {
                     const baomaHeroImg = document.querySelector('.baoma-hero-img');
                     if (baomaHeroImg) baomaHeroImg.src = heroShots[0];
@@ -8762,7 +9385,9 @@
                     track('page_load', null, { return_visitor: _isReturnVisitor });
                     const fixture = _mugsyFixtureRequested()
                         ? await _loadMugsyFixture()
-                        : (_baomaFixtureRequested() ? await _loadBaomaFixture() : null);
+                        : (_baomaFixtureRequested()
+                            ? await _loadBaomaFixture()
+                            : (_pipesFixtureRequested() ? await _loadPipesFixture() : null));
                     const data = fixture
                         ? fixture.menu_items
                         : await _supaSelect(
@@ -8775,6 +9400,8 @@
                             name_ka:        _cleanText(r.name_ka),
                             category:       _cleanText(r.categories?.name_en, 'Other'),
                             category_ka:    _cleanText(r.categories?.name_ka),
+                            sort_order:     r.sort_order ?? 0,
+                            visible:        r.visible !== false,
                             description:    _cleanText(r.description_en),
                             description_ka: _cleanText(r.description_ka),
                             price:          _cleanText(r.price),
@@ -8862,6 +9489,71 @@
             });
 
             const list = document.getElementById('menu-list');
+            let _pipesSearchTerm = '';
+
+            function _pipesMatchesSearch(item) {
+                if (!_isPipesTenant() || !_pipesSearchTerm) return true;
+                const haystack = [
+                    item.name,
+                    item.name_ka,
+                    item.description,
+                    item.description_ka,
+                    item.category,
+                    item.category_ka
+                ].map(v => _cleanText(v).toLowerCase()).join(' ');
+                return haystack.includes(_pipesSearchTerm);
+            }
+
+            function _renderPipesSignature(items) {
+                const section = document.getElementById('pipes-signature');
+                const card = document.getElementById('pipes-signature-card');
+                if (!section || !card || !_isPipesTenant()) return;
+                const orderedFeatured = (items || [])
+                    .filter(item => item.featured && item.visible !== false)
+                    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || String(a.id ?? '').localeCompare(String(b.id ?? ''), undefined, { numeric: true }));
+                const pick = orderedFeatured[0];
+                if (!pick) {
+                    section.hidden = true;
+                    card.textContent = '';
+                    return;
+                }
+                const idx = items.indexOf(pick);
+                const name = t(pick, 'name');
+                const desc = t(pick, 'description');
+                const src = _safeAssetUrl(pick.thumbnail_url);
+                const has3d = _isAREnabledMenuItem(pick);
+                section.hidden = false;
+                card.innerHTML = `
+                    ${src ? `<img src="${_escapeHtml(src)}" alt="${_escapeHtml(name)}" loading="lazy" decoding="async">` : ''}
+                    <div class="pipes-signature-body">
+                        <h3 class="pipes-signature-name">${_escapeHtml(name)}</h3>
+                        ${desc ? `<p class="pipes-signature-desc">${_escapeHtml(desc)}</p>` : ''}
+                        <p class="pipes-signature-price">${_escapeHtml(pick.price)}</p>
+                        ${has3d ? `<button class="pipes-cta secondary" type="button" data-pipes-signature-3d="${idx}">3D</button>` : ''}
+                    </div>`;
+                card.querySelector('img')?.addEventListener('click', () => openLightbox(src, name, pick, idx));
+                card.querySelector('[data-pipes-signature-3d]')?.addEventListener('click', () => openModal(idx, items));
+                const hero = document.getElementById('pipes-hero-img');
+                if (hero && src) {
+                    hero.src = src;
+                    hero.alt = name;
+                }
+                const hero3d = document.getElementById('pipes-hero-3d');
+                if (hero3d) {
+                    hero3d.hidden = !has3d;
+                    hero3d.onclick = has3d ? () => openModal(idx, items) : null;
+                }
+            }
+
+            function renderPipesEmptyState(searching = false) {
+                const empty = document.createElement('section');
+                empty.className = 'pipes-empty';
+                empty.setAttribute('aria-live', 'polite');
+                empty.textContent = searching
+                    ? (window.__lang === 'ka' ? 'ამ ძებნით კერძი ვერ მოიძებნა.' : 'No menu items match this search.')
+                    : (window.__lang === 'ka' ? 'მენიუ მალე გამოჩნდება.' : 'The menu is coming soon.');
+                return empty;
+            }
 
             // ── Food / Drinks grouping ──────────────────────────────────
             // Active only when the tenant configured drink_categories. When on, the
@@ -9019,7 +9711,7 @@
                     card.querySelector('.item-right').addEventListener('click', () => openModal(globalIdx, menuItems));
                     card.querySelector('.item-name').addEventListener('click', () => openModal(globalIdx, menuItems));
                     card.querySelector('.ar-btn')?.addEventListener('click', e => { e.stopPropagation(); openAR(globalIdx, menuItems); });
-                } else if (_isBaomaTenant() || _isMugsyTenant()) {
+                } else if (_isBaomaTenant() || _isMugsyTenant() || _isPipesTenant()) {
                     card.addEventListener('click', e => {
                         if (e.target.closest('.qty-ctrl, .variant, .addon, .ar-btn')) return;
                         openLightbox(thumbSrc, itemName, item, globalIdx);
@@ -9157,6 +9849,10 @@
                     list.appendChild(renderMugsyEmptyState());
                     return;
                 }
+                if (!items.length && _isPipesTenant()) {
+                    list.appendChild(renderPipesEmptyState(false));
+                    return;
+                }
 
                 if (cat === AR_CAT) {
                     renderARFeaturedBlock(list);
@@ -9165,7 +9861,8 @@
                 } else if (cat) {
                     const selected = categoryMap.get(cat);
                     if (selected) {
-                        list.appendChild(renderCategorySection(selected, selected.items, true));
+                        const entries = selected.items.filter(({ item }) => _pipesMatchesSearch(item));
+                        if (entries.length) list.appendChild(renderCategorySection(selected, entries, true));
                     }
                 } else {
                     renderARFeaturedBlock(list);
@@ -9175,8 +9872,12 @@
                     // grouping is on, only the active group's categories are shown.
                     categories.forEach(catEntry => {
                         if (_groupingOn() && _groupOf(catEntry.name) !== _activeGroup) return;
-                        list.appendChild(renderCategorySection(catEntry, catEntry.items, false));
+                        const entries = catEntry.items.filter(({ item }) => _pipesMatchesSearch(item));
+                        if (entries.length) list.appendChild(renderCategorySection(catEntry, entries, false));
                     });
+                }
+                if (_isPipesTenant() && !list.children.length) {
+                    list.appendChild(renderPipesEmptyState(Boolean(_pipesSearchTerm)));
                 }
 
                 document.querySelectorAll('.qty-ctrl').forEach(ctrl => _syncQtyCtrl(ctrl.dataset.idx));
@@ -9263,6 +9964,36 @@
                 });
             };
             window._renderMenuList = () => applyFilter(_activeFilter);
+            if (_isPipesTenant()) {
+                _renderPipesSignature(items);
+                window._renderPipesSignature = () => _renderPipesSignature(items);
+                const search = document.getElementById('pipes-search');
+                const clear = document.getElementById('pipes-search-clear');
+                const syncSearch = () => {
+                    _pipesSearchTerm = _cleanText(search?.value).toLowerCase();
+                    if (clear) clear.hidden = !_pipesSearchTerm;
+                    applyFilter(_activeFilter);
+                };
+                if (search && !search.__pipesBound) {
+                    search.__pipesBound = true;
+                    search.addEventListener('input', syncSearch);
+                    search.addEventListener('keydown', e => {
+                        if (e.key === 'Escape') {
+                            search.value = '';
+                            syncSearch();
+                            search.blur();
+                        }
+                    });
+                }
+                if (clear && !clear.__pipesBound) {
+                    clear.__pipesBound = true;
+                    clear.addEventListener('click', () => {
+                        if (search) search.value = '';
+                        syncSearch();
+                        search?.focus();
+                    });
+                }
+            }
 
             // ── Food / Drinks group switch ──────────────────────────────
             const groupsDiv = document.getElementById('menu-groups');

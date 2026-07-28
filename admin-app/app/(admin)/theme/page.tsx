@@ -22,6 +22,8 @@ const CONTENT_FIELDS = [
   { key: 'info_kicker_ka',           label: 'contentInfoKickerKa' },
   { key: 'info_title',               label: 'contentInfoTitle' },
   { key: 'info_title_ka',            label: 'contentInfoTitleKa' },
+  { key: 'location_address',         label: 'contentLocationAddress' },
+  { key: 'location_address_ka',      label: 'contentLocationAddressKa' },
   { key: 'info_text',                label: 'contentInfoText' },
   { key: 'info_text_ka',             label: 'contentInfoTextKa' },
   { key: 'info_directions_label',    label: 'contentDirectionsLabel' },
@@ -35,7 +37,7 @@ const CONTENT_FIELDS = [
 ] as const
 
 // Templates that render the editorial copy above.
-const CONTENT_TEMPLATES = new Set(['baoma', 'burger_bar', 'mugsy_street_diner'])
+const CONTENT_TEMPLATES = new Set(['baoma', 'burger_bar', 'mugsy_street_diner', 'pipes_fabrika'])
 
 const MUGSY_CONFIG_FIELDS = [
   { key: 'mugsy_order_links', label: 'Mugsy order links JSON' },

@@ -152,8 +152,9 @@ test('service-worker cache was bumped for changed public assets', () => {
 })
 
 test('service-worker cache advances once beyond the rebased production line', () => {
-  assert.match(sw, /const CACHE_NAME = 'bl-v140';/)
-  assert.doesNotMatch(sw, /bl-v141/)
+  const cacheMatch = sw.match(/^const CACHE_NAME = 'bl-v(\d+)';$/m)
+  assert.ok(cacheMatch, 'service worker CACHE_NAME must be declared as bl-vNNN')
+  assert.ok(Number(cacheMatch[1]) >= 144, 'PIPES public asset changes must use bl-v144+ so this build is beyond production bl-v143')
 })
 
 test('Mugsy basket rows render dynamic item thumbnails without affecting other tenants', () => {
