@@ -30,6 +30,7 @@ const CONTENT_FIELDS = [
   { key: 'info_instagram_label',     label: 'contentInstagramLabel' },
   { key: 'info_instagram_url',       label: 'contentInstagramUrl' },
   { key: 'info_map_query',           label: 'contentMapQuery' },
+  { key: 'info_map_link',            label: 'contentMapLink' },
   { key: 'venue_links',              label: 'contentVenueLinks' },
 ] as const
 
