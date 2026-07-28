@@ -16,6 +16,7 @@ export type StarterTemplateKey =
   | 'gochit_monster'
   | 'mugsy_street_diner'
   | 'betareal'
+  | 'respublika_grill'
 
 export type ThemePreset = {
   key: StarterTemplateKey
@@ -378,6 +379,30 @@ const TEMPLATE_VISUAL_TOKENS: Record<StarterTemplateKey, ThemeConfig> = {
     day_item_shadow: '0 4px 14px rgba(11,16,32,0.10)', day_item_hover_shadow: '0 12px 28px rgba(11,16,32,0.16)',
     day_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(47,107,255,0.12) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #E7EDFA 0%, #F4F7FF 72%)',
   },
+  // Transcribed verbatim from the --rg-* custom properties in index.html so the
+  // CMS preset and the in-page template cannot drift apart.
+  respublika_grill: {
+    night_bg_image: 'radial-gradient(85% 52% at 50% -8%, rgba(228,37,36,0.16) 0%, transparent 60%), radial-gradient(70% 50% at 88% 30%, rgba(218,127,47,0.12) 0%, transparent 72%), linear-gradient(178deg, #15130F 0%, #1B1712 55%, #15130F 100%)',
+    night_bg_size: 'auto, auto, auto', night_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    night_card_bg: 'linear-gradient(158deg, #211E18 0%, #2B2620 100%)', night_card_radius: '18px', night_card_blur: '0px',
+    night_stage_bg: '#211E18',
+    night_pill_bg: 'rgba(33,30,24,0.92)', night_pill_active_bg: 'linear-gradient(120deg, #E42524, #DA7F2F)',
+    night_cta_bg: 'linear-gradient(120deg, #E42524, #DA7F2F)', night_cta_shadow: '0 7px 20px rgba(228,37,36,0.30)',
+    night_hero_color: '#E42524', night_hero_shadow: '0 2px 18px rgba(228,37,36,0.26)', night_divider_bg: 'linear-gradient(90deg, transparent, #DA7F2F, transparent)',
+    night_accent_edge: 'linear-gradient(180deg, #E42524, #DA7F2F)', night_thumb_vignette: 'none',
+    night_item_shadow: '0 4px 14px rgba(0,0,0,0.5)', night_item_hover_shadow: '0 12px 26px rgba(0,0,0,0.55)',
+    night_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(228,37,36,0.14) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #1B1712 0%, #15130F 72%)',
+    day_bg_image: 'radial-gradient(90% 50% at 50% -10%, rgba(228,37,36,0.10) 0%, transparent 60%), radial-gradient(72% 48% at 86% 30%, rgba(218,127,47,0.08) 0%, transparent 72%), linear-gradient(178deg, #F6F5F4 0%, #ECEBE9 58%, #F8F7F6 100%)',
+    day_bg_size: 'auto, auto, auto', day_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    day_card_bg: 'linear-gradient(158deg, #ECEBE9 0%, #F6F5F4 100%)', day_card_radius: '18px', day_card_blur: '0px',
+    day_stage_bg: '#ECEBE9',
+    day_pill_bg: 'rgba(236,235,233,0.90)', day_pill_active_bg: 'linear-gradient(120deg, #E42524, #DA7F2F)',
+    day_cta_bg: 'linear-gradient(120deg, #E42524, #DA7F2F)', day_cta_shadow: '0 7px 20px rgba(228,37,36,0.20)',
+    day_hero_color: '#E42524', day_hero_shadow: '0 2px 14px rgba(228,37,36,0.18)', day_divider_bg: 'linear-gradient(90deg, transparent, #DA7F2F, transparent)',
+    day_accent_edge: 'linear-gradient(180deg, #E42524, #DA7F2F)', day_thumb_vignette: 'none',
+    day_item_shadow: '0 4px 14px rgba(37,28,24,0.12)', day_item_hover_shadow: '0 12px 26px rgba(37,28,24,0.16)',
+    day_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(228,37,36,0.08) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #ECEBE9 0%, #F8F7F6 72%)',
+  },
 }
 
 
@@ -686,6 +711,27 @@ export const TEMPLATE_PRESETS: ThemePreset[] = [
       day_price_color: '#0E7A57', day_add_btn_color: '#1B4FD8',
       ...TEMPLATE_VISUAL_TOKENS.betareal,
       font_body: 'Manrope', font_heading: 'Bebas Neue', template_key: 'betareal',
+      default_theme: 'night',
+    },
+  },
+  {
+    key: 'respublika_grill',
+    label: 'Respublika Grill',
+    description: 'Warm charcoal and ember red, extracted from the client’s own logo, with a full-bleed hero photo — for grill bars and steakhouses built around high-contrast food photography.',
+    primaryColor: '#E42524',
+    secondaryColor: '#DA7F2F',
+    createStarterCategory: true,
+    values: {
+      night_bg: '#15130F', night_bg2: '#1B1712', night_card: '#211E18', night_card2: '#2B2620', night_border: '#2F2B23',
+      night_text: '#F4F0EC', night_dim: '#A8A094', night_accent: '#E42524', night_accent2: '#DA7F2F', night_accent_text: '#FFFFFF', night_thumb_bg: '#211E18', night_modal_bg: '#15130F',
+      night_glow: 'rgba(228,37,36,0.45)', night_glow2: 'rgba(218,127,47,0.22)', night_shadow: 'rgba(0,0,0,0.55)',
+      night_price_color: '#E42524', night_add_btn_color: '#E42524',
+      day_bg: '#F6F5F4', day_bg2: '#ECEBE9', day_card: '#ECEBE9', day_card2: '#F1F0EE', day_border: '#DEDCD8',
+      day_text: '#251C18', day_dim: '#6B6457', day_accent: '#E42524', day_accent2: '#DA7F2F', day_accent_text: '#FFFFFF', day_thumb_bg: '#ECEBE9', day_modal_bg: '#F6F5F4',
+      day_glow: 'rgba(228,37,36,0.35)', day_glow2: 'rgba(218,127,47,0.18)', day_shadow: 'rgba(37,28,24,0.16)',
+      day_price_color: '#E42524', day_add_btn_color: '#E42524',
+      ...TEMPLATE_VISUAL_TOKENS.respublika_grill,
+      font_body: 'Nunito', font_heading: 'Anton', template_key: 'respublika_grill',
       default_theme: 'night',
     },
   },

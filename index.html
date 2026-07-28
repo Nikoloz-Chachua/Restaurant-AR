@@ -52,7 +52,8 @@
                 'burgervazha': 'burger_lions',
                 'burger-bar-main': 'burger_bar',
                 'mugsy-main': 'mugsy_street_diner',
-                'gochit-s-burger-main': 'gochit_monster'
+                'gochit-s-burger-main': 'gochit_monster',
+                'r-main': 'respublika_grill'
             };
             const BOOT_TEMPLATE_DEFAULTS = {
                 baoma: { theme: 'day', preload: './img/baoma/interior-hero-maps.webp' },
@@ -62,7 +63,8 @@
                 burger_lions: { theme: 'night' },
                 burger_bar: { theme: 'night' },
                 gochit_monster: { theme: 'night' },
-                mugsy_street_diner: { theme: 'day', preload: './assets/mugsy/hero-burger.webp' }
+                mugsy_street_diner: { theme: 'day', preload: './assets/mugsy/hero-burger.webp' },
+                respublika_grill: { theme: 'night' }
             };
             const params = new URLSearchParams(location.search);
             const host = location.hostname.toLowerCase();
@@ -620,26 +622,6 @@
             color: #ffffff;
             border-color: transparent;
         }
-        /* RESPUBLIKA (r-main): the basket panel sits on the theme's own --bg,
-           which is light in Day mode — the white pin above is unreadable there.
-           Fall back to the theme's own text color instead. Scoped to r-main;
-           Monday Greens (dark-enough backgrounds in both themes) is untouched. */
-        [data-template="monday_greens"][data-tenant="r-main"] #basket-panel .basket-item-name,
-        [data-template="monday_greens"][data-tenant="r-main"] #basket-panel .basket-item-price,
-        [data-template="monday_greens"][data-tenant="r-main"] #basket-total-label,
-        [data-template="monday_greens"][data-tenant="r-main"] #basket-total,
-        [data-template="monday_greens"][data-tenant="r-main"] #basket-waiter-btn,
-        [data-template="monday_greens"][data-tenant="r-main"] #basket-clear {
-            -webkit-text-fill-color: var(--text);
-            color: var(--text);
-        }
-        [data-template="monday_greens"][data-tenant="r-main"] #basket-panel .basket-item-addons {
-            -webkit-text-fill-color: var(--dim);
-            color: var(--dim);
-        }
-        [data-template="monday_greens"][data-tenant="r-main"] #basket-waiter-btn {
-            border-color: var(--text);
-        }
         [data-template="monday_greens"] #basket-panel .basket-qty {
             background: transparent;
             border: 0;
@@ -905,15 +887,6 @@
            the teal day bg and the dark night bg. Scoped to monday_greens so every
            other tenant keeps accent-coloured headings. */
         [data-template="monday_greens"] .category-header { color: #ffffff; }
-        /* RESPUBLIKA (r-main): its own brand red has plenty of contrast against
-           both its Day (stone) and Night (charcoal) backgrounds, unlike Monday
-           Greens' teal — so this tenant doesn't need (and is broken by) the
-           white pin above. Scoped to r-main only; Monday Greens is untouched. */
-        [data-template="monday_greens"][data-tenant="r-main"] .category-header {
-            color: var(--accent);
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
 
         /* ── Footer ── */
         .site-footer {
@@ -2841,6 +2814,272 @@
         }
         @media (prefers-reduced-motion: reduce) {
             [data-template="burger_lions"] .mg-hero-logo { animation: none; }
+        }
+
+        /* ── RESPUBLIKA GRILL template — warm charcoal + ember red ────────
+           Bold, dark, photography-led: built around RESPUBLIKA's own extracted
+           brand red (#E42524) and a warm-charcoal/stone neutral system, with a
+           secondary ember amber for badges and gradient warmth. Every color
+           below is the tenant's own theme_config value (or its fallback) — the
+           admin panel's night/day color pickers, font pickers, logo upload and
+           hero-image gallery all drive this template exactly as they drive any
+           other. Scoped entirely to [data-template="respublika_grill"] / its
+           data-theme variants; removing this block returns the base template. */
+        [data-template="respublika_grill"] {
+            --bg: var(--rg-bg);
+            --bg2: var(--rg-bg2);
+            --glow: var(--rg-glow);
+            --glow2: var(--rg-glow2);
+            --shadow: var(--rg-shadow);
+            --card: var(--rg-card);
+            --card2: var(--rg-card2);
+            --border: var(--rg-border);
+            --text: var(--rg-text);
+            --dim: var(--rg-dim);
+            --accent: var(--rg-accent);
+            --accent2: var(--rg-accent2);
+            --accent-text: var(--rg-accent-text);
+            --thumb-bg: var(--rg-thumb-bg);
+            --modal-bg: var(--rg-modal-bg);
+            --modal-rgb: var(--rg-modal-rgb);
+            --bg-image: var(--rg-bg-image);
+            --bg-size: auto, auto, auto;
+            --bg-repeat: no-repeat, no-repeat, no-repeat;
+            --card-bg: var(--rg-card-bg);
+            --card-blur: 0px;
+            --card-radius: 18px;
+            --item-shadow: var(--rg-item-shadow);
+            --item-hover-shadow: var(--rg-item-hover-shadow);
+            --accent-edge: var(--rg-accent-edge);
+            --stage-bg: var(--rg-thumb-bg);
+            --thumb-vignette: none;
+            --pill-bg: var(--rg-pill-bg);
+            --pill-active-bg: var(--rg-cta);
+            --cta-bg: var(--rg-cta);
+            --cta-shadow: var(--rg-cta-shadow);
+            --hero-color: var(--rg-accent);
+            --hero-shadow: var(--rg-hero-shadow);
+            --divider-bg: var(--rg-divider-bg);
+            --modal-bg-image: var(--rg-modal-bg-image);
+            --price-color: var(--rg-accent);
+            --add-btn-color: var(--rg-accent);
+        }
+        [data-theme="night"][data-template="respublika_grill"] {
+            --rg-bg: #15130F;
+            --rg-bg2: #1B1712;
+            --rg-glow: rgba(228,37,36,0.45);
+            --rg-glow2: rgba(218,127,47,0.22);
+            --rg-shadow: rgba(0,0,0,0.55);
+            --rg-card: #211E18;
+            --rg-card2: #2B2620;
+            --rg-border: #2F2B23;
+            --rg-text: #F4F0EC;
+            --rg-dim: #A8A094;
+            --rg-accent: #E42524;
+            --rg-accent2: #DA7F2F;
+            --rg-accent-text: #FFFFFF;
+            --rg-thumb-bg: #211E18;
+            --rg-modal-bg: #15130F;
+            --rg-modal-rgb: 21,19,15;
+            --rg-bg-image:
+                radial-gradient(85% 52% at 50% -8%, rgba(228,37,36,0.16) 0%, transparent 60%),
+                radial-gradient(70% 50% at 88% 30%, rgba(218,127,47,0.12) 0%, transparent 72%),
+                linear-gradient(178deg, #15130F 0%, #1B1712 55%, #15130F 100%);
+            --rg-card-bg: linear-gradient(158deg, #211E18 0%, #2B2620 100%);
+            --rg-item-shadow: 0 4px 14px rgba(0,0,0,0.5);
+            --rg-item-hover-shadow: 0 12px 26px rgba(0,0,0,0.55);
+            --rg-accent-edge: linear-gradient(180deg, #E42524, #DA7F2F);
+            --rg-pill-bg: rgba(33,30,24,0.92);
+            --rg-cta: linear-gradient(120deg, #E42524, #DA7F2F);
+            --rg-cta-shadow: 0 7px 20px rgba(228,37,36,0.30);
+            --rg-hero-shadow: 0 2px 18px rgba(228,37,36,0.26);
+            --rg-divider-bg: linear-gradient(90deg, transparent, #DA7F2F, transparent);
+            --rg-modal-bg-image:
+                radial-gradient(70% 48% at 50% 36%, rgba(228,37,36,0.14) 0%, transparent 62%),
+                radial-gradient(130% 100% at 50% 50%, #1B1712 0%, #15130F 72%);
+            --rg-hero-scrim:
+                radial-gradient(60% 40% at 50% 88%, rgba(228,37,36,0.32) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(10,8,7,0.36) 0%, rgba(10,8,7,0.24) 38%, rgba(21,19,15,0.92) 88%, #15130F 100%);
+        }
+        [data-theme="day"][data-template="respublika_grill"] {
+            --rg-bg: #F6F5F4;
+            --rg-bg2: #ECEBE9;
+            --rg-glow: rgba(228,37,36,0.35);
+            --rg-glow2: rgba(218,127,47,0.18);
+            --rg-shadow: rgba(37,28,24,0.16);
+            --rg-card: #ECEBE9;
+            --rg-card2: #F1F0EE;
+            --rg-border: #DEDCD8;
+            --rg-text: #251C18;
+            --rg-dim: #6B6457;
+            --rg-accent: #E42524;
+            --rg-accent2: #DA7F2F;
+            --rg-accent-text: #FFFFFF;
+            --rg-thumb-bg: #ECEBE9;
+            --rg-modal-bg: #F6F5F4;
+            --rg-modal-rgb: 246,245,244;
+            --rg-bg-image:
+                radial-gradient(90% 50% at 50% -10%, rgba(228,37,36,0.10) 0%, transparent 60%),
+                radial-gradient(72% 48% at 86% 30%, rgba(218,127,47,0.08) 0%, transparent 72%),
+                linear-gradient(178deg, #F6F5F4 0%, #ECEBE9 58%, #F8F7F6 100%);
+            --rg-card-bg: linear-gradient(158deg, #ECEBE9 0%, #F6F5F4 100%);
+            --rg-item-shadow: 0 4px 14px rgba(37,28,24,0.12);
+            --rg-item-hover-shadow: 0 12px 26px rgba(37,28,24,0.16);
+            --rg-accent-edge: linear-gradient(180deg, #E42524, #DA7F2F);
+            --rg-pill-bg: rgba(236,235,233,0.90);
+            --rg-cta: linear-gradient(120deg, #E42524, #DA7F2F);
+            --rg-cta-shadow: 0 7px 20px rgba(228,37,36,0.20);
+            --rg-hero-shadow: 0 2px 14px rgba(228,37,36,0.18);
+            --rg-divider-bg: linear-gradient(90deg, transparent, #DA7F2F, transparent);
+            --rg-modal-bg-image:
+                radial-gradient(70% 48% at 50% 36%, rgba(228,37,36,0.08) 0%, transparent 62%),
+                radial-gradient(130% 100% at 50% 50%, #ECEBE9 0%, #F8F7F6 72%);
+            --rg-hero-scrim:
+                radial-gradient(60% 40% at 50% 88%, rgba(228,37,36,0.20) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(10,8,7,0.30) 0%, rgba(10,8,7,0.17) 38%, rgba(246,245,244,0.90) 88%, #F6F5F4 100%);
+        }
+
+        /* Hero — reuses the shared .mg-hero markup (same one Monday Greens and
+           Grill House use), so the admin panel's logo upload and hero-image
+           gallery drive it with no extra wiring. Empty hero_images falls back
+           to the ambient gradient; empty logo_url hides the crest. */
+        [data-template="respublika_grill"] .mg-hero {
+            display: flex;
+            position: relative;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+            min-height: var(--mg-hero-h, 82svh);
+            overflow: hidden;
+            isolation: isolate;
+        }
+        [data-template="respublika_grill"] .mg-hero-photo {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-color: #15130F; /* holds the char while the photo loads / if unset */
+            background-image: var(--hero-image, none);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        [data-template="respublika_grill"] .mg-hero-next {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity var(--mg-hero-fade, 1200ms) ease-in-out;
+        }
+        /* An ember bloom low in the frame plus a near-opaque base so the menu,
+           which scrolls straight up into this, is never fighting a half-lit
+           photo for legibility. */
+        [data-template="respublika_grill"] .mg-hero-veil {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            background: var(--rg-hero-scrim);
+        }
+        [data-template="respublika_grill"] .mg-hero-logo {
+            position: relative;
+            z-index: 3;
+            width: min(40vw, 210px);
+            height: auto;
+            filter: drop-shadow(0 10px 28px rgba(228,37,36,0.45));
+            animation: rg-hero-rise 0.9s cubic-bezier(0.2,0.7,0.2,1) both;
+        }
+        [data-template="respublika_grill"] .mg-hero-logo:not([src]) { display: none; }
+        @keyframes rg-hero-rise {
+            from { opacity: 0; transform: translateY(18px) scale(0.97); }
+            to   { opacity: 1; transform: none; }
+        }
+        [data-template="respublika_grill"] .mg-hero-scroll {
+            position: absolute;
+            bottom: 20px;
+            z-index: 3;
+            color: var(--rg-accent2);
+            opacity: 0.9;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            [data-template="respublika_grill"] .mg-hero-logo { animation: none; }
+        }
+
+        /* Category pills — a squared-off "menu tag" instead of the base full
+           pill: a thin ember rule under the resting state, a full ember-to-amber
+           fill with a soft glow ring when active. */
+        [data-template="respublika_grill"] .cat-pill {
+            border-radius: 8px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            border: 1px solid var(--border);
+            border-bottom: 2px solid var(--accent2);
+        }
+        [data-template="respublika_grill"] .cat-pill.active {
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 0 0 1px rgba(228,37,36,0.35), var(--cta-shadow);
+        }
+
+        /* Category headings: bold uppercase with a small diamond mark and a
+           full-width ember-to-amber divider, replacing the base thin border. */
+        [data-template="respublika_grill"] .category-header {
+            text-transform: uppercase;
+            color: var(--text);
+            letter-spacing: 3px;
+            border-bottom: none;
+            padding: 22px 4px 14px;
+            position: relative;
+        }
+        [data-template="respublika_grill"] .category-header::before {
+            content: "";
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            margin-right: 10px;
+            transform: translateY(-2px) rotate(45deg);
+            background: var(--accent);
+        }
+        [data-template="respublika_grill"] .category-header::after {
+            content: "";
+            position: absolute;
+            left: 4px;
+            right: 4px;
+            bottom: 0;
+            height: 2px;
+            background: var(--divider-bg);
+        }
+        [data-template="respublika_grill"] .item-name {
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        /* Georgian has no case, so text-transform is a no-op on the letters but
+           still strips the tighter Latin tracking — and font_heading (Anton by
+           default here) has no Georgian glyphs at all. !important is load-bearing:
+           _applyHeadingFontToMenu() writes font_heading as an INLINE style on
+           .item-name/.category-header, which beats a plain stylesheet rule. */
+        html[lang="ka"][data-template="respublika_grill"] .item-name,
+        html[lang="ka"][data-template="respublika_grill"] .category-header {
+            font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif !important;
+            text-transform: none;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+        }
+
+        /* Menu cards: a hairline border that warms to the brand red on hover,
+           on top of the base card-bg/shadow tokens above. */
+        [data-template="respublika_grill"] .menu-item {
+            border: 1px solid var(--border);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+        [data-template="respublika_grill"] .menu-item:hover {
+            border-color: rgba(228,37,36,0.35);
         }
 
         /* ── BURGER BAR template — charcoal, flame orange, cream ──────────
@@ -8059,7 +8298,7 @@
 
         // Templates whose hero has the crossfade layer (.mg-hero-next) in their CSS.
         // A template not listed here still shows hero_images[0] as a still photo.
-        const HERO_GALLERY_TEMPLATES = new Set(['monday_greens', 'burger_lions']);
+        const HERO_GALLERY_TEMPLATES = new Set(['monday_greens', 'burger_lions', 'respublika_grill']);
 
         // Templates that render the generic visit/contact block. Mirrors
         // CONTENT_TEMPLATES in the admin app, which decides where the matching
@@ -8442,7 +8681,7 @@
                 // This block instead does the two things burger_lions needs, ahead of
                 // the throw and scoped to that template, leaving every other tenant on
                 // exactly the code path it runs today.
-                if (templateKey === 'burger_lions') {
+                if (templateKey === 'burger_lions' || templateKey === 'respublika_grill') {
                     const blHeroLogo = document.getElementById('mg-hero-logo');
                     const blHeroLogoUrl = _safeAssetUrl(cfg.hero_logo_url) || logoUrl;
                     if (blHeroLogo && blHeroLogoUrl) {
