@@ -3003,6 +3003,21 @@
             box-sizing: border-box;
         }
         [data-template="burger_bar"] .bb-featured:empty { display: none; }
+        /* Desktop gets two signature cards side by side. The single column is
+           right on a phone, but at full width one card per row leaves a very
+           tall, mostly-empty strip above the menu. 760px is where two cards
+           still hold a readable photo and a full name on one line. */
+        @media (min-width: 760px) {
+            [data-template="burger_bar"] .bb-featured {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                max-width: 920px;
+            }
+            /* An odd number of picks: the last one spans so the row stays even
+               instead of leaving a ragged half-width card. */
+            [data-template="burger_bar"] .bb-card:last-child:nth-child(odd) {
+                grid-column: 1 / -1;
+            }
+        }
         [data-template="burger_bar"] .bb-feat-head {
             display: flex;
             align-items: center;
@@ -3631,6 +3646,49 @@
             .mugsy-hero {
                 min-height: 300px;
             }
+        }
+
+        /* The brand mark is a circular badge that already contains the words
+           "BURGER BAR", so the text title beneath it would just repeat itself.
+           Hidden only when a logo actually loaded — a tenant with no logo keeps
+           the text and is never left with an empty header. */
+        [data-template="burger_bar"] .tenant-logo {
+            display: block;
+            width: min(42vw, 168px);
+            height: auto;
+            margin: 4px auto 0;
+        }
+        [data-template="burger_bar"] .tenant-logo[src] ~ #brand-title { display: none; }
+
+        /* ── Map ────────────────────────────────────────────────────────
+           Rendered only when the tenant sets a map URL, and the iframe is not
+           created until then, so no tenant pays for Google's payload by
+           default. */
+        .venue-map { display: none; }
+        [data-template="burger_bar"] .venue-map {
+            display: block;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto 22px;
+            padding: 0 16px;
+            box-sizing: border-box;
+        }
+        [data-template="burger_bar"] .venue-map[hidden] { display: none; }
+        [data-template="burger_bar"] .venue-map iframe {
+            display: block;
+            width: 100%;
+            height: 210px;
+            border: 1px solid var(--bb-border);
+            border-radius: 14px;
+            background: var(--bb-thumb-bg);
+        }
+        @media (min-width: 760px) {
+            /* Declared here, after every base rule: an override placed earlier
+               loses to the later base declaration on source order. */
+            [data-template="burger_bar"] .bb-feat-head,
+            [data-template="burger_bar"] .venue-info,
+            [data-template="burger_bar"] .venue-map { max-width: 920px; }
+            [data-template="burger_bar"] .venue-map iframe { height: 300px; }
         }
 
         /* ── Quantity stepper (add-to-basket control) ── */
@@ -4442,6 +4500,10 @@
         <h2 id="mugsy-location-head" class="mugsy-location-head">Locations</h2>
         <div id="mugsy-location-list" class="mugsy-location-list"></div>
     </section>
+
+    <!-- Map. The iframe is built at runtime only when the tenant configures a
+         location, so tenants without one never load Google's embed. -->
+    <div id="venue-map" class="venue-map" hidden></div>
 
     <section class="baoma-info" aria-labelledby="baoma-info-title">
         <div class="baoma-info-inner">
@@ -7176,6 +7238,36 @@
                 link('venue-instagram', txt('info_instagram_label'), cfg.info_instagram_url),
             ].filter(Boolean);
             sec.hidden = filled.length === 0;
+            _applyVenueMap(cfg);
+        }
+
+        // Build the map embed. `info_map_query` is a plain place/address string
+        // ("Burger Bar, Tbilisi") which is turned into Google's keyless embed
+        // URL; `info_map_embed_url` overrides it when a tenant has a specific
+        // embed to pin. Nothing is inserted unless one of them is set, so the
+        // third-party frame is opt-in per tenant rather than a cost everyone
+        // pays. loading=lazy keeps it off the first paint either way.
+        function _applyVenueMap(cfg) {
+            const box = document.getElementById('venue-map');
+            if (!box) return;
+            box.textContent = '';
+            const explicit = _safeAssetUrl(cfg.info_map_embed_url);
+            const query = _cleanText(cfg.info_map_query);
+            let src = '';
+            if (explicit && /(^https:\/\/(www\.)?google\.[a-z.]+\/maps)|(^https:\/\/maps\.google\.)/i.test(explicit)) {
+                src = explicit;
+            } else if (query) {
+                src = 'https://www.google.com/maps?q=' + encodeURIComponent(query) + '&output=embed';
+            }
+            box.hidden = !src;
+            if (!src) return;
+            const f = document.createElement('iframe');
+            f.src = src;
+            f.loading = 'lazy';
+            f.referrerPolicy = 'no-referrer-when-downgrade';
+            f.setAttribute('allowfullscreen', '');
+            f.title = _cleanText(cfg.site_name) || 'Map';
+            box.appendChild(f);
         }
 
         // Signature strip: up to three promoted dishes as large photo-led cards
