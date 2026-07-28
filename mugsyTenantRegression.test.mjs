@@ -84,6 +84,17 @@ test('Mugsy menu cards remain data sourced and photo-only items do not advertise
   assert.doesNotMatch(html, /Mugsy.*Featured|Popular/i)
 })
 
+test('Mugsy exact tenant forces phone twin product cards without changing larger breakpoints', () => {
+  assert.match(html, /@media \(max-width: 699px\) \{[\s\S]*?\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.menu-list \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/)
+  assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.category-header,[\s\S]*?\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.mugsy-empty \{[\s\S]*?grid-column: 1 \/ -1;/)
+  assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.menu-item:not\(\.no-image\) \.thumb-wrap \{[\s\S]*?aspect-ratio: 1 \/ 0\.82;[\s\S]*?border-radius: 14px 14px 0 0;/)
+  assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.menu-item:not\(\.no-image\) \.thumb-img,[\s\S]*?object-fit: cover;[\s\S]*?object-position: center center;/)
+  assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.menu-item:not\(\.no-image\) \.qty-add-btn \{[\s\S]*?width: 44px;[\s\S]*?height: 44px;/)
+  assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.menu-item:not\(\.no-image\) \.ar-btn \{[\s\S]*?min-height: 44px;[\s\S]*?white-space: normal;/)
+  assert.match(html, /\(cfg\.phone_layout === 'twin' \|\| _isMugsyTenant\(\)\) \? 'twin' : 'list'/)
+  assert.match(html, /@media \(min-width: 700px\) \{[\s\S]*?\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.menu-list,[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/)
+})
+
 test('Mugsy hero copy describes the interactive BetaReal menu without claiming current AR', () => {
   assert.match(html, /interactive BetaReal menu experience/)
   assert.match(html, /BetaReal-ის ინტერაქტიული მენიუს გამოცდილება/)
@@ -111,8 +122,8 @@ test('service-worker cache was bumped for changed public assets', () => {
 })
 
 test('service-worker cache remains bumped exactly once on the current Mugsy delivery rail line', () => {
-  assert.match(sw, /const CACHE_NAME = 'bl-v135';/)
-  assert.doesNotMatch(sw, /bl-v136/)
+  assert.match(sw, /const CACHE_NAME = 'bl-v136';/)
+  assert.doesNotMatch(sw, /bl-v137/)
 })
 
 test('Mugsy basket rows render dynamic item thumbnails without affecting other tenants', () => {

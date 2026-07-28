@@ -3730,6 +3730,137 @@
                 top: 58svh;
             }
         }
+        @media (max-width: 699px) {
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+                padding-left: max(12px, env(safe-area-inset-left));
+                padding-right: max(12px, env(safe-area-inset-right));
+                box-sizing: border-box;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .category-header,
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .mugsy-empty {
+                grid-column: 1 / -1;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) {
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+                padding: 0;
+                border-radius: 14px;
+                overflow: hidden;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image)::before {
+                width: 0;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .item-left {
+                order: 1;
+                width: 100%;
+                min-width: 0;
+                overflow: hidden;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .thumb-wrap {
+                width: 100%;
+                max-width: 100%;
+                height: auto;
+                min-height: 0;
+                aspect-ratio: 1 / 0.82;
+                border-radius: 14px 14px 0 0;
+                border-bottom: 1px solid rgba(45,27,20,0.10);
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .thumb-img,
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) model-viewer {
+                width: 100%;
+                height: 100%;
+                min-height: 0;
+                object-fit: cover;
+                object-position: center center;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .badge-3d {
+                top: 8px;
+                left: 8px;
+                right: auto;
+                bottom: auto;
+                max-width: calc(100% - 16px);
+                border-radius: 7px;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .item-name {
+                order: 2;
+                min-width: 0;
+                padding: 8px 9px 0;
+                font-size: 1rem;
+                line-height: 1.12;
+                overflow-wrap: anywhere;
+                word-break: normal;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .item-right {
+                order: 3;
+                min-width: 0;
+                padding: 7px 9px 10px;
+                gap: 7px;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .ingredients {
+                font-size: 0.72rem;
+                line-height: 1.3;
+                max-height: 3.9em;
+                overflow: hidden;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .item-actions {
+                align-items: center;
+                gap: 8px;
+                min-height: 44px;
+                margin-top: 0;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .price {
+                min-width: 0;
+                font-size: 1.05rem;
+                line-height: 1;
+                overflow-wrap: anywhere;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .qty-add-btn {
+                width: 44px;
+                height: 44px;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .qty-stepper {
+                width: 100%;
+                max-width: 104px;
+                min-height: 44px;
+                height: 44px;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .qty-dec,
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .qty-inc {
+                min-width: 38px;
+                padding: 0;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .qty-num {
+                min-width: 22px;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .ar-btn {
+                width: 100%;
+                min-height: 44px;
+                padding: 8px 6px;
+                font-size: 0.58rem;
+                line-height: 1.15;
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
+        }
+        @media (max-width: 340px) {
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .item-actions {
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: flex-start;
+                gap: 6px;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .price {
+                white-space: nowrap;
+            }
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .qty-ctrl,
+            [data-tenant="mugsy-main"][data-brand-slug="mugsy"] .menu-item:not(.no-image) .qty-stepper {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
         @media (max-height: 560px) {
             .mugsy-hero {
                 min-height: 300px;
@@ -7715,7 +7846,7 @@
                 // Fully gated by the [data-phone-layout="twin"] attribute + phone
                 // breakpoint, so tenants that don't opt in are unaffected.
                 document.documentElement.dataset.phoneLayout =
-                    cfg.phone_layout === 'twin' ? 'twin' : 'list';
+                    (cfg.phone_layout === 'twin' || _isMugsyTenant()) ? 'twin' : 'list';
                 // Template/tenant default theme: an explicit `default_theme` token wins;
                 // otherwise Monday Greens tenants default to light. Applied only when the
                 // visitor hasn't toggled the theme themselves, and never persisted (an
