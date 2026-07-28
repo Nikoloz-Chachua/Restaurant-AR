@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { translations, type Lang } from '@/lib/i18n'
 import { usePlan } from '@/lib/usePlan'
+import { adminIdentityLabel } from '@/lib/adminUx'
 
 const LIGHT: Record<string, string> = {
   '--bg':       '#f5f0e8',
@@ -54,6 +55,7 @@ export default function Sidebar({ open, onClose }: Props) {
   }, [])
 
   const T = translations[lang]
+  const identityLabel = adminIdentityLabel(plan)
 
   const tenantQuery = plan.restaurantSlug ? `?tenant=${encodeURIComponent(plan.restaurantSlug)}` : ''
   const tenantHref = (href: string) => tenantQuery && href !== '/tenants' ? `${href}${tenantQuery}` : href
@@ -129,6 +131,11 @@ export default function Sidebar({ open, onClose }: Props) {
             {T.brandTitle}
           </div>
           <div className="text-xs mt-0.5" style={{ color: 'var(--dim)' }}>{T.brandSub}</div>
+          {identityLabel && (
+            <div className="text-xs mt-1 font-medium" style={{ color: 'var(--text)' }}>
+              {identityLabel}
+            </div>
+          )}
         </div>
         <button
           onClick={onClose}

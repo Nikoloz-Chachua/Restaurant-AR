@@ -5,6 +5,7 @@ import LockedCard from '@/components/LockedCard'
 import { createClient } from '@/lib/supabase/client'
 import { TEMPLATE_PRESETS, type StarterTemplateKey } from '@/lib/themePresets'
 import { useLang } from '@/lib/useLang'
+import { slugify } from '@/lib/adminUx'
 
 type Restaurant = {
   id: number
@@ -80,9 +81,6 @@ type AccountLogEntry = {
 
 type TenantForm = {
   brandName: string
-  brandSlug: string
-  restaurantName: string
-  restaurantSlug: string
   plan: Brand['plan']
   templateKey: StarterTemplateKey
   primaryColor: string
@@ -166,14 +164,6 @@ function emptyBranchForm(): BranchForm {
   }
 }
 
-function slugify(value: string) {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-}
-
 async function imageToWebP(file: File, loadFailedMessage: string) {
   const url = URL.createObjectURL(file)
   return new Promise<Blob>((resolve, reject) => {
@@ -218,9 +208,6 @@ export default function TenantsPage() {
   const [branchForm, setBranchForm] = useState<Record<number, BranchForm>>({})
   const [form, setForm] = useState<TenantForm>({
     brandName: '',
-    brandSlug: '',
-    restaurantName: '',
-    restaurantSlug: '',
     plan: 'ar_menu' as Brand['plan'],
     templateKey: 'warm_gold',
     primaryColor: '#f2b535',
@@ -287,11 +274,6 @@ export default function TenantsPage() {
         next.secondaryColor = template.secondaryColor
         next.createStarterCategory = template.createStarterCategory
       }
-      if (key === 'brandName' && !current.brandSlug) next.brandSlug = slugify(String(value))
-      if ((key === 'brandName' || key === 'brandSlug') && !current.restaurantSlug) {
-        next.restaurantSlug = `${slugify(key === 'brandSlug' ? String(value) : next.brandSlug)}-main`
-      }
-      if (key === 'restaurantName' && !current.restaurantName) next.restaurantName = String(value)
       return next
     })
   }
@@ -378,9 +360,6 @@ export default function TenantsPage() {
     }
     setForm({
       brandName: '',
-      brandSlug: '',
-      restaurantName: '',
-      restaurantSlug: '',
       plan: 'ar_menu',
       templateKey: 'warm_gold',
       primaryColor: '#f2b535',
@@ -607,15 +586,6 @@ export default function TenantsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field label={T.brandName}>
             <input value={form.brandName} onChange={e => update('brandName', e.target.value)} placeholder={T.brandNamePlaceholder} />
-          </Field>
-          <Field label={T.brandSlug}>
-            <input value={form.brandSlug} onChange={e => update('brandSlug', slugify(e.target.value))} placeholder="new-client" />
-          </Field>
-          <Field label={T.firstBranchName}>
-            <input value={form.restaurantName} onChange={e => update('restaurantName', e.target.value)} placeholder={T.firstBranchNamePlaceholder} />
-          </Field>
-          <Field label={T.branchSlug}>
-            <input value={form.restaurantSlug} onChange={e => update('restaurantSlug', slugify(e.target.value))} placeholder="new-client-main" />
           </Field>
           <Field label={T.plan}>
             <select value={form.plan} onChange={e => update('plan', e.target.value as Brand['plan'])}>
