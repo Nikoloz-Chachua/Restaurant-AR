@@ -2369,6 +2369,17 @@
         [data-theme="night"][data-template="baoma"] #waiter-overlay {
             background: rgba(21,10,13,0.82);
         }
+
+        /* ── BetaReal house template ─────────────────────────────────────
+           The footer mark swaps dark/light per theme, but both are the gold
+           logo — which clashes with this template's blue. White reads on the
+           navy ground in both modes, same treatment Monday Greens uses. */
+        [data-template="betareal"] .footer-logo-dark,
+        [data-template="betareal"] .footer-logo-light { display: none; }
+        [data-template="betareal"] .footer-logo-white { display: block; }
+        /* The uploaded logo already carries the "BetaReal" wordmark, so the
+           text title underneath it just repeats the brand name. */
+        [data-template="betareal"] #brand-title { display: none; }
         [data-theme="night"][data-template="baoma"] #waiter-card {
             background: #FFF8F3;
             color: #261A1D;
