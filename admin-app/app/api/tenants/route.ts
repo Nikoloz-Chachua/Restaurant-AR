@@ -274,10 +274,16 @@ export async function POST(req: NextRequest) {
     slug: created.restaurant_slug,
     brand_id: created.brand_id,
   }
+  // Seed the menu header with the brand alone. Appending the branch produced
+  // "Respublika grill bar — Main branch" on every new tenant, because a new
+  // brand's first branch is called "Main branch" — a guest scanning a QR code
+  // at one location does not need to be told which branch they are sitting in.
+  // A brand that really does want the branch shown can set site_name per branch
+  // in the admin Theme editor, which already overrides this seed.
   const themeWarning = await upsertTenantTheme(
     restaurant.id,
-    `${brand.name} — ${restaurant.name}`,
-    `${brand.name} — ${restaurant.name}`,
+    brand.name,
+    brand.name,
     templateKey,
     primaryColor,
     secondaryColor,
