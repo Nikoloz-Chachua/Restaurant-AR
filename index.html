@@ -9502,7 +9502,18 @@
                 const _tplDefaultTheme =
                     (cfg.default_theme === 'day' || cfg.default_theme === 'night') ? cfg.default_theme
                     : (templateKey === 'monday_greens' ? 'day' : null);
-                if (!_hasStoredThemeForCurrentScope() && _tplDefaultTheme) {
+                // theme_lock pins the menu to one palette. Unlike default_theme it
+                // overrides a stored preference and hides the toggle, so the other
+                // palette is not reachable at all — for a venue whose light theme
+                // is not presentable yet. Any value other than 'day'/'night' leaves
+                // the toggle exactly as it was.
+                const _themeLock =
+                    (cfg.theme_lock === 'day' || cfg.theme_lock === 'night') ? cfg.theme_lock : '';
+                if (_themeLock) {
+                    applyTheme(_themeLock, false);
+                    const _lockedToggle = document.getElementById('theme-toggle');
+                    if (_lockedToggle) _lockedToggle.style.display = 'none';
+                } else if (!_hasStoredThemeForCurrentScope() && _tplDefaultTheme) {
                     applyTheme(_tplDefaultTheme, false);
                 }
                 // Font overrides
