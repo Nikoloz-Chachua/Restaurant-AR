@@ -45,3 +45,13 @@ test('3D thumbnail frame clips media without stretching on phone and wider layou
   assert.match(html, /\[data-phone-layout="twin"\] \.thumb-wrap \{[\s\S]*?aspect-ratio:\s*1 \/ 1;/)
   assert.match(html, /\[data-phone-layout="twin"\] \.thumb-wrap \.thumb-img,\s*\n\s*\[data-phone-layout="twin"\] \.thumb-wrap model-viewer \{[\s\S]*?height:\s*100%;/)
 })
+
+test('an explicit unresolved tenant never leaks the shared fallback menu', () => {
+  const buildMenuBlock = html.match(/async function buildMenu\(\) \{([\s\S]*?)\/\/ Apply remote theme in parallel/)
+  assert.ok(buildMenuBlock, 'Missing buildMenu implementation')
+  assert.match(
+    buildMenuBlock[1],
+    /catch \(_\) \{\s*if \(_tenantSlugFromHost\(\)\) items = \[\];\s*\}/,
+    'Explicit tenant failures must stay empty instead of loading foods/menu.json',
+  )
+})

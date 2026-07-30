@@ -9700,7 +9700,9 @@
                         // Do not leak the fallback Burger Lions/demo menu into new client sites.
                         items = [];
                     }
-                } catch (_) {}
+                } catch (_) {
+                    if (_tenantSlugFromHost()) items = [];
+                }
             }
             if (!items) {
                 items = await fetch('./foods/menu.json').then(r => r.json()).catch(() => fallback);
