@@ -19,6 +19,10 @@ export type StarterTemplateKey =
   | 'betareal'
   | 'respublika_grill'
   | 'iakobis_garden'
+  | 'luxury_dining'
+  | 'modern_cafe'
+  | 'premium_fast_casual'
+  | 'social_dining'
 
 export type ThemePreset = {
   key: StarterTemplateKey
@@ -451,6 +455,110 @@ const TEMPLATE_VISUAL_TOKENS: Record<StarterTemplateKey, ThemeConfig> = {
     day_item_shadow: '0 4px 14px rgba(36,42,29,0.10)', day_item_hover_shadow: '0 12px 26px rgba(36,42,29,0.14)',
     day_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(234,74,50,0.08) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #EBECE4 0%, #F8F9F4 72%)',
   },
+
+  // ── The four segment templates ────────────────────────────────────────────
+  // Hues come from the four chapters in the flagship site (BetaReal-Flagship,
+  // src/data/segments.ts) so the outreach page and the demo it links to read as
+  // the same design. Each chapter there is a single look; a CMS template needs
+  // both modes, so the chapter's own palette becomes the "natural" mode and the
+  // opposite mode is derived from the same family. Every text pair clears WCAG
+  // AA in both modes — see the tightest margins noted per template.
+
+  // Editorial. Wine and gold, generous gutters, serif headings.
+  luxury_dining: {
+    night_bg_image: 'radial-gradient(88% 54% at 50% -10%, rgba(217,180,110,0.16) 0%, transparent 62%), radial-gradient(64% 42% at 88% 26%, rgba(242,201,209,0.10) 0%, transparent 70%), linear-gradient(178deg, #2A0813 0%, #200610 56%, #1B040C 100%)',
+    night_bg_size: 'auto, auto, auto', night_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    night_card_bg: 'linear-gradient(162deg, #3A101E 0%, #2E0A16 100%)', night_card_radius: '4px', night_card_blur: '0px',
+    night_stage_bg: 'radial-gradient(84% 66% at 50% 20%, rgba(217,180,110,0.12), transparent 72%), #1B040C',
+    night_pill_bg: 'rgba(58,16,30,0.92)', night_pill_active_bg: '#D9B46E',
+    night_cta_bg: '#D9B46E', night_cta_shadow: '0 6px 20px rgba(217,180,110,0.26)',
+    night_hero_color: '#D9B46E', night_hero_shadow: '0 2px 18px rgba(217,180,110,0.24)', night_divider_bg: 'linear-gradient(90deg, transparent, #D9B46E, transparent)',
+    night_accent_edge: 'linear-gradient(180deg, #D9B46E, #F2C9D1)', night_thumb_vignette: 'linear-gradient(180deg, transparent 58%, rgba(27,4,12,0.52))',
+    night_item_shadow: '0 4px 18px rgba(0,0,0,0.44)', night_item_hover_shadow: '0 16px 38px rgba(0,0,0,0.54)',
+    night_modal_bg_image: 'radial-gradient(70% 48% at 50% 32%, rgba(217,180,110,0.16) 0%, transparent 64%), linear-gradient(180deg, #3A101E 0%, #1B040C 74%)',
+    day_bg_image: 'radial-gradient(88% 52% at 50% -10%, rgba(126,36,52,0.08) 0%, transparent 60%), radial-gradient(64% 42% at 88% 26%, rgba(138,106,47,0.07) 0%, transparent 70%), linear-gradient(178deg, #FFF6EC 0%, #F7E8DC 58%, #FFFDF9 100%)',
+    day_bg_size: 'auto, auto, auto', day_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    day_card_bg: 'linear-gradient(162deg, #FFFFFF 0%, #FDF3E9 100%)', day_card_radius: '4px', day_card_blur: '0px',
+    day_stage_bg: 'radial-gradient(84% 66% at 50% 20%, rgba(126,36,52,0.06), transparent 72%), #F7E8DC',
+    day_pill_bg: 'rgba(255,255,255,0.88)', day_pill_active_bg: '#7E2434',
+    day_cta_bg: '#7E2434', day_cta_shadow: '0 6px 18px rgba(126,36,52,0.20)',
+    day_hero_color: '#7E2434', day_hero_shadow: '0 2px 14px rgba(126,36,52,0.14)', day_divider_bg: 'linear-gradient(90deg, transparent, #8A6A2F, transparent)',
+    day_accent_edge: 'linear-gradient(180deg, #7E2434, #8A6A2F)', day_thumb_vignette: 'linear-gradient(180deg, transparent 62%, rgba(126,36,52,0.10))',
+    day_item_shadow: '0 4px 16px rgba(42,8,19,0.10)', day_item_hover_shadow: '0 14px 34px rgba(42,8,19,0.16)',
+    day_modal_bg_image: 'radial-gradient(70% 48% at 50% 32%, rgba(126,36,52,0.07) 0%, transparent 64%), linear-gradient(180deg, #FFF6EC 0%, #FFFDF9 74%)',
+  },
+
+  // Cafe. Daylight teal, soft rounding, lots of air.
+  modern_cafe: {
+    night_bg_image: 'radial-gradient(86% 50% at 50% -8%, rgba(79,209,232,0.14) 0%, transparent 62%), radial-gradient(60% 40% at 88% 26%, rgba(54,161,176,0.12) 0%, transparent 70%), linear-gradient(180deg, #07191D 0%, #051417 58%, #041114 100%)',
+    night_bg_size: 'auto, auto, auto', night_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    night_card_bg: 'linear-gradient(160deg, #0E272D 0%, #0A2025 100%)', night_card_radius: '18px', night_card_blur: '0px',
+    night_stage_bg: 'radial-gradient(82% 64% at 50% 18%, rgba(79,209,232,0.12), transparent 72%), #041114',
+    night_pill_bg: 'rgba(14,39,45,0.92)', night_pill_active_bg: '#4FD1E8',
+    night_cta_bg: '#4FD1E8', night_cta_shadow: '0 6px 20px rgba(79,209,232,0.26)',
+    night_hero_color: '#4FD1E8', night_hero_shadow: '0 2px 18px rgba(79,209,232,0.22)', night_divider_bg: 'linear-gradient(90deg, transparent, #36A1B0, transparent)',
+    night_accent_edge: 'linear-gradient(180deg, #4FD1E8, #36A1B0)', night_thumb_vignette: 'radial-gradient(ellipse at center, transparent 42%, rgba(4,17,20,0.52) 100%)',
+    night_item_shadow: '0 4px 16px rgba(0,0,0,0.40)', night_item_hover_shadow: '0 14px 32px rgba(0,0,0,0.48)',
+    night_modal_bg_image: 'radial-gradient(70% 48% at 50% 34%, rgba(79,209,232,0.14) 0%, transparent 64%), linear-gradient(180deg, #0E272D 0%, #041114 74%)',
+    day_bg_image: 'radial-gradient(90% 52% at 50% -10%, rgba(54,161,176,0.18) 0%, transparent 62%), radial-gradient(62% 40% at 12% 22%, rgba(8,145,178,0.10) 0%, transparent 70%), linear-gradient(180deg, #EAF9FB 0%, #D7F1F5 56%, #F7FDFE 100%)',
+    day_bg_size: 'auto, auto, auto', day_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    day_card_bg: 'linear-gradient(160deg, #FFFFFF 0%, #F2FBFD 100%)', day_card_radius: '18px', day_card_blur: '0px',
+    day_stage_bg: 'radial-gradient(82% 64% at 50% 18%, rgba(54,161,176,0.12), transparent 72%), #E6FBFF',
+    day_pill_bg: 'rgba(255,255,255,0.88)', day_pill_active_bg: '#0E7490',
+    day_cta_bg: '#0E7490', day_cta_shadow: '0 6px 18px rgba(14,116,144,0.20)',
+    day_hero_color: '#0E7490', day_hero_shadow: '0 2px 14px rgba(14,116,144,0.14)', day_divider_bg: 'linear-gradient(90deg, transparent, #0891B2, transparent)',
+    day_accent_edge: 'linear-gradient(180deg, #0E7490, #0891B2)', day_thumb_vignette: 'radial-gradient(ellipse at center, transparent 46%, rgba(230,251,255,0.60) 100%)',
+    day_item_shadow: '0 4px 16px rgba(11,42,48,0.09)', day_item_hover_shadow: '0 14px 32px rgba(11,42,48,0.14)',
+    day_modal_bg_image: 'radial-gradient(70% 48% at 50% 34%, rgba(54,161,176,0.14) 0%, transparent 64%), linear-gradient(180deg, #EAF9FB 0%, #FFFFFF 74%)',
+  },
+
+  // Poster. Sand and tomato red, heavy uppercase, tight grid.
+  premium_fast_casual: {
+    night_bg_image: 'radial-gradient(88% 52% at 50% -8%, rgba(246,197,68,0.15) 0%, transparent 62%), radial-gradient(60% 40% at 88% 26%, rgba(245,130,51,0.13) 0%, transparent 70%), linear-gradient(180deg, #1A1008 0%, #150C05 58%, #120A04 100%)',
+    night_bg_size: 'auto, auto, auto', night_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    night_card_bg: 'linear-gradient(168deg, #261809 0%, #1E1206 100%)', night_card_radius: '10px', night_card_blur: '0px',
+    night_stage_bg: 'radial-gradient(84% 64% at 50% 18%, rgba(246,197,68,0.12), transparent 72%), #120A04',
+    night_pill_bg: 'rgba(38,24,9,0.94)', night_pill_active_bg: '#F6C544',
+    night_cta_bg: 'linear-gradient(120deg, #F6C544, #F58233)', night_cta_shadow: '0 6px 20px rgba(246,197,68,0.26)',
+    night_hero_color: '#F6C544', night_hero_shadow: '0 2px 18px rgba(246,197,68,0.22)', night_divider_bg: 'linear-gradient(90deg, transparent, #F58233, transparent)',
+    night_accent_edge: 'linear-gradient(180deg, #F6C544, #F58233)', night_thumb_vignette: 'linear-gradient(180deg, transparent 56%, rgba(18,10,4,0.50))',
+    night_item_shadow: '0 4px 16px rgba(0,0,0,0.52)', night_item_hover_shadow: '0 14px 34px rgba(0,0,0,0.60)',
+    night_modal_bg_image: 'radial-gradient(70% 48% at 50% 32%, rgba(246,197,68,0.15) 0%, transparent 64%), linear-gradient(180deg, #261809 0%, #120A04 74%)',
+    day_bg_image: 'radial-gradient(88% 52% at 50% -8%, rgba(193,51,32,0.11) 0%, transparent 60%), radial-gradient(60% 40% at 88% 26%, rgba(168,81,20,0.10) 0%, transparent 70%), linear-gradient(180deg, #F3D19D 0%, #EBC084 56%, #FDE9C6 100%)',
+    day_bg_size: 'auto, auto, auto', day_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    day_card_bg: 'linear-gradient(168deg, #FFF3DA 0%, #FDE9C6 100%)', day_card_radius: '10px', day_card_blur: '0px',
+    day_stage_bg: 'radial-gradient(84% 64% at 50% 18%, rgba(193,51,32,0.08), transparent 72%), #FDE9C6',
+    day_pill_bg: 'rgba(255,243,218,0.92)', day_pill_active_bg: '#C13320',
+    day_cta_bg: 'linear-gradient(120deg, #C13320, #A85114)', day_cta_shadow: '0 6px 18px rgba(193,51,32,0.24)',
+    day_hero_color: '#C13320', day_hero_shadow: '0 2px 14px rgba(193,51,32,0.16)', day_divider_bg: 'linear-gradient(90deg, transparent, #A85114, transparent)',
+    day_accent_edge: 'linear-gradient(180deg, #C13320, #A85114)', day_thumb_vignette: 'linear-gradient(180deg, transparent 60%, rgba(34,20,11,0.12))',
+    day_item_shadow: '0 4px 16px rgba(34,20,11,0.14)', day_item_hover_shadow: '0 14px 34px rgba(34,20,11,0.20)',
+    day_modal_bg_image: 'radial-gradient(70% 48% at 50% 32%, rgba(193,51,32,0.10) 0%, transparent 64%), linear-gradient(180deg, #FFF3DA 0%, #FDE9C6 74%)',
+  },
+
+  // Industrial. Slate and safety orange, condensed caps, dense rows.
+  social_dining: {
+    night_bg_image: 'radial-gradient(88% 50% at 50% -8%, rgba(255,122,71,0.13) 0%, transparent 62%), radial-gradient(60% 40% at 88% 26%, rgba(95,168,224,0.11) 0%, transparent 70%), linear-gradient(180deg, #1F2428 0%, #1B1F23 58%, #171B1E 100%)',
+    night_bg_size: 'auto, auto, auto', night_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    night_card_bg: 'linear-gradient(170deg, #2D3338 0%, #272C31 100%)', night_card_radius: '2px', night_card_blur: '0px',
+    night_stage_bg: 'radial-gradient(84% 64% at 50% 18%, rgba(255,122,71,0.11), transparent 72%), #171B1E',
+    night_pill_bg: 'rgba(45,51,56,0.94)', night_pill_active_bg: '#FF7A47',
+    night_cta_bg: '#FF7A47', night_cta_shadow: '0 5px 16px rgba(255,122,71,0.28)',
+    night_hero_color: '#FF7A47', night_hero_shadow: '0 2px 16px rgba(255,122,71,0.22)', night_divider_bg: 'linear-gradient(90deg, transparent, #5FA8E0, transparent)',
+    night_accent_edge: 'linear-gradient(180deg, #FF7A47, #5FA8E0)', night_thumb_vignette: 'linear-gradient(180deg, transparent 60%, rgba(23,27,30,0.48))',
+    night_item_shadow: '0 3px 12px rgba(0,0,0,0.46)', night_item_hover_shadow: '0 10px 26px rgba(0,0,0,0.54)',
+    night_modal_bg_image: 'radial-gradient(70% 48% at 50% 32%, rgba(255,122,71,0.13) 0%, transparent 64%), linear-gradient(180deg, #2D3338 0%, #171B1E 74%)',
+    day_bg_image: 'radial-gradient(88% 50% at 50% -8%, rgba(196,68,26,0.09) 0%, transparent 60%), radial-gradient(60% 40% at 88% 26%, rgba(31,95,150,0.08) 0%, transparent 70%), linear-gradient(180deg, #F2EEE4 0%, #E6E1D4 58%, #FAF8F3 100%)',
+    day_bg_size: 'auto, auto, auto', day_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    day_card_bg: 'linear-gradient(170deg, #FFFFFF 0%, #F7F4EC 100%)', day_card_radius: '2px', day_card_blur: '0px',
+    day_stage_bg: 'radial-gradient(84% 64% at 50% 18%, rgba(196,68,26,0.07), transparent 72%), #E6E1D4',
+    day_pill_bg: 'rgba(255,255,255,0.92)', day_pill_active_bg: '#C4441A',
+    day_cta_bg: '#C4441A', day_cta_shadow: '0 5px 16px rgba(196,68,26,0.22)',
+    day_hero_color: '#C4441A', day_hero_shadow: '0 2px 14px rgba(196,68,26,0.15)', day_divider_bg: 'linear-gradient(90deg, transparent, #1F5F96, transparent)',
+    day_accent_edge: 'linear-gradient(180deg, #C4441A, #1F5F96)', day_thumb_vignette: 'linear-gradient(180deg, transparent 64%, rgba(17,19,23,0.10))',
+    day_item_shadow: '0 3px 12px rgba(17,19,23,0.10)', day_item_hover_shadow: '0 10px 26px rgba(17,19,23,0.16)',
+    day_modal_bg_image: 'radial-gradient(70% 48% at 50% 32%, rgba(196,68,26,0.09) 0%, transparent 64%), linear-gradient(180deg, #FFFFFF 0%, #F2EEE4 74%)',
+  },
 }
 
 
@@ -824,6 +932,98 @@ export const TEMPLATE_PRESETS: ThemePreset[] = [
       ...TEMPLATE_VISUAL_TOKENS.iakobis_garden,
       font_body: 'Nunito', font_heading: 'Fraunces', template_key: 'iakobis_garden',
       default_theme: 'day',
+    },
+  },
+  {
+    key: 'luxury_dining',
+    label: 'Luxury Dining Template',
+    description:
+      'Deep wine and brushed gold with serif headings and wide editorial gutters — for fine dining rooms where plating and atmosphere carry the menu. Square corners and a slow, spacious grid.',
+    primaryColor: '#D9B46E',
+    secondaryColor: '#7E2434',
+    createStarterCategory: true,
+    preserveModeAccents: true,
+    values: {
+      night_bg: '#2A0813', night_bg2: '#1B040C', night_card: '#3A101E', night_card2: '#461624', night_border: 'rgba(217,180,110,0.22)',
+      night_text: '#FFF6EC', night_dim: '#D9B0AC', night_accent: '#D9B46E', night_accent2: '#F2C9D1', night_accent_text: '#2A0813', night_thumb_bg: '#1B040C', night_modal_bg: '#2A0813',
+      night_glow: 'rgba(217,180,110,0.16)', night_glow2: 'rgba(242,201,209,0.10)', night_shadow: 'rgba(0,0,0,0.60)',
+      night_price_color: '#D9B46E', night_add_btn_color: '#D9B46E',
+      day_bg: '#FFF6EC', day_bg2: '#F7E8DC', day_card: '#FFFFFF', day_card2: '#FDF3E9', day_border: 'rgba(42,8,19,0.14)',
+      day_text: '#2A0813', day_dim: '#6E4A4F', day_accent: '#7E2434', day_accent2: '#8A6A2F', day_accent_text: '#FFF6EC', day_thumb_bg: '#F7E8DC', day_modal_bg: '#FFFDF9',
+      day_glow: 'rgba(126,36,52,0.08)', day_glow2: 'rgba(138,106,47,0.07)', day_shadow: 'rgba(42,8,19,0.14)',
+      day_price_color: '#7E2434', day_add_btn_color: '#7E2434',
+      ...TEMPLATE_VISUAL_TOKENS.luxury_dining,
+      font_body: 'Nunito', font_heading: 'Cormorant Garamond', template_key: 'luxury_dining',
+      default_theme: 'night',
+    },
+  },
+  {
+    key: 'modern_cafe',
+    label: 'Modern Cafe Template',
+    description:
+      'Daylight teal on white with generous rounding and an even three-column grid — for breakfast, coffee and takeaway menus that get scanned quickly between tables.',
+    primaryColor: '#0E7490',
+    secondaryColor: '#36A1B0',
+    createStarterCategory: true,
+    preserveModeAccents: true,
+    values: {
+      night_bg: '#07191D', night_bg2: '#041114', night_card: '#0E272D', night_card2: '#133239', night_border: 'rgba(79,209,232,0.20)',
+      night_text: '#EAF9FB', night_dim: '#8FB3BA', night_accent: '#4FD1E8', night_accent2: '#36A1B0', night_accent_text: '#07191D', night_thumb_bg: '#041114', night_modal_bg: '#07191D',
+      night_glow: 'rgba(79,209,232,0.14)', night_glow2: 'rgba(54,161,176,0.12)', night_shadow: 'rgba(0,0,0,0.52)',
+      night_price_color: '#4FD1E8', night_add_btn_color: '#4FD1E8',
+      day_bg: '#EAF9FB', day_bg2: '#D7F1F5', day_card: '#FFFFFF', day_card2: '#F2FBFD', day_border: 'rgba(11,42,48,0.13)',
+      day_text: '#0B2A30', day_dim: '#4A6B72', day_accent: '#0E7490', day_accent2: '#0891B2', day_accent_text: '#FFFFFF', day_thumb_bg: '#E6FBFF', day_modal_bg: '#FFFFFF',
+      day_glow: 'rgba(54,161,176,0.18)', day_glow2: 'rgba(8,145,178,0.10)', day_shadow: 'rgba(11,42,48,0.13)',
+      day_price_color: '#0E7490', day_add_btn_color: '#0E7490',
+      ...TEMPLATE_VISUAL_TOKENS.modern_cafe,
+      font_body: 'Nunito', font_heading: 'Manrope', template_key: 'modern_cafe',
+      default_theme: 'day',
+    },
+  },
+  {
+    key: 'premium_fast_casual',
+    label: 'Fast Casual Template',
+    description:
+      'Sand, tomato red and heavy uppercase type in a tight poster grid — for burger and combo menus where the guest has to decide fast and the product photo does the selling.',
+    primaryColor: '#C13320',
+    secondaryColor: '#F58233',
+    createStarterCategory: true,
+    preserveModeAccents: true,
+    values: {
+      night_bg: '#1A1008', night_bg2: '#120A04', night_card: '#261809', night_card2: '#31200D', night_border: 'rgba(246,197,68,0.22)',
+      night_text: '#FFF3DA', night_dim: '#C0A176', night_accent: '#F6C544', night_accent2: '#F58233', night_accent_text: '#1A1008', night_thumb_bg: '#120A04', night_modal_bg: '#1A1008',
+      night_glow: 'rgba(246,197,68,0.15)', night_glow2: 'rgba(245,130,51,0.13)', night_shadow: 'rgba(0,0,0,0.66)',
+      night_price_color: '#F6C544', night_add_btn_color: '#F6C544',
+      day_bg: '#F3D19D', day_bg2: '#EBC084', day_card: '#FFF3DA', day_card2: '#FDE9C6', day_border: 'rgba(34,20,11,0.18)',
+      day_text: '#22140B', day_dim: '#6A3C23', day_accent: '#C13320', day_accent2: '#A85114', day_accent_text: '#FFF3DA', day_thumb_bg: '#FDE9C6', day_modal_bg: '#FFF3DA',
+      day_glow: 'rgba(193,51,32,0.11)', day_glow2: 'rgba(168,81,20,0.10)', day_shadow: 'rgba(34,20,11,0.18)',
+      day_price_color: '#C13320', day_add_btn_color: '#C13320',
+      ...TEMPLATE_VISUAL_TOKENS.premium_fast_casual,
+      font_body: 'Nunito', font_heading: 'Archivo Black', template_key: 'premium_fast_casual',
+      default_theme: 'day',
+    },
+  },
+  {
+    key: 'social_dining',
+    label: 'Social Dining Template',
+    description:
+      'Slate and safety orange, condensed caps, near-square cards in dense rows — for bars, food halls and high-volume rooms where guests order standing up and tap targets have to be big.',
+    primaryColor: '#FF7A47',
+    secondaryColor: '#5FA8E0',
+    createStarterCategory: true,
+    preserveModeAccents: true,
+    values: {
+      night_bg: '#1F2428', night_bg2: '#171B1E', night_card: '#2D3338', night_card2: '#373E44', night_border: 'rgba(255,122,71,0.20)',
+      night_text: '#F2EEE4', night_dim: '#A7AEB4', night_accent: '#FF7A47', night_accent2: '#5FA8E0', night_accent_text: '#121820', night_thumb_bg: '#171B1E', night_modal_bg: '#1F2428',
+      night_glow: 'rgba(255,122,71,0.13)', night_glow2: 'rgba(95,168,224,0.11)', night_shadow: 'rgba(0,0,0,0.56)',
+      night_price_color: '#FF7A47', night_add_btn_color: '#FF7A47',
+      day_bg: '#F2EEE4', day_bg2: '#E6E1D4', day_card: '#FFFFFF', day_card2: '#F7F4EC', day_border: 'rgba(17,19,23,0.14)',
+      day_text: '#111317', day_dim: '#585F66', day_accent: '#C4441A', day_accent2: '#1F5F96', day_accent_text: '#FFFFFF', day_thumb_bg: '#E6E1D4', day_modal_bg: '#FFFFFF',
+      day_glow: 'rgba(196,68,26,0.09)', day_glow2: 'rgba(31,95,150,0.08)', day_shadow: 'rgba(17,19,23,0.14)',
+      day_price_color: '#C4441A', day_add_btn_color: '#C4441A',
+      ...TEMPLATE_VISUAL_TOKENS.social_dining,
+      font_body: 'Nunito', font_heading: 'Bebas Neue', template_key: 'social_dining',
+      default_theme: 'night',
     },
   },
 ]
