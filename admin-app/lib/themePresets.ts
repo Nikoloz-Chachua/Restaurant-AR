@@ -522,7 +522,8 @@ const TEMPLATE_VISUAL_TOKENS: Record<StarterTemplateKey, ThemeConfig> = {
     night_cta_bg: 'linear-gradient(120deg, #F6C544, #F58233)', night_cta_shadow: '0 6px 20px rgba(246,197,68,0.26)',
     night_hero_color: '#F6C544', night_hero_shadow: '0 2px 18px rgba(246,197,68,0.22)', night_divider_bg: 'linear-gradient(90deg, transparent, #F58233, transparent)',
     night_accent_edge: 'linear-gradient(180deg, #F6C544, #F58233)', night_thumb_vignette: 'linear-gradient(180deg, transparent 56%, rgba(18,10,4,0.50))',
-    night_item_shadow: '0 4px 16px rgba(0,0,0,0.52)', night_item_hover_shadow: '0 14px 34px rgba(0,0,0,0.60)',
+    // Hard offset instead of a blur: the poster look is printed, not lit.
+    night_item_shadow: '8px 8px 0 rgba(246,197,68,0.18)', night_item_hover_shadow: '10px 10px 0 rgba(246,197,68,0.28)',
     night_modal_bg_image: 'radial-gradient(70% 48% at 50% 32%, rgba(246,197,68,0.15) 0%, transparent 64%), linear-gradient(180deg, #261809 0%, #120A04 74%)',
     day_bg_image: 'radial-gradient(88% 52% at 50% -8%, rgba(193,51,32,0.11) 0%, transparent 60%), radial-gradient(60% 40% at 88% 26%, rgba(168,81,20,0.10) 0%, transparent 70%), linear-gradient(180deg, #F3D19D 0%, #EBC084 56%, #FDE9C6 100%)',
     day_bg_size: 'auto, auto, auto', day_bg_repeat: 'no-repeat, no-repeat, no-repeat',
@@ -532,7 +533,7 @@ const TEMPLATE_VISUAL_TOKENS: Record<StarterTemplateKey, ThemeConfig> = {
     day_cta_bg: 'linear-gradient(120deg, #C13320, #A85114)', day_cta_shadow: '0 6px 18px rgba(193,51,32,0.24)',
     day_hero_color: '#C13320', day_hero_shadow: '0 2px 14px rgba(193,51,32,0.16)', day_divider_bg: 'linear-gradient(90deg, transparent, #A85114, transparent)',
     day_accent_edge: 'linear-gradient(180deg, #C13320, #A85114)', day_thumb_vignette: 'linear-gradient(180deg, transparent 60%, rgba(34,20,11,0.12))',
-    day_item_shadow: '0 4px 16px rgba(34,20,11,0.14)', day_item_hover_shadow: '0 14px 34px rgba(34,20,11,0.20)',
+    day_item_shadow: '8px 8px 0 rgba(193,51,32,0.20)', day_item_hover_shadow: '10px 10px 0 rgba(193,51,32,0.30)',
     day_modal_bg_image: 'radial-gradient(70% 48% at 50% 32%, rgba(193,51,32,0.10) 0%, transparent 64%), linear-gradient(180deg, #FFF3DA 0%, #FDE9C6 74%)',
   },
 
@@ -546,7 +547,8 @@ const TEMPLATE_VISUAL_TOKENS: Record<StarterTemplateKey, ThemeConfig> = {
     night_cta_bg: '#FF7A47', night_cta_shadow: '0 5px 16px rgba(255,122,71,0.28)',
     night_hero_color: '#FF7A47', night_hero_shadow: '0 2px 16px rgba(255,122,71,0.22)', night_divider_bg: 'linear-gradient(90deg, transparent, #5FA8E0, transparent)',
     night_accent_edge: 'linear-gradient(180deg, #FF7A47, #5FA8E0)', night_thumb_vignette: 'linear-gradient(180deg, transparent 60%, rgba(23,27,30,0.48))',
-    night_item_shadow: '0 3px 12px rgba(0,0,0,0.46)', night_item_hover_shadow: '0 10px 26px rgba(0,0,0,0.54)',
+    // Hard offset in the secondary blue — signage, not soft UI.
+    night_item_shadow: '5px 5px 0 rgba(95,168,224,0.55)', night_item_hover_shadow: '7px 7px 0 rgba(95,168,224,0.75)',
     night_modal_bg_image: 'radial-gradient(70% 48% at 50% 32%, rgba(255,122,71,0.13) 0%, transparent 64%), linear-gradient(180deg, #2D3338 0%, #171B1E 74%)',
     day_bg_image: 'radial-gradient(88% 50% at 50% -8%, rgba(196,68,26,0.09) 0%, transparent 60%), radial-gradient(60% 40% at 88% 26%, rgba(31,95,150,0.08) 0%, transparent 70%), linear-gradient(180deg, #F2EEE4 0%, #E6E1D4 58%, #FAF8F3 100%)',
     day_bg_size: 'auto, auto, auto', day_bg_repeat: 'no-repeat, no-repeat, no-repeat',
@@ -556,7 +558,7 @@ const TEMPLATE_VISUAL_TOKENS: Record<StarterTemplateKey, ThemeConfig> = {
     day_cta_bg: '#C4441A', day_cta_shadow: '0 5px 16px rgba(196,68,26,0.22)',
     day_hero_color: '#C4441A', day_hero_shadow: '0 2px 14px rgba(196,68,26,0.15)', day_divider_bg: 'linear-gradient(90deg, transparent, #1F5F96, transparent)',
     day_accent_edge: 'linear-gradient(180deg, #C4441A, #1F5F96)', day_thumb_vignette: 'linear-gradient(180deg, transparent 64%, rgba(17,19,23,0.10))',
-    day_item_shadow: '0 3px 12px rgba(17,19,23,0.10)', day_item_hover_shadow: '0 10px 26px rgba(17,19,23,0.16)',
+    day_item_shadow: '5px 5px 0 rgba(31,95,150,0.30)', day_item_hover_shadow: '7px 7px 0 rgba(31,95,150,0.45)',
     day_modal_bg_image: 'radial-gradient(70% 48% at 50% 32%, rgba(196,68,26,0.09) 0%, transparent 64%), linear-gradient(180deg, #FFFFFF 0%, #F2EEE4 74%)',
   },
 }

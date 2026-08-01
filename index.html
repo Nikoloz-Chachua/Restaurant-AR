@@ -55,7 +55,14 @@
                 'pipes-burger-main': 'pipes_fabrika',
                 'gochit-s-burger-main': 'gochit_monster',
                 'r-main': 'respublika_grill',
-                'iakobis-ezo-main': 'iakobis_garden'
+                'iakobis-ezo-main': 'iakobis_garden',
+                // The four segment demo templates. Their slugs ARE their
+                // subdomains (luxury.betareal.ge → 'luxury'), so hostSlug below
+                // resolves them without a ?tenant= param.
+                'luxury': 'luxury_dining',
+                'cafe': 'modern_cafe',
+                'fast-casual': 'premium_fast_casual',
+                'social-dining': 'social_dining'
             };
             const BOOT_TEMPLATE_DEFAULTS = {
                 baoma: { theme: 'day', preload: './img/baoma/interior-hero-maps.webp' },
@@ -68,7 +75,13 @@
                 mugsy_street_diner: { theme: 'day', preload: './assets/mugsy/hero-burger.webp' },
                 pipes_fabrika: { theme: 'day', preload: './assets/pipes/items-webp/pipes-signature-burger.webp' },
                 respublika_grill: { theme: 'night' },
-                iakobis_garden: { theme: 'day' }
+                iakobis_garden: { theme: 'day' },
+                // Matches default_theme in each preset. No preload: these demos
+                // have no hero photo, so there is no LCP image to hint at.
+                luxury_dining: { theme: 'night' },
+                modern_cafe: { theme: 'day' },
+                premium_fast_casual: { theme: 'day' },
+                social_dining: { theme: 'night' }
             };
             const params = new URLSearchParams(location.search);
             const host = location.hostname.toLowerCase();
@@ -6005,6 +6018,185 @@
             }
             #modal-message { order: 4; }
             #modal-tip { order: 5; }
+        }
+
+        /* ══ The four segment templates ═══════════════════════════════════════
+           luxury_dining · modern_cafe · premium_fast_casual · social_dining
+
+           These back the four demo menus we send to prospects
+           (luxury/cafe/fast-casual/social-dining.betareal.ge). Their palettes
+           come from the four chapters of the flagship outreach page, and this
+           block is the structural half — the part a theme token cannot say.
+
+           Deliberately LAST in the stylesheet. The base desktop grid lives in
+           @media blocks near line 5777, so a template rule declared earlier
+           would lose on source order to a base rule of equal specificity. That
+           mistake has already been made three times in this file; keeping the
+           whole family down here removes the chance of a fourth.
+
+           Everything is scoped to [data-template="…"]. Nothing here reaches the
+           3D viewer, the AR flow or the modal — those stay exactly as every
+           other tenant gets them, which is the whole point of these being CMS
+           templates rather than a separate microsite.
+
+           Class map from the flagship's mockup to ours:
+             .preview → page   .grid → .menu-list   .card → .menu-item
+             .card h3 → .item-name   .categories span → .cat-pill
+             .imageFrame → .thumb-wrap
+
+           Note on fonts: _applyHeadingFontToMenu() writes font_heading as an
+           INLINE style on .item-name/.category-header/.badge-3d, so those
+           already carry the per-template face and cannot be restyled from here.
+           Only the properties around them (size, tracking, case) are set below.
+        */
+
+        /* ── 1. EDITORIAL — luxury_dining ──────────────────────────────────
+           Two columns where the others run three, taller plates, and serif
+           names with the tracking taken back out. Bebas-style letter-spacing
+           on a Cormorant name reads as a mistake, so it is zeroed. */
+        [data-template="luxury_dining"] .item-name {
+            letter-spacing: 0;
+            font-size: 1.3rem;
+            line-height: 1.25;
+            text-transform: none;
+        }
+        /* The one place the house Bebas price is wrong: a condensed grotesque
+           numeral beside a Cormorant name looks like two unrelated menus. */
+        [data-template="luxury_dining"] .price {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.32rem;
+            letter-spacing: 0;
+            font-weight: 700;
+        }
+        [data-template="luxury_dining"] .category-header {
+            letter-spacing: 0.5px;
+            text-transform: none;
+        }
+        [data-template="luxury_dining"] .cat-pill {
+            letter-spacing: 1.4px;
+            font-size: 0.68rem;
+        }
+
+        @media (min-width: 640px) {
+            [data-template="luxury_dining"] .menu-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 26px;
+            }
+            [data-template="luxury_dining"] .item-left .thumb-wrap {
+                height: 260px;
+                border-radius: 4px 4px 0 0;
+            }
+        }
+        @media (min-width: 1100px) {
+            /* Stays at two. Fine dining is the one segment where fewer, larger
+               plates per row is the point — three would make it a canteen. */
+            [data-template="luxury_dining"] .menu-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                max-width: 1040px;
+                gap: 32px;
+            }
+            [data-template="luxury_dining"] .item-left .thumb-wrap { height: 300px; }
+        }
+
+        /* ── 2. CAFE — modern_cafe ─────────────────────────────────────────
+           Base three-column grid, opened up, with the flagship's asymmetric
+           card radius: generous at the top where the photo sits, tighter at
+           the bottom where the price does. */
+        [data-template="modern_cafe"] .menu-item {
+            border-radius: 18px 18px 10px 10px;
+        }
+        [data-template="modern_cafe"] .item-name {
+            letter-spacing: 0.2px;
+            font-size: 1.06rem;
+        }
+        [data-template="modern_cafe"] .cat-pill {
+            border-radius: 999px;
+            font-size: 0.7rem;
+            letter-spacing: 0.8px;
+        }
+        @media (min-width: 640px) {
+            [data-template="modern_cafe"] .menu-list { gap: 20px; }
+            [data-template="modern_cafe"] .item-left .thumb-wrap {
+                border-radius: 18px 18px 0 0;
+            }
+        }
+        @media (min-width: 1100px) {
+            [data-template="modern_cafe"] .menu-list { gap: 24px; }
+        }
+
+        /* ── 3. POSTER — premium_fast_casual ───────────────────────────────
+           Printed, not lit: 2px rules, a hard offset shadow (set in the theme
+           tokens so the CMS owns it), and a faint horizontal stripe over the
+           card that reads as newsprint. Tight gutters — this segment wants
+           density and speed, not air. */
+        /* The stripe is an extra background LAYER on the card, not a pseudo-
+           element. .menu-item::before is already the 3px accent edge every card
+           gets (line ~348), and ::after would paint above the card's own text
+           because an absolutely-positioned box outranks non-positioned inline
+           content in paint order. Stacking it into background sidesteps both,
+           and it is how the flagship draws the same stripe. */
+        [data-template="premium_fast_casual"] .menu-item {
+            border-width: 2px;
+            background:
+                repeating-linear-gradient(0deg, rgba(193,51,32,0.055) 0 7px, transparent 7px 18px),
+                var(--card-bg);
+        }
+        [data-theme="night"][data-template="premium_fast_casual"] .menu-item {
+            background:
+                repeating-linear-gradient(0deg, rgba(246,197,68,0.05) 0 7px, transparent 7px 18px),
+                var(--card-bg);
+        }
+        [data-template="premium_fast_casual"] .item-name {
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-size: 0.98rem;
+            line-height: 1.15;
+        }
+        [data-template="premium_fast_casual"] .cat-pill {
+            border-radius: 6px;
+            border-width: 2px;
+            font-size: 0.68rem;
+        }
+        @media (min-width: 640px) {
+            [data-template="premium_fast_casual"] .menu-list { gap: 14px; }
+            [data-template="premium_fast_casual"] .item-left .thumb-wrap {
+                border-radius: 8px 8px 0 0;
+            }
+        }
+        @media (min-width: 1100px) {
+            [data-template="premium_fast_casual"] .menu-list { gap: 16px; }
+        }
+
+        /* ── 4. INDUSTRIAL — social_dining ─────────────────────────────────
+           Signage. Near-square cards behind a heavy ink rule, a hard offset in
+           the secondary blue (token-driven), the tightest gutters of the four,
+           and taller buttons — this is the segment where people order standing
+           up with a drink in the other hand. */
+        [data-template="social_dining"] .menu-item {
+            border-width: 2px;
+            border-color: var(--text);
+        }
+        [data-template="social_dining"] .item-name {
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-size: 1.24rem;
+        }
+        [data-template="social_dining"] .cat-pill {
+            border-radius: 4px;
+            border-width: 2px;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+        }
+        /* Bigger targets than the 44px house minimum. */
+        [data-template="social_dining"] .ar-btn { min-height: 50px; }
+        @media (min-width: 640px) {
+            [data-template="social_dining"] .menu-list { gap: 12px; }
+            [data-template="social_dining"] .item-left .thumb-wrap {
+                border-radius: 2px 2px 0 0;
+            }
+        }
+        @media (min-width: 1100px) {
+            [data-template="social_dining"] .menu-list { gap: 14px; }
         }
 
     </style>
