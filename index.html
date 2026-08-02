@@ -81,7 +81,7 @@
                 luxury_dining: { theme: 'night' },
                 modern_cafe: { theme: 'day' },
                 premium_fast_casual: { theme: 'day' },
-                social_dining: { theme: 'night' }
+                social_dining: { theme: 'day' }
             };
             const params = new URLSearchParams(location.search);
             const host = location.hostname.toLowerCase();
@@ -6167,36 +6167,98 @@
             [data-template="premium_fast_casual"] .menu-list { gap: 16px; }
         }
 
-        /* ── 4. INDUSTRIAL — social_dining ─────────────────────────────────
-           Signage. Near-square cards behind a heavy ink rule, a hard offset in
-           the secondary blue (token-driven), the tightest gutters of the four,
-           and taller buttons — this is the segment where people order standing
-           up with a drink in the other hand. */
+        /* ── 4. PRINT / POSTER — social_dining ─────────────────────────────
+           This one is a generalisation of the PIPES Fabrika design we already
+           built and liked, not of the flagship's "social dining" chapter — that
+           chapter's own demo link pointed at pipes-burger-main anyway.
+
+           What it deliberately does NOT do is reuse the .pipes-* shell. That
+           markup (topbar, hero, location block, footer) is static HTML carrying
+           PIPES's own name, branch, address and Maps link, and it is gated on
+           [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"].
+           Showing it here would put another restaurant's identity on a page we
+           send to prospects. The generic equivalents already exist and are used
+           instead: #bb-featured for the signature strip, #venue-info for the
+           address block.
+
+           Where pipes hardcodes hex, this uses the theme tokens, so the CMS can
+           recolour it and the night mode works — pipes only ever ships day. */
+        [data-template="social_dining"] .cat-pill {
+            min-height: 44px;
+            border-radius: 0;
+            border: 2px solid var(--border);
+            font-weight: 900;
+            letter-spacing: 0.4px;
+            box-shadow: 3px 3px 0 var(--shadow);
+        }
+        [data-template="social_dining"] .cat-pill.active {
+            box-shadow: 3px 3px 0 var(--accent);
+        }
+        /* Ink, not accent. Pipes sets both the section heads and the dish names
+           in near-black and lets the orange appear only on the card edge, the
+           price and the buttons. Leaving them on the base --accent turns the
+           whole page orange and loses the printed-page feel entirely. */
+        [data-template="social_dining"] .category-header {
+            padding: 16px 0 6px;
+            border-bottom: 3px solid var(--border);
+            color: var(--text);
+            font-size: 1.7rem;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
         [data-template="social_dining"] .menu-item {
-            border-width: 2px;
-            border-color: var(--text);
+            border: 2px solid var(--border);
+        }
+        /* Pipes widens the accent edge from 3px to 5px — at this weight of
+           border it is the detail that keeps the card from reading as a plain
+           box. */
+        [data-template="social_dining"] .menu-item::before {
+            width: 5px;
+            background: var(--accent);
         }
         [data-template="social_dining"] .item-name {
+            color: var(--text);
             text-transform: uppercase;
-            letter-spacing: 1.2px;
-            font-size: 1.24rem;
+            letter-spacing: 0;
+            font-size: 1.28rem;
+            line-height: 1.04;
         }
-        [data-template="social_dining"] .cat-pill {
-            border-radius: 4px;
-            border-width: 2px;
-            font-size: 0.7rem;
-            letter-spacing: 1px;
+        [data-template="social_dining"] .price {
+            font-family: 'Anton', 'Nunito', sans-serif;
+            font-size: 1.28rem;
+            letter-spacing: 0;
         }
-        /* Bigger targets than the 44px house minimum. */
-        [data-template="social_dining"] .ar-btn { min-height: 50px; }
+        [data-template="social_dining"] .ingredients {
+            font-weight: 700;
+            line-height: 1.4;
+        }
+        /* Square, ink-outlined controls in the secondary — pipes puts black on
+           yellow here rather than white on orange, and it is the single most
+           recognisable element of the design. */
+        [data-template="social_dining"] .qty-add-btn,
+        [data-template="social_dining"] .qty-stepper {
+            min-height: 44px;
+            border: 2px solid var(--border);
+            border-radius: 0;
+        }
+        [data-template="social_dining"] .ar-btn {
+            border-radius: 0;
+            border: 2px solid var(--border);
+            min-height: 48px;
+        }
         @media (min-width: 640px) {
-            [data-template="social_dining"] .menu-list { gap: 12px; }
+            [data-template="social_dining"] .menu-list { gap: 14px; }
+            /* Square photo well with a full-weight rule under it, matching the
+               card border rather than fading into it. */
             [data-template="social_dining"] .item-left .thumb-wrap {
-                border-radius: 2px 2px 0 0;
+                border-radius: 0;
+                border-bottom: 2px solid var(--border);
+                aspect-ratio: 1.25 / 1;
+                height: auto;
             }
         }
         @media (min-width: 1100px) {
-            [data-template="social_dining"] .menu-list { gap: 14px; }
+            [data-template="social_dining"] .menu-list { gap: 16px; }
         }
 
     </style>
