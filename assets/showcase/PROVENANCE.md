@@ -8,9 +8,9 @@ The hero photographs were supplied by the user for this showcase. The original W
 
 | Tenant | Original Windows filename | Original SHA-256 | Repository derivative | Derivative SHA-256 |
 |---|---|---|---|---|
-| AUREVANE | `dummy.jpg` | `23d00a83f56ff703c7cdffc7b00964fb3cee58502bf2af6ef1b2db61f365329a` | `assets/showcase/aurevane/hero-wide.webp` | `e70f3f2e6eaf269eaad8e4240a22af2b61d4ea36c81720e7e15b984725dbf485` |
-| AUREVANE | `dummy 2.jpg` | `17e11943fd49e983b3a58d9824d8dd88cbb6ef6c0431c6aa551e6fd3f9875250` | `assets/showcase/aurevane/hero-portrait.webp` | `6d8d63e3b693b0d4002c9e228d737a149f8aa43708e563c1713c3b5b4d33d1ad` |
-| MINGLEYARD | `burgerplace.jpg` | `34e90b4deb3e55142f723beb18a1d16528b6f9a9ae038e2325289ad2959d6608` | `assets/showcase/mingleyard/hero.webp` | `ef208e383eb8521ab53620d97c832ece8725024e8275dd3f04b9e2beb9b998f7` |
+| AUREVANE | `ChatGPT Image Aug 3, 2026, 10_07_52 PM (2).png` | `cee702a28e184e561bfe49687ded76405586d18925beebc784a49917559d04dc` | `assets/showcase/aurevane/hero-wide.webp` | `3237a77292fc401cf6a9b380bbf7ef4d0c48e1d8f4fd32f2e091d89acd406755` |
+| AUREVANE | `ChatGPT Image Aug 3, 2026, 10_07_53 PM (3).png` | `69178898ba042c7d63821401e9fc400236900cf9c67312ab6d49ebd15b30759b` | `assets/showcase/aurevane/hero-portrait.webp` | `b733d0f713581722219f5ccd1de9864642338cf1c33b6a49d22e914e1026fd5b` |
+| MINGLEYARD | `ChatGPT Image Aug 3, 2026, 10_07_52 PM (1).png` | `1911c0a7e5a1ef5ab58261c96302d5c8fc3d6cedfce2530955672ba1ccc1c682` | `assets/showcase/mingleyard/hero.webp` | `4fbd03412513b5498acfa80ce1baf7275d8602ffb4b0b5474bb8c2328a7dd1bb` |
 
 ## AUREVANE dish photographs (CC0)
 

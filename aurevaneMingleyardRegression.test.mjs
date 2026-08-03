@@ -68,7 +68,7 @@ test('direct-editor SQL is ASCII-only, rollback-first and uses PostgreSQL Unicod
   assert.doesNotMatch(text, /theme_config\.updated_at/);
 });
 
-test('service worker cache advances once beyond rebased remote v149', () => {
-  assert.match(sw, /const CACHE_NAME = 'bl-v150';/);
-  assert.equal((sw.match(/bl-v150/g) || []).length, 1);
+test('service worker cache advances for enhanced showcase hero media', () => {
+  assert.match(sw, /const CACHE_NAME = 'bl-v151';/);
+  assert.equal((sw.match(/bl-v151/g) || []).length, 1);
 });
