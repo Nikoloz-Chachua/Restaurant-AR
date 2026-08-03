@@ -55,7 +55,14 @@
                 'pipes-burger-main': 'pipes_fabrika',
                 'gochit-s-burger-main': 'gochit_monster',
                 'r-main': 'respublika_grill',
-                'iakobis-ezo-main': 'iakobis_garden'
+                'iakobis-ezo-main': 'iakobis_garden',
+                // The four segment demo templates. Their slugs ARE their
+                // subdomains (luxury.betareal.ge → 'luxury'), so hostSlug below
+                // resolves them without a ?tenant= param.
+                'luxury': 'luxury_dining',
+                'cafe': 'modern_cafe',
+                'fast-casual': 'premium_fast_casual',
+                'social-dining': 'social_dining'
             };
             const BOOT_TEMPLATE_DEFAULTS = {
                 baoma: { theme: 'day', preload: './img/baoma/interior-hero-maps.webp' },
@@ -68,7 +75,13 @@
                 mugsy_street_diner: { theme: 'day', preload: './assets/mugsy/hero-burger.webp' },
                 pipes_fabrika: { theme: 'day', preload: './assets/pipes/items-webp/pipes-signature-burger.webp' },
                 respublika_grill: { theme: 'night' },
-                iakobis_garden: { theme: 'day' }
+                iakobis_garden: { theme: 'day' },
+                // Matches default_theme in each preset. No preload: these demos
+                // have no hero photo, so there is no LCP image to hint at.
+                luxury_dining: { theme: 'night' },
+                modern_cafe: { theme: 'day' },
+                premium_fast_casual: { theme: 'day' },
+                social_dining: { theme: 'day' }
             };
             const params = new URLSearchParams(location.search);
             const host = location.hostname.toLowerCase();
@@ -6007,7 +6020,1015 @@
             #modal-tip { order: 5; }
         }
 
-    </style>
+        /* ══ The four segment templates ═══════════════════════════════════════
+           luxury_dining · modern_cafe · premium_fast_casual · social_dining
+
+           These back the four demo menus we send to prospects
+           (luxury/cafe/fast-casual/social-dining.betareal.ge). Their palettes
+           come from the four chapters of the flagship outreach page, and this
+           block is the structural half — the part a theme token cannot say.
+
+           Deliberately LAST in the stylesheet. The base desktop grid lives in
+           @media blocks near line 5777, so a template rule declared earlier
+           would lose on source order to a base rule of equal specificity. That
+           mistake has already been made three times in this file; keeping the
+           whole family down here removes the chance of a fourth.
+
+           Everything is scoped to [data-template="…"]. Nothing here reaches the
+           3D viewer, the AR flow or the modal — those stay exactly as every
+           other tenant gets them, which is the whole point of these being CMS
+           templates rather than a separate microsite.
+
+           Class map from the flagship's mockup to ours:
+             .preview → page   .grid → .menu-list   .card → .menu-item
+             .card h3 → .item-name   .categories span → .cat-pill
+             .imageFrame → .thumb-wrap
+
+           Note on fonts: _applyHeadingFontToMenu() writes font_heading as an
+           INLINE style on .item-name/.category-header/.badge-3d, so those
+           already carry the per-template face and cannot be restyled from here.
+           Only the properties around them (size, tracking, case) are set below.
+        */
+
+        /* ── 1. EDITORIAL — luxury_dining ──────────────────────────────────
+           Two columns where the others run three, taller plates, and serif
+           names with the tracking taken back out. Bebas-style letter-spacing
+           on a Cormorant name reads as a mistake, so it is zeroed. */
+        [data-template="luxury_dining"] .item-name {
+            letter-spacing: 0;
+            font-size: 1.3rem;
+            line-height: 1.25;
+            text-transform: none;
+        }
+        /* The one place the house Bebas price is wrong: a condensed grotesque
+           numeral beside a Cormorant name looks like two unrelated menus. */
+        [data-template="luxury_dining"] .price {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.32rem;
+            letter-spacing: 0;
+            font-weight: 700;
+        }
+        [data-template="luxury_dining"] .category-header {
+            letter-spacing: 0.5px;
+            text-transform: none;
+        }
+        [data-template="luxury_dining"] .cat-pill {
+            letter-spacing: 1.4px;
+            font-size: 0.68rem;
+        }
+
+        @media (min-width: 640px) {
+            [data-template="luxury_dining"] .menu-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 26px;
+            }
+            [data-template="luxury_dining"] .item-left .thumb-wrap {
+                height: 260px;
+                border-radius: 4px 4px 0 0;
+            }
+        }
+        @media (min-width: 1100px) {
+            /* Stays at two. Fine dining is the one segment where fewer, larger
+               plates per row is the point — three would make it a canteen. */
+            [data-template="luxury_dining"] .menu-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                max-width: 1040px;
+                gap: 32px;
+            }
+            [data-template="luxury_dining"] .item-left .thumb-wrap { height: 300px; }
+        }
+
+        /* ── 4. PRINT / POSTER — social_dining ─────────────────────────────
+           This one is a generalisation of the PIPES Fabrika design we already
+           built and liked, not of the flagship's "social dining" chapter — that
+           chapter's own demo link pointed at pipes-burger-main anyway.
+
+           What it deliberately does NOT do is reuse the .pipes-* shell. That
+           markup (topbar, hero, location block, footer) is static HTML carrying
+           PIPES's own name, branch, address and Maps link, and it is gated on
+           [data-tenant="pipes-burger-main"][data-brand-slug="pipes-burger"].
+           Showing it here would put another restaurant's identity on a page we
+           send to prospects. The generic equivalents already exist and are used
+           instead: #bb-featured for the signature strip, #venue-info for the
+           address block.
+
+           Where pipes hardcodes hex, this uses the theme tokens, so the CMS can
+           recolour it and the night mode works — pipes only ever ships day. */
+        [data-template="social_dining"] .cat-pill {
+            min-height: 44px;
+            border-radius: 0;
+            border: 2px solid var(--border);
+            font-weight: 900;
+            letter-spacing: 0.4px;
+            box-shadow: 3px 3px 0 var(--shadow);
+        }
+        [data-template="social_dining"] .cat-pill.active {
+            box-shadow: 3px 3px 0 var(--accent);
+        }
+        /* Ink, not accent. Pipes sets both the section heads and the dish names
+           in near-black and lets the orange appear only on the card edge, the
+           price and the buttons. Leaving them on the base --accent turns the
+           whole page orange and loses the printed-page feel entirely. */
+        [data-template="social_dining"] .category-header {
+            padding: 16px 0 6px;
+            border-bottom: 3px solid var(--border);
+            color: var(--text);
+            font-size: 1.7rem;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+        [data-template="social_dining"] .menu-item {
+            border: 2px solid var(--border);
+        }
+        /* Pipes widens the accent edge from 3px to 5px — at this weight of
+           border it is the detail that keeps the card from reading as a plain
+           box. */
+        [data-template="social_dining"] .menu-item::before {
+            width: 5px;
+            background: var(--accent);
+        }
+        [data-template="social_dining"] .item-name {
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 0;
+            font-size: 1.28rem;
+            line-height: 1.04;
+        }
+        [data-template="social_dining"] .price {
+            font-family: 'Anton', 'Nunito', sans-serif;
+            font-size: 1.28rem;
+            letter-spacing: 0;
+        }
+        [data-template="social_dining"] .ingredients {
+            font-weight: 700;
+            line-height: 1.4;
+        }
+        /* Square, ink-outlined controls in the secondary — pipes puts black on
+           yellow here rather than white on orange, and it is the single most
+           recognisable element of the design. */
+        [data-template="social_dining"] .qty-add-btn,
+        [data-template="social_dining"] .qty-stepper {
+            min-height: 44px;
+            border: 2px solid var(--border);
+            border-radius: 0;
+        }
+        [data-template="social_dining"] .ar-btn {
+            border-radius: 0;
+            border: 2px solid var(--border);
+            min-height: 48px;
+        }
+        @media (min-width: 640px) {
+            [data-template="social_dining"] .menu-list { gap: 14px; }
+            /* Square photo well with a full-weight rule under it, matching the
+               card border rather than fading into it. */
+            [data-template="social_dining"] .item-left .thumb-wrap {
+                border-radius: 0;
+                border-bottom: 2px solid var(--border);
+                aspect-ratio: 1.25 / 1;
+                height: auto;
+            }
+        }
+        @media (min-width: 1100px) {
+            [data-template="social_dining"] .menu-list { gap: 16px; }
+        }
+
+    
+
+
+
+        /* ══ Cloned template designs ═══════════════════════════════════════
+           Twins of the Monday Greens and Mugsy rules, re-scoped to the two
+           demo template keys. Generated by scratchpad/tpl4/dupcss.js — do
+           not hand-edit; re-run the script instead.
+
+           These are COPIES on purpose. The demos have to be able to drift
+           from the client sites without dragging them along: Monday Greens
+           has our menus on its tables, and Mugsy is live.
+        */
+
+        /* ── Mugsy (tenant+brand)  ->  Fast Casual ── */
+        html[data-template="premium_fast_casual"] body {
+            padding: 0 12px 42px;
+            background: var(--mugsy-bg);
+            color: var(--mugsy-text);
+            font-family: 'Nunito', 'Noto Sans Georgian', system-ui, -apple-system, sans-serif;
+        }
+        html[data-template="premium_fast_casual"] #theme-toggle,
+        html[data-template="premium_fast_casual"] #lang-toggle {
+            top: calc(9px + env(safe-area-inset-top, 0px));
+            z-index: 1230;
+            min-width: 44px;
+            min-height: 44px;
+            padding: 0 12px;
+            background: var(--mugsy-surface);
+            color: var(--mugsy-red-deep);
+            border-color: var(--mugsy-border);
+            box-shadow: none;
+        }
+        html[data-template="premium_fast_casual"] #theme-toggle {
+            position: static;
+            grid-column: 3;
+            width: 44px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        html[data-template="premium_fast_casual"] #lang-toggle {
+            position: static;
+            grid-column: 5;
+            width: 44px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        html[data-template="premium_fast_casual"] .mg-hero,
+        html[data-template="premium_fast_casual"] .baoma-shell,
+        html[data-template="premium_fast_casual"] .header {
+            display: none;
+        }
+        html[data-template="premium_fast_casual"] .mugsy-shell {
+            display: block;
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+            background: var(--mugsy-bg);
+        }
+        html[data-template="premium_fast_casual"] .mugsy-delivery-rail {
+            position: fixed;
+            right: calc(6px + env(safe-area-inset-right, 0px));
+            top: 50svh;
+            z-index: 1210;
+            flex-direction: column;
+            gap: 8px;
+            transform: translateY(-50%);
+        }
+        html[data-template="premium_fast_casual"] .cat-bar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            width: 100vw;
+            max-width: none;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+            padding: 10px 0;
+            background: var(--mugsy-catbar-bg);
+            border-bottom: 1px solid var(--mugsy-border);
+            backdrop-filter: blur(12px) saturate(140%);
+        }
+        html[data-template="premium_fast_casual"] .cat-scroll,
+        html[data-template="premium_fast_casual"] .cat-filter {
+            max-width: 1180px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: max(12px, env(safe-area-inset-left));
+            padding-right: max(12px, env(safe-area-inset-right));
+        }
+        html[data-template="premium_fast_casual"] .cat-filter {
+            scrollbar-width: none;
+        }
+        html[data-template="premium_fast_casual"] .cat-filter::-webkit-scrollbar {
+            display: none;
+        }
+        html[data-template="premium_fast_casual"] .cat-pill {
+            min-height: 44px;
+            border-radius: 999px;
+            border-color: var(--mugsy-border);
+            background: var(--mugsy-pill);
+            color: var(--mugsy-text);
+            font-weight: 900;
+        }
+        html[data-template="premium_fast_casual"] .cat-pill.active {
+            background: var(--mugsy-red);
+            color: var(--mugsy-accent-text);
+            box-shadow: var(--mugsy-cta-shadow);
+        }
+        html[data-template="premium_fast_casual"] .menu-list {
+            max-width: 1180px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            padding-top: 16px;
+            padding-right: max(12px, env(safe-area-inset-right));
+        }
+        html[data-template="premium_fast_casual"] .cat-section {
+            display: contents;
+        }
+        html[data-template="premium_fast_casual"] .category-header {
+            grid-column: 1 / -1;
+            max-width: none;
+            color: var(--mugsy-red-deep);
+            border-bottom: 3px solid var(--mugsy-red);
+            font-family: 'Bebas Neue', 'Nunito', sans-serif;
+            font-size: 1.75rem;
+            letter-spacing: 0;
+            text-transform: uppercase;
+            padding: 18px 2px 8px;
+        }
+        html[data-template="premium_fast_casual"] .menu-item:not(.no-image) {
+            grid-template-columns: 126px minmax(0, 1fr);
+            grid-template-areas: "left name" "left right";
+            padding: 10px;
+            border-radius: 16px;
+            border-color: var(--mugsy-border);
+        }
+        html[data-template="premium_fast_casual"] .menu-item::before {
+            width: 4px;
+            background: var(--mugsy-red);
+        }
+        html[data-template="premium_fast_casual"] .thumb-wrap {
+            width: 126px;
+            min-height: 126px;
+            border-radius: 14px;
+            background: var(--mugsy-thumb);
+        }
+        html[data-template="premium_fast_casual"] .thumb-img {
+            cursor: zoom-in;
+        }
+        html[data-template="premium_fast_casual"] .item-name {
+            color: var(--mugsy-red-deep);
+            font-family: 'Bebas Neue', 'Nunito', sans-serif;
+            font-size: 1.45rem;
+            letter-spacing: 0;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+        html[data-template="premium_fast_casual"] .ingredients {
+            color: var(--mugsy-dim);
+            font-size: 0.78rem;
+            line-height: 1.38;
+            font-weight: 700;
+        }
+        html[data-template="premium_fast_casual"] .price {
+            color: var(--mugsy-price);
+            font-family: 'Bebas Neue', 'Nunito', sans-serif;
+            font-size: 1.45rem;
+            letter-spacing: 0;
+        }
+        html[data-template="premium_fast_casual"] .qty-add-btn,
+        html[data-template="premium_fast_casual"] .qty-stepper {
+            border-color: var(--mugsy-red);
+            color: var(--mugsy-red);
+        }
+        html[data-template="premium_fast_casual"] .qty-add-btn {
+            width: 44px;
+            height: 44px;
+        }
+        html[data-template="premium_fast_casual"] .qty-stepper {
+            min-height: 44px;
+            height: 44px;
+        }
+        html[data-template="premium_fast_casual"] .qty-dec,
+        html[data-template="premium_fast_casual"] .qty-inc {
+            min-width: 44px;
+            justify-content: center;
+        }
+        html[data-template="premium_fast_casual"] .mugsy-locations {
+            display: block;
+            width: 100%;
+            max-width: 1180px;
+            margin: 26px auto 0;
+            padding: 18px max(12px, env(safe-area-inset-right)) 4px 2px;
+            border-top: 1px solid var(--mugsy-border);
+        }
+        html[data-template="premium_fast_casual"] .site-footer {
+            max-width: 1180px;
+            align-items: center;
+            text-align: center;
+        }
+        html[data-template="premium_fast_casual"] .footer-brand-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            outline-offset: 4px;
+        }
+        html[data-template="premium_fast_casual"] .footer-brand-link:focus-visible {
+            outline: 3px solid var(--mugsy-focus);
+        }
+        html[data-theme="night"][data-template="premium_fast_casual"] .footer-logo-dark,
+        html[data-theme="night"][data-template="premium_fast_casual"] .footer-logo-light {
+            display: none;
+        }
+        html[data-theme="night"][data-template="premium_fast_casual"] .footer-logo-white {
+            display: block;
+        }
+        html[data-template="premium_fast_casual"] .badge-3d,
+        html[data-template="premium_fast_casual"] .ar-featured-banner {
+            border-color: var(--mugsy-border);
+        }
+        html[data-template="premium_fast_casual"] #basket-panel,
+        html[data-template="premium_fast_casual"] #basket-close {
+            background: var(--mugsy-bg);
+            color: var(--mugsy-text);
+        }
+        html[data-template="premium_fast_casual"] #basket-clear,
+        html[data-template="premium_fast_casual"] .basket-qty,
+        html[data-template="premium_fast_casual"] #basket-close {
+            border-color: var(--mugsy-border);
+        }
+        html[data-template="premium_fast_casual"] .basket-qty,
+        html[data-template="premium_fast_casual"] #basket-close {
+            background: var(--mugsy-surface);
+        }
+        html[data-template="premium_fast_casual"] #img-lightbox.has-panel {
+            background-color: var(--mugsy-modal);
+            background-image: var(--mugsy-modal-bg-image);
+            isolation: isolate;
+            z-index: 10001;
+        }
+        html[data-template="premium_fast_casual"] #img-lightbox.has-panel #lightbox-name,
+        html[data-template="premium_fast_casual"] #img-lightbox.has-panel #lightbox-panel {
+            background: var(--mugsy-modal);
+        }
+        html[data-template="premium_fast_casual"] #modal {
+            background-color: var(--mugsy-modal);
+            isolation: isolate;
+        }
+        html[data-template="premium_fast_casual"] #modal::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background: var(--mugsy-modal-bg-image);
+            pointer-events: none;
+        }
+        html[data-template="premium_fast_casual"] #modal > * {
+            z-index: 1;
+        }
+        html[data-template="premium_fast_casual"] #modal .close-btn,
+        html[data-template="premium_fast_casual"] #modal .nav-arrow,
+        html[data-template="premium_fast_casual"] #modal .spin-btn {
+            z-index: 3;
+        }
+        html[data-template="premium_fast_casual"] #modal-viewer-wrap,
+        html[data-template="premium_fast_casual"] #modal-drawer {
+            background: var(--mugsy-modal);
+        }
+        html[data-template="premium_fast_casual"] #img-lightbox.has-panel #lightbox-desc {
+            color: var(--mugsy-dim);
+        }
+        html[data-template="premium_fast_casual"] #img-lightbox.has-panel #lightbox-price {
+            background: none;
+            -webkit-text-fill-color: var(--mugsy-price);
+            color: var(--mugsy-price);
+        }
+        html[data-template="premium_fast_casual"] #waiter-card {
+            background: var(--mugsy-surface);
+            color: var(--mugsy-text);
+        }
+        html[data-template="premium_fast_casual"] #waiter-overlay-title {
+            color: var(--mugsy-text);
+        }
+        html[data-template="premium_fast_casual"] #waiter-overlay-hint {
+            color: var(--mugsy-dim);
+        }
+        html[data-template="premium_fast_casual"] :focus-visible {
+            outline: 3px solid var(--mugsy-focus);
+            outline-offset: 3px;
+        }
+        html[lang="ka"][data-template="premium_fast_casual"] .mugsy-title,
+        html[lang="ka"][data-template="premium_fast_casual"] .category-header,
+        html[lang="ka"][data-template="premium_fast_casual"] .item-name {
+            font-family: 'Noto Sans Georgian', 'Nunito', system-ui, sans-serif !important;
+            font-weight: 900;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        html[data-template="premium_fast_casual"] .basket-item {
+            gap: 8px;
+        }
+        html[data-template="premium_fast_casual"] .basket-item-media {
+            width: 52px;
+            height: 52px;
+            flex: 0 0 52px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--mugsy-border);
+            background: var(--mugsy-thumb);
+        }
+        html[data-template="premium_fast_casual"] .basket-item-thumb {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center center;
+        }
+        html[data-template="premium_fast_casual"] .basket-item-info {
+            min-width: 0;
+        }
+        html[data-template="premium_fast_casual"] .basket-item-name {
+            overflow-wrap: anywhere;
+            line-height: 1.05;
+        }
+        @media (min-width: 700px) {
+            html[data-template="premium_fast_casual"] .mugsy-delivery-rail {
+                right: calc(14px + env(safe-area-inset-right, 0px));
+            }
+            html[data-template="premium_fast_casual"] .menu-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            html[data-template="premium_fast_casual"] .menu-list {
+                padding-right: 16px;
+            }
+            html[data-template="premium_fast_casual"] .mugsy-locations {
+                padding-right: 16px;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) {
+                grid-template-columns: 1fr;
+                grid-template-areas: "left" "name" "right";
+            }
+            html[data-template="premium_fast_casual"] .thumb-wrap {
+                width: 100%;
+                aspect-ratio: 4 / 3;
+                min-height: 0;
+            }
+            html[data-template="premium_fast_casual"] .thumb-img {
+                min-height: 0;
+            }
+        }
+        @media (min-width: 768px) {
+            html[data-template="premium_fast_casual"] .mugsy-delivery-rail {
+                display: flex;
+            }
+        }
+        @media (min-width: 1040px) {
+            html[data-template="premium_fast_casual"] .menu-list {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            html[data-template="premium_fast_casual"] .mugsy-delivery-rail {
+                right: calc(22px + env(safe-area-inset-right, 0px));
+                gap: 10px;
+            }
+        }
+        @media (max-width: 380px) {
+            html[data-template="premium_fast_casual"] .menu-list {
+                padding-right: max(12px, env(safe-area-inset-right));
+            }
+            html[data-template="premium_fast_casual"] .mugsy-locations {
+                padding-right: max(12px, env(safe-area-inset-right));
+            }
+            html[data-template="premium_fast_casual"] .mugsy-delivery-rail {
+                top: 58svh;
+            }
+        }
+        @media (max-width: 699px) {
+            html[data-template="premium_fast_casual"] .menu-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+                padding-left: max(12px, env(safe-area-inset-left));
+                padding-right: max(12px, env(safe-area-inset-right));
+                box-sizing: border-box;
+            }
+            html[data-template="premium_fast_casual"] .category-header,
+            html[data-template="premium_fast_casual"] .mugsy-empty {
+                grid-column: 1 / -1;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) {
+                display: flex;
+                flex-direction: column;
+                min-width: 0;
+                padding: 0;
+                border-radius: 14px;
+                overflow: hidden;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image)::before {
+                width: 0;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .item-left {
+                order: 1;
+                width: 100%;
+                min-width: 0;
+                overflow: hidden;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .thumb-wrap {
+                width: 100%;
+                max-width: 100%;
+                height: auto;
+                min-height: 0;
+                aspect-ratio: 1 / 0.82;
+                border-radius: 14px 14px 0 0;
+                border-bottom: 1px solid var(--mugsy-border);
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .thumb-img,
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) model-viewer {
+                width: 100%;
+                height: 100%;
+                min-height: 0;
+                object-fit: cover;
+                object-position: center center;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .badge-3d {
+                top: 8px;
+                left: 8px;
+                right: auto;
+                bottom: auto;
+                max-width: calc(100% - 16px);
+                border-radius: 7px;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .item-name {
+                order: 2;
+                min-width: 0;
+                padding: 8px 9px 0;
+                font-size: 1rem;
+                line-height: 1.12;
+                overflow-wrap: anywhere;
+                word-break: normal;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .item-right {
+                order: 3;
+                min-width: 0;
+                padding: 7px 9px 10px;
+                gap: 7px;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .ingredients {
+                font-size: 0.72rem;
+                line-height: 1.3;
+                max-height: 3.9em;
+                overflow: hidden;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .item-actions {
+                align-items: center;
+                gap: 8px;
+                min-height: 44px;
+                margin-top: 0;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .price {
+                min-width: 0;
+                font-size: 1.05rem;
+                line-height: 1;
+                overflow-wrap: anywhere;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .qty-add-btn {
+                width: 44px;
+                height: 44px;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .qty-stepper {
+                width: 100%;
+                max-width: 104px;
+                min-height: 44px;
+                height: 44px;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .qty-dec,
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .qty-inc {
+                min-width: 38px;
+                padding: 0;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .qty-num {
+                min-width: 22px;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .ar-btn {
+                width: 100%;
+                min-height: 44px;
+                padding: 8px 6px;
+                font-size: 0.58rem;
+                line-height: 1.15;
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
+        }
+        @media (max-width: 340px) {
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .item-actions {
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: flex-start;
+                gap: 6px;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .price {
+                white-space: nowrap;
+            }
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .qty-ctrl,
+            html[data-template="premium_fast_casual"] .menu-item:not(.no-image) .qty-stepper {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+        @media (min-width: 640px) {
+            html[data-template="premium_fast_casual"] .basket-item-media {
+                width: 60px;
+                height: 60px;
+                flex-basis: 60px;
+            }
+        }
+
+        /* ── Mugsy (tenant+template, the --mugsy-* palette)  ->  Fast Casual ── */
+        html[data-template="premium_fast_casual"] {
+            --bg: var(--mugsy-bg);
+            --bg2: var(--mugsy-bg2);
+            --glow: var(--mugsy-glow);
+            --glow2: var(--mugsy-glow2);
+            --shadow: var(--mugsy-shadow);
+            --card: var(--mugsy-card);
+            --card2: var(--mugsy-card2);
+            --border: var(--mugsy-border);
+            --text: var(--mugsy-text);
+            --dim: var(--mugsy-dim);
+            --accent: var(--mugsy-accent);
+            --accent2: var(--mugsy-accent2);
+            --accent-text: var(--mugsy-accent-text);
+            --thumb-bg: var(--mugsy-thumb);
+            --modal-bg: var(--mugsy-modal);
+            --modal-rgb: var(--mugsy-modal-rgb);
+            --bg-image: var(--mugsy-bg-image);
+            --bg-size: 28px 28px, auto, auto;
+            --bg-repeat: repeat, no-repeat, no-repeat;
+            --card-bg: var(--mugsy-card-bg);
+            --card-blur: 0px;
+            --card-radius: 16px;
+            --item-shadow: var(--mugsy-shadow-card);
+            --item-hover-shadow: var(--mugsy-shadow-card-hover);
+            --accent-edge: linear-gradient(180deg, var(--mugsy-red), var(--mugsy-mustard));
+            --stage-bg: var(--mugsy-thumb);
+            --thumb-vignette: var(--mugsy-thumb-vignette);
+            --pill-bg: var(--mugsy-pill);
+            --pill-active-bg: var(--mugsy-red);
+            --cta-bg: var(--mugsy-red);
+            --cta-shadow: var(--mugsy-cta-shadow);
+            --hero-color: var(--mugsy-red);
+            --hero-shadow: none;
+            --divider-bg: linear-gradient(90deg, transparent, var(--mugsy-red), transparent);
+            --modal-bg-image: var(--mugsy-modal-bg-image);
+            --price-color: var(--mugsy-price);
+            --add-btn-color: var(--mugsy-red);
+            --badge-bg: var(--mugsy-red);
+        }
+        html[data-theme="day"][data-template="premium_fast_casual"] {
+            --mugsy-bg: #FFF7E7;
+            --mugsy-bg2: #FFFDF7;
+            --mugsy-glow: rgba(217,46,39,0.14);
+            --mugsy-glow2: rgba(244,185,66,0.18);
+            --mugsy-shadow: rgba(45,27,20,0.16);
+            --mugsy-card: #ffffff;
+            --mugsy-card2: #F8E8C9;
+            --mugsy-border: rgba(45,27,20,0.16);
+            --mugsy-text: #241A16;
+            --mugsy-dim: #6C5A50;
+            --mugsy-accent: #D92E27;
+            --mugsy-accent2: #F4B942;
+            --mugsy-accent-text: #FFFDF7;
+            --mugsy-red: #D92E27;
+            --mugsy-red-deep: #A91E1A;
+            --mugsy-mustard: #F4B942;
+            --mugsy-price: #D92E27;
+            --mugsy-thumb: #F8E8C9;
+            --mugsy-modal: #FFF7E7;
+            --mugsy-modal-rgb: 255,247,231;
+            --mugsy-bg-image:
+            linear-gradient(90deg, rgba(45,27,20,0.035) 1px, transparent 1px),
+            radial-gradient(68% 42% at 12% 4%, rgba(244,185,66,0.30), transparent 66%),
+            linear-gradient(180deg, #FFF7E7 0%, #FFFDF7 54%, #F8E8C9 100%);
+            --mugsy-card-bg: linear-gradient(180deg, #ffffff 0%, #FFFDF7 100%);
+            --mugsy-surface: #FFFDF7;
+            --mugsy-topbar-bg: rgba(255,253,247,0.92);
+            --mugsy-catbar-bg: rgba(255,253,247,0.94);
+            --mugsy-pill: #FFF7E7;
+            --mugsy-thumb-vignette: linear-gradient(180deg, transparent 58%, rgba(45,27,20,0.12));
+            --mugsy-shadow-card: 0 8px 20px rgba(45,27,20,0.10);
+            --mugsy-shadow-card-hover: 0 14px 30px rgba(45,27,20,0.16);
+            --mugsy-cta-shadow: 0 8px 18px rgba(217,46,39,0.20);
+            --mugsy-modal-bg-image: linear-gradient(180deg, #FFFDF7 0%, #FFF7E7 100%);
+            --mugsy-empty-bg: repeating-linear-gradient(45deg, rgba(217,46,39,0.08) 0 12px, transparent 12px 24px), #FFFDF7;
+            --mugsy-focus: #D92E27;
+        }
+        html[data-theme="night"][data-template="premium_fast_casual"] {
+            --mugsy-bg: #20140f;
+            --mugsy-bg2: #2A1A13;
+            --mugsy-glow: rgba(244,185,66,0.18);
+            --mugsy-glow2: rgba(217,46,39,0.13);
+            --mugsy-shadow: rgba(10,6,4,0.48);
+            --mugsy-card: #2D1B14;
+            --mugsy-card2: #382319;
+            --mugsy-border: rgba(255,232,188,0.17);
+            --mugsy-text: #FFF1D0;
+            --mugsy-dim: #D8BE92;
+            --mugsy-accent: #FF6A5E;
+            --mugsy-accent2: #FFC84A;
+            --mugsy-accent-text: #21130E;
+            --mugsy-red: #FF5A50;
+            --mugsy-red-deep: #FF756C;
+            --mugsy-mustard: #FFC84A;
+            --mugsy-price: #FFC84A;
+            --mugsy-thumb: #1A100C;
+            --mugsy-modal: #1C110D;
+            --mugsy-modal-rgb: 28,17,13;
+            --mugsy-bg-image:
+            linear-gradient(90deg, rgba(255,232,188,0.035) 1px, transparent 1px),
+            radial-gradient(68% 42% at 12% 4%, rgba(244,185,66,0.13), transparent 66%),
+            linear-gradient(180deg, #20140f 0%, #2A1A13 54%, #160D0A 100%);
+            --mugsy-card-bg: linear-gradient(180deg, #332016 0%, #26170F 100%);
+            --mugsy-surface: #2A1A13;
+            --mugsy-topbar-bg: rgba(32,20,15,0.94);
+            --mugsy-catbar-bg: rgba(32,20,15,0.95);
+            --mugsy-pill: #332016;
+            --mugsy-thumb-vignette: linear-gradient(180deg, transparent 52%, rgba(18,10,7,0.34));
+            --mugsy-shadow-card: 0 10px 26px rgba(8,4,3,0.34);
+            --mugsy-shadow-card-hover: 0 16px 38px rgba(8,4,3,0.46);
+            --mugsy-cta-shadow: 0 8px 20px rgba(255,90,80,0.20);
+            --mugsy-modal-bg-image: radial-gradient(70% 42% at 50% 14%, rgba(244,185,66,0.12), transparent 68%), linear-gradient(180deg, #2A1A13 0%, #160D0A 100%);
+            --mugsy-empty-bg: repeating-linear-gradient(45deg, rgba(255,200,74,0.08) 0 12px, transparent 12px 24px), #2A1A13;
+            --mugsy-focus: #FFC84A;
+        }
+
+        /* ── Monday Greens (template)  ->  Modern Cafe ── */
+        html[data-template="modern_cafe"] #img-lightbox.has-panel #lightbox-name,
+        html[data-template="modern_cafe"] #img-lightbox.has-panel #lightbox-desc,
+        html[data-template="modern_cafe"] #img-lightbox.has-panel #lightbox-price,
+        html[data-template="modern_cafe"] #modal-title,
+        html[data-template="modern_cafe"] #modal-title-d,
+        html[data-template="modern_cafe"] #modal-description,
+        html[data-template="modern_cafe"] #modal-price {
+            background: none;
+            -webkit-background-clip: initial;
+            background-clip: initial;
+            -webkit-text-fill-color: #ffffff;
+            color: #ffffff;
+        }
+        html[data-template="modern_cafe"] #basket-panel .basket-item-name,
+        html[data-template="modern_cafe"] #basket-panel .basket-item-addons,
+        html[data-template="modern_cafe"] #basket-panel .basket-item-price,
+        html[data-template="modern_cafe"] #basket-total-label,
+        html[data-template="modern_cafe"] #basket-total,
+        html[data-template="modern_cafe"] #basket-waiter-btn {
+            -webkit-text-fill-color: #ffffff;
+            color: #ffffff;
+        }
+        html[data-template="modern_cafe"] #basket-waiter-btn {
+            border: 2px solid #ffffff;
+        }
+        html[data-template="modern_cafe"] #basket-clear {
+            -webkit-text-fill-color: #ffffff;
+            color: #ffffff;
+            border-color: transparent;
+        }
+        html[data-template="modern_cafe"] #basket-panel .basket-qty {
+            background: transparent;
+            border: 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.32);
+            border-radius: 0;
+        }
+        html[data-template="modern_cafe"] .menu-item:not(.no-image) {
+            grid-template-columns: 108px minmax(0, 1fr);
+            grid-template-areas: "name  name" "left  right";
+            min-width: 0;
+        }
+        html[data-template="modern_cafe"] .item-name {
+            overflow-wrap: anywhere;
+            word-break: normal;
+            white-space: normal;
+            min-width: 0;
+        }
+        html[data-template="modern_cafe"] .thumb-img {
+            cursor: zoom-in;
+        }
+        html[data-template="modern_cafe"] .category-header {
+            color: #ffffff;
+        }
+        html[data-theme="day"][data-template="modern_cafe"] #modal-title,
+        html[data-theme="day"][data-template="modern_cafe"] #modal-title-d,
+        html[data-theme="day"][data-template="modern_cafe"] #modal-price,
+        html[data-theme="day"][data-template="modern_cafe"] #modal-description {
+            color: #0d7b98;
+            -webkit-text-fill-color: #0d7b98;
+        }
+        html[data-theme="day"][data-template="modern_cafe"] .tip {
+            color: #0d7b98;
+            -webkit-text-fill-color: #0d7b98;
+            opacity: 0.8;
+        }
+        html[data-template="modern_cafe"] .cat-bar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            background: var(--bg);
+            padding-top: 10px;
+            box-shadow: 0 8px 18px -10px var(--shadow, rgba(0,0,0,0.45));
+        }
+        html[data-template="modern_cafe"] {
+            --bg-image: linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%);
+            --bg-size: auto;
+            --bg-repeat: no-repeat;
+        }
+        html[data-template="modern_cafe"] .mg-hero {
+            position: relative;
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+            min-height: 100svh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+        html[data-template="modern_cafe"] .mg-hero {
+            min-height: var(--mg-hero-h, 100svh);
+        }
+        html[data-template="modern_cafe"] .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: none;
+            padding: 34px 18px 10px;
+            margin: 0 auto 8px;
+        }
+        html[data-template="modern_cafe"] .header::after {
+            display: none;
+        }
+        html[data-template="modern_cafe"] .header h1 {
+            display: none;
+        }
+        html[data-template="modern_cafe"] .tenant-logo {
+            display: block;
+            max-width: min(450px, 96vw);
+            margin: 0 auto;
+            filter: drop-shadow(0 8px 18px rgba(0,0,0,0.08));
+        }
+        html[data-template="modern_cafe"] .mg-hero-photo {
+            position: absolute; inset: 0; z-index: 0;
+            background-color: #063236; /* fallback while the photo loads / if unset */
+            background-image: var(--hero-image, none);
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+        }
+        html[data-template="modern_cafe"] .mg-hero-next {
+            position: absolute; inset: 0; z-index: 0;
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--mg-hero-fade, 1200ms) ease-in-out;
+        }
+        html[data-template="modern_cafe"] .mg-hero-veil {
+            position: absolute; inset: 0; z-index: 1;
+            background:
+            radial-gradient(66% 40% at 50% 46%, rgba(0,0,0,0.40) 0%, transparent 70%),
+            linear-gradient(to bottom, rgba(0,0,0,0.16) 0%, transparent 20%, transparent 68%, var(--bg) 100%);
+        }
+        html[data-theme="day"] [data-template="modern_cafe"] .mg-hero-veil,
+        html[data-template="modern_cafe"][data-theme="day"] .mg-hero-veil {
+            background:
+            radial-gradient(62% 36% at 50% 46%, rgba(0,0,0,0.28) 0%, transparent 72%),
+            linear-gradient(to bottom, transparent 90%, var(--bg) 100%);
+        }
+        html[data-template="modern_cafe"] .mg-hero-logo {
+            position: relative; z-index: 2;
+            width: clamp(240px, 74vw, 540px);
+            max-width: calc(100% - 48px);
+            height: auto;
+            filter: drop-shadow(0 2px 9px rgba(0,0,0,0.6)) drop-shadow(0 10px 40px rgba(0,0,0,0.45));
+            animation: mg-hero-rise 0.9s cubic-bezier(0.2,0.7,0.2,1) both;
+        }
+        html[data-template="modern_cafe"] .mg-hero-logo:not([src]) {
+            display: none;
+        }
+        html[data-template="modern_cafe"] .mg-hero-scroll {
+            position: absolute; z-index: 2;
+            bottom: max(26px, env(safe-area-inset-bottom, 26px));
+            left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            color: rgba(255,255,255,0.82);
+            font-size: 0.62rem; font-weight: 800; letter-spacing: 3px;
+            text-transform: uppercase; text-decoration: none;
+        }
+        html[data-template="modern_cafe"] .mg-hero-scroll svg {
+            width: 22px; height: 22px; animation: mg-nudge 1.8s ease-in-out infinite;
+        }
+        @media (max-width: 640px) {
+            html[data-template="modern_cafe"] .cat-bar {
+                padding-top: 54px;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            html[data-template="modern_cafe"] .mg-hero-logo,
+            html[data-template="modern_cafe"] .mg-hero-scroll svg {
+                animation: none;
+            }
+        }
+        @media (min-width: 640px) {
+            html[data-template="modern_cafe"] body {
+                padding-left: 0; padding-right: 0;
+            }
+            html[data-template="modern_cafe"] .cat-bar,
+            html[data-template="modern_cafe"] .menu-list,
+            html[data-template="modern_cafe"] .site-footer {
+                width: calc(100% - 64px);
+            }
+        }
+
+        /* ── Monday Greens (tenant-only extras)  ->  Modern Cafe ── */
+        html[data-template="modern_cafe"] .footer-logo-dark,
+        html[data-template="modern_cafe"] .footer-logo-light {
+            display: none;
+        }
+        html[data-template="modern_cafe"] .footer-logo-white {
+            display: block;
+        }
+        html[data-template="modern_cafe"] .footer-email,
+        html[data-template="modern_cafe"] .footer-copy {
+            color: #fff;
+        }
+</style>
     <!-- ── Anti-FOUC cloak ───────────────────────────────────────────
          The page ships with default night/empty-template markup and only
          resolves the tenant's real theme + template + colours after a
@@ -7380,6 +8401,14 @@
             return document.documentElement.dataset.template === _BAOMA_TEMPLATE_KEY;
         }
         function _isMugsyTenant() {
+            // The Fast Casual demo template is a clone of this design, so it needs
+            // the same shell — topbar, hero, order rail. Everything the shell
+            // renders already comes from theme_config (logo_url, hero_image_url,
+            // mugsy_order_links, site_name), with Mugsy's own assets only as
+            // fallbacks, so the demo can be rebranded from the admin panel without
+            // touching code. Checked by TEMPLATE key, never by slug, so it stays
+            // true for the demo no matter what the tenant is called.
+            if (document.documentElement.dataset.template === 'premium_fast_casual') return true;
             const tenant = window.__tenant || _tenant || {};
             const restaurant_slug = tenant.restaurant_slug || _tenantSlugFromHost();
             const brand = Array.isArray(tenant.brand) ? tenant.brand[0] : tenant.brand;
@@ -9467,7 +10496,16 @@
                 // per-tenant colour choice: an owner editing palette colours must not be
                 // able to knock out the layered background the template is built on.
                 // Every other token stays editable from the CMS as normal.
-                const _bgOwnedByTemplate = ['monday_greens', 'baoma', 'mugsy_street_diner', 'pipes_fabrika'].includes(templateKey);
+                // modern_cafe and premium_fast_casual are clones of monday_greens
+                // and mugsy_street_diner, so they inherit the same property: the
+                // layered background is part of the layout, not a colour choice.
+                // Leaving them off this list is what made the Fast Casual demo
+                // render Mugsy's structure under a generic grain background — the
+                // copied bg_image was injected into <style id="remote-theme">,
+                // which is appended after the main stylesheet and therefore beats
+                // the template's own rule no matter how specific it is.
+                const _bgOwnedByTemplate = ['monday_greens', 'baoma', 'mugsy_street_diner', 'pipes_fabrika',
+                    'modern_cafe', 'premium_fast_casual'].includes(templateKey);
                 // Inject a <style> block that overrides both themes regardless of which is active
                 let css = '[data-theme="night"] {';
                 Object.entries(varMap).forEach(([k, cssVar]) => {

@@ -19,6 +19,10 @@ export type StarterTemplateKey =
   | 'betareal'
   | 'respublika_grill'
   | 'iakobis_garden'
+  | 'luxury_dining'
+  | 'modern_cafe'
+  | 'premium_fast_casual'
+  | 'social_dining'
 
 export type ThemePreset = {
   key: StarterTemplateKey
@@ -451,6 +455,159 @@ const TEMPLATE_VISUAL_TOKENS: Record<StarterTemplateKey, ThemeConfig> = {
     day_item_shadow: '0 4px 14px rgba(36,42,29,0.10)', day_item_hover_shadow: '0 12px 26px rgba(36,42,29,0.14)',
     day_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(234,74,50,0.08) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #EBECE4 0%, #F8F9F4 72%)',
   },
+
+  // ── The four segment templates ────────────────────────────────────────────
+  // Hues come from the four chapters in the flagship site (BetaReal-Flagship,
+  // src/data/segments.ts) so the outreach page and the demo it links to read as
+  // the same design. Each chapter there is a single look; a CMS template needs
+  // both modes, so the chapter's own palette becomes the "natural" mode and the
+  // opposite mode is derived from the same family. Every text pair clears WCAG
+  // AA in both modes — see the tightest margins noted per template.
+
+  // Editorial. Wine and gold, generous gutters, serif headings.
+  luxury_dining: {
+    night_bg_image: 'radial-gradient(88% 54% at 50% -10%, rgba(217,180,110,0.16) 0%, transparent 62%), radial-gradient(64% 42% at 88% 26%, rgba(242,201,209,0.10) 0%, transparent 70%), linear-gradient(178deg, #2A0813 0%, #200610 56%, #1B040C 100%)',
+    night_bg_size: 'auto, auto, auto', night_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    night_card_bg: 'linear-gradient(162deg, #3A101E 0%, #2E0A16 100%)', night_card_radius: '4px', night_card_blur: '0px',
+    night_stage_bg: 'radial-gradient(84% 66% at 50% 20%, rgba(217,180,110,0.12), transparent 72%), #1B040C',
+    night_pill_bg: 'rgba(58,16,30,0.92)', night_pill_active_bg: '#D9B46E',
+    night_cta_bg: '#D9B46E', night_cta_shadow: '0 6px 20px rgba(217,180,110,0.26)',
+    night_hero_color: '#D9B46E', night_hero_shadow: '0 2px 18px rgba(217,180,110,0.24)', night_divider_bg: 'linear-gradient(90deg, transparent, #D9B46E, transparent)',
+    night_accent_edge: 'linear-gradient(180deg, #D9B46E, #F2C9D1)', night_thumb_vignette: 'linear-gradient(180deg, transparent 58%, rgba(27,4,12,0.52))',
+    night_item_shadow: '0 4px 18px rgba(0,0,0,0.44)', night_item_hover_shadow: '0 16px 38px rgba(0,0,0,0.54)',
+    night_modal_bg_image: 'radial-gradient(70% 48% at 50% 32%, rgba(217,180,110,0.16) 0%, transparent 64%), linear-gradient(180deg, #3A101E 0%, #1B040C 74%)',
+    day_bg_image: 'radial-gradient(88% 52% at 50% -10%, rgba(126,36,52,0.08) 0%, transparent 60%), radial-gradient(64% 42% at 88% 26%, rgba(138,106,47,0.07) 0%, transparent 70%), linear-gradient(178deg, #FFF6EC 0%, #F7E8DC 58%, #FFFDF9 100%)',
+    day_bg_size: 'auto, auto, auto', day_bg_repeat: 'no-repeat, no-repeat, no-repeat',
+    day_card_bg: 'linear-gradient(162deg, #FFFFFF 0%, #FDF3E9 100%)', day_card_radius: '4px', day_card_blur: '0px',
+    day_stage_bg: 'radial-gradient(84% 66% at 50% 20%, rgba(126,36,52,0.06), transparent 72%), #F7E8DC',
+    day_pill_bg: 'rgba(255,255,255,0.88)', day_pill_active_bg: '#7E2434',
+    day_cta_bg: '#7E2434', day_cta_shadow: '0 6px 18px rgba(126,36,52,0.20)',
+    day_hero_color: '#7E2434', day_hero_shadow: '0 2px 14px rgba(126,36,52,0.14)', day_divider_bg: 'linear-gradient(90deg, transparent, #8A6A2F, transparent)',
+    day_accent_edge: 'linear-gradient(180deg, #7E2434, #8A6A2F)', day_thumb_vignette: 'linear-gradient(180deg, transparent 62%, rgba(126,36,52,0.10))',
+    day_item_shadow: '0 4px 16px rgba(42,8,19,0.10)', day_item_hover_shadow: '0 14px 34px rgba(42,8,19,0.16)',
+    day_modal_bg_image: 'radial-gradient(70% 48% at 50% 32%, rgba(126,36,52,0.07) 0%, transparent 64%), linear-gradient(180deg, #FFF6EC 0%, #FFFDF9 74%)',
+  },
+
+  // Cafe. Daylight teal, soft rounding, lots of air.
+  modern_cafe: {
+    // Cloned verbatim from the live monday-greens theme_config so the CMS
+    // preset and the demo tenant cannot drift apart.
+    day_accent_edge: 'linear-gradient(180deg, #0e7490, #0b5566)',
+    day_bg_image: 'linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%)',
+    day_bg_repeat: 'no-repeat',
+    day_bg_size: 'auto',
+    day_card_bg: 'linear-gradient(158deg, #ffffff 0%, #e6fbff 100%)',
+    day_card_blur: '0px',
+    day_card_radius: '18px',
+    day_cta_bg: 'linear-gradient(120deg, #0891b2, #0e7490)',
+    day_cta_shadow: '0 7px 20px rgba(8,145,178,0.20)',
+    day_divider_bg: 'linear-gradient(90deg, transparent, #0e7490, transparent)',
+    day_hero_color: '#0e7490',
+    day_hero_shadow: '0 2px 14px rgba(8,145,178,0.18)',
+    day_item_hover_shadow: '0 12px 26px rgba(6,58,66,0.18)',
+    day_item_shadow: '0 4px 14px rgba(6,58,66,0.14)',
+    day_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(6,140,150,0.13) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #bfe7ec 0%, #eafafb 72%)',
+    day_pill_active_bg: 'linear-gradient(120deg, #0891b2, #0e7490)',
+    day_pill_bg: 'rgba(255,255,255,0.86)',
+    day_stage_bg: 'radial-gradient(85% 68% at 50% 18%, rgba(6,140,150,0.12), transparent 72%), #e4f4f4',
+    day_thumb_vignette: 'radial-gradient(ellipse at center, transparent 36%, rgba(215,246,251,0.85) 100%)',
+    night_accent_edge: 'linear-gradient(180deg, #22d3ee, #38bdf8)',
+    night_bg_image: 'linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%)',
+    night_bg_repeat: 'no-repeat',
+    night_bg_size: 'auto',
+    night_card_bg: 'linear-gradient(158deg, #0c2029 0%, #123039 100%)',
+    night_card_blur: '0px',
+    night_card_radius: '18px',
+    night_cta_bg: 'linear-gradient(120deg, #22d3ee, #38bdf8)',
+    night_cta_shadow: '0 7px 20px rgba(34,211,238,0.24)',
+    night_divider_bg: 'linear-gradient(90deg, transparent, #38bdf8, transparent)',
+    night_hero_color: '#22d3ee',
+    night_hero_shadow: '0 2px 18px rgba(34,211,238,0.24)',
+    night_item_hover_shadow: '0 12px 26px rgba(0,0,0,0.56)',
+    night_item_shadow: '0 4px 14px rgba(0,0,0,0.5)',
+    night_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(34,211,238,0.18) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #0a2630 0%, #06171c 72%)',
+    night_pill_active_bg: 'linear-gradient(120deg, #22d3ee, #38bdf8)',
+    night_pill_bg: 'rgba(12,32,41,0.92)',
+    night_stage_bg: 'radial-gradient(85% 68% at 50% 18%, rgba(34,211,238,0.16), transparent 72%), #08222a',
+    night_thumb_vignette: 'radial-gradient(ellipse at center, transparent 34%, rgba(12,32,41,0.80) 100%)',
+  },
+
+  // Poster. Sand and tomato red, heavy uppercase, tight grid.
+  premium_fast_casual: {
+    // Cloned verbatim from the live mugsy-main theme_config so the CMS
+    // preset and the demo tenant cannot drift apart.
+    day_accent_edge: 'linear-gradient(180deg, #f2b535, #c07808)',
+    day_bg_image: 'url("./img/grain.png"), radial-gradient(90% 52% at 50% -10%, rgba(192,120,8,0.14) 0%, transparent 60%), radial-gradient(72% 48% at 86% 32%, rgba(242,181,53,0.12) 0%, transparent 72%), linear-gradient(175deg, #f5f0e8 0%, #ede7d8 60%, #fffaf2 100%)',
+    day_bg_repeat: 'repeat, no-repeat, no-repeat, no-repeat',
+    day_bg_size: '64px 64px, auto, auto, auto',
+    day_card_bg: 'linear-gradient(158deg, #ffffff 0%, #f7eddc 100%)',
+    day_card_blur: '0px',
+    day_card_radius: '20px',
+    day_cta_bg: 'linear-gradient(120deg, #f2b535, #c07808)',
+    day_cta_shadow: '0 7px 20px rgba(242,181,53,0.15)',
+    day_divider_bg: 'linear-gradient(90deg, transparent, #c07808, transparent)',
+    day_hero_color: '#f2b535',
+    day_hero_shadow: '0 2px 14px rgba(242,181,53,0.14)',
+    day_item_hover_shadow: '0 12px 26px rgba(120,80,10,0.18)',
+    day_item_shadow: '0 4px 14px rgba(120,80,10,0.13)',
+    day_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(192,120,8,0.13) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #ede7d8 0%, #fffaf2 72%)',
+    day_pill_active_bg: 'linear-gradient(120deg, #f2b535, #c07808)',
+    day_pill_bg: 'rgba(255,255,255,0.86)',
+    day_stage_bg: 'radial-gradient(90% 70% at 50% 18%, rgba(192,120,8,0.10), transparent 72%), #fff8ec',
+    day_thumb_vignette: 'radial-gradient(ellipse at center, transparent 36%, rgba(255,248,236,0.78) 100%)',
+    night_accent_edge: 'linear-gradient(180deg, #f2b535, #c07808)',
+    night_bg_image: 'url("./img/grain.png"), radial-gradient(95% 55% at 50% -8%, rgba(242,181,53,0.20) 0%, transparent 60%), radial-gradient(70% 50% at 85% 35%, rgba(192,120,8,0.12) 0%, transparent 72%), linear-gradient(175deg, #0f0b07 0%, #1d1610 58%, #0f0b07 100%)',
+    night_bg_repeat: 'repeat, no-repeat, no-repeat, no-repeat',
+    night_bg_size: '64px 64px, auto, auto, auto',
+    night_card_bg: 'linear-gradient(158deg, #1d1610 0%, #261d13 100%)',
+    night_card_blur: '0px',
+    night_card_radius: '20px',
+    night_cta_bg: 'linear-gradient(120deg, #f2b535, #c07808)',
+    night_cta_shadow: '0 7px 20px rgba(242,181,53,0.22)',
+    night_divider_bg: 'linear-gradient(90deg, transparent, #c07808, transparent)',
+    night_hero_color: '#f2b535',
+    night_hero_shadow: '0 2px 18px rgba(242,181,53,0.22)',
+    night_item_hover_shadow: '0 12px 26px rgba(0,0,0,0.52)',
+    night_item_shadow: '0 4px 14px rgba(0,0,0,0.46)',
+    night_modal_bg_image: 'radial-gradient(70% 48% at 50% 36%, rgba(242,181,53,0.18) 0%, transparent 62%), radial-gradient(130% 100% at 50% 50%, #1d1610 0%, #120d08 72%)',
+    night_pill_active_bg: 'linear-gradient(120deg, #f2b535, #c07808)',
+    night_pill_bg: 'rgba(29,22,16,0.92)',
+    night_stage_bg: 'radial-gradient(90% 70% at 50% 18%, rgba(242,181,53,0.14), transparent 72%), #17100a',
+    night_thumb_vignette: 'radial-gradient(ellipse at center, transparent 34%, rgba(29,22,16,0.78) 100%)',
+  },
+
+  // Print / poster. Rebuilt on the PIPES Fabrika look rather than the flagship
+  // chapter: that chapter's own demo link already pointed at pipes-burger-main,
+  // and we have a finished, liked design for exactly this segment. The day
+  // tokens are lifted from the live pipes_fabrika block in index.html so the
+  // template and the client site read as one design language; night is a
+  // dark-paper counterpart, since pipes itself only ever ships day.
+  //
+  // The 24px ink rule and the paper gradient are what make it read as printed
+  // stock rather than a dark UI, so both come across verbatim.
+  social_dining: {
+    night_bg_image: 'linear-gradient(90deg, rgba(245,240,230,0.045) 1px, transparent 1px), linear-gradient(180deg, #1A1815 0%, #201D18 50%, #131210 100%)',
+    night_bg_size: '24px 24px, auto', night_bg_repeat: 'repeat, no-repeat',
+    night_card_bg: '#232019', night_card_radius: '8px', night_card_blur: '0px',
+    night_stage_bg: '#131210',
+    night_pill_bg: '#232019', night_pill_active_bg: '#F5F0E6',
+    night_cta_bg: '#FF7A4D', night_cta_shadow: '4px 4px 0 #F5F0E6',
+    night_hero_color: '#FF7A4D', night_hero_shadow: 'none', night_divider_bg: 'linear-gradient(90deg, transparent, #B7D936, transparent)',
+    night_accent_edge: '#FF7A4D', night_thumb_vignette: 'none',
+    // Hard offset, no blur — the whole language is printed matter.
+    night_item_shadow: '5px 5px 0 rgba(245,240,230,0.16)', night_item_hover_shadow: '7px 7px 0 rgba(245,240,230,0.22)',
+    night_modal_bg_image: 'linear-gradient(180deg, #232019 0%, #131210 74%)',
+    day_bg_image: 'linear-gradient(90deg, rgba(23,23,23,0.035) 1px, transparent 1px), linear-gradient(180deg, #E9E3D7 0%, #F5F0E6 50%, #E9E3D7 100%)',
+    day_bg_size: '24px 24px, auto', day_bg_repeat: 'repeat, no-repeat',
+    day_card_bg: '#FFFDF7', day_card_radius: '8px', day_card_blur: '0px',
+    day_stage_bg: '#E9E3D7',
+    day_pill_bg: '#FFFDF7', day_pill_active_bg: '#171717',
+    day_cta_bg: '#C7431C', day_cta_shadow: '4px 4px 0 #171717',
+    day_hero_color: '#171717', day_hero_shadow: 'none', day_divider_bg: 'linear-gradient(90deg, transparent, #5E7A0E, transparent)',
+    day_accent_edge: '#E04E1E', day_thumb_vignette: 'none',
+    day_item_shadow: '5px 5px 0 rgba(23,23,23,0.18)', day_item_hover_shadow: '7px 7px 0 rgba(23,23,23,0.24)',
+    day_modal_bg_image: 'linear-gradient(180deg, #FFFDF7 0%, #E9E3D7 74%)',
+  },
 }
 
 
@@ -823,6 +980,165 @@ export const TEMPLATE_PRESETS: ThemePreset[] = [
       day_price_color: '#EA4A32', day_add_btn_color: '#EA4A32',
       ...TEMPLATE_VISUAL_TOKENS.iakobis_garden,
       font_body: 'Nunito', font_heading: 'Fraunces', template_key: 'iakobis_garden',
+      default_theme: 'day',
+    },
+  },
+  {
+    key: 'luxury_dining',
+    label: 'Luxury Dining Template',
+    description:
+      'Deep wine and brushed gold with serif headings and wide editorial gutters — for fine dining rooms where plating and atmosphere carry the menu. Square corners and a slow, spacious grid.',
+    primaryColor: '#D9B46E',
+    secondaryColor: '#7E2434',
+    createStarterCategory: true,
+    preserveModeAccents: true,
+    values: {
+      night_bg: '#2A0813', night_bg2: '#1B040C', night_card: '#3A101E', night_card2: '#461624', night_border: 'rgba(217,180,110,0.22)',
+      night_text: '#FFF6EC', night_dim: '#D9B0AC', night_accent: '#D9B46E', night_accent2: '#F2C9D1', night_accent_text: '#2A0813', night_thumb_bg: '#1B040C', night_modal_bg: '#2A0813',
+      night_glow: 'rgba(217,180,110,0.16)', night_glow2: 'rgba(242,201,209,0.10)', night_shadow: 'rgba(0,0,0,0.60)',
+      night_price_color: '#D9B46E', night_add_btn_color: '#D9B46E',
+      day_bg: '#FFF6EC', day_bg2: '#F7E8DC', day_card: '#FFFFFF', day_card2: '#FDF3E9', day_border: 'rgba(42,8,19,0.14)',
+      day_text: '#2A0813', day_dim: '#6E4A4F', day_accent: '#7E2434', day_accent2: '#8A6A2F', day_accent_text: '#FFF6EC', day_thumb_bg: '#F7E8DC', day_modal_bg: '#FFFDF9',
+      day_glow: 'rgba(126,36,52,0.08)', day_glow2: 'rgba(138,106,47,0.07)', day_shadow: 'rgba(42,8,19,0.14)',
+      day_price_color: '#7E2434', day_add_btn_color: '#7E2434',
+      ...TEMPLATE_VISUAL_TOKENS.luxury_dining,
+      font_body: 'Nunito', font_heading: 'Cormorant Garamond', template_key: 'luxury_dining',
+      default_theme: 'night',
+    },
+  },
+  {
+    key: 'modern_cafe',
+    label: 'Modern Cafe Template',
+    // An independent clone of the Monday Greens design — full-bleed hero,
+    // teal-on-cream, Fraunces headings, three-column photo cards. Duplicated
+    // rather than shared: this must be free to drift without repainting a cafe
+    // that has our menus on its tables.
+    description:
+      'The Monday Greens look, as a reusable template: a full-height hero, teal on cream, serif headings and roomy three-column photo cards — for cafes and all-day brunch rooms where the photography does the selling.',
+    // Monday Greens' own day accents. Its night accents differ (#f5feff /
+    // #38bdf8), which is why preserveModeAccents stays on — flattening both
+    // modes onto one primary would wreck the dark palette.
+    primaryColor: '#0891b2',
+    secondaryColor: '#0e7490',
+    createStarterCategory: true,
+    preserveModeAccents: true,
+    values: {
+      day_accent: '#0891b2',
+      day_accent_text: '#ffffff',
+      day_accent2: '#0e7490',
+      day_bg: '#36a1b0',
+      day_bg2: '#36a1b0',
+      day_border: 'rgba(6,120,150,0.20)',
+      day_card: '#e6dbdb',
+      day_card2: '#e6fbff',
+      day_dim: '#4f818c',
+      day_glow: 'rgba(94,255,228,0.90)',
+      day_glow2: 'rgba(6,140,150,0.18)',
+      day_modal_bg: '#000000',
+      day_shadow: 'rgba(6,58,66,0.18)',
+      day_text: '#0b2a30',
+      day_thumb_bg: '#78bac4',
+      default_theme: 'day',
+      font_body: 'Nunito',
+      font_heading: 'Fraunces',
+      night_accent: '#f5feff',
+      night_accent_text: '#000000',
+      night_accent2: '#38bdf8',
+      night_bg: '#052529',
+      night_bg2: '#052529',
+      night_border: 'rgba(34,211,238,0.22)',
+      night_card: '#0c2029',
+      night_card2: '#0b5e75',
+      night_dim: '#ffffff',
+      night_glow: 'rgba(34,211,238,0.30)',
+      night_glow2: 'rgba(56,189,248,0.24)',
+      night_modal_bg: '#06171c',
+      night_shadow: 'rgba(0,0,0,0.55)',
+      night_text: '#ffffff',
+      night_thumb_bg: '#13333a',
+      ...TEMPLATE_VISUAL_TOKENS.modern_cafe,
+      template_key: 'modern_cafe',
+    },
+  },
+  {
+    key: 'premium_fast_casual',
+    label: 'Fast Casual Template',
+    // An independent clone of the Mugsy Street Diner design — sticky topbar,
+    // photo hero with order links, condensed caps, sand and gold.
+    description:
+      'The Mugsy Street Diner look, as a reusable template: sticky topbar, a full-width photo hero with delivery links, condensed caps and warm sand-and-gold cards — for burger joints and fast-casual rooms that sell on the product shot.',
+    primaryColor: '#f2b535',
+    secondaryColor: '#c07808',
+    createStarterCategory: true,
+    preserveModeAccents: true,
+    values: {
+      day_accent: '#f2b535',
+      day_accent_text: '#ffffff',
+      day_accent2: '#c07808',
+      day_bg: '#f5f0e8',
+      day_bg2: '#ede7d8',
+      day_border: 'rgba(192,120,8,0.22)',
+      day_card: '#ffffff',
+      day_card2: '#ede7d8',
+      day_dim: '#8a7060',
+      day_glow: 'rgba(192,120,8,0.16)',
+      day_glow2: 'rgba(155,98,8,0.10)',
+      day_modal_bg: '#fffaf2',
+      day_shadow: 'rgba(120,80,10,0.16)',
+      day_text: '#1c1308',
+      day_thumb_bg: '#fff8ec',
+      default_theme: 'day',
+      font_body: 'Nunito',
+      font_heading: 'Bebas Neue',
+      night_accent: '#f2b535',
+      night_accent_text: '#0f0b07',
+      night_accent2: '#c07808',
+      night_bg: '#0f0b07',
+      night_bg2: '#1d1610',
+      night_border: 'rgba(192,120,8,0.22)',
+      night_card: '#1d1610',
+      night_card2: '#261d13',
+      night_dim: '#8a7a62',
+      night_glow: 'rgba(242,181,53,0.20)',
+      night_glow2: 'rgba(192,120,8,0.12)',
+      night_modal_bg: '#120d08',
+      night_shadow: 'rgba(0,0,0,0.55)',
+      night_text: '#ede6d4',
+      night_thumb_bg: '#17100a',
+      ...TEMPLATE_VISUAL_TOKENS.premium_fast_casual,
+      template_key: 'premium_fast_casual',
+    },
+  },
+  {
+    key: 'social_dining',
+    label: 'Social Dining Template',
+    description:
+      'Cream stock, heavy ink rules and a hard offset shadow, with Anton caps and an orange edge on every card — the PIPES Fabrika look, generalised. For burger joints, bars and food halls where the room is loud and the menu should read like a printed poster.',
+    // The one place this deviates from pipes: it runs #F05A28 with a cream
+    // label, which is 3.33:1 and fails AA on the live site. #E04E1E is the
+    // smallest darkening that clears both gates, and ink-on-accent matches how
+    // pipes already styles its yellow quantity button.
+    primaryColor: '#E04E1E',
+    secondaryColor: '#5E7A0E',
+    createStarterCategory: true,
+    preserveModeAccents: true,
+    values: {
+      night_bg: '#1A1815', night_bg2: '#131210', night_card: '#232019', night_card2: '#2B2720', night_border: '#F5F0E6',
+      night_text: '#F5F0E6', night_dim: '#A9A296', night_accent: '#FF7A4D', night_accent2: '#B7D936', night_accent_text: '#171717', night_thumb_bg: '#131210', night_modal_bg: '#1A1815',
+      night_glow: 'rgba(255,122,77,0.14)', night_glow2: 'rgba(183,217,54,0.10)', night_shadow: 'rgba(0,0,0,0.55)',
+      night_price_color: '#FF8A5E', night_add_btn_color: '#FF7A4D',
+      day_bg: '#E9E3D7', day_bg2: '#F5F0E6', day_card: '#FFFDF7', day_card2: '#F5F0E6', day_border: '#171717',
+      // accent_text has to be legible on BOTH the active pill and the CTA, and
+      // those have opposite lightness. Cream is the only option that works on
+      // the ink pill, which forces the day CTA down to the rust #C7431C where
+      // cream clears 4.86:1 (it is only 3.91:1 on the accent orange itself).
+      day_text: '#171717', day_dim: '#555555', day_accent: '#E04E1E', day_accent2: '#5E7A0E', day_accent_text: '#FFFDF7', day_thumb_bg: '#E9E3D7', day_modal_bg: '#F5F0E6',
+      day_glow: 'rgba(224,78,30,0.10)', day_glow2: 'rgba(94,122,14,0.08)', day_shadow: 'rgba(23,23,23,0.18)',
+      day_price_color: '#C7431C', day_add_btn_color: '#E04E1E',
+      ...TEMPLATE_VISUAL_TOKENS.social_dining,
+      font_body: 'Nunito', font_heading: 'Anton', template_key: 'social_dining',
+      // Paper wants daylight. Pipes hides its toggle entirely; this keeps the
+      // toggle but opens on the mode the design was drawn for.
       default_theme: 'day',
     },
   },
