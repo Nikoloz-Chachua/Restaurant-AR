@@ -6211,6 +6211,17 @@
             isolation: isolate;
             text-align: center;
         }
+        /* AUREVANE follows BAOMA's compact cinematic hero proportions instead of
+           the social template's near-full-screen treatment. This keeps the first
+           menu cards visible sooner and gives both luxury demos the same rhythm. */
+        [data-template="luxury_dining"] .mg-hero {
+            min-height: clamp(360px, 82vw, 430px);
+        }
+        @media (min-width: 640px) {
+            [data-template="luxury_dining"] .mg-hero {
+                min-height: clamp(500px, 44vw, 590px);
+            }
+        }
         [data-template="luxury_dining"] .mg-hero-photo,
         [data-template="luxury_dining"] .mg-hero-next,
         [data-template="social_dining"] .mg-hero-photo,

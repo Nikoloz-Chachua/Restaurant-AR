@@ -22,6 +22,8 @@ test('showcase templates opt into shared hero gallery and localized brand headin
   assert.match(html, /\[data-template="luxury_dining"\] \.mg-hero,/);
   assert.match(html, /\[data-template="social_dining"\] \.mg-hero \{/);
   assert.match(html, /\[data-template="luxury_dining"\] \.mg-hero-logo,[\s\S]*?display: none/);
+  assert.match(html, /\[data-template="luxury_dining"\] \.mg-hero \{\s*min-height: clamp\(360px, 82vw, 430px\);/);
+  assert.match(html, /@media \(min-width: 640px\) \{\s*\[data-template="luxury_dining"\] \.mg-hero \{\s*min-height: clamp\(500px, 44vw, 590px\);/);
 });
 
 test('only the intended templates are added to generic venue rendering', () => {
@@ -68,7 +70,7 @@ test('direct-editor SQL is ASCII-only, rollback-first and uses PostgreSQL Unicod
   assert.doesNotMatch(text, /theme_config\.updated_at/);
 });
 
-test('service worker cache advances for enhanced showcase hero media', () => {
-  assert.match(sw, /const CACHE_NAME = 'bl-v151';/);
-  assert.equal((sw.match(/bl-v151/g) || []).length, 1);
+test('service worker cache advances for AUREVANE hero sizing', () => {
+  assert.match(sw, /const CACHE_NAME = 'bl-v152';/);
+  assert.equal((sw.match(/bl-v152/g) || []).length, 1);
 });
