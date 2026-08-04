@@ -10538,7 +10538,24 @@
 
         // Templates whose hero has the crossfade layer (.mg-hero-next) in their CSS.
         // A template not listed here still shows hero_images[0] as a still photo.
-        const HERO_GALLERY_TEMPLATES = new Set(['monday_greens', 'burger_lions', 'respublika_grill', 'iakobis_garden', 'luxury_dining', 'social_dining']);
+        const HERO_GALLERY_TEMPLATES = new Set(['monday_greens', 'burger_lions', 'respublika_grill', 'iakobis_garden',
+            'luxury_dining', 'social_dining', 'modern_cafe']);
+
+        // Templates whose hero starts aria-hidden in the markup and is only
+        // revealed once its photo is known.
+        const HERO_REVEAL_TEMPLATES = new Set(['luxury_dining', 'social_dining']);
+
+        // FOOD | DRINKS split — deliberately held off (2026-08-04).
+        //
+        // The switch is configured and has been silently dead since 2026-07-27,
+        // killed by the same ReferenceError repaired in applyRemoteTheme(). Fixing
+        // that revives it, but on Monday Greens it moves 102 of 169 items behind a
+        // DRINKS tab — a visible restructure of a live café menu that is printed on
+        // their tables. It waits for the restaurant's go-ahead rather than arriving
+        // as a side effect of a hero-gallery fix.
+        //
+        // To turn on: set this to true. Nothing else needs changing.
+        const DRINK_SPLIT_ENABLED = false;
 
         // Templates that render the generic visit/contact block. Mirrors
         // CONTENT_TEMPLATES in the admin app, which decides where the matching
@@ -10927,45 +10944,20 @@
                 if (heroShots.length) {
                     document.documentElement.style.setProperty('--hero-image', `url("${heroShots[0]}")`);
                 }
-                // ⚠ WORKAROUND — delete this block once the line below is fixed.
-                //
-                // The `isBaomaTenant` check on the next line reads an identifier that
-                // does not exist (every other call site uses `_isBaomaTenant()`). It
-                // throws a ReferenceError that the enclosing `catch (_) {}` swallows,
-                // so EVERY statement after it is skipped for EVERY tenant — including
-                // the hero-logo assignment and _startHeroGallery near the end of this
-                // function.
-                //
-                // Repairing the identifier would also revive the hero gallery, the
-                // FOOD | DRINKS switch and the spin button on tenants that have them
-                // configured but have been running without them since 2026-07-27 —
-                // a visible change to a live menu, so it is deliberately NOT done here.
-                // This block instead does the two things burger_lions needs, ahead of
-                // the throw and scoped to that template, leaving every other tenant on
-                // exactly the code path it runs today.
-                if (templateKey === 'burger_lions' || templateKey === 'respublika_grill' || templateKey === 'iakobis_garden' || templateKey === 'luxury_dining' || templateKey === 'social_dining') {
-                    if (templateKey === 'luxury_dining' || templateKey === 'social_dining') {
-                        document.querySelector('.mg-hero')?.removeAttribute('aria-hidden');
-                    }
-                    const blHeroLogo = document.getElementById('mg-hero-logo');
-                    const blHeroLogoUrl = _safeAssetUrl(cfg.hero_logo_url) || logoUrl;
-                    if (blHeroLogo && blHeroLogoUrl) {
-                        blHeroLogo.src = blHeroLogoUrl;
-                        blHeroLogo.alt = cfg.site_name || tenant.restaurant_name || '';
-                        blHeroLogo.onerror = () => { blHeroLogo.style.display = 'none'; };
-                    }
-                    if (heroShots.length > 1) _startHeroGallery(heroShots);
-                    if (cfg.hero_min_h) {
-                        document.documentElement.style.setProperty('--mg-hero-h', cfg.hero_min_h);
-                    }
+                // Showcase heroes ship aria-hidden and are revealed here. The rest of
+                // what surrounded this on cloudflare was the 2026-07-27 workaround for
+                // the ReferenceError repaired below; with the throw gone, the hero
+                // logo, gallery and hero_min_h all run again at the end of this
+                // function, so re-running them here would start a second crossfade
+                // interval and fight the first one mid-fade.
+                if (HERO_REVEAL_TEMPLATES.has(templateKey)) {
+                    document.querySelector('.mg-hero')?.removeAttribute('aria-hidden');
                 }
                 // Visit / contact block. Same theme_config keys the BAOMA copy
                 // fields already use, so the admin Theme page drives both, but
                 // rendered into generic markup that starts empty — an unset
                 // field hides its element instead of falling back to whatever
                 // restaurant the markup was first written for.
-                // Runs here, ahead of the throw below, for the same reason as
-                // the block above.
                 if (VENUE_INFO_TEMPLATES.has(templateKey)) _applyVenueInfo(cfg);
                 if (_isMugsyTenant()) {
                     const mugsyHeroImg = document.getElementById('mugsy-hero-img');
@@ -10977,12 +10969,17 @@
                     if (pipesHeroImg && heroShots.length) pipesHeroImg.src = heroShots[0];
                     _applyPipesCopy();
                 }
-                if (isBaomaTenant && heroShots.length) {
+                // Was `isBaomaTenant` — an identifier that does not exist, so this
+                // threw a ReferenceError into the enclosing `catch (_) {}` and every
+                // statement below it was silently skipped for EVERY tenant from
+                // 2026-07-27 until now: the hero gallery, hero_min_h, the spin
+                // button, the FOOD | DRINKS switch and the hero logo all read their
+                // config and then never ran.
+                if (_isBaomaTenant() && heroShots.length) {
                     const baomaHeroImg = document.querySelector('.baoma-hero-img');
                     if (baomaHeroImg) baomaHeroImg.src = heroShots[0];
                 }
-                if (templateKey === 'monday_greens' && heroShots.length > 1) _startHeroGallery(heroShots);
-                else if (HERO_GALLERY_TEMPLATES.has(templateKey) && heroShots.length > 1) _startHeroGallery(heroShots);
+                if (HERO_GALLERY_TEMPLATES.has(templateKey) && heroShots.length > 1) _startHeroGallery(heroShots);
                 // Optional per-tenant hero height (e.g. "56.25vw" for a full 16:9 banner).
                 if (cfg.hero_min_h) {
                     document.documentElement.style.setProperty('--mg-hero-h', cfg.hero_min_h);
@@ -10996,7 +10993,7 @@
                 // Food/Drinks split — a tenant lists its drink category names in
                 // theme_config.drink_categories (JSON array or comma list). Non-empty →
                 // a top-level FOOD | DRINKS switch appears; empty/unset → menu unchanged.
-                window.__drinkCats = _parseDrinkCats(cfg.drink_categories);
+                window.__drinkCats = DRINK_SPLIT_ENABLED ? _parseDrinkCats(cfg.drink_categories) : new Set();
                 if (typeof window._applyMenuGroups === 'function') window._applyMenuGroups();
                 const heroLogo = document.getElementById('mg-hero-logo');
                 const heroLogoUrl = _safeAssetUrl(cfg.hero_logo_url) || logoUrl;
