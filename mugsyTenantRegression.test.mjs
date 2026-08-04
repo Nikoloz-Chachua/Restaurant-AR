@@ -56,7 +56,7 @@ test('Mugsy delivery services render from config into a local-asset side rail', 
   assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.mugsy-delivery-rail \{[\s\S]*?position: fixed;[\s\S]*?top: 50svh;[\s\S]*?transform: translateY\(-50%\);/)
   assert.match(html, /@media \(min-width: 768px\) \{[\s\S]*?\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.mugsy-delivery-rail \{[\s\S]*?display: flex;/)
   assert.match(html, /const _MUGSY_DELIVERY_ICONS = \{[\s\S]*?wolt: '\.\/assets\/mugsy\/deliveries\/wolt\.jpg'[\s\S]*?glovo: '\.\/assets\/mugsy\/deliveries\/glovo\.png'/)
-  assert.match(html, /function _applyMugsyCopy\(\)[\s\S]*?const orders = _parseConfigList\(cfg\.mugsy_order_links\);[\s\S]*?const orderLinks = orders\.length \? orders : _MUGSY_DEFAULT_ORDER_LINKS;/)
+  assert.match(html, /function _applyMugsyCopy\(\)[\s\S]*?const orders = _parseConfigList\(cfg\.mugsy_order_links\);[\s\S]*?const orderLinks = orders\.length \? orders[\s\S]*?_demo \? _DEMO_ORDER_LINKS : _MUGSY_DEFAULT_ORDER_LINKS/)
   assert.match(html, /const renderDeliveryRail = \(\) => \{[\s\S]*?window\.matchMedia\('\(min-width: 768px\)'\)\.matches[\s\S]*?rail\.hidden = true;[\s\S]*?return;/)
   assert.match(html, /const renderDeliveryRail = \(\) => \{[\s\S]*?const safe = _safeAssetUrl\(link\.url\);[\s\S]*?const icon = _MUGSY_DELIVERY_ICONS\[key\];[\s\S]*?a\.href = safe;[\s\S]*?img\.src = icon;/)
   assert.match(html, /https:\/\/wolt\.com\/en\/geo\/tbilisi\/restaurant\/magsys-burger/)
