@@ -6,6 +6,7 @@ const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
 const sql = readFileSync(new URL('./supabase/sql/2026-08-03_aurevane_mingleyard_showcase_finish.sql', import.meta.url), 'utf8');
 const asciiSql = readFileSync(new URL('./supabase/sql/2026-08-03_aurevane_mingleyard_showcase_finish_ascii_safe.sql', import.meta.url));
 const sw = readFileSync(new URL('./sw.js', import.meta.url), 'utf8');
+const mingleCss = readFileSync(new URL('./assets/showcase/mingleyard/editorial.css', import.meta.url), 'utf8');
 
 const directions = 'https://www.google.com/maps/dir/?api=1&destination=41.723254266557774,44.730718867747115';
 const coordinate = '41.723254266557774,44.730718867747115';
@@ -70,9 +71,46 @@ test('direct-editor SQL is ASCII-only, rollback-first and uses PostgreSQL Unicod
   assert.doesNotMatch(text, /theme_config\.updated_at/);
 });
 
-// Pinned to a literal, so it has to move with every cache bump. v152 was the
-// AUREVANE hero sizing; v153 is the hero-gallery ReferenceError repair.
-test('service worker cache advances for AUREVANE hero sizing', () => {
-  assert.match(sw, /const CACHE_NAME = 'bl-v153';/);
-  assert.equal((sw.match(/bl-v153/g) || []).length, 1);
+test('MINGLEYARD editorial is exact-tenant gated and keeps sibling templates out', () => {
+  assert.match(html, /data-editorial="mingleyard"/);
+  assert.match(html, /data-mingleyard="headlineLead"/);
+  assert.match(html, /function _isMingleyardTenant\(\)/);
+  assert.match(html, /dataset\.tenant === 'social-dining'[\s\S]*dataset\.template === 'social_dining'/);
+  assert.match(mingleCss, /html\[data-tenant="social-dining"\]\[data-template="social_dining"\]/);
+  assert.match(mingleCss, /--bg:#ebe3d4/);
+  assert.match(mingleCss, /--accent:#f05a28/);
+  assert.match(mingleCss, /\.my-sticker-one/);
+  assert.match(mingleCss, /\.bb-featured:not\(:empty\)/);
+  assert.doesNotMatch(mingleCss, /data-template="(?:luxury_dining|modern_cafe|premium_fast_casual|monday_greens)"/);
+});
+
+test('MINGLEYARD editorial copy localizes and its fallback hero remains accessible', () => {
+  assert.match(html, /const _MINGLEYARD_COPY = \{/);
+  assert.match(html, /headlineLead: 'One yard\.'/);
+  assert.match(html, /headlineLead: 'ერთი ეზო\.'/);
+  assert.match(html, /cta: 'იხილეთ ეზოს მენიუ →'/);
+  assert.match(html, /function _ensureMingleyardTemplateForExactTenant\(\)/);
+  assert.match(html, /dataset\.tenant === 'social-dining' && !root\.dataset\.template/);
+  assert.match(html, /root\.dataset\.template = 'social_dining'/);
+  assert.match(html, /dataset\.tenant = _tenant\.restaurant_slug \|\| '';[\s\S]*?_ensureMingleyardTemplateForExactTenant\(\)/);
+  assert.match(html, /document\.documentElement\.dataset\.template = templateKey;[\s\S]*?_applyMingleyardCopy\(\)/);
+  assert.match(html, /_applyMingleyardCopy\(\);[\s\S]*document\.getElementById\('lang-toggle'\)/);
+  assert.match(html, /_applyMingleyardCopy\(\);[\s\S]*try \{[\s\S]*const tenant = await _resolveTenant\(\)/);
+  assert.match(html, /document\.querySelector\('\.mg-hero'\)\?\.removeAttribute\('aria-hidden'\)/);
+  assert.doesNotMatch(html.match(/const _MINGLEYARD_COPY = \{[\s\S]*?\n        \};/)?.[0] || '', /open late/i);
+});
+
+test('MINGLEYARD presentation contains no historical source-brand wording', () => {
+  const editorialMarkup = html.match(/<header class="my-topbar"[\s\S]*?<\/header>[\s\S]*?<div class="my-editorial-copy"[\s\S]*?<\/div>/)?.[0] || '';
+  assert.ok(editorialMarkup);
+  assert.doesNotMatch(editorialMarkup, /(?:fabrika|pipes)/i);
+  assert.doesNotMatch(mingleCss, /(?:fabrika|pipes)/i);
+});
+
+// v153 repaired the production hero gallery; this redesign advances the cache
+// once more so returning visitors receive the new MINGLEYARD stylesheet.
+test('service worker cache advances and precaches MINGLEYARD editorial CSS', () => {
+  assert.match(sw, /const CACHE_NAME = 'bl-v154';/);
+  assert.equal((sw.match(/bl-v154/g) || []).length, 1);
+  assert.match(sw, /assets\/showcase\/mingleyard\/editorial\.css/);
 });

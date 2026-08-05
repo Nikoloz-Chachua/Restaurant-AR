@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant Menu</title>
     <link id="app-favicon" rel="icon" type="image/svg+xml" href="./img/betareal-favicon.svg">
+    <link rel="stylesheet" href="./assets/showcase/mingleyard/editorial.css">
     <script>
         // ── KILLSWITCH ────────────────────────────────────────────────
         // One-shot cleanup for anyone who still has an old service worker
@@ -7329,6 +7330,11 @@
     <button id="theme-toggle" aria-label="Toggle theme">Day</button>
     <button id="lang-toggle" aria-label="Toggle language">EN</button>
 
+    <header class="my-topbar" data-editorial="mingleyard">
+        <a class="my-brand" href="#cat-filter" data-brand aria-label="MINGLEYARD menu">MINGLEYARD</a>
+        <span class="my-topnote" data-mingleyard="topnote">Social dining · Tbilisi</span>
+    </header>
+
     <!-- Shared tenant hero — shown only by templates that opt into it.
          Photo from theme_config.hero_images/hero_image_url (--hero-image), logo from logo_url.
          Degrades to a gradient + the standard header when either is unset. -->
@@ -7336,6 +7342,14 @@
         <div class="mg-hero-photo"></div>
         <div class="mg-hero-next"></div>
         <div class="mg-hero-veil"></div>
+        <div class="my-editorial-copy" data-editorial="mingleyard">
+            <span class="my-sticker my-sticker-one" data-mingleyard="stickerOne">Yard no. 11</span>
+            <span class="my-sticker my-sticker-two" data-mingleyard="stickerTwo">House drop</span>
+            <p class="my-kicker" data-mingleyard="kicker">House drop · burgers + people</p>
+            <h1 class="my-headline"><span class="my-headline-ka" data-mingleyard="headlineLead">One yard.</span><span data-mingleyard="headlineTail">Many tables.</span></h1>
+            <p class="my-deck" data-mingleyard="deck">Pressed stacks, loud plates and a shared table. Built for the whole crew, from first bite to last call.</p>
+            <a class="my-hero-link" href="#cat-filter" data-mingleyard="cta">See the house menu →</a>
+        </div>
         <img id="mg-hero-logo" class="mg-hero-logo" alt="" decoding="async">
         <h1 class="mg-hero-brand" data-brand></h1>
         <a class="mg-hero-scroll" href="#cat-filter" aria-label="Menu">
@@ -8684,6 +8698,51 @@
             const brandSlug = brand?.slug || document.documentElement.dataset.brandSlug || '';
             return restaurant_slug === _PIPES_RESTAURANT_SLUG && brandSlug === _PIPES_BRAND_SLUG;
         }
+        function _isMingleyardTenant() {
+            return document.documentElement.dataset.tenant === 'social-dining'
+                && document.documentElement.dataset.template === 'social_dining';
+        }
+        function _ensureMingleyardTemplateForExactTenant() {
+            const root = document.documentElement;
+            if (root.dataset.tenant === 'social-dining' && !root.dataset.template) {
+                root.dataset.template = 'social_dining';
+            }
+        }
+        const _MINGLEYARD_COPY = {
+            en: {
+                topnote: 'Social dining · Tbilisi',
+                stickerOne: 'Yard no. 11',
+                stickerTwo: 'House drop',
+                kicker: 'House drop · burgers + people',
+                headlineLead: 'One yard.',
+                headlineTail: 'Many tables.',
+                deck: 'Pressed stacks, loud plates and a shared table. Built for the whole crew, from first bite to last call.',
+                cta: 'See the house menu →',
+                menuAria: 'MINGLEYARD menu'
+            },
+            ka: {
+                topnote: 'საერთო სუფრა · თბილისი',
+                stickerOne: 'ეზო №11',
+                stickerTwo: 'ეზოს არჩევანი',
+                kicker: 'ეზოს არჩევანი · ბურგერები + ხალხი',
+                headlineLead: 'ერთი ეზო.',
+                headlineTail: 'ბევრი მაგიდა.',
+                deck: 'დაპრესილი ბურგერები, გამორჩეული კერძები და ერთი დიდი სუფრა — პირველი ლუკმიდან ბოლო შეკვეთამდე.',
+                cta: 'იხილეთ ეზოს მენიუ →',
+                menuAria: 'MINGLEYARD-ის მენიუ'
+            }
+        };
+        function _applyMingleyardCopy() {
+            if (!_isMingleyardTenant()) return;
+            const copy = _MINGLEYARD_COPY[window.__lang === 'ka' ? 'ka' : 'en'];
+            document.querySelectorAll('[data-mingleyard]').forEach(el => {
+                const value = copy[el.dataset.mingleyard];
+                if (value) el.textContent = value;
+            });
+            const brandLink = document.querySelector('.my-brand');
+            if (brandLink) brandLink.setAttribute('aria-label', copy.menuAria);
+            document.querySelector('.mg-hero')?.removeAttribute('aria-hidden');
+        }
         const _PIPES_COPY_TOKENS = {
             kicker: 'hero_kicker',
             heroCopy: 'hero_copy',
@@ -9176,12 +9235,14 @@
                 };
                 window.__tenant = _tenant;
                 document.documentElement.dataset.tenant = _tenant.restaurant_slug || '';
+                _ensureMingleyardTemplateForExactTenant();
                 document.documentElement.dataset.brandSlug = brand?.slug || '';
                 _applyTenantFavicon(_tenant);
                 _applyBrandTitle();
                 _applyBaomaCopy();
                 _applyMugsyCopy();
                 _applyPipesCopy();
+                _applyMingleyardCopy();
                 return _tenant;
             }
             const isDefaultHost = Boolean(_DEFAULT_RESTAURANT_SLUG) && slug === _DEFAULT_RESTAURANT_SLUG;
@@ -9207,12 +9268,14 @@
             // tenant currently resolves to template_key "monday_greens", so
             // [data-template="monday_greens"] matches the whole estate.
             document.documentElement.dataset.tenant = _tenant.restaurant_slug || '';
+            _ensureMingleyardTemplateForExactTenant();
             document.documentElement.dataset.brandSlug = brand?.slug || '';
             _applyTenantFavicon(_tenant);
             _applyBrandTitle();
             _applyBaomaCopy();
             _applyMugsyCopy();
             _applyPipesCopy();
+            _applyMingleyardCopy();
             return _tenant;
         }
         // POST /rest/v1/<table> — fire-and-forget insert (analytics). Never throws.
@@ -9605,6 +9668,7 @@
             _applyBaomaCopy();
             _applyMugsyCopy();
             _applyPipesCopy();
+            _applyMingleyardCopy();
             document.getElementById('lang-toggle').textContent   = u.langBtn;
             const _themeToggle = document.getElementById('theme-toggle');
             _themeToggle.innerHTML = theme === 'night' ? _SVG_SUN : _SVG_MOON;
@@ -10708,12 +10772,24 @@
             // the top of the Drinks list reads as a bug, not a highlight.
             const on = VENUE_INFO_TEMPLATES.has(document.documentElement.dataset.template)
                 && !activeFilter;
-            const picks = on
+            let picks = on
                 ? (items || []).filter(i => i.featured && i.visible !== false).slice(0, FEATURED_LIMIT)
                 : [];
+            // The exact MINGLEYARD showcase always has one dynamic editorial lead.
+            // Prefer an admin-featured dish; otherwise choose the first real 3D
+            // record with a poster. No name, price, or asset is hardcoded here.
+            const isMingleyard = document.documentElement.dataset.tenant === 'social-dining'
+                && document.documentElement.dataset.template === 'social_dining';
+            if (on && isMingleyard && !picks.length) {
+                const lead = (items || []).find(i => i.visible !== false
+                    && _isAREnabledMenuItem(i) && _safeAssetUrl(i.thumbnail_url));
+                if (lead) picks = [lead];
+            }
             head.hidden = !picks.length;
             if (!picks.length) return;
-            head.textContent = window.__lang === 'ka' ? 'ფირმის კერძები' : "Chef's picks";
+            head.textContent = isMingleyard
+                ? (window.__lang === 'ka' ? 'ეზოს არჩევანი' : 'House drop')
+                : (window.__lang === 'ka' ? 'ფირმის კერძები' : "Chef's picks");
 
             picks.forEach(item => {
                 const idx = items.indexOf(item);
@@ -10754,7 +10830,8 @@
                 card.append(img, body);
 
                 card.addEventListener('click', () => {
-                    if (src) openLightbox(src, name, item, idx);
+                    if (isMingleyard && _isAREnabledMenuItem(item)) openModal(idx, items);
+                    else if (src) openLightbox(src, name, item, idx);
                 });
                 wrap.appendChild(card);
             });
@@ -10798,6 +10875,10 @@
 
         // Fetch theme config from Supabase and apply as CSS overrides
         async function applyRemoteTheme() {
+            // MINGLEYARD's editorial hero has a complete local fallback. Reveal and
+            // localize it before network work so a missing theme_config response
+            // cannot leave visible, focusable controls inside aria-hidden content.
+            _applyMingleyardCopy();
             try {
                 const tenant = await _resolveTenant();
                 const fixture = _mugsyFixtureRequested()
@@ -10871,6 +10952,7 @@
                 }
                 styleEl.textContent = css;
                 document.documentElement.dataset.template = templateKey;
+                _applyMingleyardCopy();
                 // Phone layout option (admin-set): 'twin' shows two photo-forward
                 // cards per row on phones; anything else keeps the default list.
                 // Fully gated by the [data-phone-layout="twin"] attribute + phone
