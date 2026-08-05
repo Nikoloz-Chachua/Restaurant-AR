@@ -72,8 +72,8 @@ test('direct-editor SQL is ASCII-only, rollback-first and uses PostgreSQL Unicod
 
 // Pinned to a literal, so it has to move with every cache bump. v152 was the
 // AUREVANE hero sizing; v153 the hero-gallery ReferenceError repair; v154 the
-// custom-domain tenant resolution.
+// custom-domain tenant resolution; v155 the short demo hostnames.
 test('service worker cache advances for AUREVANE hero sizing', () => {
-  assert.match(sw, /const CACHE_NAME = 'bl-v154';/);
-  assert.equal((sw.match(/bl-v154/g) || []).length, 1);
+  assert.match(sw, /const CACHE_NAME = 'bl-v155';/);
+  assert.equal((sw.match(/bl-v155/g) || []).length, 1);
 });

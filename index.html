@@ -56,21 +56,19 @@
                 'gochit-s-burger-main': 'gochit_monster',
                 'r-main': 'respublika_grill',
                 'iakobis-ezo-main': 'iakobis_garden',
-                // The four segment demo templates, under both names: the restaurant
-                // slug (?tenant=cafe) and the published hostname
-                // (modern-cafe-template.betareal.ge). The hostname is deliberately
-                // NOT the slug — it is written to read well in a cold email — so it
-                // needs its own entry here or the demo flashes the base theme before
-                // theme_config lands. The slug itself resolves through
-                // restaurants.custom_domain in _resolveTenant.
+                // The four segment demo templates. Two publish on their own slug
+                // (luxury.betareal.ge, cafe.betareal.ge). The other two publish on a
+                // hostname SHORTER than their slug — casual.betareal.ge for
+                // fast-casual, social.betareal.ge for social-dining — and reach the
+                // tenant through restaurants.custom_domain in _resolveTenant. Both
+                // spellings need an entry here, or the demo flashes the base theme
+                // while theme_config is still in flight.
                 'luxury': 'luxury_dining',
                 'cafe': 'modern_cafe',
                 'fast-casual': 'premium_fast_casual',
                 'social-dining': 'social_dining',
-                'luxury-dining-template': 'luxury_dining',
-                'modern-cafe-template': 'modern_cafe',
-                'fast-casual-template': 'premium_fast_casual',
-                'social-dining-template': 'social_dining'
+                'casual': 'premium_fast_casual',
+                'social': 'social_dining'
             };
             const BOOT_TEMPLATE_DEFAULTS = {
                 baoma: { theme: 'day', preload: './img/baoma/interior-hero-maps.webp' },
@@ -9200,10 +9198,10 @@
             let rows = await _supaSelect(query);
             // A subdomain that is not itself a restaurant slug still resolves, through
             // restaurants.custom_domain. That lets a tenant be published on a hostname
-            // chosen to read well in a cold email — modern-cafe-template.betareal.ge —
-            // without renaming the slug its ?tenant= links and QR codes already use.
-            // Only runs when the slug lookup already missed, so it costs nothing for
-            // every tenant whose subdomain IS its slug.
+            // chosen to read well in a cold email — casual.betareal.ge for the tenant
+            // slugged fast-casual — without renaming the slug that its ?tenant= links
+            // and QR codes already point at. Only runs when the slug lookup already
+            // missed, so it costs nothing for every tenant whose subdomain IS its slug.
             if ((!rows || !rows.length) && slug) rows = await _supaSelect(_byDomain);
             if ((!rows || !rows.length) && isDefaultHost) {
                 rows = await _supaSelect(`restaurants?select=id,slug,name,brand_id,brands(id,slug,name,plan)&slug=eq.${_DEFAULT_RESTAURANT_SLUG}&limit=1`);
