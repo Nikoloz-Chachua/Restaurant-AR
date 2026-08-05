@@ -2,6 +2,12 @@
 -- Drop the inherited hero logo from the Modern Cafe demo.
 -- ROLLBACK by default; change the final line to COMMIT; to apply.
 --
+-- APPLIED 2026-08-05 via the REST endpoint (the Management API token was
+-- revoked at the time), deleting exactly one row: restaurant 68 / hero_logo_url.
+-- Verified after: cafe has no hero_logo_url and keeps its own logo_url,
+-- monday-greens still has hers, and the project-wide hero_logo_url count went
+-- 6 -> 5. Kept here as the record of the change; re-running is a harmless no-op.
+--
 -- The demo was cloned from Monday Greens with a byte-exact copy of their
 -- theme_config, which included:
 --
