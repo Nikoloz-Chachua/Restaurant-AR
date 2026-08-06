@@ -10623,17 +10623,16 @@
         // revealed once its photo is known.
         const HERO_REVEAL_TEMPLATES = new Set(['luxury_dining', 'social_dining']);
 
-        // FOOD | DRINKS split — deliberately held off (2026-08-04).
+        // FOOD | DRINKS split. A tenant opts in by listing its drink category
+        // names in theme_config.drink_categories; an empty list means no switch.
         //
-        // The switch is configured and has been silently dead since 2026-07-27,
-        // killed by the same ReferenceError repaired in applyRemoteTheme(). Fixing
-        // that revives it, but on Monday Greens it moves 102 of 169 items behind a
-        // DRINKS tab — a visible restructure of a live café menu that is printed on
-        // their tables. It waits for the restaurant's go-ahead rather than arriving
-        // as a side effect of a hero-gallery fix.
-        //
-        // To turn on: set this to true. Nothing else needs changing.
-        const DRINK_SPLIT_ENABLED = false;
+        // Held off between 2026-08-04 and 2026-08-06 while the restaurants were
+        // asked. It had been silently dead since 2026-07-27 — killed by the
+        // ReferenceError repaired in applyRemoteTheme() — so repairing that would
+        // have restructured a live café menu as a side effect of a hero fix.
+        // Restored deliberately, on request: this is the arrangement Monday Greens
+        // had before the break, not a new one.
+        const DRINK_SPLIT_ENABLED = true;
 
         // Templates that render the generic visit/contact block. Mirrors
         // CONTENT_TEMPLATES in the admin app, which decides where the matching

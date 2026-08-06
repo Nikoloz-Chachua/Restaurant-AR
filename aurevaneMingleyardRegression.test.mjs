@@ -110,10 +110,11 @@ test('MINGLEYARD presentation contains no historical source-brand wording', () =
 // Pinned to a literal, so it moves with every cache bump. v152 was the AUREVANE
 // hero sizing; v153 the hero-gallery ReferenceError repair; v154 the MINGLEYARD
 // editorial redesign; v156 the custom-domain tenant resolution and the short
-// demo hostnames. (v155 was this branch's number before merging v154; skipped
-// so the published cache only ever moves forward.)
+// demo hostnames; v157 restores the FOOD | DRINKS split. (v155 was this
+// branch's number before merging v154; skipped so the published cache only ever
+// moves forward.)
 test('service worker cache advances and precaches MINGLEYARD editorial CSS', () => {
-  assert.match(sw, /const CACHE_NAME = 'bl-v156';/);
-  assert.equal((sw.match(/bl-v156/g) || []).length, 1);
+  assert.match(sw, /const CACHE_NAME = 'bl-v157';/);
+  assert.equal((sw.match(/bl-v157/g) || []).length, 1);
   assert.match(sw, /assets\/showcase\/mingleyard\/editorial\.css/);
 });
