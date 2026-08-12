@@ -635,15 +635,15 @@
         [data-template="monday_greens"] #basket-total-label,
         [data-template="monday_greens"] #basket-total,
         [data-template="monday_greens"] #basket-waiter-btn {
-            -webkit-text-fill-color: #ffffff;
-            color: #ffffff;
+            -webkit-text-fill-color: var(--panel-ink, #ffffff);
+            color: var(--panel-ink, #ffffff);
         }
         [data-template="monday_greens"] #basket-waiter-btn {
-            border: 2px solid #ffffff;
+            border: 2px solid var(--panel-ink, #ffffff);
         }
         [data-template="monday_greens"] #basket-clear {
-            -webkit-text-fill-color: #ffffff;
-            color: #ffffff;
+            -webkit-text-fill-color: var(--panel-ink, #ffffff);
+            color: var(--panel-ink, #ffffff);
             border-color: transparent;
         }
         [data-template="monday_greens"] #basket-panel .basket-qty {
@@ -910,7 +910,7 @@
            exposes no separate control for them. Pin them to white — legible on both
            the teal day bg and the dark night bg. Scoped to monday_greens so every
            other tenant keeps accent-coloured headings. */
-        [data-template="monday_greens"] .category-header { color: #ffffff; }
+        [data-template="monday_greens"] .category-header { color: var(--cat-color, #ffffff); }
 
         /* ── Footer ── */
         .site-footer {
@@ -1206,12 +1206,12 @@
         [data-theme="day"][data-template="monday_greens"] #modal-title-d,
         [data-theme="day"][data-template="monday_greens"] #modal-price,
         [data-theme="day"][data-template="monday_greens"] #modal-description {
-            color: #0d7b98;
-            -webkit-text-fill-color: #0d7b98;
+            color: var(--modal-ink, #0d7b98);
+            -webkit-text-fill-color: var(--modal-ink, #0d7b98);
         }
         [data-theme="day"][data-template="monday_greens"] .tip {
-            color: #0d7b98;
-            -webkit-text-fill-color: #0d7b98;
+            color: var(--modal-ink, #0d7b98);
+            -webkit-text-fill-color: var(--modal-ink, #0d7b98);
             opacity: 0.8;
         }
 
@@ -1671,7 +1671,12 @@
         }
         [data-template="monday_greens"] .mg-hero-photo {
             position: absolute; inset: 0; z-index: 0;
-            background-color: #063236; /* fallback while the photo loads / if unset */
+            /* Fallback while the photo loads, and the whole hero for a tenant with
+               no hero photo yet. #063236 is Monday Greens' own teal, so every other
+               tenant on this template was showing a competitor's brand colour behind
+               its logo; theme_config `day_hero_bg` / `night_hero_bg` overrides it.
+               Tenants that set neither keep the exact previous colour. */
+            background-color: var(--hero-bg, #063236);
             background-image: var(--hero-image, none);
             background-size: cover; background-position: center; background-repeat: no-repeat;
         }
@@ -7111,15 +7116,15 @@
         html[data-template="modern_cafe"] #basket-total-label,
         html[data-template="modern_cafe"] #basket-total,
         html[data-template="modern_cafe"] #basket-waiter-btn {
-            -webkit-text-fill-color: #ffffff;
-            color: #ffffff;
+            -webkit-text-fill-color: var(--panel-ink, #ffffff);
+            color: var(--panel-ink, #ffffff);
         }
         html[data-template="modern_cafe"] #basket-waiter-btn {
-            border: 2px solid #ffffff;
+            border: 2px solid var(--panel-ink, #ffffff);
         }
         html[data-template="modern_cafe"] #basket-clear {
-            -webkit-text-fill-color: #ffffff;
-            color: #ffffff;
+            -webkit-text-fill-color: var(--panel-ink, #ffffff);
+            color: var(--panel-ink, #ffffff);
             border-color: transparent;
         }
         html[data-template="modern_cafe"] #basket-panel .basket-qty {
@@ -7143,18 +7148,18 @@
             cursor: zoom-in;
         }
         html[data-template="modern_cafe"] .category-header {
-            color: #ffffff;
+            color: var(--cat-color, #ffffff);
         }
         html[data-theme="day"][data-template="modern_cafe"] #modal-title,
         html[data-theme="day"][data-template="modern_cafe"] #modal-title-d,
         html[data-theme="day"][data-template="modern_cafe"] #modal-price,
         html[data-theme="day"][data-template="modern_cafe"] #modal-description {
-            color: #0d7b98;
-            -webkit-text-fill-color: #0d7b98;
+            color: var(--modal-ink, #0d7b98);
+            -webkit-text-fill-color: var(--modal-ink, #0d7b98);
         }
         html[data-theme="day"][data-template="modern_cafe"] .tip {
-            color: #0d7b98;
-            -webkit-text-fill-color: #0d7b98;
+            color: var(--modal-ink, #0d7b98);
+            -webkit-text-fill-color: var(--modal-ink, #0d7b98);
             opacity: 0.8;
         }
         html[data-template="modern_cafe"] .cat-bar {
@@ -7209,7 +7214,12 @@
         }
         html[data-template="modern_cafe"] .mg-hero-photo {
             position: absolute; inset: 0; z-index: 0;
-            background-color: #063236; /* fallback while the photo loads / if unset */
+            /* Fallback while the photo loads, and the whole hero for a tenant with
+               no hero photo yet. #063236 is Monday Greens' own teal, so every other
+               tenant on this template was showing a competitor's brand colour behind
+               its logo; theme_config `day_hero_bg` / `night_hero_bg` overrides it.
+               Tenants that set neither keep the exact previous colour. */
+            background-color: var(--hero-bg, #063236);
             background-image: var(--hero-image, none);
             background-size: cover; background-position: center; background-repeat: no-repeat;
         }
@@ -10952,6 +10962,8 @@
                     pill_bg: '--pill-bg', pill_active_bg: '--pill-active-bg',
                     cta_bg: '--cta-bg', cta_shadow: '--cta-shadow',
                     hero_color: '--hero-color', hero_shadow: '--hero-shadow', divider_bg: '--divider-bg',
+                    hero_bg: '--hero-bg', cat_color: '--cat-color',
+                    panel_ink: '--panel-ink', modal_ink: '--modal-ink',
                     modal_bg_image: '--modal-bg-image',
                     badge_bg: '--badge-bg', price_color: '--price-color', add_btn_color: '--add-btn-color'
                 };
