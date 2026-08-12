@@ -11632,14 +11632,7 @@
                     const data = fixture
                         ? fixture.menu_items
                         : await _supaSelect(
-                            // categories(...) is an explicit embedded column list -- PostgREST 400s
-                            // on an unknown column there (unlike top-level select=*, which just
-                            // omits what doesn't exist). name_ru goes back in once
-                            // 2026-08-12_add_ru_columns.sql has run; until then this stays name_en/
-                            // name_ka only so every tenant's menu keeps loading. Item-level
-                            // name_ru/description_ru are unaffected -- select=* already tolerates
-                            // their absence.
-                            `menu_items?select=*,categories(name_en,name_ka)&restaurant_id=eq.${tenant.restaurant_id}&visible=eq.true&order=category_id,sort_order`
+                            `menu_items?select=*,categories(name_en,name_ka,name_ru)&restaurant_id=eq.${tenant.restaurant_id}&visible=eq.true&order=category_id,sort_order`
                         );
                     if (data && data.length) {
                         items = data.map(r => ({
@@ -12251,9 +12244,11 @@
 
             // ── Food / Drinks group switch ──────────────────────────────
             const groupsDiv = document.getElementById('menu-groups');
-            const _groupLabels = (lang) => (lang === 'ka')
+            const _groupLabels = (lang) => lang === 'ka'
                 ? { food: 'საკვები', drink: 'სასმელები' }
-                : { food: 'Food', drink: 'Drinks' };
+                : lang === 'ru'
+                    ? { food: 'Еда', drink: 'Напитки' }
+                    : { food: 'Food', drink: 'Drinks' };
 
             function _renderGroupToggle() {
                 const lab = _groupLabels(window.__lang);
