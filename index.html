@@ -561,7 +561,8 @@
             color: var(--accent);
             text-shadow: 0 2px 18px var(--glow);
         }
-        html[lang="ka"] #img-lightbox.has-panel #lightbox-name {
+        html[lang="ka"] #img-lightbox.has-panel #lightbox-name,
+        html[lang="ru"] #img-lightbox.has-panel #lightbox-name {
             font-family: 'Nunito', system-ui, -apple-system, sans-serif;
             font-weight: 800; letter-spacing: 0.5px;
             -webkit-text-fill-color: initial;
@@ -889,18 +890,19 @@
             transition: color var(--t), border-color var(--t);
         }
 
-        /* Georgian text should feel clean, not forced through the condensed
-           Latin display font or huge tracking. */
-        html[lang="ka"] .category-header,
-        html[lang="ka"] .cat-pill,
-        html[lang="ka"] .tagline,
-        html[lang="ka"] .item-name,
-        html[lang="ka"] #modal-title,
-        html[lang="ka"] #modal-title-d {
+        /* Georgian and Russian text should feel clean, not forced through the
+           condensed Latin display font (Bebas Neue / Cormorant, neither of
+           which ships Cyrillic or Georgian glyphs) or its huge tracking. */
+        html[lang="ka"] .category-header, html[lang="ru"] .category-header,
+        html[lang="ka"] .cat-pill,        html[lang="ru"] .cat-pill,
+        html[lang="ka"] .tagline,         html[lang="ru"] .tagline,
+        html[lang="ka"] .item-name,       html[lang="ru"] .item-name,
+        html[lang="ka"] #modal-title,     html[lang="ru"] #modal-title,
+        html[lang="ka"] #modal-title-d,   html[lang="ru"] #modal-title-d {
             font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             letter-spacing: 0.7px;
         }
-        html[lang="ka"] .category-header {
+        html[lang="ka"] .category-header, html[lang="ru"] .category-header {
             font-size: 1.08rem;
             font-weight: 900;
             padding-top: 22px;
@@ -1021,7 +1023,7 @@
             color: var(--accent);
             margin: 0 0 14px;
         }
-        html[lang="ka"] .mg-reviews-title { font-family: inherit; font-weight: 900; font-size: 1.1rem; letter-spacing: 0; }
+        html[lang="ka"] .mg-reviews-title, html[lang="ru"] .mg-reviews-title { font-family: inherit; font-weight: 900; font-size: 1.1rem; letter-spacing: 0; }
         .mg-reviews-track {
             display: flex;
             gap: 12px;
@@ -1147,6 +1149,47 @@
             white-space: pre-line;
         }
         .mg-info-note[hidden] { display: none; }
+
+        /* ── Reviews + info footer, desktop only ──
+           Both blocks were designed mobile-first and stayed pinned to the same
+           450px column the rest of the layout uses on mobile -- on a wide
+           screen that reads as a stray strip stranded on the left, and the
+           reviews track's horizontal drag (natural on a touchscreen) has no
+           equivalent on a desktop trackpad/mouse, so the second card just sits
+           there un-openable. 1100px matches the breakpoint the menu grid
+           itself switches on (.menu-list, max-width: 1160px above). Below
+           that, everything here is untouched. */
+        @media (min-width: 1100px) {
+            .mg-reviews, .mg-info-footer { max-width: 1160px; }
+
+            .mg-reviews-track {
+                flex-wrap: wrap;
+                overflow-x: visible;
+                scroll-snap-type: none;
+                margin: 0;
+                padding-left: 0;
+                padding-right: 0;
+            }
+            .mg-review-card {
+                flex: 1 1 300px;
+                width: auto;
+                max-width: 360px;
+            }
+
+            .mg-info-grid {
+                flex-direction: row;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 40px;
+            }
+            .mg-info-hours, .mg-info-contact { flex: 0 0 auto; }
+            .mg-info-actions {
+                flex: 0 0 auto;
+                justify-content: flex-start;
+                gap: 20px;
+                margin-left: auto;
+            }
+        }
 
         /* ── Modal (3D view page) — a lit stage ── */
         #modal {
@@ -7552,7 +7595,7 @@
     </script>
 
     <button id="theme-toggle" aria-label="Toggle theme">Day</button>
-    <button id="lang-toggle" aria-label="Toggle language">EN</button>
+    <button id="lang-toggle" aria-label="Toggle language">RU</button>
 
     <header class="my-topbar" data-editorial="mingleyard">
         <a class="my-brand" href="#cat-filter" data-brand aria-label="MINGLEYARD menu">MINGLEYARD</a>
@@ -9706,7 +9749,7 @@
                 coachScanSub: 'ნელა ამოძრავეთ ტელეფონი ტექსტურიან ბრტყელ მაგიდაზე',
                 coachFound:   'ზედაპირი ნაპოვნია!',
                 coachFoundSub:'მზადაა კერძის დასადებად',
-                langBtn:   'EN',
+                langBtn:   'RU',
                 themeDay:  'ნათელი თემა',
                 themeNight:'მუქი თემა',
                 carouselBtn:  'კარუსელი',
@@ -9729,6 +9772,50 @@
     arModelMissing:'3D მოდელი ვერ ჩაიტვირთა. იხსნება 3D.',
     arFailed:     'AR ვერ გაეშვა. იხსნება 3D.',
     arUnsupported:'ამ მოწყობილობაზე AR მიუწვდომელია. იხსნება 3D.',
+            },
+            ru: {
+                tagline:   'Попробуй дикий вкус',
+                viewAR:    'ПОКАЗАТЬ НА СТОЛЕ',
+                view3D:    'СМОТРЕТЬ В 3D',
+                loading:   'Загрузка...',
+                close:     'Закрыть',
+                tip:       'Проведите пальцем, чтобы повернуть',
+                spin:      'Автовращение',
+                placeHint: 'Наведите на хорошо освещённый стол с текстурой и медленно двигайте телефон',
+                moveHint:  'Проведите пальцем — поворот · Сведите пальцы — масштаб',
+                exitAR:    'Закрыть модель',
+                placeAgain:'Разместить снова',
+                hintStep1: 'ШАГ 1 ИЗ 2',
+                hintScan:  'Медленно наведите на освещённый стол с текстурой',
+                hintStep2: 'ШАГ 2 ИЗ 2',
+                hintTap:   'Коснитесь экрана, чтобы разместить блюдо',
+                coachScan:    'Найдите стол',
+                coachScanSub: 'Медленно двигайте телефон над плоским столом с текстурой',
+                coachFound:   'Поверхность найдена!',
+                coachFoundSub:'Готово к размещению блюда',
+                langBtn:   'EN',
+                themeDay:  'Светлая тема',
+                themeNight:'Тёмная тема',
+                carouselBtn:  'КАРУСЕЛЬ',
+                singleBtn:    'ОДНО БЛЮДО',
+                onTable:      'НА СТОЛЕ',
+                floating:     'В ВОЗДУХЕ',
+                addBtn:       'ДОБАВИТЬ',
+                basketTitle:  'Корзина',
+                emptyBasket:  'Ваша корзина пуста',
+                total:        'Итого',
+                clearBasket:  'Очистить',
+                showWaiter:   'Показать официанту',
+                waiterHint:   'Официант отсканирует и сразу получит ваш заказ',
+                readyBtn:     '✓ Заказ готов',
+                readyDone:    '✓ Заказ принят!',
+                hideUI:       'Скрыть интерфейс',
+                showUI:       'Показать интерфейс',
+                arNoUsdz:     'Для AR на iPhone нужна модель USDZ. Открываем 3D.',
+                arNoModel:    'Для этого блюда 3D-модель недоступна.',
+                arModelMissing:'Не удалось загрузить 3D-модель. Открываем 3D.',
+                arFailed:     'Не удалось запустить AR. Открываем 3D.',
+                arUnsupported:'AR недоступен на этом устройстве. Открываем 3D.',
             }
         };
 
@@ -9853,8 +9940,7 @@
         // independently so a tenant can set only e.g. hours without reviews.
         function _applyRestaurantInfo() {
             const cfg = _themeConfig || {};
-            const ka = window.__lang === 'ka';
-            const pick = base => (ka && cfg[base + '_ka']) ? cfg[base + '_ka'] : (cfg[base] || '');
+            const pick = base => _byLang(cfg[base] || '', cfg[base + '_ka'], cfg[base + '_ru']);
 
             const taglineEl = document.querySelector('[data-tagline]');
             if (taglineEl) {
@@ -9890,7 +9976,7 @@
                     });
                 }
                 const titleEl = document.querySelector('[data-reviews-title]');
-                if (titleEl) titleEl.textContent = pick('reviews_title') || (ka ? 'მიმოხილვები' : 'Reviews');
+                if (titleEl) titleEl.textContent = pick('reviews_title') || _byLang('Reviews', 'მიმოხილვები', 'Отзывы');
                 reviewsSection.hidden = reviewsTrack.children.length === 0;
             }
 
@@ -9905,7 +9991,7 @@
                     if (hoursRange) {
                         anyVisible = true;
                         document.querySelector('[data-info-hours-label]').textContent =
-                            pick('site_hours_label') || (ka ? 'გახსნის საათები' : 'Opening Hours');
+                            pick('site_hours_label') || _byLang('Opening Hours', 'გახსნის საათები', 'Часы работы');
                         document.querySelector('[data-info-hours-range]').textContent = hoursRange;
                         document.querySelector('[data-info-hours-note]').textContent = pick('site_hours_note');
                     }
@@ -9918,7 +10004,7 @@
                     if (address) {
                         anyVisible = true;
                         document.querySelector('[data-info-address-label]').textContent =
-                            pick('site_address_label') || (ka ? 'მისამართი' : 'Address');
+                            pick('site_address_label') || _byLang('Address', 'მისამართი', 'Адрес');
                         document.querySelector('[data-info-address]').textContent = address;
                     }
                 }
@@ -9930,7 +10016,7 @@
                     if (phoneDisplay) {
                         anyVisible = true;
                         document.querySelector('[data-info-phone-label]').textContent =
-                            pick('site_phone_label') || (ka ? 'ტელეფონი' : 'Phone');
+                            pick('site_phone_label') || _byLang('Phone', 'ტელეფონი', 'Телефон');
                         const a = document.querySelector('[data-info-phone]');
                         a.textContent = phoneDisplay;
                         const tel = _cleanText(cfg.site_phone || phoneDisplay).replace(/[^\d+]/g, '');
@@ -9945,7 +10031,7 @@
                     if (deliveryUrl) {
                         anyVisible = true;
                         deliveryEl.href = deliveryUrl;
-                        deliveryEl.textContent = pick('delivery_label') || (ka ? 'მიწოდება' : 'Delivery');
+                        deliveryEl.textContent = pick('delivery_label') || _byLang('Delivery', 'მიწოდება', 'Доставка');
                     }
                 }
 
@@ -10005,8 +10091,30 @@
         }
 
         function t(item, field) {
-            const ka = field + '_ka';
-            return _cleanText((window.__lang === 'ka' && item[ka]) ? item[ka] : item[field]);
+            const lang = window.__lang;
+            if (lang === 'ru' && item[field + '_ru']) return _cleanText(item[field + '_ru']);
+            if (lang === 'ka' && item[field + '_ka']) return _cleanText(item[field + '_ka']);
+            return _cleanText(item[field]);
+        }
+
+        // Generic three-way picker for inline UI strings (category names, filter
+        // pills, item counts) that carry en/ka/ru variants but are not full
+        // menu-item objects. Falls back toward en if a language is missing.
+        function _byLang(en, ka, ru) {
+            const lang = window.__lang;
+            if (lang === 'ru' && ru) return ru;
+            if (lang === 'ka' && ka) return ka;
+            return en;
+        }
+
+        // Russian noun plurals after a count follow one/few/many, not singular/
+        // plural: 1 товар, 2 товара, 5 товаров, 21 товар, 22 товара, 25 товаров.
+        function _ruPlural(n, one, few, many) {
+            n = Math.abs(n);
+            const mod10 = n % 10, mod100 = n % 100;
+            if (mod10 === 1 && mod100 !== 11) return one;
+            if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
+            return many;
         }
 
         // Per-item add-on options (e.g. "Make Double +6.9 ₾"), rendered under the price.
@@ -10096,13 +10204,14 @@
             if (hideUIBtn)   hideUIBtn.textContent   = (window.XR?.isUIHidden?.()) ? u.showUI : u.hideUI;
             if (window.__categories) {
                 window.__categories.forEach(cat => {
+                    const label = _cleanText(_byLang(cat.name, cat.name_ka, cat.name_ru));
                     const header = document.querySelector(`.category-header[data-cat-name="${CSS.escape(cat.name)}"]`);
-                    if (header) header.textContent = _cleanText((lang === 'ka' && cat.name_ka) ? cat.name_ka : cat.name);
+                    if (header) header.textContent = label;
                     const pill = document.querySelector(`.cat-pill[data-cat="${CSS.escape(cat.name)}"]`);
-                    if (pill) pill.textContent = _cleanText((lang === 'ka' && cat.name_ka) ? cat.name_ka : cat.name);
+                    if (pill) pill.textContent = label;
                 });
                 const allPill = document.querySelector('.cat-pill[data-cat=""]');
-                if (allPill) allPill.textContent = lang === 'ka' ? 'ყველა' : 'All';
+                if (allPill) allPill.textContent = _byLang('All', 'ყველა', 'Все');
             }
             if (typeof window._updateGroupLabels === 'function') window._updateGroupLabels(lang);
             if (typeof window._updateCatNav === 'function') window._updateCatNav();
@@ -10125,7 +10234,8 @@
         }
 
         document.getElementById('lang-toggle').addEventListener('click', () => {
-            const _from = window.__lang, _to = _from === 'en' ? 'ka' : 'en';
+            const _from = window.__lang;
+            const _to = _from === 'en' ? 'ka' : _from === 'ka' ? 'ru' : 'en';
             track('lang_change', null, { from: _from, to: _to });
             applyLang(_to);
         });
@@ -11522,6 +11632,13 @@
                     const data = fixture
                         ? fixture.menu_items
                         : await _supaSelect(
+                            // categories(...) is an explicit embedded column list -- PostgREST 400s
+                            // on an unknown column there (unlike top-level select=*, which just
+                            // omits what doesn't exist). name_ru goes back in once
+                            // 2026-08-12_add_ru_columns.sql has run; until then this stays name_en/
+                            // name_ka only so every tenant's menu keeps loading. Item-level
+                            // name_ru/description_ru are unaffected -- select=* already tolerates
+                            // their absence.
                             `menu_items?select=*,categories(name_en,name_ka)&restaurant_id=eq.${tenant.restaurant_id}&visible=eq.true&order=category_id,sort_order`
                         );
                     if (data && data.length) {
@@ -11529,12 +11646,15 @@
                             id:             r.id,          // stable DB id — needed by the Show-to-staff QR payload
                             name:           _cleanText(r.name_en),
                             name_ka:        _cleanText(r.name_ka),
+                            name_ru:        _cleanText(r.name_ru),
                             category:       _cleanText(r.categories?.name_en, 'Other'),
                             category_ka:    _cleanText(r.categories?.name_ka),
+                            category_ru:    _cleanText(r.categories?.name_ru),
                             sort_order:     r.sort_order ?? 0,
                             visible:        r.visible !== false,
                             description:    _cleanText(r.description_en),
                             description_ka: _cleanText(r.description_ka),
+                            description_ru: _cleanText(r.description_ru),
                             price:          _cleanText(r.price),
                             price_old:      _cleanText(r.price_old),
                             featured:       r.featured === true,
@@ -11614,7 +11734,7 @@
             items.forEach((item, globalIdx) => {
                 const key = item.category || 'Other';
                 if (!categoryMap.has(key)) {
-                    const cat = { name: key, name_ka: item.category_ka || key, items: [] };
+                    const cat = { name: key, name_ka: item.category_ka || key, name_ru: item.category_ru || key, items: [] };
                     categories.push(cat);
                     categoryMap.set(key, cat);
                 }
@@ -11741,7 +11861,7 @@
                 header.className = 'category-header';
                 header.dataset.catName   = cat.name;
                 header.dataset.catNameKa = cat.name_ka;
-                header.textContent = _cleanText(window.__lang === 'ka' ? cat.name_ka : cat.name);
+                header.textContent = _cleanText(_byLang(cat.name, cat.name_ka, cat.name_ru));
                 return header;
             }
 
@@ -12026,7 +12146,7 @@
             allPill.className = 'cat-pill active';
             allPill.dataset.cat   = '';
             allPill.dataset.catKa = '';
-            allPill.textContent   = window.__lang === 'ka' ? 'ყველა' : 'All';
+            allPill.textContent   = _byLang('All', 'ყველა', 'Все');
             filterDiv.appendChild(allPill);
 
             if (_mostOrderedEntries().length) {
@@ -12052,7 +12172,8 @@
                 pill.className      = 'cat-pill';
                 pill.dataset.cat    = cat.name;
                 pill.dataset.catKa  = cat.name_ka;
-                const label = window.__lang === 'ka' ? cat.name_ka : cat.name;
+                pill.dataset.catRu  = cat.name_ru;
+                const label = _byLang(cat.name, cat.name_ka, cat.name_ru);
                 pill.textContent    = _cleanText(label);
                 filterDiv.appendChild(pill);
             });
@@ -12328,7 +12449,9 @@
             if (showBar) {
                 const u = UI[window.__lang];
                 document.getElementById('basket-bar-count').textContent =
-                    count + ' ' + (window.__lang === 'ka' ? 'პროდუქტი' : count === 1 ? 'item' : 'items');
+                    count + ' ' + (window.__lang === 'ka' ? 'პროდუქტი'
+                        : window.__lang === 'ru' ? _ruPlural(count, 'товар', 'товара', 'товаров')
+                        : count === 1 ? 'item' : 'items');
                 document.getElementById('basket-bar-total').textContent = _fmtPrice(_basketTotal());
             }
         }
