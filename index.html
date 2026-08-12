@@ -635,15 +635,15 @@
         [data-template="monday_greens"] #basket-total-label,
         [data-template="monday_greens"] #basket-total,
         [data-template="monday_greens"] #basket-waiter-btn {
-            -webkit-text-fill-color: #ffffff;
-            color: #ffffff;
+            -webkit-text-fill-color: var(--panel-ink, #ffffff);
+            color: var(--panel-ink, #ffffff);
         }
         [data-template="monday_greens"] #basket-waiter-btn {
-            border: 2px solid #ffffff;
+            border: 2px solid var(--panel-ink, #ffffff);
         }
         [data-template="monday_greens"] #basket-clear {
-            -webkit-text-fill-color: #ffffff;
-            color: #ffffff;
+            -webkit-text-fill-color: var(--panel-ink, #ffffff);
+            color: var(--panel-ink, #ffffff);
             border-color: transparent;
         }
         [data-template="monday_greens"] #basket-panel .basket-qty {
@@ -910,7 +910,7 @@
            exposes no separate control for them. Pin them to white — legible on both
            the teal day bg and the dark night bg. Scoped to monday_greens so every
            other tenant keeps accent-coloured headings. */
-        [data-template="monday_greens"] .category-header { color: #ffffff; }
+        [data-template="monday_greens"] .category-header { color: var(--cat-color, #ffffff); }
 
         /* ── Footer ── */
         .site-footer {
@@ -974,6 +974,179 @@
             color: var(--dim);
             transition: color var(--t);
         }
+
+        /* ── Hero tagline (theme_config.site_tagline / site_tagline_ka) ──
+           Sits inside .mg-hero under the brand mark/logo, so it only ever
+           renders where that hero already renders. --hero-color assumes a
+           flat brand-colour background (which is what a tenant with no hero
+           photo gets) -- against an actual photo it disappears into whichever
+           patch of the photo happens to sit behind it. A permanent white +
+           translucent chip, the same trick the logo artwork and the "Menu"
+           scroll cue already lean on, stays legible over both. */
+        .mg-hero-tagline {
+            position: relative; z-index: 2;
+            display: inline-block;
+            margin: 12px 0 0;
+            max-width: min(480px, calc(100% - 48px));
+            padding: 8px 18px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.28);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+            font-size: clamp(0.85rem, 2.4vw, 1.05rem);
+            line-height: 1.4;
+            text-align: center;
+            color: rgba(255,255,255,0.95);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+        .mg-hero-tagline[hidden] { display: none; }
+
+        /* ── Reviews (theme_config.reviews_json) ──
+           A JSON array of {name, stars, text}. Horizontal scroll-snap row —
+           no carousel library, so it costs nothing on tenants that skip it. */
+        .mg-reviews {
+            width: 100%;
+            max-width: 450px;
+            margin: 44px auto 0;
+            padding: 0 16px;
+            box-sizing: border-box;
+        }
+        .mg-reviews[hidden] { display: none; }
+        .mg-reviews-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 4px;
+            color: var(--accent);
+            margin: 0 0 14px;
+        }
+        html[lang="ka"] .mg-reviews-title { font-family: inherit; font-weight: 900; font-size: 1.1rem; letter-spacing: 0; }
+        .mg-reviews-track {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding-bottom: 6px;
+            margin: 0 -16px;
+            padding-left: 16px;
+            padding-right: 16px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .mg-reviews-track::-webkit-scrollbar { display: none; }
+        .mg-review-card {
+            flex: 0 0 auto;
+            scroll-snap-align: start;
+            width: min(78vw, 300px);
+            background: var(--card-bg, var(--card));
+            border: 1px solid var(--border);
+            border-radius: var(--card-radius, 14px);
+            padding: 16px 16px 14px;
+            box-shadow: var(--item-shadow);
+        }
+        .mg-review-stars {
+            color: var(--accent);
+            font-size: 0.82rem;
+            letter-spacing: 2px;
+            margin: 0 0 8px;
+        }
+        .mg-review-text {
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.86rem;
+            line-height: 1.5;
+            color: var(--text);
+            margin: 0 0 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 6;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .mg-review-name {
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: var(--dim);
+        }
+
+        /* ── Restaurant-info footer (hours / address / phone / delivery / social) ── */
+        .mg-info-footer {
+            width: 100%;
+            max-width: 450px;
+            margin: 40px auto 0;
+            padding: 22px 16px 6px;
+            border-top: 1px solid var(--border);
+            box-sizing: border-box;
+            font-family: 'Nunito', sans-serif;
+        }
+        .mg-info-footer[hidden] { display: none; }
+        .mg-info-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .mg-info-hours[hidden], .mg-info-line[hidden], .mg-info-delivery[hidden],
+        .mg-info-social[hidden], [data-info-fb][hidden], [data-info-ig][hidden] { display: none; }
+        .mg-info-label {
+            display: block;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 2px;
+        }
+        .mg-info-hours { font-size: 0.86rem; color: var(--text); }
+        .mg-info-hours-range { display: block; font-weight: 700; }
+        .mg-info-hours-note { display: block; color: var(--dim); font-size: 0.78rem; margin-top: 2px; }
+        .mg-info-contact { display: flex; flex-direction: column; gap: 8px; }
+        .mg-info-line { margin: 0; font-size: 0.86rem; color: var(--text); }
+        .mg-info-line a { color: var(--text); text-decoration: none; }
+        @media (hover: hover) { .mg-info-line a:hover { color: var(--accent); } }
+        .mg-info-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .mg-info-delivery {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 18px;
+            border-radius: 999px;
+            background: var(--cta-bg);
+            color: var(--accent-text, #fff);
+            font-weight: 800;
+            font-size: 0.82rem;
+            text-decoration: none;
+            box-shadow: var(--cta-shadow);
+            transition: transform 0.15s;
+        }
+        .mg-info-delivery:active { transform: scale(0.97); }
+        .mg-info-social { display: flex; gap: 10px; }
+        .mg-info-social a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: var(--pill-bg);
+            color: var(--dim);
+            transition: color 0.15s, background 0.15s;
+        }
+        @media (hover: hover) {
+            .mg-info-social a:hover { color: var(--accent); }
+        }
+        .mg-info-note {
+            margin: 18px 0 0;
+            font-size: 0.72rem;
+            line-height: 1.5;
+            color: var(--dim);
+            white-space: pre-line;
+        }
+        .mg-info-note[hidden] { display: none; }
 
         /* ── Modal (3D view page) — a lit stage ── */
         #modal {
@@ -1206,12 +1379,12 @@
         [data-theme="day"][data-template="monday_greens"] #modal-title-d,
         [data-theme="day"][data-template="monday_greens"] #modal-price,
         [data-theme="day"][data-template="monday_greens"] #modal-description {
-            color: #0d7b98;
-            -webkit-text-fill-color: #0d7b98;
+            color: var(--modal-ink, #0d7b98);
+            -webkit-text-fill-color: var(--modal-ink, #0d7b98);
         }
         [data-theme="day"][data-template="monday_greens"] .tip {
-            color: #0d7b98;
-            -webkit-text-fill-color: #0d7b98;
+            color: var(--modal-ink, #0d7b98);
+            -webkit-text-fill-color: var(--modal-ink, #0d7b98);
             opacity: 0.8;
         }
 
@@ -1671,7 +1844,12 @@
         }
         [data-template="monday_greens"] .mg-hero-photo {
             position: absolute; inset: 0; z-index: 0;
-            background-color: #063236; /* fallback while the photo loads / if unset */
+            /* Fallback while the photo loads, and the whole hero for a tenant with
+               no hero photo yet. #063236 is Monday Greens' own teal, so every other
+               tenant on this template was showing a competitor's brand colour behind
+               its logo; theme_config `day_hero_bg` / `night_hero_bg` overrides it.
+               Tenants that set neither keep the exact previous colour. */
+            background-color: var(--hero-bg, #063236);
             background-image: var(--hero-image, none);
             background-size: cover; background-position: center; background-repeat: no-repeat;
         }
@@ -7111,15 +7289,15 @@
         html[data-template="modern_cafe"] #basket-total-label,
         html[data-template="modern_cafe"] #basket-total,
         html[data-template="modern_cafe"] #basket-waiter-btn {
-            -webkit-text-fill-color: #ffffff;
-            color: #ffffff;
+            -webkit-text-fill-color: var(--panel-ink, #ffffff);
+            color: var(--panel-ink, #ffffff);
         }
         html[data-template="modern_cafe"] #basket-waiter-btn {
-            border: 2px solid #ffffff;
+            border: 2px solid var(--panel-ink, #ffffff);
         }
         html[data-template="modern_cafe"] #basket-clear {
-            -webkit-text-fill-color: #ffffff;
-            color: #ffffff;
+            -webkit-text-fill-color: var(--panel-ink, #ffffff);
+            color: var(--panel-ink, #ffffff);
             border-color: transparent;
         }
         html[data-template="modern_cafe"] #basket-panel .basket-qty {
@@ -7143,18 +7321,18 @@
             cursor: zoom-in;
         }
         html[data-template="modern_cafe"] .category-header {
-            color: #ffffff;
+            color: var(--cat-color, #ffffff);
         }
         html[data-theme="day"][data-template="modern_cafe"] #modal-title,
         html[data-theme="day"][data-template="modern_cafe"] #modal-title-d,
         html[data-theme="day"][data-template="modern_cafe"] #modal-price,
         html[data-theme="day"][data-template="modern_cafe"] #modal-description {
-            color: #0d7b98;
-            -webkit-text-fill-color: #0d7b98;
+            color: var(--modal-ink, #0d7b98);
+            -webkit-text-fill-color: var(--modal-ink, #0d7b98);
         }
         html[data-theme="day"][data-template="modern_cafe"] .tip {
-            color: #0d7b98;
-            -webkit-text-fill-color: #0d7b98;
+            color: var(--modal-ink, #0d7b98);
+            -webkit-text-fill-color: var(--modal-ink, #0d7b98);
             opacity: 0.8;
         }
         html[data-template="modern_cafe"] .cat-bar {
@@ -7209,7 +7387,12 @@
         }
         html[data-template="modern_cafe"] .mg-hero-photo {
             position: absolute; inset: 0; z-index: 0;
-            background-color: #063236; /* fallback while the photo loads / if unset */
+            /* Fallback while the photo loads, and the whole hero for a tenant with
+               no hero photo yet. #063236 is Monday Greens' own teal, so every other
+               tenant on this template was showing a competitor's brand colour behind
+               its logo; theme_config `day_hero_bg` / `night_hero_bg` overrides it.
+               Tenants that set neither keep the exact previous colour. */
+            background-color: var(--hero-bg, #063236);
             background-image: var(--hero-image, none);
             background-size: cover; background-position: center; background-repeat: no-repeat;
         }
@@ -7393,6 +7576,7 @@
         </div>
         <img id="mg-hero-logo" class="mg-hero-logo" alt="" decoding="async">
         <h1 class="mg-hero-brand" data-brand></h1>
+        <p class="mg-hero-tagline" data-tagline hidden></p>
         <a class="mg-hero-scroll" href="#cat-filter" aria-label="Menu">
             <span>Menu</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -7552,6 +7736,49 @@
             <img class="baoma-info-img" src="./img/baoma/interior-terrace.jpg" alt="BAOMA terrace table scene with rich red floral decor" width="900" height="1200" loading="lazy" decoding="async">
         </div>
     </section>
+
+    <!-- Reviews and restaurant-info footer. Both are driven entirely by
+         theme_config (reviews_json, site_phone*, delivery_url, site_hours_*,
+         site_address*, site_footer_note*, facebook_url, instagram_url) and stay
+         hidden -- via the `hidden` attribute on the section/individual rows --
+         for any tenant that sets none of it, so this is a no-op everywhere
+         except a tenant that opts in. -->
+    <section class="mg-reviews" data-reviews-section hidden aria-label="Reviews">
+        <h2 class="mg-reviews-title" data-reviews-title></h2>
+        <div class="mg-reviews-track" data-reviews-track></div>
+    </section>
+
+    <footer class="mg-info-footer" data-info-footer hidden>
+        <div class="mg-info-grid">
+            <div class="mg-info-hours" data-info-hours-row hidden>
+                <span class="mg-info-label" data-info-hours-label></span>
+                <span class="mg-info-hours-range" data-info-hours-range></span>
+                <span class="mg-info-hours-note" data-info-hours-note></span>
+            </div>
+            <div class="mg-info-contact">
+                <p class="mg-info-line" data-info-address-row hidden>
+                    <span class="mg-info-label" data-info-address-label></span>
+                    <span data-info-address></span>
+                </p>
+                <p class="mg-info-line" data-info-phone-row hidden>
+                    <span class="mg-info-label" data-info-phone-label></span>
+                    <a data-info-phone href="#"></a>
+                </p>
+            </div>
+            <div class="mg-info-actions">
+                <a class="mg-info-delivery" data-info-delivery href="#" target="_blank" rel="noopener" hidden></a>
+                <div class="mg-info-social" data-info-social hidden>
+                    <a data-info-fb href="#" target="_blank" rel="noopener" aria-label="Facebook" hidden>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.16 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.88h2.78l-.44 2.91h-2.34V22c4.78-.78 8.44-4.94 8.44-9.94Z"/></svg>
+                    </a>
+                    <a data-info-ig href="#" target="_blank" rel="noopener" aria-label="Instagram" hidden>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <p class="mg-info-note" data-info-note hidden></p>
+    </footer>
 
     <footer class="site-footer">
         <img class="footer-logo footer-logo-dark"  src="./img/betareal-logo-dark.png"  alt="BetaReal" width="333" height="110" loading="lazy" decoding="async">
@@ -9280,6 +9507,7 @@
                 document.documentElement.dataset.brandSlug = brand?.slug || '';
                 _applyTenantFavicon(_tenant);
                 _applyBrandTitle();
+                _applyRestaurantInfo();
                 _applyBaomaCopy();
                 _applyMugsyCopy();
                 _applyPipesCopy();
@@ -9321,6 +9549,7 @@
             document.documentElement.dataset.brandSlug = brand?.slug || '';
             _applyTenantFavicon(_tenant);
             _applyBrandTitle();
+            _applyRestaurantInfo();
             _applyBaomaCopy();
             _applyMugsyCopy();
             _applyPipesCopy();
@@ -9618,6 +9847,130 @@
                 : '');
         }
 
+        // Hero tagline, reviews and the restaurant-info footer are all optional,
+        // theme_config-driven, and hidden by default -- a tenant that sets none
+        // of these keys renders exactly as before. Every group hides itself
+        // independently so a tenant can set only e.g. hours without reviews.
+        function _applyRestaurantInfo() {
+            const cfg = _themeConfig || {};
+            const ka = window.__lang === 'ka';
+            const pick = base => (ka && cfg[base + '_ka']) ? cfg[base + '_ka'] : (cfg[base] || '');
+
+            const taglineEl = document.querySelector('[data-tagline]');
+            if (taglineEl) {
+                const tagline = _cleanText(pick('site_tagline'));
+                taglineEl.textContent = tagline;
+                taglineEl.hidden = !tagline;
+            }
+
+            const reviewsSection = document.querySelector('[data-reviews-section]');
+            const reviewsTrack = document.querySelector('[data-reviews-track]');
+            if (reviewsSection && reviewsTrack) {
+                let reviews;
+                try { reviews = JSON.parse(cfg.reviews_json || '[]'); } catch (_) { reviews = []; }
+                reviewsTrack.textContent = '';
+                if (Array.isArray(reviews)) {
+                    reviews.forEach(r => {
+                        const text = _cleanText(r && r.text);
+                        if (!text) return;
+                        const stars = Math.max(0, Math.min(5, parseInt(r && r.stars, 10) || 5));
+                        const card = document.createElement('div');
+                        card.className = 'mg-review-card';
+                        const starsEl = document.createElement('div');
+                        starsEl.className = 'mg-review-stars';
+                        starsEl.textContent = '★'.repeat(stars) + '☆'.repeat(5 - stars);
+                        const textEl = document.createElement('p');
+                        textEl.className = 'mg-review-text';
+                        textEl.textContent = text;
+                        const nameEl = document.createElement('div');
+                        nameEl.className = 'mg-review-name';
+                        nameEl.textContent = _cleanText(r && r.name);
+                        card.append(starsEl, textEl, nameEl);
+                        reviewsTrack.appendChild(card);
+                    });
+                }
+                const titleEl = document.querySelector('[data-reviews-title]');
+                if (titleEl) titleEl.textContent = pick('reviews_title') || (ka ? 'მიმოხილვები' : 'Reviews');
+                reviewsSection.hidden = reviewsTrack.children.length === 0;
+            }
+
+            const infoFooter = document.querySelector('[data-info-footer]');
+            if (infoFooter) {
+                let anyVisible = false;
+
+                const hoursRow = document.querySelector('[data-info-hours-row]');
+                const hoursRange = _cleanText(cfg.site_hours_range);
+                if (hoursRow) {
+                    hoursRow.hidden = !hoursRange;
+                    if (hoursRange) {
+                        anyVisible = true;
+                        document.querySelector('[data-info-hours-label]').textContent =
+                            pick('site_hours_label') || (ka ? 'გახსნის საათები' : 'Opening Hours');
+                        document.querySelector('[data-info-hours-range]').textContent = hoursRange;
+                        document.querySelector('[data-info-hours-note]').textContent = pick('site_hours_note');
+                    }
+                }
+
+                const addrRow = document.querySelector('[data-info-address-row]');
+                const address = pick('site_address');
+                if (addrRow) {
+                    addrRow.hidden = !address;
+                    if (address) {
+                        anyVisible = true;
+                        document.querySelector('[data-info-address-label]').textContent =
+                            pick('site_address_label') || (ka ? 'მისამართი' : 'Address');
+                        document.querySelector('[data-info-address]').textContent = address;
+                    }
+                }
+
+                const phoneRow = document.querySelector('[data-info-phone-row]');
+                const phoneDisplay = _cleanText(cfg.site_phone_display) || _cleanText(cfg.site_phone);
+                if (phoneRow) {
+                    phoneRow.hidden = !phoneDisplay;
+                    if (phoneDisplay) {
+                        anyVisible = true;
+                        document.querySelector('[data-info-phone-label]').textContent =
+                            pick('site_phone_label') || (ka ? 'ტელეფონი' : 'Phone');
+                        const a = document.querySelector('[data-info-phone]');
+                        a.textContent = phoneDisplay;
+                        const tel = _cleanText(cfg.site_phone || phoneDisplay).replace(/[^\d+]/g, '');
+                        a.href = tel ? ('tel:' + tel) : '#';
+                    }
+                }
+
+                const deliveryEl = document.querySelector('[data-info-delivery]');
+                if (deliveryEl) {
+                    const deliveryUrl = _cleanText(cfg.delivery_url);
+                    deliveryEl.hidden = !deliveryUrl;
+                    if (deliveryUrl) {
+                        anyVisible = true;
+                        deliveryEl.href = deliveryUrl;
+                        deliveryEl.textContent = pick('delivery_label') || (ka ? 'მიწოდება' : 'Delivery');
+                    }
+                }
+
+                const socialWrap = document.querySelector('[data-info-social]');
+                const fb = document.querySelector('[data-info-fb]');
+                const ig = document.querySelector('[data-info-ig]');
+                let anySocial = false;
+                const fbUrl = _cleanText(cfg.facebook_url);
+                const igUrl = _cleanText(cfg.instagram_url);
+                if (fb) { fb.hidden = !fbUrl; if (fbUrl) { fb.href = fbUrl; anySocial = true; } }
+                if (ig) { ig.hidden = !igUrl; if (igUrl) { ig.href = igUrl; anySocial = true; } }
+                if (socialWrap) socialWrap.hidden = !anySocial;
+                if (anySocial) anyVisible = true;
+
+                const noteEl = document.querySelector('[data-info-note]');
+                const note = pick('site_footer_note');
+                if (noteEl) {
+                    noteEl.hidden = !note;
+                    if (note) { noteEl.textContent = note; anyVisible = true; }
+                }
+
+                infoFooter.hidden = !anyVisible;
+            }
+        }
+
         function _applyBaomaCopy() {
             if (!_isBaomaTenant()) return;
             document.querySelectorAll('[data-baoma]').forEach(el => {
@@ -9714,6 +10067,7 @@
             const theme = document.documentElement.getAttribute('data-theme');
 
             _applyBrandTitle();
+            _applyRestaurantInfo();
             _applyBaomaCopy();
             _applyMugsyCopy();
             _applyPipesCopy();
@@ -10952,6 +11306,8 @@
                     pill_bg: '--pill-bg', pill_active_bg: '--pill-active-bg',
                     cta_bg: '--cta-bg', cta_shadow: '--cta-shadow',
                     hero_color: '--hero-color', hero_shadow: '--hero-shadow', divider_bg: '--divider-bg',
+                    hero_bg: '--hero-bg', cat_color: '--cat-color',
+                    panel_ink: '--panel-ink', modal_ink: '--modal-ink',
                     modal_bg_image: '--modal-bg-image',
                     badge_bg: '--badge-bg', price_color: '--price-color', add_btn_color: '--add-btn-color'
                 };
@@ -11046,6 +11402,7 @@
                 }
                 // Branding
                 _applyBrandTitle();
+                _applyRestaurantInfo();
                 // Re-run now that theme_config is in hand: the earlier calls painted the
                 // template defaults, this one applies whatever the tenant configured.
                 _applyBaomaCopy();
