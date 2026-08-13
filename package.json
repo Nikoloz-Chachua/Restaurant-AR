@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "npx --yes serve -p 3000 .",
     "build": "echo 'No build step for raw HTML'",
-    "test": "node --test publicMenu3dThumbnail.test.mjs mugsyTenantRegression.test.mjs mugsyMenuImport.test.mjs pipesTenantRegression.test.mjs aurevaneMingleyardRegression.test.mjs",
+    "test": "node --test publicMenu3dThumbnail.test.mjs mugsyTenantRegression.test.mjs mugsyMenuImport.test.mjs pipesTenantRegression.test.mjs aurevaneMingleyardRegression.test.mjs mondayGreensLanguageRegression.test.mjs",
     "smoke:baoma": "playwright test scripts/smoke-baoma-local.spec.mjs",
     "smoke:mugsy": "playwright test scripts/smoke-mugsy-local.spec.mjs",
     "smoke:pipes": "playwright test scripts/smoke-pipes-local.spec.mjs",

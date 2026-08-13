@@ -9436,8 +9436,28 @@
             return res.json();
         }
         const _DEFAULT_RESTAURANT_SLUG = ''; // empty = no restaurant is hardcoded into the shared template
+        const _LANGUAGES_BY_TENANT_SLUG = {
+            'monday-greens': ['ka', 'en']
+        };
+        const _DEFAULT_LANGUAGE_BY_TENANT_SLUG = {
+            'monday-greens': 'ka'
+        };
         let _tenant = null;
         let _themeConfig = {};
+        function _allowedLanguagesForTenant(tenant = _tenant) {
+            return _LANGUAGES_BY_TENANT_SLUG[tenant?.restaurant_slug] || ['en', 'ka', 'ru'];
+        }
+        function _normalizeLanguageForTenant(tenant) {
+            const allowed = _allowedLanguagesForTenant(tenant);
+            if (allowed.includes(window.__lang)) return;
+            window.__lang = _DEFAULT_LANGUAGE_BY_TENANT_SLUG[tenant?.restaurant_slug] || allowed[0];
+            document.documentElement.lang = window.__lang;
+            localStorage.setItem('bl-lang', window.__lang);
+        }
+        function _languageToggleLabel(lang) {
+            if (_tenant?.restaurant_slug !== 'monday-greens') return UI[lang].langBtn;
+            return lang === 'ka' ? 'EN' : 'ქარ';
+        }
         function _tenantSlugFromUrl() {
             const params = new URLSearchParams(location.search);
             const requested = params.get('tenant') || params.get('restaurant') || params.get('slug');
@@ -9545,6 +9565,7 @@
                     brand
                 };
                 window.__tenant = _tenant;
+                _normalizeLanguageForTenant(_tenant);
                 document.documentElement.dataset.tenant = _tenant.restaurant_slug || '';
                 _ensureMingleyardTemplateForExactTenant();
                 document.documentElement.dataset.brandSlug = brand?.slug || '';
@@ -9584,6 +9605,7 @@
                 brand
             };
             window.__tenant = _tenant;
+            _normalizeLanguageForTenant(_tenant);
             // Per-restaurant styling hook. data-template cannot do this job: every
             // tenant currently resolves to template_key "monday_greens", so
             // [data-template="monday_greens"] matches the whole estate.
@@ -10180,7 +10202,7 @@
             _applyMugsyCopy();
             _applyPipesCopy();
             _applyMingleyardCopy();
-            document.getElementById('lang-toggle').textContent   = u.langBtn;
+            document.getElementById('lang-toggle').textContent   = _languageToggleLabel(lang);
             const _themeToggle = document.getElementById('theme-toggle');
             _themeToggle.innerHTML = theme === 'night' ? _SVG_SUN : _SVG_MOON;
             _themeToggle.setAttribute('aria-label', theme === 'night' ? u.themeDay : u.themeNight);
@@ -10235,7 +10257,8 @@
 
         document.getElementById('lang-toggle').addEventListener('click', () => {
             const _from = window.__lang;
-            const _to = _from === 'en' ? 'ka' : _from === 'ka' ? 'ru' : 'en';
+            const _languages = _allowedLanguagesForTenant();
+            const _to = _languages[(_languages.indexOf(_from) + 1) % _languages.length];
             track('lang_change', null, { from: _from, to: _to });
             applyLang(_to);
         });
