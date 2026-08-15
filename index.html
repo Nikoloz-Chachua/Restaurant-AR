@@ -9437,10 +9437,12 @@
         }
         const _DEFAULT_RESTAURANT_SLUG = ''; // empty = no restaurant is hardcoded into the shared template
         const _LANGUAGES_BY_TENANT_SLUG = {
-            'monday-greens': ['ka', 'en']
+            'monday-greens': ['ka', 'en'],
+            'chero-main': ['ka', 'en']
         };
         const _DEFAULT_LANGUAGE_BY_TENANT_SLUG = {
-            'monday-greens': 'ka'
+            'monday-greens': 'ka',
+            'chero-main': 'ka'
         };
         let _tenant = null;
         let _themeConfig = {};
@@ -9454,9 +9456,17 @@
             document.documentElement.lang = window.__lang;
             localStorage.setItem('bl-lang', window.__lang);
         }
+        // UI[lang].langBtn assumes the full three-language cycle ("RU" is what
+        // the ka-state button offers next). A tenant restricted to two
+        // languages needs whatever its own allow-list actually cycles to next,
+        // not the dict default -- computed generically here instead of a
+        // per-slug branch, so any future restricted-language tenant gets a
+        // correct button label for free.
         function _languageToggleLabel(lang) {
-            if (_tenant?.restaurant_slug !== 'monday-greens') return UI[lang].langBtn;
-            return lang === 'ka' ? 'EN' : 'ქარ';
+            const languages = _allowedLanguagesForTenant();
+            if (languages.length >= 3) return UI[lang].langBtn;
+            const next = languages[(languages.indexOf(lang) + 1) % languages.length];
+            return next === 'ka' ? 'ქარ' : next === 'ru' ? 'RU' : 'EN';
         }
         function _tenantSlugFromUrl() {
             const params = new URLSearchParams(location.search);
