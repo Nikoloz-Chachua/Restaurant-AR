@@ -2,7 +2,7 @@
 
 > **Single source of truth.** This document exists to onboard new team members and to give AI assistants full context about BetaReal in one place. It covers the company, the product, the technical architecture, the 3D production pipeline, the AI strategy, the business model, go-to-market, the team, finances/legal status, and the roadmap.
 >
-> **Status:** Living document. Last major update: **2026-06-09**.
+> **Status:** Living document. Last major update: **2026-06-09**. Partial update **2026-08-15** (marked with dated notes below) — covers multi-tenancy going live, the first real client, data model changes, and current live URLs. Sections not touched in the 2026-08-15 pass (team, legal/equity, pricing, 3D pipeline, AI strategy, market/traction narrative) may also be stale — verify with Temo/George before treating them as current.
 > **Maintainer:** Temo Tkeshelashvili (CEO).
 > **How to use it:** Read top-to-bottom for the full picture, or jump via the table of contents. Anything marked **🟡 TBD / OPEN** is an unresolved decision — do not treat it as settled fact. Anything marked **⚠️ RISK** is a known weakness to manage.
 
@@ -44,11 +44,11 @@
 
 **BetaReal** is a Tbilisi-based technology startup building a **WebAR menu platform for restaurants**. We turn real dishes into high-quality interactive 3D models that customers can rotate, inspect, and place on their own table in Augmented Reality — directly in the phone browser, **with no app download**. A customer scans a QR code on the table, the menu opens instantly, and they can see the true size, layering, and presentation of a dish before ordering.
 
-The product is **not** a one-off menu for a single restaurant. It is a **reusable template/platform** designed to be deployed for any restaurant. Our current showcase ("Burger Lions") is built on the real menu of a burger restaurant near our workspace, used as our first real-world test subject to prove and demonstrate the system.
+The product is **not** a one-off menu for a single restaurant — it now runs on a genuinely **multi-tenant platform** (see §22 for the architecture, built since this doc's last major pass). One shared codebase serves every restaurant, each with its own subdomain/custom domain, theme, menu, and language configuration.
 
 Our long-term advantage — the "moat" — is a **data flywheel**: every restaurant we onboard produces pairs of *(dish photos → finished 3D model)*. Once we accumulate enough of these (we estimate **~500 unique high-quality models** are enough to train it), we fine-tune an open-source image-to-3D AI model so we can generate new dish models from just a few photos. That collapses our production cost and time, which lets us undercut and out-scale anyone doing this manually.
 
-**Stage:** Pre-revenue. Working MVP built and live. No legal entity or paying clients yet. Immediate goal is to get into two accelerators (**2080 Ventures** and **GITA**), then land our first client.
+**Stage:** **[2026-08-15]** Has its first live tenant with real customers ordering off it (Monday Greens, Tbilisi) — see §2. Several more restaurants (Kobuleti market: Burrito, Chero) are in active outreach as prospects, not yet signed. No legal entity yet (unconfirmed whether this has changed — verify with Temo). Original goal of getting into **2080 Ventures** and **GITA** — status unconfirmed as of this update, verify with Temo.
 
 ---
 
@@ -65,9 +65,11 @@ Our long-term advantage — the "moat" — is a **data flywheel**: every restaur
 | **Legal entity** | ❌ None yet (not registered). |
 | **Revenue** | ₾0 (pre-revenue). |
 | **Funding** | Bootstrapped. ~₾300–400 spent on equipment, from CEO's leftover prize money from a previous accelerator. |
-| **Current #1 goal** | Acceptance into **2080 Ventures** and **GITA collaborative accelerator**. |
-| **Showcase / demo** | "Burger Lions" — built on a real nearby burger restaurant's menu; **not a client**, used as the demo dataset. |
-| **Live demo URL** | https://restaurant-ar.pages.dev |
+| **Current #1 goal** | Unconfirmed as of 2026-08-15 update — was acceptance into **2080 Ventures** and **GITA collaborative accelerator** as of 2026-06-09; verify current priority with Temo. |
+| **First real client** | **[2026-08-15]** Monday Greens (Tbilisi) — live, real customers ordering off the AR menu on real tables. Treat as production: never push untested changes straight to its live site. |
+| **Active prospects (not yet signed)** | **[2026-08-15]** Burrito and Chero, both Kobuleti — demo sites built (full menu, branding, language), in-person/WhatsApp outreach underway. Do not cite either as a reference customer until they've explicitly agreed — see §18. |
+| **Showcase / demo** | "Burger Lions" (as of 2026-06-09) — built on a real nearby burger restaurant's menu; was not a client at that time. Current status unconfirmed — verify whether still used as the primary demo or superseded by the newer segment-template demos (luxury/cafe/casual/social) built since. |
+| **Live app (multi-tenant)** | https://restaurant-ar.pages.dev — the shared codebase; append `?tenant=<slug>` to view a specific restaurant (e.g. `?tenant=burrito-main`). Signed customers also get a `*.betareal.ge` subdomain or custom domain — see §6. |
 
 ---
 
@@ -95,14 +97,15 @@ BetaReal provides a **complete WebAR menu ecosystem** — restaurants need zero 
 4. **Restaurants self-manage** items, prices, descriptions, theme, and visibility from an admin panel — no reprinting menus.
 5. **We host, maintain, and improve** the platform, and provide analytics on customer behavior.
 
-**Core product qualities:** premium UI/UX, lightweight & fast, multilingual (Georgian/English today), no app install, works on modern Android and iOS.
+**Core product qualities:** premium UI/UX, lightweight & fast, multilingual (Georgian/English/Russian as of **[2026-08-15]**), no app install, works on modern Android and iOS.
 
 ### Feature checklist (what exists today)
 
 - ✅ Interactive 3D inspection of every dish (rotate, zoom, realistic lighting).
 - ✅ Web-based AR placement on the real table (Android WebXR + iOS Quick Look).
 - ✅ QR-based, app-free access.
-- ✅ Bilingual interface (Georgian / English) with live language switching.
+- ✅ **[2026-08-15]** Trilingual interface (Georgian / English / Russian) with live language switching, restrictable per tenant (e.g. a tenant can be Georgian/English-only) via an allow-list, not a per-tenant code fork.
+- ✅ **[2026-08-15]** True multi-tenancy: one shared codebase, `restaurant_id`/`brand_id` on every row, tenant resolved by `?tenant=` slug, subdomain, or custom domain. See §22.
 - ✅ Day/Night theme toggle.
 - ✅ **Live 3D thumbnails** and an optional uploaded image thumbnail per item.
 - ✅ A **basket/cart** that lets customers tally a desired order locally (see note below).
@@ -158,7 +161,8 @@ We run **three** distinct front-ends:
 
 | Surface | What it is | Where it lives | Who uses it |
 |---|---|---|---|
-| **Customer menu app** | `index.html` — shared WebAR menu template | **Cloudflare Pages** → https://restaurant-ar.pages.dev | Restaurant guests |
+| **Customer menu app** | `index.html` — shared WebAR menu template, now serving **multiple tenants** off one deploy | **Cloudflare Pages** → https://restaurant-ar.pages.dev (append `?tenant=<slug>`) | Restaurant guests |
+| **Per-tenant live URLs** | **[2026-08-15]** Signed tenants get a `*.betareal.ge` subdomain (e.g. `monday-greens.betareal.ge`) or a custom domain (`restaurants.custom_domain` in Supabase). A subdomain must also be registered as a Cloudflare Pages custom domain or it fails with error 1014. | Cloudflare DNS + Pages, same deploy as above | Restaurant guests (production) |
 | **Admin panel** | `admin-app/` — Next.js app to manage menu + theme + view analytics | **Vercel** (Niko's account) → https://betareal-admin.vercel.app | Restaurant staff / us |
 | **Analytics dashboard** | `admin.html` — Chart.js dashboard | Served from Cloudflare Pages, **embedded via iframe** inside the admin panel's Dashboard page | Restaurant owners / us |
 
@@ -198,9 +202,9 @@ The admin panel's Dashboard page embeds `https://restaurant-ar.pages.dev/admin.h
 
 ### 7.2 Customer app (`index.html`)
 
-- **Pure static** single HTML file (~142 KB), **no build step**. All AR libraries (model-viewer, Three.js) load from CDN, **lazily on first AR tap** to avoid blocking the menu.
-- **Primary data source:** Supabase `menu_items` + `categories` (live). Falls back to `foods/menu.json` only if Supabase is unreachable.
-- **Service worker (`sw.js`, cache `bl-v55`):**
+- **Pure static** single HTML file (has grown well past the original ~142 KB as multi-tenancy, trilingual support, and per-tenant template variants were added — check current size before quoting a number), **no build step**. All AR libraries (model-viewer, Three.js) load from CDN, **lazily on first AR tap** to avoid blocking the menu.
+- **Primary data source:** Supabase `menu_items` + `categories`, scoped by `restaurant_id` (live, multi-tenant as of **[2026-08-15]**). Falls back to `foods/menu.json` only if Supabase is unreachable.
+- **Service worker (`sw.js`):**
   - Pre-caches the page shell + `foods/menu.json`.
   - At install, fetches the list of visible model URLs from Supabase and **pre-caches all GLB models** so AR is instant.
   - **Navigation requests** are network-first with `cache: 'no-store'` (bypasses browser + Cloudflare edge cache) so updates reach users on the very next reload.
@@ -234,39 +238,56 @@ The admin panel's Dashboard page embeds `https://restaurant-ar.pages.dev/admin.h
 
 ## 8. Data Model (Supabase)
 
-**Project:** "Restaurant AR Claude version" · **Project ID:** `xctoxhaahxtcicfgnmme` · **URL:** `https://xctoxhaahxtcicfgnmme.supabase.co`
+**[2026-08-15] Corrected:** the project ID below (`xctoxhaahxtcicfgnmme`) was Temo's original **single-tenant** project and is **retired** — this contradicted §11 elsewhere in this same doc, which already had the right answer. The live **multi-tenant** project is:
+
+**Project:** multi-tenant BetaReal DB · **Project ID:** `lwdpegloznhpcecivhfy` · **URL:** `https://lwdpegloznhpcecivhfy.supabase.co` (Niko's account)
 
 ### Tables
+
+**`restaurants`** — **[2026-08-15, added]** one row per tenant: `id` (PK), `brand_id` (FK → brands), `name`, `slug`, `custom_domain`, `status`, `created_at`, `updated_at`. Tenant resolution in the customer app tries `custom_domain` first, then `slug`.
+
+**`brands`** — **[2026-08-15, added]** `id` (PK), `name`, `slug`, `plan`, `logo_url`, `primary_color`, `secondary_color`, `can_create_branches`, `created_at`, `updated_at`. Supports one brand having multiple restaurant locations (branches).
 
 **`menu_items`** — the live menu (primary source for the app)
 | Column | Type | Notes |
 |---|---|---|
 | `id` | int (PK) | |
-| `name_en`, `name_ka` | text | Bilingual name |
-| `description_en`, `description_ka` | text | Bilingual description |
+| `restaurant_id` | int (FK → restaurants) | **[2026-08-15, added]** — every row is tenant-scoped |
+| `name_en`, `name_ka`, `name_ru` | text | Trilingual name. **`name_ru` added [2026-08-15]** — not present on every tenant's rows yet, only where imported |
+| `description_en`, `description_ka`, `description_ru` | text | Trilingual description. **`description_ru` added [2026-08-15]** |
 | `price` | text | Free-form (e.g., `"14 ₾"`) — stored as text, not numeric |
 | `category_id` | int (FK → categories) | |
-| `model` | text (URL) | Full URL to the GLB (R2 target storage) |
+| `model`, `model_usdz` | text (URL) | GLB / USDZ model URLs (R2) |
 | `thumbnail_url` | text (URL) | Optional uploaded WebP thumbnail |
 | `thumb_3d` | bool | If true, thumbnail shows live 3D instead of the image |
+| `is_3d` | bool | **[2026-08-15, added]** |
+| `text_only` | bool | **[2026-08-15, added]** — true suppresses the thumbnail/3D UI entirely; used for tenants imported from a spreadsheet with no photos/models yet |
 | `ar_scale` | numeric | Per-item AR scale multiplier (default 1.0) |
 | `visible` | bool | Hidden items don't render on the live menu |
 | `sort_order` | int | Ordering within a category |
+| `featured` | bool | **[2026-08-15, added]** |
+| `addons`, `variants` | jsonb | **[2026-08-15, added]** — per-item add-on options / size-price variants, each entry an `{en, ka, price}`-shaped object (no `ru` key support yet as of this update) |
+| `price_old` | text | **[2026-08-15, added]** — struck-through "was" price when set |
 
-**`categories`** — `id`, `name_en`, `name_ka`, `sort_order`.
+**`categories`** — `id`, `restaurant_id` (FK), `name_en`, `name_ka`, `name_ru` (**added [2026-08-15]**), `sort_order`.
 
-**`theme_config`** — key/value store driving the customer app's look:
-- `night_*` / `day_*` color keys: `bg`, `card`, `card2`, `border`, `text`, `dim`, `accent`, `accent_text`, `thumb_bg`, `modal_bg`.
+**`theme_config`** — key/value store (`restaurant_id`, `key`, `value`) driving the customer app's per-tenant look and content. Far more keys exist now than the original color palette — **[2026-08-15]**:
+- `night_*` / `day_*` color/style keys: `bg`, `bg2`, `card`, `card2`, `border`, `text`, `dim`, `accent`, `accent2`, `accent_text`, `accent_edge`, `thumb_bg`, `modal_bg`, `modal_bg_image`, `cta_bg`, `cta_shadow`, `pill_bg`, `pill_active_bg`, `hero_color`, `hero_bg`, `hero_shadow`, `cat_color`, `panel_ink`, `modal_ink`, `divider_bg`, `glow`, `glow2`, `shadow`, `stage_bg`, `thumb_vignette`, `card_blur`, `card_radius`, `item_shadow`, `item_hover_shadow`, `bg_image`, `bg_size`, `bg_repeat`.
 - `font_body`, `font_heading` (Google Font names).
-- `site_name`, `site_name_ka` (branding).
+- `site_name`, `site_name_ka` (branding — no `_ru` variant; brand names generally aren't translated).
+- `logo_url`, `hero_image_url`, `hero_images` (JSON array — multi-photo crossfade hero gallery), `hero_min_h`.
+- `template_key` — selects which visual template a tenant renders as (`monday_greens`, `modern_cafe`, `luxury_dining`, `premium_fast_casual`, `social_dining`, etc.).
+- `drink_categories` — JSON array of category `name_en` values that belong in the "Drinks" tab of an opt-in Food/Drinks split.
+- `featured_items` — JSON array of `menu_items.id` in display order, for a "most ordered" pinned filter.
+- Content/footer keys (all optional, tenant renders nothing if unset): `site_tagline`/`_ka`/`_ru`, `reviews_json` (array of `{name, stars, text}`), `reviews_title_ru`, `site_hours_range`, `site_hours_note`/`_ka`/`_ru`, `site_hours_label_ru`, `site_address`/`_ka`/`_ru`, `site_address_label_ru`, `site_phone`, `site_phone_display`, `site_phone_label_ru`, `delivery_url`, `delivery_label_ru`, `facebook_url`, `instagram_url`, `site_footer_note`/`_ka`/`_ru`.
 
 **`events`** — analytics (see §10): `session_id`, `visitor_id`, `event`, `item_index`, `item_name`, `category`, `lang`, `ar_cap`, `extra` (JSON), `created_at`.
 
 **Auth** — Supabase Auth (email+password) gates the admin panel.
 
-> **Current live data is a work-in-progress demo set**, not the polished 16-item `menu.json`. As of this writing it contains a handful of real scanned items (BigBurger, Hot Dog, Croissant, Donut) plus duplicate/hidden test rows. Categories: Burgers, Sides, Drinks, Desserts, Coffee.
+> ⚠️ **Operational note [2026-08-15]:** the app's Supabase keys (`sb_publishable_...` / `sb_secret_...`) are **data-plane (PostgREST) keys only** — they can never run schema changes (`ALTER TABLE` etc.), no matter how privileged. Schema changes need either the Supabase dashboard's SQL Editor (a human logs in and pastes SQL) or a **Management API personal access token** (`sbp_...`, generated at dashboard → account icon → Access Tokens) used against `https://api.supabase.com/v1/projects/{ref}/database/query`. Don't assume an AI session has DDL access by default.
 >
-> ⚠️ **Security to verify:** the Supabase anon key is public **by design** (it's embedded in the client). What matters is **Row-Level Security**: anonymous users must be able to *read* visible menu/theme and *insert* events, but must **not** be able to modify `menu_items`, `categories`, or `theme_config`. **Confirm RLS policies enforce this.**
+> ⚠️ **Security to verify:** the Supabase anon/publishable key is public **by design** (it's embedded in the client). What matters is **Row-Level Security**: anonymous users must be able to *read* visible menu/theme and *insert* events, but must **not** be able to modify `menu_items`, `categories`, or `theme_config`. **Confirm RLS policies enforce this** — not re-verified as part of the 2026-08-15 pass.
 
 ---
 
@@ -348,7 +369,7 @@ This is a genuine product differentiator: **most QR menus give the restaurant ze
 1. **One deploy branch: `cloudflare`.** Customer app (`index.html`, `sw.js`, `admin.html`, `foods/`)
    and admin app (`admin-app/`) both deploy from it (Cloudflare Pages + Vercel respectively).
    **Never commit to `main`** — it is stale (frozen 2026-06-19) and deploys nothing.
-2. **Bump `CACHE_NAME` in `sw.js`** (`bl-v55` → `bl-v56` → …) in the **same commit** whenever any of these change:
+2. **Bump `CACHE_NAME` in `sw.js`** (check the current value — it has advanced well past `bl-v55`, don't trust a hardcoded number in this doc) in the **same commit** whenever any of these change:
    - `index.html`, `foods/menu.json`, `sw.js` itself, any local GLB, or any new file served to the browser.
    - If you forget, returning visitors keep seeing the **old cached version** until a hard refresh.
 3. Supabase REST calls (menu/theme/events) are **never cached** — admin changes are immediately visible. Only stable-URL model files are cached.
@@ -496,8 +517,9 @@ The 5-AR-item cap is **intentional artificial scarcity**. Only some dishes get a
 > 🟡 GTM is the **least-developed** part of the business and the **#1 thing to fix**. We have a product and no sales motion yet. The CEO is actively learning B2B sales (Alex Hormozi material + mentorship from a strong B2C salesman friend + roleplay with team/AIs).
 
 ### Lighthouse first client
-- **Target: Burger Lions** (the demo restaurant) — great for **team morale**, it's nearby, and the demo already uses their menu.
-- ⚠️ **We have no contact there yet and no sales script.** Needs: a named contact, a one-page offer, a live in-person demo on their own dishes, and a clear ask.
+- **Original target (2026-06-09): Burger Lions** (the demo restaurant) — great for **team morale**, it's nearby, and the demo already uses their menu. Current status unconfirmed as of 2026-08-15.
+- **[2026-08-15] Actual first live tenant: Monday Greens** (Tbilisi) — real customers ordering off the AR menu on real tables. How this relationship was closed (which of §18's motions worked) is not captured in this doc — worth writing down while it's fresh, since it's the one closing motion that's actually been proven.
+- **[2026-08-15] Active motion, different city:** in-person walk-in + WhatsApp outreach in **Kobuleti** (not Tbilisi as originally scoped here) — Burrito and Chero, both pre-built demos, neither signed yet. Confirms the door-to-door motion below is being executed, just relocated.
 
 ### Recommended near-term motion
 1. **Build a tight offer + demo flow** (Hormozi-style "grand slam offer"): lead with the **QReal AOV stat** (+20–26%), show *their own* dish in AR on the table, and make the first month risk-free (month-to-month, no lock-in).
@@ -604,17 +626,17 @@ Bilingual (Georgian/English) survey; first responses **2026-06-05**, wider distr
 - [ ] Centralize credentials in a shared password manager (reduce bus-factor).
 
 **Phase 1 — First revenue**
-- [ ] **Solve the size-perception gap** (from survey): show each dish at **true scale** in AR and/or alongside a **common reference object** (or display real dimensions). This is the sharpest piece of user feedback and directly addresses the #1 pain (portion size) — cheap, high-impact, and reinforces the core value prop.
+- [ ] **Solve the size-perception gap** (from survey): show each dish at **true scale** in AR and/or alongside a **common reference object** (or display real dimensions). This is the sharpest piece of user feedback and directly addresses the #1 pain (portion size) — cheap, high-impact, and reinforces the core value prop. Status unconfirmed as of 2026-08-15 — verify.
 - [ ] **Strengthen the "leave your contact" CTA** so the menu itself generates restaurant leads.
-- [ ] Build a **sales playbook**: offer one-pager, demo script, objection handling, pricing sheet.
-- [ ] **Land first paying client** (target: Burger Lions) → first case study + testimonial.
-- [ ] **Register the legal entity**; sign a **founders' agreement with vesting**.
-- [ ] Buy a **custom domain** + build the **BetaReal landing page** (qualities, stats, partners, accomplishments).
+- [ ] Build a **sales playbook**: offer one-pager, demo script, objection handling, pricing sheet. **[2026-08-15]** In-progress in practice — George is running door-to-door + WhatsApp outreach in Kobuleti (Burrito, Chero), iterating the pitch live rather than from a written playbook. Worth codifying what's working once a few more restaurants respond.
+- [x] **Land first client** — **[2026-08-15] DONE, but not Burger Lions.** Monday Greens (Tbilisi) is live with real customers ordering off the AR menu on real tables. Whether it's a *paying* client (contract/pricing terms) is unconfirmed by this update — verify with Temo. Burger Lions' current status (client, demo, or dropped) is also unconfirmed.
+- [ ] **Register the legal entity**; sign a **founders' agreement with vesting**. Status unconfirmed as of 2026-08-15.
+- [ ] Buy a **custom domain** + build the **BetaReal landing page** (qualities, stats, partners, accomplishments). **[2026-08-15]** A landing page exists at `betareal.ge` (GitHub Pages, `docs/` folder on a `landing-page` branch) with sections on partners, product, and live template demos. Whether it covers stats/accomplishments per this roadmap item is unconfirmed — check current content.
 
 **Phase 2 — Multi-tenant scale**
-- [ ] Build **multi-tenancy** (see decision below) so many restaurants run off one system.
-- [ ] **Custom domain per client.**
-- [ ] Onboard several clients; **systematize the production pipeline**; grow the dish photo↔model **dataset**.
+- [x] Build **multi-tenancy** — **[2026-08-15] DONE.** See §22 resolution below and §8 for the schema.
+- [x] **Custom domain per client** — **[2026-08-15] DONE.** `restaurants.custom_domain` + `*.betareal.ge` subdomains, both live.
+- [ ] Onboard several clients; **systematize the production pipeline**; grow the dish photo↔model **dataset**. Partial: several tenants exist (Monday Greens live; Burrito, Chero as prospect demos; 4 segment-template showcase demos: luxury/cafe/fast-casual/social-dining) but most are **text-only, no 3D models** — imported from spreadsheets/websites rather than through the photo→3D pipeline. The dataset-growth goal (§14) has likely not advanced much via these; confirm with the team whether new 3D scans have happened since 2026-06-09.
 
 **Phase 3 — The AI moat**
 - [ ] Reach **~500 unique high-quality models** (enough variety to train the AI).
@@ -623,13 +645,13 @@ Bilingual (Georgian/English) survey; first responses **2026-06-05**, wider distr
 
 **Phase 4 — Expand the platform**
 - [ ] Real **online ordering** (basket → kitchen/POS) + **delivery-app partnerships** (Wolt/Glovo/Bolt Food/Hotcard).
-- [ ] More languages (e.g., **Russian** for tourists).
+- [x] More languages (e.g., **Russian** for tourists) — **[2026-08-15] DONE.** Georgian/English/Russian, restrictable per tenant.
 - [ ] Analytics as a paid product; loyalty; multi-location management; AI recommendations; marketplace/franchise plays.
 
-### 🟡 Architecture decision needed: multi-tenancy
-Current system is **single-tenant** (one menu, one DB). The CEO's leaning: **one shared database + an internal CMS connected to all clients, with a separate deploy + custom domain per client.**
+### ✅ RESOLVED [2026-08-15]: multi-tenancy is built and live
+The recommendation this section used to pose as an open question is what got built: **one shared Supabase database**, `restaurant_id` on every menu/category/theme_config row, **one customer-app codebase** (`index.html`), tenant selected by `?tenant=` slug, `*.betareal.ge` subdomain, or `restaurants.custom_domain`. A `template_key` in `theme_config` selects which visual template a tenant renders as, so tenants can look completely different while sharing all the underlying code. See §8 for the current schema.
 
-**Recommendation to evaluate:** keep **one shared Supabase database** with a `restaurant_id` on every row and **RLS-enforced isolation**, serve all clients from **one customer-app codebase**, and select the tenant by **domain/subdomain**. This avoids maintaining N separate deployments while still giving each client their own domain and theme. Decide between *(a)* this row-level multi-tenancy vs *(b)* separate-deploy-per-client **before** onboarding client #2.
+Not independently re-verified as part of this update: whether RLS actually enforces tenant isolation (flagged in §8) — confirm before treating cross-tenant data safety as settled.
 
 ---
 
@@ -637,9 +659,9 @@ Current system is **single-tenant** (one menu, one DB). The CEO's leaning: **one
 
 In priority order, as stated by the CEO:
 
-1. **Get into 2080 Ventures and the GITA collaborative accelerator.** ← immediate focus
-2. **Get the first client** (ideally Burger Lions).
-3. **Gather enough clients and data** to make the AI viable (~500 unique models).
+1. **Get into 2080 Ventures and the GITA collaborative accelerator.** Status as of 2026-06-09; unconfirmed whether still current focus as of 2026-08-15.
+2. ~~**Get the first client**~~ — **[2026-08-15] DONE**, though not the originally-targeted Burger Lions: Monday Greens (Tbilisi) is live. Current #2 priority is presumably converting the active Kobuleti prospects (Burrito, Chero) — confirm with Temo.
+3. **Gather enough clients and data** to make the AI viable (~500 unique models). Most tenants added since 2026-06-09 are text-only imports (no 3D models), so this likely has not advanced much — confirm current model count with the team.
 4. **Train the AI** to generate 3D models from a few photos — the endgame that makes production cheap and scalable.
 
 Long-term vision: become **the leading interactive restaurant-tech platform in Georgia**, then expand internationally — building the largest WebAR food-visualization network in the region and making immersive dining the industry standard.
@@ -672,30 +694,39 @@ Long-term vision: become **the leading interactive restaurant-tech platform in G
 ```
 Company:          BetaReal  (brand new; logo ~2026-06-07)
 Product (public): "3D AR Menu"  (kept for clarity; survey already sent under this)
-Demo:             "Burger Lions" — real nearby burger place, used as demo (NOT a client)
-Stage:            Pre-revenue, MVP live, validation in progress
-Team:             5 active founders (CS students, TSU); originally 6 (1 left amicably)
+First client:     Monday Greens (Tbilisi) — LIVE, real customers, real tables  [2026-08-15]
+Active prospects:  Burrito, Chero (both Kobuleti) — demos built, not yet signed  [2026-08-15]
+Demo (2026-06-09): "Burger Lions" — real nearby burger place; current status unconfirmed
+Stage:            Has first live tenant; still pre- or early-revenue (payment terms unconfirmed)
+Team:             5 active founders (CS students, TSU) as of 2026-06-09; originally 6 (1 left amicably) — unconfirmed if still current
 Market:           Tbilisi → Georgia → international
-Live customer app:  https://restaurant-ar.pages.dev        (Cloudflare Pages, branch `cloudflare`)
+Live app:           https://restaurant-ar.pages.dev  (multi-tenant; ?tenant=<slug>)   [branch: see note below]
+Per-tenant URLs:    *.betareal.ge subdomain or custom domain, per signed tenant        [2026-08-15]
 Admin panel:        Next.js 16 / React 19 on Vercel (Niko's account) — betareal-admin.vercel.app
 Analytics:          admin.html (Chart.js), embedded in admin via iframe
 Database:           Supabase project lwdpegloznhpcecivhfy (Niko's account; multi-tenant)
-Tables:             menu_items, categories, theme_config, events  (+ Auth)
+Tables:             restaurants, brands, menu_items, categories, theme_config, events  (+ Auth)  [restaurants/brands added 2026-08-15]
+Languages:          Georgian / English / Russian, restrictable per tenant  [Russian added 2026-08-15]
 Model storage:      Cloudflare R2 with restaurant-slug key prefixes
 Thumbnails:         Cloudflare R2, client-side WebP
-SW cache version:   bl-v55  (BUMP on index.html / sw.js / menu.json / GLB changes)
-Production:         Lightbox photos → KIRI Engine → Blender → GLB → admin → R2  (~20 min/dish)
+SW cache version:   check sw.js CACHE_NAME directly — has advanced well past bl-v55, don't trust a hardcoded number here
+Production:         Lightbox photos → KIRI Engine → Blender → GLB → admin → R2  (~20 min/dish, per 2026-06-09 figures)
 Model sizes:        ~5.8–8.6 MB, no Draco (decoder download not worth it)
 AI plan:            Fine-tune open-source image-to-3D on ~500 unique dish models, rented cloud GPU
-Pricing (₾/mo):     300 (AR only) · 450 (full+analytics+theme) · 900 (unlimited+consult)
-Onboarding:         ₾500 one-time (incl. 5 items)
-Extra items:        ₾50–70 each, recurring monthly; 5 included per tier
+Pricing (₾/mo):     300 (AR only) · 450 (full+analytics+theme) · 900 (unlimited+consult)  — as of 2026-06-09, unconfirmed if changed
+Onboarding:         ₾500 one-time (incl. 5 items)  — as of 2026-06-09, unconfirmed if changed
+Extra items:        ₾50–70 each, recurring monthly; 5 included per tier  — as of 2026-06-09, unconfirmed if changed
 Multi-location:     Priced per location; each extra location ~½–⅔ of base price
 Contract:           Month-to-month, no lock-in + annual prepay discount
-Funding:            Bootstrapped; ~₾300–400 spent; from CEO's prior prize money
-Legal:              No entity yet; equity informal & equal; no salaries
-#1 goal:            Get into 2080 Ventures + GITA accelerator
+Funding:            Bootstrapped; ~₾300–400 spent (as of 2026-06-09); from CEO's prior prize money
+Legal:              No entity as of 2026-06-09; equity informal & equal; no salaries — unconfirmed if changed
+#1 goal:            Unconfirmed as of 2026-08-15 — was "get into 2080 Ventures + GITA" as of 2026-06-09
 Competitor north star: QReal/Kabaq (+20–26% AOV, 800+ restaurants)
+
+Note on branch/repo: as of 2026-08-15, all verified deploys to restaurant-ar.pages.dev went through
+Nikoloz-Chachua/Restaurant-AR (remote `niko`), branch `cloudflare` — consistent with §11/§12 above.
+If this doc and current reality disagree on the canonical repo, trust a fresh `git log`/deploy check
+over this file.
 ```
 
 ---
@@ -704,8 +735,8 @@ Competitor north star: QReal/Kabaq (+20–26% AOV, 800+ restaurants)
 
 ```
 Restaurant-AR/
-├── index.html              # Customer WebAR menu app (static, ~142 KB) — THE product
-├── sw.js                   # Service worker (offline + model precache); cache = bl-v55
+├── index.html              # Customer WebAR menu app (static; has grown well past ~142 KB — multi-tenant, trilingual, several per-tenant templates) — THE product
+├── sw.js                   # Service worker (offline + model precache); check CACHE_NAME for current version, not this doc
 ├── admin.html              # Analytics dashboard (Chart.js), embedded in admin panel
 ├── metadata.json           # App metadata (name/description/camera permission)
 ├── _headers                # Cloudflare Pages cache headers (no-cache HTML + sw.js)
@@ -738,6 +769,14 @@ not part of BetaReal. Ignore it for this product.
 ```bash
 # Customer app (root)
 npm run dev            # serve static files at http://localhost:3000
+npm test                # [2026-08-15] node --test over *Regression.test.mjs files —
+                         # one file per tenant/feature (mugsyTenantRegression.test.mjs,
+                         # pipesTenantRegression.test.mjs, mondayGreensLanguageRegression.test.mjs,
+                         # cheroLanguageRegression.test.mjs, ...). Follow this file-per-tenant
+                         # convention when adding tenant-specific test coverage. As of 2026-08-15
+                         # a handful of pre-existing failures are known and unrelated to
+                         # tenant/language work — confirm against a clean checkout before
+                         # assuming a change broke something.
 
 # Admin panel
 cd admin-app && npm run dev    # Next.js dev server
