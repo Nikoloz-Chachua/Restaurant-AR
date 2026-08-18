@@ -5948,7 +5948,11 @@
                 grid-template-columns: repeat(2, 1fr);
                 gap: 12px;
                 max-width: 520px;
-                align-items: start;
+                /* stretch (not start): two dishes with different name lengths must not
+                   leave the price/cart row sitting at two different heights across a
+                   row -- see .item-right below, which is what actually claims the
+                   extra space this creates. */
+                align-items: stretch;
             }
             [data-phone-layout="twin"] .category-header { grid-column: 1 / -1; }
             [data-phone-layout="twin"] .menu-item {
@@ -5993,6 +5997,15 @@
                 order: 3;
                 padding: 6px 10px 9px;
                 gap: 6px;
+                /* .menu-item is now stretched to match its row-mate's height (see
+                   .menu-list above); .item-right must claim that extra space itself
+                   -- it doesn't happen automatically just because the outer card grew.
+                   Its only child here is .item-actions (ingredients is hidden in twin
+                   mode), so the base rule's `justify-content: space-between` has
+                   nothing to space between and would leave it stuck at the top --
+                   flex-end pins it to the bottom of the now-taller card instead. */
+                flex: 1;
+                justify-content: flex-end;
             }
             [data-phone-layout="twin"] .item-right .ingredients { display: none; }
             [data-phone-layout="twin"] .item-actions { margin-top: 0; min-height: 0; }
@@ -6011,6 +6024,50 @@
                 padding: 6px;
                 font-size: 0.6rem;
                 border-radius: 8px;
+            }
+
+            /* Twin layout was built for photo cards (square image, name,
+               price/cart) and never accounted for text-only items -- a
+               no-image card fell back to the generic
+               [data-phone-layout="twin"] .menu-item { display:flex; padding:0 }
+               rule, which strips the card's padding (description text touches
+               the card edge / overflows above it) and leaves every child at
+               its default flex order (0) except .item-name/.item-right, which
+               that same generic rule pins to order 2/3 -- so the description
+               (still order 0) sorted BEFORE the name instead of after it.
+               Higher specificity here ((0,3,0) vs the generic rule's (0,2,0))
+               guarantees this wins regardless of source order. Unlike photo
+               cards, the description stays visible: a photo already shows
+               what a dish is, but a no-image card has nothing else to. */
+            [data-phone-layout="twin"] .menu-item.no-image {
+                display: flex;
+                flex-direction: column;
+                padding: 10px 12px 9px;
+            }
+            [data-phone-layout="twin"] .menu-item.no-image .item-name {
+                order: 1;
+                padding: 0 0 4px;
+            }
+            [data-phone-layout="twin"] .menu-item.no-image .ingredients {
+                order: 2;
+                display: block;
+                font-size: 0.66rem;
+                margin: 0 0 8px;
+            }
+            [data-phone-layout="twin"] .menu-item.no-image .item-right {
+                /* .menu-item.no-image .item-right sets display:block elsewhere (built
+                   for the grid-based no-image layout, where block is correct for a
+                   grid-area). That rule is still higher-specificity than the generic
+                   twin .item-right{display:flex}, and a property this block doesn't
+                   redeclare still falls through to it -- so display/flex-direction
+                   have to be repeated here, or justify-content below is a no-op on a
+                   block box and .item-actions sits at the top instead of the bottom. */
+                display: flex;
+                flex-direction: column;
+                order: 3;
+                flex: 1;
+                justify-content: flex-end;
+                padding: 0;
             }
         }
 
@@ -6034,7 +6091,13 @@
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
                 gap: 16px;
-                align-items: start;
+                /* stretch, not start -- see the matching comment on the twin-layout
+                   .menu-list above. This rule is shared by every template that
+                   doesn't override its own .menu-list here (i.e. most of them,
+                   and the >=1100px 3-column grid below, which doesn't redeclare
+                   align-items and so inherits this), so the fix applies platform-
+                   wide, not just to Monday Greens. */
+                align-items: stretch;
             }
 
             .category-header {
@@ -6063,7 +6126,14 @@
 
             .item-left  { order: 1; width: 100%; }
             .item-name  { order: 2; padding: 10px 14px 4px; }
-            .item-right { order: 3; padding: 4px 14px 14px; }
+            /* flex: 1 claims the extra height .menu-list's align-items: stretch now
+               gives this card over a shorter row-mate. The base rule's
+               `justify-content: space-between` (unchanged, applies here as everywhere)
+               then pins .item-actions to the bottom of that space while .ingredients
+               stays put directly under the name -- harmless no-op for
+               .menu-item.no-image, which lays .item-right out with CSS Grid instead
+               of as a flex child, so `flex` has nothing to apply to there. */
+            .item-right { order: 3; padding: 4px 14px 14px; flex: 1; }
 
             .item-left .thumb-wrap {
                 width: 100%;
