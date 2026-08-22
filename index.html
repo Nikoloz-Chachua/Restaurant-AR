@@ -11147,6 +11147,18 @@
                 mv.setAttribute('interaction-prompt', 'none');
                 mv.setAttribute('min-camera-orbit', 'auto 0deg auto');
                 mv.setAttribute('max-camera-orbit', 'auto 85deg auto');
+                // casual.betareal.ge only: dish thumbnails spin continuously in the
+                // grid instead of sitting still until dragged. Scoped to this one
+                // template on purpose -- every other tenant's thumbnails are
+                // unaffected. camera-controls (above) still lets a visitor grab and
+                // rotate manually; auto-rotate-delay 0 means it resumes spinning
+                // immediately after they let go instead of waiting the model-viewer
+                // default 3s.
+                if (document.documentElement.dataset.template === 'premium_fast_casual') {
+                    mv.setAttribute('auto-rotate', '');
+                    mv.setAttribute('auto-rotate-delay', '0');
+                    mv.setAttribute('rotation-per-second', '60deg'); // faster than model-viewer's 30deg default
+                }
                 const orbit = _itemCameraOrbit(menuItems[gIdx]);
                 if (orbit) mv.setAttribute('camera-orbit', orbit);
                 wrap.insertBefore(mv, wrap.firstChild);
