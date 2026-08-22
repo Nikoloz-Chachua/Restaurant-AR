@@ -11157,6 +11157,7 @@
                 if (document.documentElement.dataset.template === 'premium_fast_casual') {
                     mv.setAttribute('auto-rotate', '');
                     mv.setAttribute('auto-rotate-delay', '0');
+                    mv.setAttribute('rotation-per-second', '60deg'); // faster than model-viewer's 30deg default
                 }
                 const orbit = _itemCameraOrbit(menuItems[gIdx]);
                 if (orbit) mv.setAttribute('camera-orbit', orbit);
