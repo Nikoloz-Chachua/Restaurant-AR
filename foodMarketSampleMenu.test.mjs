@@ -34,3 +34,9 @@ test('Food & Market SQL Editor artifact is ASCII-only and decodes localized lite
   assert.doesNotMatch(safe, /áƒ|Ã|�|â‚¾/);
   assert.equal(safe.trimEnd().endsWith('ROLLBACK;'), true);
 });
+
+test('Food & Market public menu offers Georgian and English only', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  assert.match(html, /'food-market-main': \['ka', 'en'\]/);
+  assert.match(html, /_DEFAULT_LANGUAGE_BY_TENANT_SLUG = \{[^}]*'food-market-main': 'ka'/s);
+});
