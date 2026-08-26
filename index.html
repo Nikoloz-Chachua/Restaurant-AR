@@ -11149,29 +11149,14 @@
                 mv.setAttribute('max-camera-orbit', 'auto 85deg auto');
                 const orbit = _itemCameraOrbit(menuItems[gIdx]);
                 if (orbit) mv.setAttribute('camera-orbit', orbit);
-                // monday_greens only (PREVIEW, not yet approved for prod): on mobile a
-                // single-finger swipe over a thumbnail is indistinguishable to model-viewer
-                // from a page-scroll swipe, so scrolling past these dishes fights the model.
-                // This reads the swipe's own angle on the wrap (an ancestor of the
-                // model-viewer, so this fires before model-viewer's own pointer handling)
-                // and, once it's mostly vertical -- 70deg or more from horizontal -- stops
-                // the event from ever reaching model-viewer for the rest of that drag, so
-                // the browser just scrolls. A mostly-horizontal swipe (<70deg) is left alone
-                // and still orbits the model normally.
+                // monday_greens only (PREVIEW, not yet approved for prod): a swipe over a
+                // thumbnail was fighting page scroll on mobile. The CSS on .thumb-wrap
+                // model-viewer already computes touch-action: pan-y, but model-viewer's own
+                // gesture handling reads the touch-action *attribute* directly rather than
+                // trusting computed style -- betareal.ge's gallery models set it this way and
+                // scroll cleanly past them, so this matches that proven setup.
                 if (document.documentElement.dataset.template === 'monday_greens') {
-                    let _sx = 0, _sy = 0, _scrollLock = null;
-                    wrap.addEventListener('pointerdown', e => {
-                        _sx = e.clientX; _sy = e.clientY; _scrollLock = null;
-                    }, { capture: true });
-                    wrap.addEventListener('pointermove', e => {
-                        if (_scrollLock === null) {
-                            const dx = e.clientX - _sx, dy = e.clientY - _sy;
-                            if (Math.hypot(dx, dy) < 8) return; // not enough movement to tell direction yet
-                            const angleFromHorizontal = Math.atan2(Math.abs(dy), Math.abs(dx)) * 180 / Math.PI;
-                            _scrollLock = angleFromHorizontal >= 70;
-                        }
-                        if (_scrollLock) e.stopImmediatePropagation();
-                    }, { capture: true });
+                    mv.setAttribute('touch-action', 'pan-y');
                 }
                 wrap.insertBefore(mv, wrap.firstChild);
                 let _px = 0, _py = 0;
