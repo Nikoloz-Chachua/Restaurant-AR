@@ -4167,6 +4167,61 @@
         [data-template="burger_bar"] .venue-link[hidden],
         [data-template="gochit_monster"] .venue-link[hidden]{ display: none; }
 
+        /* Burger Planet only: same visit/contact block as burger_bar/gochit_monster,
+           but scoped by tenant instead of template (its template is modern_cafe,
+           shared by other tenants that haven't asked for this), and styled with the
+           tenant's own theme vars instead of burger_bar's fixed --bb-* palette. */
+        [data-tenant="burger-planet-main"] .venue-info {
+            display: block;
+            width: 100%;
+            max-width: 450px;
+            margin: 26px auto 8px;
+            padding: 18px 16px 20px;
+            box-sizing: border-box;
+            border-top: 1px solid var(--border);
+        }
+        [data-tenant="burger-planet-main"] .venue-info[hidden] { display: none; }
+        [data-tenant="burger-planet-main"] .venue-kicker {
+            font-size: 0.68rem;
+            letter-spacing: 1.6px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin: 0 0 6px;
+            font-weight: 700;
+        }
+        [data-tenant="burger-planet-main"] .venue-title {
+            font-size: 1.2rem;
+            letter-spacing: 0.2px;
+            color: var(--text);
+            margin: 0 0 8px;
+        }
+        [data-tenant="burger-planet-main"] .venue-text {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--dim);
+            margin: 0 0 14px;
+            white-space: pre-line;
+        }
+        [data-tenant="burger-planet-main"] .venue-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+        [data-tenant="burger-planet-main"] .venue-link {
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+            padding: 0 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        [data-tenant="burger-planet-main"] .venue-link.primary {
+            background: var(--accent);
+            border-color: transparent;
+            color: var(--accent-text);
+        }
+        [data-tenant="burger-planet-main"] .venue-link[hidden] { display: none; }
+
         /* ── Mugsy tenant shell — exact restaurant + brand gate ───────── */
         [data-tenant="mugsy-main"][data-template="mugsy_street_diner"] {
             --bg: var(--mugsy-bg);
@@ -5562,6 +5617,38 @@
             inset: 0 16px;
             border-radius: 14px;
             display: block;
+        }
+
+        /* Burger Planet's map, tenant-scoped to match its venue-info block above. */
+        [data-tenant="burger-planet-main"] .venue-map {
+            display: block;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto 22px;
+            padding: 0 16px;
+            box-sizing: border-box;
+            position: relative;
+        }
+        [data-tenant="burger-planet-main"] .venue-map[hidden] { display: none; }
+        [data-tenant="burger-planet-main"] .venue-map iframe {
+            display: block;
+            width: 100%;
+            height: 210px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: var(--stage-bg);
+        }
+        [data-tenant="burger-planet-main"] .venue-map.is-link iframe { pointer-events: none; }
+        [data-tenant="burger-planet-main"] .venue-map-hit {
+            position: absolute;
+            inset: 0 16px;
+            border-radius: 14px;
+            display: block;
+        }
+        @media (min-width: 760px) {
+            [data-tenant="burger-planet-main"] .venue-info,
+            [data-tenant="burger-planet-main"] .venue-map { max-width: 920px; }
+            [data-tenant="burger-planet-main"] .venue-map iframe { height: 300px; }
         }
 
         @media (min-width: 760px) {
@@ -11664,7 +11751,7 @@
                 // rendered into generic markup that starts empty — an unset
                 // field hides its element instead of falling back to whatever
                 // restaurant the markup was first written for.
-                if (VENUE_INFO_TEMPLATES.has(templateKey)) _applyVenueInfo(cfg);
+                if (VENUE_INFO_TEMPLATES.has(templateKey) || document.documentElement.dataset.tenant === 'burger-planet-main') _applyVenueInfo(cfg);
                 if (_isMugsyTenant()) {
                     const mugsyHeroImg = document.getElementById('mugsy-hero-img');
                     if (mugsyHeroImg && heroShots.length) mugsyHeroImg.src = heroShots[0];
