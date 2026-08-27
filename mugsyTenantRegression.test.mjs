@@ -19,6 +19,11 @@ test('Mugsy public shell is exact tenant gated and keeps other tenants out', () 
   assert.match(html, /\[data-tenant="mugsy-main"\]\[data-brand-slug="mugsy"\] \.mugsy-shell/)
 })
 
+test('reusable fast-casual shell has neutral boot accessibility and resolved tenant identity', () => {
+  assert.match(html, /<section class="mugsy-shell" aria-label="Restaurant menu">/)
+  assert.match(html, /const shell = document\.querySelector\('\.mugsy-shell'\);\s*if \(shell\) shell\.setAttribute\('aria-label', _localizedBrandTitle\(\) \|\| 'Restaurant menu'\);/)
+})
+
 test('Mugsy fixture is localhost-only, explicit, dynamic, and not precached', () => {
   assert.match(html, /function _mugsyFixtureRequested\(\)/)
   assert.match(html, /_tenantSlugFromHost\(\) === _MUGSY_RESTAURANT_SLUG/)

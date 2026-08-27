@@ -7713,7 +7713,7 @@
         </section>
     </section>
 
-    <section class="mugsy-shell" aria-label="Mugsy's Burgers">
+    <section class="mugsy-shell" aria-label="Restaurant menu">
         <div class="mugsy-topbar">
             <img id="mugsy-topbar-logo" class="mugsy-topbar-logo" src="./assets/mugsy/logo.svg" alt="Mugsy's Burgers" decoding="async">
             <a class="mugsy-menu-jump" href="#cat-filter" aria-label="Menu">&#9776;</a>
@@ -9307,6 +9307,8 @@
         function _applyMugsyCopy() {
             if (!_isMugsyTenant()) return;
             const cfg = _themeConfig || {};
+            const shell = document.querySelector('.mugsy-shell');
+            if (shell) shell.setAttribute('aria-label', _localizedBrandTitle() || 'Restaurant menu');
             const themeToggle = document.getElementById('theme-toggle');
             const langToggle = document.getElementById('lang-toggle');
             const menuJump = document.querySelector('.mugsy-menu-jump');
