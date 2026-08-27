@@ -5638,13 +5638,12 @@
             border-radius: 14px;
             background: var(--stage-bg);
         }
-        [data-tenant="burger-planet-main"] .venue-map.is-link iframe { pointer-events: none; }
-        [data-tenant="burger-planet-main"] .venue-map-hit {
-            position: absolute;
-            inset: 0 16px;
-            border-radius: 14px;
-            display: block;
-        }
+        /* Unlike burger_bar/gochit_monster, this map stays a real interactive
+           embed -- no tap-to-jump-out overlay -- so pinch/zoom/pan work on it
+           directly. The "View on map" button already covers opening the full
+           Google Maps app for anyone who wants that instead. */
+        [data-tenant="burger-planet-main"] .venue-map.is-link iframe { pointer-events: auto; }
+        [data-tenant="burger-planet-main"] .venue-map-hit { display: none; }
         @media (min-width: 760px) {
             [data-tenant="burger-planet-main"] .venue-info,
             [data-tenant="burger-planet-main"] .venue-map { max-width: 920px; }
