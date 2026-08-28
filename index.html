@@ -630,6 +630,15 @@
             -webkit-text-fill-color: #ffffff;
             color: #ffffff;
         }
+        /* Burger Planet's day theme uses dark teal text/dim tones meant for a
+           light page background; the lightbox overlay is always near-black
+           regardless of day/night, so its description text needs the same
+           fixed-white treatment as Monday Greens above. Name/price already use
+           the accent gradient (bright red/orange), which reads fine on black
+           either way. */
+        [data-tenant="burger-planet-main"] #img-lightbox.has-panel #lightbox-desc {
+            color: #ffffff;
+        }
         [data-template="monday_greens"] #basket-panel .basket-item-name,
         [data-template="monday_greens"] #basket-panel .basket-item-addons,
         [data-template="monday_greens"] #basket-panel .basket-item-price,
@@ -12257,16 +12266,17 @@
                         thumbImg.addEventListener('click', () => openModal(globalIdx, menuItems));
                     } else if (thumbSrc) {
                         // Photo-only item: tap the image to expand it. In twin phone
-                        // layout it opens the rich popup (name + photo + description +
-                        // price + add-to-cart); Monday Greens and Burger Planet keep the
-                        // plain image. Checked at click time, after the remote theme has
-                        // set the data-template / data-tenant / data-phone-layout attributes.
+                        // layout and Burger Planet it opens the rich popup (name + photo +
+                        // description + price + add-to-cart) -- the plain image alone left
+                        // most of the screen empty below it; Monday Greens keeps the plain
+                        // image. Checked at click time, after the remote theme has set the
+                        // data-template / data-tenant / data-phone-layout attributes.
                         thumbImg.addEventListener('click', e => {
-                            if (document.documentElement.dataset.phoneLayout === 'twin') {
+                            if (document.documentElement.dataset.phoneLayout === 'twin'
+                                || document.documentElement.dataset.tenant === 'burger-planet-main') {
                                 e.stopPropagation();
                                 openLightbox(thumbSrc, itemName, item, globalIdx);
-                            } else if (document.documentElement.dataset.template === 'monday_greens'
-                                || document.documentElement.dataset.tenant === 'burger-planet-main') {
+                            } else if (document.documentElement.dataset.template === 'monday_greens') {
                                 e.stopPropagation();
                                 openLightbox(thumbSrc, itemName);
                             }
