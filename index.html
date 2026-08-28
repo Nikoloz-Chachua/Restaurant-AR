@@ -5650,6 +5650,46 @@
             [data-tenant="burger-planet-main"] .venue-map iframe { height: 300px; }
         }
 
+        /* Burger Planet's social links (Instagram, TikTok), same tenant-scoped
+           treatment as venue-info/venue-map above. */
+        [data-tenant="burger-planet-main"] .venue-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto 18px;
+            padding: 0 16px;
+            box-sizing: border-box;
+        }
+        [data-tenant="burger-planet-main"] .venue-links[hidden] { display: none; }
+        [data-tenant="burger-planet-main"] .venue-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 44px;
+            padding: 0 14px 0 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            line-height: 1;
+            transition: border-color .15s, transform .12s;
+        }
+        [data-tenant="burger-planet-main"] .venue-chip:active { transform: scale(0.97); }
+        [data-tenant="burger-planet-main"] .venue-chip:hover { border-color: var(--accent); }
+        [data-tenant="burger-planet-main"] .venue-chip img {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+        }
+        @media (min-width: 760px) {
+            [data-tenant="burger-planet-main"] .venue-links { max-width: 920px; }
+        }
+
         /* Burger Planet only: delivery-app CTA row. Lives inside the sticky
            #cat-bar (see modern_cafe's `.cat-bar { position: sticky; top: 0 }`
            above) so it travels with the nav and stays reachable the whole time
@@ -11465,6 +11505,7 @@
         const VENUE_LINK_ICONS = {
             facebook: 'facebook', fb: 'facebook',
             instagram: 'instagram', ig: 'instagram',
+            tiktok: 'tiktok',
             wolt: 'wolt',
             glovo: 'glovo',
             bolt: 'bolt-food', boltfood: 'bolt-food'
