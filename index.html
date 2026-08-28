@@ -5650,6 +5650,45 @@
             [data-tenant="burger-planet-main"] .venue-map iframe { height: 300px; }
         }
 
+        /* Burger Planet only: delivery-app CTA row. Lives inside the sticky
+           #cat-bar (see modern_cafe's `.cat-bar { position: sticky; top: 0 }`
+           above) so it travels with the nav and stays reachable the whole time
+           someone is browsing -- this kitchen has very limited seating and
+           depends on Wolt/Glovo/Bolt orders, so the whole point of the menu is
+           getting people to one of those apps, not just showing dishes. Kept to
+           one slim row (not the full item-card treatment) since it's permanent
+           screen real estate on every scroll, not a one-time banner. */
+        .bp-delivery-row { display: none; }
+        [data-tenant="burger-planet-main"] .bp-delivery-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto 10px;
+            box-sizing: border-box;
+        }
+        [data-tenant="burger-planet-main"] .bp-delivery-btn {
+            flex: 1 1 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            border-radius: 10px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 0.8rem;
+            letter-spacing: 0.3px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        [data-tenant="burger-planet-main"] .bp-delivery-btn:active { opacity: 0.8; }
+        [data-tenant="burger-planet-main"] .bp-delivery-wolt  { background: #00c2e8; color: #00303a; }
+        [data-tenant="burger-planet-main"] .bp-delivery-glovo { background: #ffc244; color: #241900; }
+        [data-tenant="burger-planet-main"] .bp-delivery-bolt  { background: #34d186; color: #052414; }
+        @media (min-width: 760px) {
+            [data-tenant="burger-planet-main"] .bp-delivery-row { max-width: 478px; }
+        }
+
         @media (min-width: 760px) {
             /* Declared here, after every base rule: an override placed earlier
                loses to the later base declaration on source order. */
@@ -7863,6 +7902,14 @@
     </div>
 
     <div id="cat-bar" class="cat-bar">
+        <!-- Burger Planet only: delivery-app buttons, always visible inside the
+             sticky category bar. Hardcoded (not theme_config-driven) because these
+             three URLs are specific to this one tenant with no reuse elsewhere. -->
+        <div class="bp-delivery-row">
+            <a class="bp-delivery-btn bp-delivery-wolt" href="https://wolt.com/ka/geo/tbilisi/restaurant/burger-planett" target="_blank" rel="noopener">Wolt</a>
+            <a class="bp-delivery-btn bp-delivery-glovo" href="https://glovoapp.com/ka/ge/tbilisi/stores/ghost-burger-tbi" target="_blank" rel="noopener">Glovo</a>
+            <a class="bp-delivery-btn bp-delivery-bolt" href="https://food.bolt.eu/en/15-tbilisi/p/187522-burger-planet/" target="_blank" rel="noopener">Bolt</a>
+        </div>
         <div id="menu-groups" class="menu-groups" hidden></div>
         <div class="cat-scroll">
             <button type="button" class="cat-nav cat-nav-l" aria-label="Scroll categories left" hidden>&#8249;</button>
