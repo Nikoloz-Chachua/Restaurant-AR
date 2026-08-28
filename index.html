@@ -1014,6 +1014,23 @@
         }
         .mg-hero-tagline[hidden] { display: none; }
 
+        /* Burger Planet only: the tagline sat inline right under the H1 title,
+           which for this tenant lands mid-way down the hero photo, on top of
+           the ring/lettuce of the logo artwork itself -- busy background,
+           cramped next to the title. Pinned near the top instead (matching how
+           .mg-hero-scroll is already pinned near the bottom, same technique),
+           clear of the fixed lang/theme toggles, over the plainer top strip of
+           the photo. Taken out of the centered flex stack entirely so the logo
+           + title group also re-centers slightly tighter without it. */
+        [data-tenant="burger-planet-main"] .mg-hero-tagline {
+            position: absolute;
+            z-index: 2;
+            top: max(64px, calc(env(safe-area-inset-top, 0px) + 64px));
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 0;
+        }
+
         /* ── Reviews (theme_config.reviews_json) ──
            A JSON array of {name, stars, text}. Horizontal scroll-snap row —
            no carousel library, so it costs nothing on tenants that skip it. */
