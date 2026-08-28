@@ -12258,14 +12258,15 @@
                     } else if (thumbSrc) {
                         // Photo-only item: tap the image to expand it. In twin phone
                         // layout it opens the rich popup (name + photo + description +
-                        // price + add-to-cart); Monday Greens keeps the plain image.
-                        // Checked at click time, after the remote theme has set the
-                        // data-template / data-phone-layout attributes.
+                        // price + add-to-cart); Monday Greens and Burger Planet keep the
+                        // plain image. Checked at click time, after the remote theme has
+                        // set the data-template / data-tenant / data-phone-layout attributes.
                         thumbImg.addEventListener('click', e => {
                             if (document.documentElement.dataset.phoneLayout === 'twin') {
                                 e.stopPropagation();
                                 openLightbox(thumbSrc, itemName, item, globalIdx);
-                            } else if (document.documentElement.dataset.template === 'monday_greens') {
+                            } else if (document.documentElement.dataset.template === 'monday_greens'
+                                || document.documentElement.dataset.tenant === 'burger-planet-main') {
                                 e.stopPropagation();
                                 openLightbox(thumbSrc, itemName);
                             }
