@@ -7673,12 +7673,12 @@
         [data-tenant="burger-planet-main"][data-theme="day"] {
             --bg-image: url("https://lwdpegloznhpcecivhfy.supabase.co/storage/v1/object/public/thumbnails/burger-planet-main/bg-day.webp");
             --bg-size: 100% auto;
-            --bg-repeat: no-repeat;
+            --bg-repeat: repeat-y;
         }
         [data-tenant="burger-planet-main"][data-theme="night"] {
             --bg-image: url("https://lwdpegloznhpcecivhfy.supabase.co/storage/v1/object/public/thumbnails/burger-planet-main/bg-night.webp");
             --bg-size: 100% auto;
-            --bg-repeat: no-repeat;
+            --bg-repeat: repeat-y;
         }
         /* On a short, wide desktop viewport, body::before's default fixed
            positioning + cover sizing crammed the tall poster into one screen and
@@ -7687,7 +7687,13 @@
            instead of staying pinned lets the rest of the poster keep unfolding as
            you scroll down, instead of being frozen on one cropped frame. Needs its
            own positioned ancestor since absolute + inset:0 otherwise sizes to the
-           viewport just like fixed does. */
+           viewport just like fixed does.
+           A single 100%-wide copy of the poster is shorter than the actual page
+           (which keeps growing as items are added) on every viewport, badly so on
+           narrow phones, so it ran out partway down leaving flat color underneath.
+           repeat-y tiles it for as many screens as the menu turns out to be,
+           instead of stretching one copy and warping the round planets into
+           ovals to force-fit a height guessed today. */
         html[data-tenant="burger-planet-main"] { position: relative; }
         [data-tenant="burger-planet-main"] body::before {
             position: absolute;
