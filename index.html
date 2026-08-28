@@ -7672,13 +7672,26 @@
            there's nothing later in the cascade to fight with. */
         [data-tenant="burger-planet-main"][data-theme="day"] {
             --bg-image: url("https://lwdpegloznhpcecivhfy.supabase.co/storage/v1/object/public/thumbnails/burger-planet-main/bg-day.webp");
-            --bg-size: cover;
+            --bg-size: 100% auto;
             --bg-repeat: no-repeat;
         }
         [data-tenant="burger-planet-main"][data-theme="night"] {
             --bg-image: url("https://lwdpegloznhpcecivhfy.supabase.co/storage/v1/object/public/thumbnails/burger-planet-main/bg-night.webp");
-            --bg-size: cover;
+            --bg-size: 100% auto;
             --bg-repeat: no-repeat;
+        }
+        /* On a short, wide desktop viewport, body::before's default fixed
+           positioning + cover sizing crammed the tall poster into one screen and
+           cropped most of the planets off the sides. Scaling to 100% width (above)
+           already stops the side-cropping; making the layer scroll with the page
+           instead of staying pinned lets the rest of the poster keep unfolding as
+           you scroll down, instead of being frozen on one cropped frame. Needs its
+           own positioned ancestor since absolute + inset:0 otherwise sizes to the
+           viewport just like fixed does. */
+        html[data-tenant="burger-planet-main"] { position: relative; }
+        [data-tenant="burger-planet-main"] body::before {
+            position: absolute;
+            background-position: top center;
         }
         html[data-template="modern_cafe"] .mg-hero {
             position: relative;
