@@ -6020,6 +6020,34 @@
         #basket-waiter-btn:active { transform: scale(0.98); }
         #basket-waiter-btn:disabled { opacity: 0.55; cursor: default; }
 
+        /* Burger Planet only: no waiters, so "Show to staff" is demoted to a
+           small secondary option below the actual checkout path (the delivery
+           buttons). Kept, not removed -- pending a decision with the owner. */
+        .bp-basket-delivery { display: none; }
+        [data-tenant="burger-planet-main"] .bp-basket-delivery { display: block; width: 100%; }
+        [data-tenant="burger-planet-main"] .bp-basket-delivery-label {
+            margin: 0 0 8px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--dim);
+            text-align: center;
+        }
+        [data-tenant="burger-planet-main"] .bp-basket-delivery .bp-delivery-row {
+            max-width: none;
+            margin: 0;
+        }
+        [data-tenant="burger-planet-main"] #basket-waiter-btn {
+            width: auto;
+            align-self: center;
+            padding: 6px 14px;
+            font-size: 0.72rem;
+            letter-spacing: 1px;
+            gap: 6px;
+            opacity: 0.7;
+        }
+        [data-tenant="burger-planet-main"] #basket-waiter-btn svg { width: 13px; height: 13px; }
+
         /* ── Show-to-staff QR overlay ── */
         #waiter-overlay {
             position: fixed; inset: 0; z-index: 100000; /* above basket-panel (9000) — it opens from within the basket */
@@ -8161,6 +8189,18 @@
             <div class="basket-total-row">
                 <span id="basket-total-label">Total</span>
                 <span id="basket-total">0 ₾</span>
+            </div>
+            <!-- Burger Planet only: no waiters to show a basket to, so the actual
+                 path to an order is one of the delivery apps. The basket still
+                 works as a build-your-order step; this is what "checkout" means
+                 here instead. Hardcoded links, same as the cat-bar row. -->
+            <div class="bp-basket-delivery">
+                <p class="bp-basket-delivery-label">Ready to order? Continue on:</p>
+                <div class="bp-delivery-row">
+                    <a class="bp-delivery-btn bp-delivery-wolt" href="https://wolt.com/ka/geo/tbilisi/restaurant/burger-planett" target="_blank" rel="noopener">Wolt</a>
+                    <a class="bp-delivery-btn bp-delivery-glovo" href="https://glovoapp.com/ka/ge/tbilisi/stores/ghost-burger-tbi" target="_blank" rel="noopener">Glovo</a>
+                    <a class="bp-delivery-btn bp-delivery-bolt" href="https://food.bolt.eu/en/15-tbilisi/p/187522-burger-planet/" target="_blank" rel="noopener">Bolt</a>
+                </div>
             </div>
             <button id="basket-waiter-btn" type="button">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><line x1="14" y1="14" x2="14" y2="14.01"/><line x1="17" y1="14" x2="17" y2="14.01"/><line x1="20" y1="14" x2="20" y2="14.01"/><line x1="14" y1="17" x2="14" y2="17.01"/><line x1="17" y1="17" x2="17" y2="17.01"/><line x1="20" y1="17" x2="20" y2="17.01"/><line x1="14" y1="20" x2="14" y2="20.01"/><line x1="17" y1="20" x2="17" y2="20.01"/><line x1="20" y1="20" x2="20" y2="20.01"/></svg>
