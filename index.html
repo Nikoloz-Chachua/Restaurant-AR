@@ -7663,6 +7663,23 @@
             --bg-size: auto;
             --bg-repeat: no-repeat;
         }
+        /* Burger Planet only: a starfield backdrop behind the whole page (not just
+           the hero) -- modern_cafe's --bg-image is template-owned (applyRemoteTheme
+           deliberately skips bg_image/bg_size/bg_repeat from theme_config for this
+           template, see _bgOwnedByTemplate), so this has to be a real CSS override
+           rather than a CMS value. Wins on specificity over the rule above; the
+           remote-theme <style> block never re-sets --bg-image for this template, so
+           there's nothing later in the cascade to fight with. */
+        [data-tenant="burger-planet-main"][data-theme="day"] {
+            --bg-image: url("https://lwdpegloznhpcecivhfy.supabase.co/storage/v1/object/public/thumbnails/burger-planet-main/bg-day.webp");
+            --bg-size: cover;
+            --bg-repeat: no-repeat;
+        }
+        [data-tenant="burger-planet-main"][data-theme="night"] {
+            --bg-image: url("https://lwdpegloznhpcecivhfy.supabase.co/storage/v1/object/public/thumbnails/burger-planet-main/bg-night.webp");
+            --bg-size: cover;
+            --bg-repeat: no-repeat;
+        }
         html[data-template="modern_cafe"] .mg-hero {
             position: relative;
             width: 100vw;
