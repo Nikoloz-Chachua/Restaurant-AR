@@ -39,7 +39,7 @@ const GOOGLE_FONTS = [
   'Source Sans 3', 'Oswald', 'PT Serif', 'Merriweather',
 ]
 
-type ThemeTab = 'templates' | 'night' | 'day' | 'background' | 'fonts' | 'branding'
+type ThemeTab = 'templates' | 'night' | 'day' | 'background' | 'fonts' | 'branding' | 'announcement'
 
 function isColor(v: string) {
   return /^#[0-9a-fA-F]{3,8}$/.test(v) || v.startsWith('rgb')
@@ -295,6 +295,7 @@ export default function ThemePage() {
     { id: 'background', label: T.tabBackground },
     { id: 'fonts',     label: T.tabFonts },
     { id: 'branding',  label: T.tabBranding },
+    { id: 'announcement', label: T.tabAnnouncement },
   ].filter((item): item is { id: ThemeTab; label: string } => Boolean(item))
 
   if (!plan.loading && !plan.restaurantId) {
@@ -462,6 +463,34 @@ export default function ThemePage() {
                               upLabel={T.heroMoveUp} downLabel={T.heroMoveDown} emptyLabel={T.heroEmpty}
                               onPick={files => uploadHeroImages(files)}
                               onRemove={removeHeroImage} onMove={moveHeroImage} />
+            </>
+          )}
+          {tab === 'announcement' && (
+            <>
+              <div className="p-4 rounded-xl text-sm leading-6"
+                   style={{ background: 'var(--card)', border: '1px solid var(--border)', color: 'var(--dim)' }}>
+                {T.announcementDesc}
+              </div>
+              <ToggleRow label={T.announcementEnabled}
+                         checked={/^(1|true|on|yes)$/i.test((config.announcement_enabled ?? '').trim())}
+                         onChange={v => set('announcement_enabled', v ? 'true' : 'false')} />
+              <ImageUploadRow label={T.announcementPhoto} hint={T.announcementPhotoHint}
+                              value={config.announcement_photo_url ?? ''}
+                              uploading={uploadingKey === 'announcement_photo_url'}
+                              uploadLabel={T.uploadThumb} clearLabel={T.clearThumb}
+                              onPick={f => uploadImage('announcement_photo_url', f)}
+                              onClear={() => set('announcement_photo_url', '')} />
+              <BrandRow label={T.announcementDate} value={config.announcement_date ?? ''}
+                        placeholder={T.announcementDatePlaceholder}
+                        onChange={v => set('announcement_date', v)} />
+              <BrandRow label={T.announcementTime} value={config.announcement_time ?? ''}
+                        placeholder={T.announcementTimePlaceholder}
+                        onChange={v => set('announcement_time', v)} />
+              <TextAreaRow label={T.announcementTextEn} value={config.announcement_text ?? ''}
+                           onChange={v => set('announcement_text', v)} />
+              <TextAreaRow label={T.announcementTextKa} value={config.announcement_text_ka ?? ''}
+                           onChange={v => set('announcement_text_ka', v)} />
+              <p className="text-xs" style={{ color: 'var(--dim)' }}>{T.announcementRequiredHint}</p>
             </>
           )}
         </div>
@@ -644,12 +673,34 @@ function HeroGalleryRow({ label, hint, images, uploading, addLabel, removeLabel,
   )
 }
 
-function BrandRow({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function BrandRow({ label, value, placeholder, onChange }: { label: string; value: string; placeholder?: string; onChange: (v: string) => void }) {
   return (
     <div className="p-3 rounded-xl"
          style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
       <div className="text-xs mb-2 uppercase tracking-widest" style={{ color: 'var(--dim)' }}>{label}</div>
-      <input value={value} onChange={e => onChange(e.target.value)} />
+      <input value={value} placeholder={placeholder} onChange={e => onChange(e.target.value)} />
     </div>
+  )
+}
+
+function TextAreaRow({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="p-3 rounded-xl"
+         style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+      <div className="text-xs mb-2 uppercase tracking-widest" style={{ color: 'var(--dim)' }}>{label}</div>
+      <textarea value={value} onChange={e => onChange(e.target.value)} rows={4}
+                style={{ width: '100%', resize: 'vertical', fontFamily: 'inherit' }} />
+    </div>
+  )
+}
+
+function ToggleRow({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <label className="flex items-center gap-3 p-3 rounded-xl cursor-pointer"
+           style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+      <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)}
+             style={{ width: 18, height: 18 }} />
+      <span className="text-sm" style={{ color: 'var(--text)' }}>{label}</span>
+    </label>
   )
 }
