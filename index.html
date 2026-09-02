@@ -1888,6 +1888,54 @@
         [data-template="elegant_black"] .cat-pill.active {
             box-shadow: 0 7px 20px var(--glow);
         }
+
+        /* ── Elegant Black template: full-bleed interior-photo hero ──
+           Reuses the shared .mg-hero markup (same one Monday Greens/Burger Lions
+           use), so the admin panel's hero-image gallery drives it with no extra
+           wiring. Sits above the existing logo+title header rather than
+           replacing it, so branding is untouched -- this is purely a photo
+           lead-in. The veil fades to var(--bg) at the bottom so the breakout
+           band blends into the header instead of ending on a hard edge.
+           Empty hero_images/hero_image_url falls back to a plain warm-umber
+           band; currently only Corner By Eleven uses this template. */
+        [data-template="elegant_black"] .mg-hero {
+            display: flex;
+            position: relative;
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+            min-height: var(--mg-hero-h, 56svh);
+            overflow: hidden;
+            isolation: isolate;
+        }
+        [data-template="elegant_black"] .mg-hero-photo {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-color: #0C0906;
+            background-image: var(--hero-image, none);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        [data-template="elegant_black"] .mg-hero-next {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity var(--mg-hero-fade, 1200ms) ease-in-out;
+        }
+        [data-template="elegant_black"] .mg-hero-veil {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background:
+                radial-gradient(70% 55% at 50% 30%, rgba(0,0,0,0.18) 0%, transparent 70%),
+                linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, transparent 30%, transparent 55%, var(--bg) 100%);
+        }
         [data-template="mediterranean_air"] .thumb-wrap,
         [data-template="soft_cafe"] .thumb-wrap {
             background:
@@ -11550,7 +11598,7 @@
         // Templates whose hero has the crossfade layer (.mg-hero-next) in their CSS.
         // A template not listed here still shows hero_images[0] as a still photo.
         const HERO_GALLERY_TEMPLATES = new Set(['monday_greens', 'burger_lions', 'respublika_grill', 'iakobis_garden',
-            'luxury_dining', 'social_dining', 'modern_cafe']);
+            'luxury_dining', 'social_dining', 'modern_cafe', 'elegant_black']);
 
         // Templates whose hero starts aria-hidden in the markup and is only
         // revealed once its photo is known.
