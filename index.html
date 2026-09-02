@@ -1985,20 +1985,50 @@
             [data-template="elegant_black"] .mg-hero {
                 min-height: var(--mg-hero-h, 44svh);
             }
-            /* Below 640px every tenant uses the compact row card (108px thumb
-               beside name, full-height column to its right) -- see the plain
-               .menu-item rule above. None of Corner's items have a
-               description, so that right-hand column was just an empty
-               paragraph pushing price+cart all the way to the card's bottom,
-               leaving the row beside the name blank and the card taller than
-               it needs to be. Packing the column's content to the top puts
-               the price right beside the name instead. */
-            [data-template="elegant_black"] .ingredients:empty { display: none; }
-            [data-template="elegant_black"] .menu-item:not(.no-image) .item-right {
-                justify-content: flex-start;
-            }
-            [data-template="elegant_black"] .menu-item:not(.no-image) .item-actions {
-                margin-top: 2px;
+        }
+        /* Below 640px every other tenant falls back to the compact row card
+           (108px thumb beside the name, a tall column to its right) -- see the
+           plain .menu-item rule above. Corner's dish names are full combo
+           descriptions ("Lobio, pickled vegetables, cornbread, Georgian
+           salad"), not short labels, so that 108px column wrapped them 4-5
+           lines tall with a big empty gap beside the photo (none of Corner's
+           items have a description to fill it) and a still-taller card below.
+           Applying the same photo-on-top card used at >=640px at every width
+           instead -- proven all session on desktop -- fixes both: names get
+           the full card width to wrap in 1-2 lines, and price+cart sit
+           directly under the photo with no dead column. Unconditional (not
+           media-gated) since it should win at every width, not just mobile;
+           only Corner uses this template today. */
+        [data-template="elegant_black"] .menu-item:not(.no-image) {
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            overflow: hidden;
+        }
+        [data-template="elegant_black"] .menu-item:not(.no-image) .item-left {
+            order: 1;
+            width: 100%;
+        }
+        [data-template="elegant_black"] .menu-item:not(.no-image) .item-left .thumb-wrap {
+            width: 100%;
+            height: 220px;
+            min-height: unset;
+            border-radius: 16px 16px 0 0;
+            border-bottom: none;
+        }
+        [data-template="elegant_black"] .menu-item:not(.no-image) .item-name {
+            order: 2;
+            padding: 10px 14px 4px;
+        }
+        [data-template="elegant_black"] .menu-item:not(.no-image) .item-right {
+            order: 3;
+            padding: 4px 14px 14px;
+            flex: 1;
+        }
+        [data-template="elegant_black"] .ingredients:empty { display: none; }
+        @media (min-width: 1100px) {
+            [data-template="elegant_black"] .menu-item:not(.no-image) .item-left .thumb-wrap {
+                height: 240px;
             }
         }
         [data-template="mediterranean_air"] .thumb-wrap,
