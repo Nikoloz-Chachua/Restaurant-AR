@@ -1114,6 +1114,7 @@
             gap: 14px;
         }
         .mg-info-hours[hidden], .mg-info-line[hidden], .mg-info-delivery[hidden],
+        .mg-info-review[hidden],
         .mg-info-social[hidden], [data-info-fb][hidden], [data-info-ig][hidden] { display: none; }
         .mg-info-label {
             display: block;
@@ -1141,6 +1142,7 @@
         .mg-info-delivery {
             display: inline-flex;
             align-items: center;
+            gap: 8px;
             justify-content: center;
             padding: 10px 18px;
             border-radius: 999px;
@@ -1153,6 +1155,27 @@
             transition: transform 0.15s;
         }
         .mg-info-delivery:active { transform: scale(0.97); }
+        .mg-info-delivery-icon { width: 18px; height: 18px; border-radius: 4px; object-fit: contain; }
+        .mg-info-delivery-icon[hidden] { display: none; }
+        .mg-info-review {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: center;
+            padding: 9px 16px;
+            border-radius: 999px;
+            background: none;
+            border: 1.5px solid var(--accent);
+            color: var(--accent);
+            font-weight: 800;
+            font-size: 0.8rem;
+            text-decoration: none;
+            transition: transform 0.15s, background 0.15s, color 0.15s;
+        }
+        .mg-info-review:active { transform: scale(0.97); }
+        @media (hover: hover) {
+            .mg-info-review:hover { background: var(--accent); color: var(--accent-text, #fff); }
+        }
         .mg-info-social { display: flex; gap: 10px; }
         .mg-info-social a {
             display: inline-flex;
@@ -8114,11 +8137,12 @@
     </section>
 
     <!-- Reviews and restaurant-info footer. Both are driven entirely by
-         theme_config (reviews_json, site_phone*, delivery_url, site_hours_*,
-         site_address*, site_footer_note*, facebook_url, instagram_url) and stay
-         hidden -- via the `hidden` attribute on the section/individual rows --
-         for any tenant that sets none of it, so this is a no-op everywhere
-         except a tenant that opts in. -->
+         theme_config (reviews_json, site_phone*, delivery_url, delivery_icon,
+         site_hours_*, site_address*, site_footer_note*, facebook_url,
+         instagram_url, google_review_url) and stay hidden -- via the `hidden`
+         attribute on the section/individual rows -- for any tenant that sets
+         none of it, so this is a no-op everywhere except a tenant that opts
+         in. -->
     <section class="mg-reviews" data-reviews-section hidden aria-label="Reviews">
         <h2 class="mg-reviews-title" data-reviews-title></h2>
         <div class="mg-reviews-track" data-reviews-track></div>
@@ -8142,7 +8166,14 @@
                 </p>
             </div>
             <div class="mg-info-actions">
-                <a class="mg-info-delivery" data-info-delivery href="#" target="_blank" rel="noopener" hidden></a>
+                <a class="mg-info-delivery" data-info-delivery href="#" target="_blank" rel="noopener" hidden>
+                    <img class="mg-info-delivery-icon" data-info-delivery-icon src="" alt="" hidden>
+                    <span data-info-delivery-text></span>
+                </a>
+                <a class="mg-info-review" data-info-review href="#" target="_blank" rel="noopener" hidden>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.06 6.6.77-4.9 4.55 1.28 6.55L12 17.13l-5.88 3.3 1.28-6.55-4.9-4.55 6.6-.77L12 2.5z"/></svg>
+                    <span data-info-review-text></span>
+                </a>
                 <div class="mg-info-social" data-info-social hidden>
                     <a data-info-fb href="#" target="_blank" rel="noopener" aria-label="Facebook" hidden>
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.16 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.88h2.78l-.44 2.91h-2.34V22c4.78-.78 8.44-4.94 8.44-9.94Z"/></svg>
@@ -10416,7 +10447,24 @@
                     if (deliveryUrl) {
                         anyVisible = true;
                         deliveryEl.href = deliveryUrl;
-                        deliveryEl.textContent = pick('delivery_label') || _byLang('Delivery', 'მიწოდება', 'Доставка');
+                        document.querySelector('[data-info-delivery-text]').textContent =
+                            pick('delivery_label') || _byLang('Delivery', 'მიწოდება', 'Доставка');
+                        const deliveryIconUrl = _cleanText(cfg.delivery_icon);
+                        const deliveryIconEl = document.querySelector('[data-info-delivery-icon]');
+                        deliveryIconEl.hidden = !deliveryIconUrl;
+                        if (deliveryIconUrl) deliveryIconEl.src = deliveryIconUrl;
+                    }
+                }
+
+                const reviewEl = document.querySelector('[data-info-review]');
+                if (reviewEl) {
+                    const reviewUrl = _cleanText(cfg.google_review_url);
+                    reviewEl.hidden = !reviewUrl;
+                    if (reviewUrl) {
+                        anyVisible = true;
+                        reviewEl.href = reviewUrl;
+                        document.querySelector('[data-info-review-text]').textContent =
+                            pick('google_review_label') || _byLang('Write a Review', 'შეაფასეთ', 'Оставить отзыв');
                     }
                 }
 
