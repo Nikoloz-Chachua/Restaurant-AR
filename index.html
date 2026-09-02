@@ -1936,6 +1936,67 @@
                 radial-gradient(70% 55% at 50% 30%, rgba(0,0,0,0.18) 0%, transparent 70%),
                 linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, transparent 30%, transparent 55%, var(--bg) 100%);
         }
+        /* Logo overlaid on the photo itself, plus a scroll cue -- on a phone the
+           hero alone can fill the first screen, so without these a guest sees
+           nothing but a photo gallery until they scroll. The header below still
+           carries the "CORNER BY ELEVEN" title text; its small square logo is
+           now redundant with this one and hidden to avoid showing the same
+           mark twice. */
+        [data-template="elegant_black"] .mg-hero-logo {
+            position: relative;
+            z-index: 3;
+            width: min(34vw, 160px);
+            height: auto;
+            border-radius: 8px;
+            filter: drop-shadow(0 6px 20px rgba(0,0,0,0.55));
+            animation: eb-hero-rise 0.85s cubic-bezier(0.2,0.7,0.2,1) both;
+        }
+        [data-template="elegant_black"] .mg-hero-logo:not([src]) { display: none; }
+        @keyframes eb-hero-rise {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: none; }
+        }
+        [data-template="elegant_black"] .mg-hero-scroll {
+            position: absolute;
+            bottom: max(18px, env(safe-area-inset-bottom, 18px));
+            z-index: 3;
+            color: var(--accent);
+            opacity: 0.9;
+        }
+        [data-template="elegant_black"] .header .tenant-logo {
+            display: none !important;
+        }
+        /* Photo-only items: tap the image to expand it (see lightbox JS). */
+        [data-template="elegant_black"] .thumb-img {
+            cursor: zoom-in;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            [data-template="elegant_black"] .mg-hero-logo { animation: none; }
+        }
+        /* Mobile: the interior photos are roughly square, so the same height
+           used on wide screens crops them into a tight, "zoomed in" vertical
+           sliver. Shorter here lets `cover` keep most of each photo's width
+           in frame. */
+        @media (max-width: 639px) {
+            [data-template="elegant_black"] .mg-hero {
+                min-height: var(--mg-hero-h, 44svh);
+            }
+            /* Below 640px every tenant uses the compact row card (108px thumb
+               beside name, full-height column to its right) -- see the plain
+               .menu-item rule above. None of Corner's items have a
+               description, so that right-hand column was just an empty
+               paragraph pushing price+cart all the way to the card's bottom,
+               leaving the row beside the name blank and the card taller than
+               it needs to be. Packing the column's content to the top puts
+               the price right beside the name instead. */
+            [data-template="elegant_black"] .ingredients:empty { display: none; }
+            [data-template="elegant_black"] .menu-item:not(.no-image) .item-right {
+                justify-content: flex-start;
+            }
+            [data-template="elegant_black"] .menu-item:not(.no-image) .item-actions {
+                margin-top: 2px;
+            }
+        }
         [data-template="mediterranean_air"] .thumb-wrap,
         [data-template="soft_cafe"] .thumb-wrap {
             background:
@@ -12424,7 +12485,8 @@
                         // data-template / data-tenant / data-phone-layout attributes.
                         thumbImg.addEventListener('click', e => {
                             if (document.documentElement.dataset.phoneLayout === 'twin'
-                                || document.documentElement.dataset.tenant === 'burger-planet-main') {
+                                || document.documentElement.dataset.tenant === 'burger-planet-main'
+                                || document.documentElement.dataset.template === 'elegant_black') {
                                 e.stopPropagation();
                                 openLightbox(thumbSrc, itemName, item, globalIdx);
                             } else if (document.documentElement.dataset.template === 'monday_greens') {
