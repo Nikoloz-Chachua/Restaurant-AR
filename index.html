@@ -1114,8 +1114,18 @@
             gap: 14px;
         }
         .mg-info-hours[hidden], .mg-info-line[hidden], .mg-info-delivery[hidden],
-        .mg-info-review[hidden],
+        .mg-info-review[hidden], .mg-info-map-link[hidden],
         .mg-info-social[hidden], [data-info-fb][hidden], [data-info-ig][hidden] { display: none; }
+        .mg-info-map-link {
+            display: inline-flex;
+            vertical-align: middle;
+            margin-left: 6px;
+            color: var(--accent);
+            opacity: 0.85;
+        }
+        @media (hover: hover) {
+            .mg-info-map-link:hover { opacity: 1; }
+        }
         .mg-info-label {
             display: block;
             font-size: 0.68rem;
@@ -8281,7 +8291,8 @@
 
     <!-- Reviews and restaurant-info footer. Both are driven entirely by
          theme_config (reviews_json, site_phone*, delivery_url, delivery_icon,
-         site_hours_*, site_address*, site_footer_note*, facebook_url,
+         delivery2_url, delivery2_label, delivery2_icon, site_hours_*,
+         site_address*, site_map_url, site_footer_note*, facebook_url,
          instagram_url, google_review_url) and stay hidden -- via the `hidden`
          attribute on the section/individual rows -- for any tenant that sets
          none of it, so this is a no-op everywhere except a tenant that opts
@@ -8302,6 +8313,9 @@
                 <p class="mg-info-line" data-info-address-row hidden>
                     <span class="mg-info-label" data-info-address-label></span>
                     <span data-info-address></span>
+                    <a class="mg-info-map-link" data-info-map-link href="#" target="_blank" rel="noopener" aria-label="View on map" hidden>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </a>
                 </p>
                 <p class="mg-info-line" data-info-phone-row hidden>
                     <span class="mg-info-label" data-info-phone-label></span>
@@ -8312,6 +8326,10 @@
                 <a class="mg-info-delivery" data-info-delivery href="#" target="_blank" rel="noopener" hidden>
                     <img class="mg-info-delivery-icon" data-info-delivery-icon src="" alt="" hidden>
                     <span data-info-delivery-text></span>
+                </a>
+                <a class="mg-info-delivery" data-info-delivery-2 href="#" target="_blank" rel="noopener" hidden>
+                    <img class="mg-info-delivery-icon" data-info-delivery-2-icon src="" alt="" hidden>
+                    <span data-info-delivery-2-text></span>
                 </a>
                 <a class="mg-info-review" data-info-review href="#" target="_blank" rel="noopener" hidden>
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.06 6.6.77-4.9 4.55 1.28 6.55L12 17.13l-5.88 3.3 1.28-6.55-4.9-4.55 6.6-.77L12 2.5z"/></svg>
@@ -10565,6 +10583,10 @@
                         document.querySelector('[data-info-address-label]').textContent =
                             pick('site_address_label') || _byLang('Address', 'მისამართი', 'Адрес');
                         document.querySelector('[data-info-address]').textContent = address;
+                        const mapUrl = _cleanText(cfg.site_map_url);
+                        const mapLinkEl = document.querySelector('[data-info-map-link]');
+                        mapLinkEl.hidden = !mapUrl;
+                        if (mapUrl) mapLinkEl.href = mapUrl;
                     }
                 }
 
@@ -10596,6 +10618,22 @@
                         const deliveryIconEl = document.querySelector('[data-info-delivery-icon]');
                         deliveryIconEl.hidden = !deliveryIconUrl;
                         if (deliveryIconUrl) deliveryIconEl.src = deliveryIconUrl;
+                    }
+                }
+
+                const delivery2El = document.querySelector('[data-info-delivery-2]');
+                if (delivery2El) {
+                    const delivery2Url = _cleanText(cfg.delivery2_url);
+                    delivery2El.hidden = !delivery2Url;
+                    if (delivery2Url) {
+                        anyVisible = true;
+                        delivery2El.href = delivery2Url;
+                        document.querySelector('[data-info-delivery-2-text]').textContent =
+                            pick('delivery2_label') || _byLang('Delivery', 'მიწოდება', 'Доставка');
+                        const delivery2IconUrl = _cleanText(cfg.delivery2_icon);
+                        const delivery2IconEl = document.querySelector('[data-info-delivery-2-icon]');
+                        delivery2IconEl.hidden = !delivery2IconUrl;
+                        if (delivery2IconUrl) delivery2IconEl.src = delivery2IconUrl;
                     }
                 }
 
