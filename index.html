@@ -1832,6 +1832,15 @@
             letter-spacing: 0.3px;
             font-size: 0.9rem;
         }
+        [data-tenant="food-market-main"] .menu-groups { max-width: 450px; }
+        [data-tenant="food-market-main"] .group-btn {
+            min-width: 0;
+            padding: 9px 5px;
+            font-size: 0.78rem;
+            letter-spacing: 0.2px;
+            text-transform: none;
+            line-height: 1.15;
+        }
 
         /* Sticky category bar — after you scroll past the hero it stays pinned to
            the top so diners can switch categories at any point. Scoped to the
@@ -9615,6 +9624,14 @@
             const brandSlug = brand?.slug || document.documentElement.dataset.brandSlug || '';
             return restaurant_slug === _PIPES_RESTAURANT_SLUG && brandSlug === _PIPES_BRAND_SLUG;
         }
+        function _isFoodMarketTenant() {
+            const tenant = window.__tenant || _tenant || {};
+            return (tenant.restaurant_slug || _tenantSlugFromHost()) === 'food-market-main';
+        }
+        function _foodMarketVisibleCategory(name) {
+            if (!_isFoodMarketTenant()) return _cleanText(name);
+            return _cleanText(name).replace(/^(?:Georgian|Thai|Japanese|Drinks|ქართული|ტაილანდური|იაპონური|სასმელები)\s+—\s+/, '');
+        }
         function _isMingleyardTenant() {
             return document.documentElement.dataset.tenant === 'social-dining'
                 && document.documentElement.dataset.template === 'social_dining';
@@ -10130,6 +10147,11 @@
                 && _tenantSlugFromHost() === _PIPES_RESTAURANT_SLUG
                 && new URLSearchParams(location.search).get('fixture') === 'pipes';
         }
+        function _foodMarketFixtureRequested() {
+            return _isLocalhost()
+                && _tenantSlugFromHost() === 'food-market-main'
+                && new URLSearchParams(location.search).get('fm_catalogue') === '1';
+        }
         let _baomaFixturePromise = null;
         async function _loadBaomaFixture() {
             if (!_baomaFixtureRequested()) return null;
@@ -10166,19 +10188,33 @@
             }
             return _pipesFixturePromise;
         }
+        let _foodMarketFixturePromise = null;
+        async function _loadFoodMarketFixture() {
+            if (!_foodMarketFixtureRequested()) return null;
+            if (!_foodMarketFixturePromise) {
+                _foodMarketFixturePromise = fetch('./foods/food-market-full-catalogue.json', { cache: 'no-store' })
+                    .then(r => {
+                        if (!r.ok) throw new Error('food market fixture ' + r.status);
+                        return r.json();
+                    });
+            }
+            return _foodMarketFixturePromise;
+        }
         const _requestedTenantSlug = _tenantSlugFromHost();
         const _previewAccessAllowed = true;
-        const _analyticsEnabled = !_baomaFixtureRequested() && !_mugsyFixtureRequested() && !_pipesFixtureRequested();
+        const _analyticsEnabled = !_baomaFixtureRequested() && !_mugsyFixtureRequested() && !_pipesFixtureRequested() && !_foodMarketFixtureRequested();
         _applyTenantFavicon(_requestedTenantSlug);
         async function _resolveTenant() {
             if (_tenant) return _tenant;
             const slug = _tenantSlugFromHost();
             if ((_baomaFixtureRequested() && slug === _BAOMA_FIXTURE_SLUG) ||
                 (_mugsyFixtureRequested() && slug === _MUGSY_RESTAURANT_SLUG) ||
-                (_pipesFixtureRequested() && slug === _PIPES_RESTAURANT_SLUG)) {
+                (_pipesFixtureRequested() && slug === _PIPES_RESTAURANT_SLUG) ||
+                (_foodMarketFixtureRequested() && slug === 'food-market-main')) {
                 const fixture = _pipesFixtureRequested()
                     ? await _loadPipesFixture()
-                    : (_mugsyFixtureRequested() ? await _loadMugsyFixture() : await _loadBaomaFixture());
+                    : (_mugsyFixtureRequested() ? await _loadMugsyFixture()
+                        : (_foodMarketFixtureRequested() ? await _loadFoodMarketFixture() : await _loadBaomaFixture()));
                 const restaurant = fixture.restaurant;
                 const brand = Array.isArray(restaurant.brands) ? restaurant.brands[0] : restaurant.brands;
                 _tenant = {
@@ -10920,7 +10956,7 @@
             if (hideUIBtn)   hideUIBtn.textContent   = (window.XR?.isUIHidden?.()) ? u.showUI : u.hideUI;
             if (window.__categories) {
                 window.__categories.forEach(cat => {
-                    const label = _cleanText(_byLang(cat.name, cat.name_ka, cat.name_ru));
+                    const label = _foodMarketVisibleCategory(_byLang(cat.name, cat.name_ka, cat.name_ru));
                     const header = document.querySelector(`.category-header[data-cat-name="${CSS.escape(cat.name)}"]`);
                     if (header) header.textContent = label;
                     const pill = document.querySelector(`.cat-pill[data-cat="${CSS.escape(cat.name)}"]`);
@@ -12115,7 +12151,8 @@
                     ? await _loadMugsyFixture()
                     : (_baomaFixtureRequested()
                         ? await _loadBaomaFixture()
-                        : (_pipesFixtureRequested() ? await _loadPipesFixture() : null));
+                        : (_pipesFixtureRequested() ? await _loadPipesFixture()
+                            : (_foodMarketFixtureRequested() ? await _loadFoodMarketFixture() : null)));
                 const data = fixture
                     ? fixture.theme_config
                     : await _supaSelect(`theme_config?select=key,value&restaurant_id=eq.${tenant.restaurant_id}`);
@@ -12347,7 +12384,8 @@
                         ? await _loadMugsyFixture()
                         : (_baomaFixtureRequested()
                             ? await _loadBaomaFixture()
-                            : (_pipesFixtureRequested() ? await _loadPipesFixture() : null));
+                            : (_pipesFixtureRequested() ? await _loadPipesFixture()
+                                : (_foodMarketFixtureRequested() ? await _loadFoodMarketFixture() : null)));
                     const data = fixture
                         ? fixture.menu_items
                         : await _supaSelect(
@@ -12524,11 +12562,21 @@
             // Active only when the tenant configured drink_categories. When on, the
             // menu is split into two top-level groups; a category is "drink" if its
             // English name is in the configured set, otherwise "food".
-            let _activeGroup = (window.__menuGroup === 'drink') ? 'drink' : 'food';
-            const _groupingOn = () => !!(window.__drinkCats && window.__drinkCats.size);
-            const _groupOf = (catName) =>
-                (window.__drinkCats && window.__drinkCats.has(String(catName || '').toLowerCase()))
-                    ? 'drink' : 'food';
+            const _fmGroupFromQuery = () => {
+                const value = new URLSearchParams(location.search).get('menu');
+                return ['georgian', 'asian', 'drinks'].includes(value) ? value : 'georgian';
+            };
+            let _activeGroup = _isFoodMarketTenant() ? _fmGroupFromQuery() : ((window.__menuGroup === 'drink') ? 'drink' : 'food');
+            const _groupingOn = () => _isFoodMarketTenant() || !!(window.__drinkCats && window.__drinkCats.size);
+            const _groupOf = (catName) => {
+                if (_isFoodMarketTenant()) {
+                    const prefix = String(catName || '').split('—')[0].trim();
+                    if (prefix === 'Drinks') return 'drinks';
+                    if (prefix === 'Thai' || prefix === 'Japanese') return 'asian';
+                    return 'georgian';
+                }
+                return (window.__drinkCats && window.__drinkCats.has(String(catName || '').toLowerCase())) ? 'drink' : 'food';
+            };
 
             function _arFeaturedText() {
                 return window.__lang === 'ka'
@@ -12573,7 +12621,7 @@
                 header.className = 'category-header';
                 header.dataset.catName   = cat.name;
                 header.dataset.catNameKa = cat.name_ka;
-                header.textContent = _cleanText(_byLang(cat.name, cat.name_ka, cat.name_ru));
+                header.textContent = _foodMarketVisibleCategory(_byLang(cat.name, cat.name_ka, cat.name_ru));
                 return header;
             }
 
@@ -12833,7 +12881,7 @@
                         if (entries.length) list.appendChild(renderCategorySection(selected, entries, true));
                     }
                 } else {
-                    renderARFeaturedBlock(list);
+                    if (!_isFoodMarketTenant()) renderARFeaturedBlock(list);
                     renderMostOrderedBlock(list);
                     // Every category keeps ALL its items (3D ones included), in menu order —
                     // a 3D dish appears both in the virtual 3D block above and here. When
@@ -12889,7 +12937,7 @@
                 pill.dataset.catKa  = cat.name_ka;
                 pill.dataset.catRu  = cat.name_ru;
                 const label = _byLang(cat.name, cat.name_ka, cat.name_ru);
-                pill.textContent    = _cleanText(label);
+                pill.textContent    = _foodMarketVisibleCategory(label);
                 filterDiv.appendChild(pill);
             });
 
@@ -12928,7 +12976,7 @@
                         p.textContent = '3D';
                     } else {
                         const name = lang === 'ka' ? p.dataset.catKa : p.dataset.cat;
-                        p.textContent = _cleanText(name);
+                        p.textContent = _foodMarketVisibleCategory(name);
                     }
                 });
             };
@@ -12966,16 +13014,22 @@
 
             // ── Food / Drinks group switch ──────────────────────────────
             const groupsDiv = document.getElementById('menu-groups');
-            const _groupLabels = (lang) => lang === 'ka'
-                ? { food: 'საკვები', drink: 'სასმელები' }
-                : lang === 'ru'
-                    ? { food: 'Еда', drink: 'Напитки' }
-                    : { food: 'Food', drink: 'Drinks' };
+            const _groupKeys = () => _isFoodMarketTenant() ? ['georgian', 'asian', 'drinks'] : ['food', 'drink'];
+            const _groupLabels = (lang) => {
+                if (_isFoodMarketTenant()) return lang === 'ka'
+                    ? { georgian: 'ქართული და სხვა', asian: 'აზიური (ტაილანდური + იაპონური)', drinks: 'სასმელები' }
+                    : { georgian: 'Georgian & More', asian: 'Asian (Thai + Japanese)', drinks: 'Drinks' };
+                return lang === 'ka'
+                    ? { food: 'საკვები', drink: 'სასმელები' }
+                    : lang === 'ru'
+                        ? { food: 'Еда', drink: 'Напитки' }
+                        : { food: 'Food', drink: 'Drinks' };
+            };
 
             function _renderGroupToggle() {
                 const lab = _groupLabels(window.__lang);
                 groupsDiv.innerHTML = '';
-                ['food', 'drink'].forEach(g => {
+                _groupKeys().forEach(g => {
                     const b = document.createElement('button');
                     b.className = 'group-btn' + (g === _activeGroup ? ' active' : '');
                     b.dataset.group = g;
@@ -13001,9 +13055,14 @@
             }
 
             function _setGroup(g) {
-                if ((g !== 'food' && g !== 'drink') || g === _activeGroup) return;
+                if (!_groupKeys().includes(g) || g === _activeGroup) return;
                 _activeGroup = g;
                 window.__menuGroup = g;
+                if (_isFoodMarketTenant()) {
+                    const url = new URL(location.href);
+                    url.searchParams.set('menu', g);
+                    history.replaceState(history.state, '', url);
+                }
                 document.querySelectorAll('.group-btn').forEach(b => b.classList.toggle('active', b.dataset.group === g));
                 _updateGroupPillVisibility();
                 applyFilter('');   // reset to "All" within the new group and re-render
@@ -13026,7 +13085,9 @@
                     if (!_filterIsValid(_activeFilter)) applyFilter('');
                     return;
                 }
-                _activeGroup = (window.__menuGroup === 'drink') ? 'drink' : 'food';
+                _activeGroup = _isFoodMarketTenant()
+                    ? _fmGroupFromQuery()
+                    : ((window.__menuGroup === 'drink') ? 'drink' : 'food');
                 _renderGroupToggle();
                 groupsDiv.hidden = false;
                 _updateGroupPillVisibility();
