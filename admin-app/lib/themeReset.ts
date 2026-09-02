@@ -1,7 +1,11 @@
 import { TEMPLATE_PRESETS, type StarterTemplateKey, type ThemeConfig } from './themePresets.ts'
 import type { RoleId } from './usePlan.ts'
 
-export const BRANDING_KEYS = ['site_name', 'site_name_ka', 'logo_url', 'hero_logo_url', 'hero_image_url', 'hero_images'] as const
+export const BRANDING_KEYS = [
+  'site_name', 'site_name_ka', 'logo_url', 'hero_logo_url', 'hero_image_url', 'hero_images',
+  'announcement_enabled', 'announcement_photo_url', 'announcement_date', 'announcement_time',
+  'announcement_text', 'announcement_text_ka',
+] as const
 
 const MONDAY_GREENS_APPROVED_THEME = Object.freeze({
   night_bg: '#052529', night_bg2: '#052529', night_card: '#0c2029', night_card2: '#0b5e75', night_border: 'rgba(34,211,238,0.22)',
