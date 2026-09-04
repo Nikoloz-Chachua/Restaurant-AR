@@ -2112,8 +2112,43 @@
                 var(--thumb-bg);
         }
 
-        /* ── Monday Greens template: full-bleed hero photo + logo ── */
+        /* Every template accepts the same hero media. Templates below only change
+           its art direction; a configured image reveals this shared fallback hero. */
         .mg-hero { display: none; }
+        html[data-generic-hero="true"] .mg-hero {
+            position: relative;
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+            min-height: var(--mg-hero-h, min(52svh, 520px));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+        html[data-generic-hero="true"] .mg-hero-photo,
+        html[data-generic-hero="true"] .mg-hero-next {
+            position: absolute; inset: 0; z-index: 0;
+            background-image: var(--hero-image, none);
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        html[data-generic-hero="true"] .mg-hero-next { opacity: 0; pointer-events: none; }
+        html[data-generic-hero="true"] .mg-hero-veil {
+            position: absolute; inset: 0; z-index: 1;
+            background: linear-gradient(180deg, rgba(0,0,0,0.16), rgba(0,0,0,0.62));
+        }
+        html[data-generic-hero="true"] .mg-hero-logo,
+        html[data-generic-hero="true"] .mg-hero-brand,
+        html[data-generic-hero="true"] .mg-hero-tagline { position: relative; z-index: 2; }
+        html[data-generic-hero="true"] .mg-hero-logo { max-width: min(58vw, 360px); max-height: 180px; object-fit: contain; }
+        html[data-generic-hero="true"] .mg-hero-brand { color: #fff; font-size: clamp(2.25rem, 9vw, 4.5rem); text-shadow: 0 3px 18px rgba(0,0,0,0.62); }
+        html[data-generic-hero="true"] .mg-hero-tagline { color: rgba(255,255,255,0.9); max-width: min(88vw, 560px); }
+        html[data-generic-hero="true"] .mg-hero-scroll { position: absolute; z-index: 2; bottom: 22px; color: #fff; }
+        /* ── Monday Greens template: full-bleed hero photo + logo ── */
         [data-template="monday_greens"] .mg-hero {
             position: relative;
             width: 100vw;
@@ -11883,6 +11918,10 @@
         // revealed once its photo is known.
         const HERO_REVEAL_TEMPLATES = new Set(['luxury_dining', 'social_dining']);
 
+        // Templates with their own dedicated hero shell still receive the same uploaded
+        // image, but do not also render the shared hero above it.
+        const HERO_NATIVE_SHELL_TEMPLATES = new Set(['baoma', 'mugsy_street_diner', 'pipes_fabrika']);
+
         // FOOD | DRINKS split. A tenant opts in by listing its drink category
         // names in theme_config.drink_categories; an empty list means no switch.
         //
@@ -12302,6 +12341,8 @@
                 const heroGallery = _parseHeroImages(cfg.hero_images);
                 const heroSingle = _safeAssetUrl(cfg.hero_image_url);
                 const heroShots = heroGallery.length ? heroGallery : (heroSingle ? [heroSingle] : []);
+                document.documentElement.dataset.heroImage = heroShots.length ? 'true' : 'false';
+                document.documentElement.dataset.genericHero = heroShots.length && !HERO_NATIVE_SHELL_TEMPLATES.has(templateKey) ? 'true' : 'false';
                 if (heroShots.length) {
                     document.documentElement.style.setProperty('--hero-image', `url("${heroShots[0]}")`);
                 }

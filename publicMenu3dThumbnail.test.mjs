@@ -46,6 +46,13 @@ test('3D thumbnail frame clips media without stretching on phone and wider layou
   assert.match(html, /\[data-phone-layout="twin"\] \.thumb-wrap \.thumb-img,\s*\n\s*\[data-phone-layout="twin"\] \.thumb-wrap model-viewer \{[\s\S]*?height:\s*100%;/)
 })
 
+test('a configured hero image is available to every shared-template tenant', () => {
+  assert.match(html, /html\[data-generic-hero="true"\] \.mg-hero \{[\s\S]*?display:\s*flex;/)
+  assert.match(html, /document\.documentElement\.dataset\.heroImage = heroShots\.length \? 'true' : 'false';/)
+  assert.match(html, /document\.documentElement\.dataset\.genericHero = heroShots\.length && !HERO_NATIVE_SHELL_TEMPLATES\.has\(templateKey\) \? 'true' : 'false';/)
+  assert.match(html, /\.mg-hero-photo \{[\s\S]*?background-image:\s*var\(--hero-image, none\)/)
+})
+
 test('an explicit unresolved tenant never leaks the shared fallback menu', () => {
   const buildMenuBlock = html.match(/async function buildMenu\(\) \{([\s\S]*?)\/\/ Apply remote theme in parallel/)
   assert.ok(buildMenuBlock, 'Missing buildMenu implementation')
