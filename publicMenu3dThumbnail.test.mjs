@@ -45,3 +45,10 @@ test('3D thumbnail frame clips media without stretching on phone and wider layou
   assert.match(html, /\[data-phone-layout="twin"\] \.thumb-wrap \{[\s\S]*?aspect-ratio:\s*1 \/ 1;/)
   assert.match(html, /\[data-phone-layout="twin"\] \.thumb-wrap \.thumb-img,\s*\n\s*\[data-phone-layout="twin"\] \.thumb-wrap model-viewer \{[\s\S]*?height:\s*100%;/)
 })
+
+test('pictured choices drive the card image and pictureless first choices fall through to the first pictured choice', () => {
+  assert.match(html, /function _variantIndex\(item, globalIdx\) \{[\s\S]*?findIndex\(v => _safeAssetUrl\(v\?\.image_url\)\)/)
+  assert.match(html, /function _selectedVariantImage\(item, globalIdx\) \{[\s\S]*?_safeAssetUrl\(item\.variants\[_variantIndex\(item, globalIdx\)\]\?\.image_url\)/)
+  assert.match(html, /const selectedVariantImage = _selectedVariantImage\(item, globalIdx\);\s*const thumbSrc = selectedVariantImage \|\| _safeAssetUrl\(item\.thumbnail_url\);/)
+  assert.match(html, /if \(selectedVariantImage\) \{[\s\S]*?thumbImg\.src = selectedVariantImage;/)
+})

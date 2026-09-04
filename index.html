@@ -3620,11 +3620,19 @@
             return `<div class="addons">${rows}</div>`;
         }
 
-        // Selected variant index for an item (defaults to 0, clamped to a valid one).
+        // A saved customer choice wins; otherwise choose the first choice with a photo.
+        // That prevents a pictureless first choice (for example Veggie) from becoming the
+        // default card state when the available photo is Chicken.
         function _variantIndex(item, globalIdx) {
             const s = window.__variantSel && window.__variantSel[globalIdx];
             if (typeof s === 'number' && item.variants && item.variants[s]) return s;
-            return 0;
+            const pictured = (item.variants || []).findIndex(v => _safeAssetUrl(v?.image_url));
+            return pictured >= 0 ? pictured : 0;
+        }
+
+        function _selectedVariantImage(item, globalIdx) {
+            if (!item.variants || !item.variants.length) return '';
+            return _safeAssetUrl(item.variants[_variantIndex(item, globalIdx)]?.image_url);
         }
         // Add-to-basket control. Shared by photo cards and text-only cards so the two
         // can't drift apart. Starts as the cart button; _syncQtyCtrl swaps in the
@@ -4667,7 +4675,8 @@
             function renderMenuCard(item, globalIdx, promoted = false) {
                 const card = document.createElement('div');
                 card.className = promoted ? 'menu-item ar-featured' : 'menu-item';
-                const thumbSrc = _safeAssetUrl(item.thumbnail_url);
+                const selectedVariantImage = _selectedVariantImage(item, globalIdx);
+                const thumbSrc = selectedVariantImage || _safeAssetUrl(item.thumbnail_url);
                 // A non-3D item (is_3d === false) or an item with no model renders as a
                 // plain photo card: no 3D badge, no live-3D thumbnail upgrade, no AR button.
                 const has3d = _isAREnabledMenuItem(item);
@@ -4811,6 +4820,16 @@
                         const pv = item.variants[vi];
                         const priceEl = card.querySelector('.price');
                         if (priceEl && pv) priceEl.textContent = pv.price || '';
+                        const selectedVariantImage = _selectedVariantImage(item, globalIdx);
+                        // Pictureless choices retain the main photo; pictured choices swap
+                        // only this card's photo, never create another menu item.
+                        if (selectedVariantImage) {
+                            card.querySelector('model-viewer')?.remove();
+                            card.querySelector('.thumb-wrap')?.classList.remove('thumb-model-ready');
+                            thumbImg.dataset.model = '';
+                            delete thumbImg.dataset.upgraded;
+                            thumbImg.src = selectedVariantImage;
+                        }
                     });
                 });
 
