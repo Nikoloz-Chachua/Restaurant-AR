@@ -55,3 +55,10 @@ test('an explicit unresolved tenant never leaks the shared fallback menu', () =>
     'Explicit tenant failures must stay empty instead of loading foods/menu.json',
   )
 })
+
+test('pictured choices drive the card image and pictureless first choices fall through to the first pictured choice', () => {
+  assert.match(html, /function _variantIndex\(item, globalIdx\) \{[\s\S]*?findIndex\(v => _safeAssetUrl\(v\?\.image_url\)\)/)
+  assert.match(html, /function _selectedVariantImage\(item, globalIdx\) \{[\s\S]*?_safeAssetUrl\(item\.variants\[_variantIndex\(item, globalIdx\)\]\?\.image_url\)/)
+  assert.match(html, /const selectedVariantImage = _selectedVariantImage\(item, globalIdx\);\s*const thumbSrc = selectedVariantImage \|\| _safeAssetUrl\(item\.thumbnail_url\);/)
+  assert.match(html, /if \(selectedVariantImage\) \{[\s\S]*?thumbImg\.src = selectedVariantImage;/)
+})
