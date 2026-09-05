@@ -4,10 +4,132 @@
     "/home/gagi/food-market-working/asian.json",
     "/home/gagi/food-market-working/drinks.json"
   ],
+  "transform_version": "fm-catalogue-v2-food-cover-drinks-contain-1200",
   "images": [
     {
-      "output_path": "assets/food-market/catalogue/asian-futomaki-salmon-futomaki-d1ecf09b.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/FUTOMAKI/Copy of futomaki salmon.JPG",
+      "output_path": "assets/food-market/catalogue/asian-appetizer-crispy-shrimp-with-tamarind-sauce-f6ce1da9.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/APPETIZER/Copy of ხრაშუნა კრევეტი თამარინდ სოუსით crispy shrimp with tamarind souce.jpg",
+      "source_sha256": "58bbf61e393a824458cdaf35b6a9a024b1b732e86ca9776932446cd9a012549b",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Crispy Shrimp with Tamarind Sauce"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-appetizer-kimchi-3b825892.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/APPETIZER/Kimchi.jpg",
+      "source_sha256": "7614d61ce3669b5378bec093ec5c1f599e99277e60d551464209d5d358bc1a52",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Kimchi"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-curry-grilled-chicken-red-hot-curry-385723bc.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/CURRY/Grilled Chicken Red Hot Curry.jpg",
+      "source_sha256": "5e04b5aa9f80d9b5c9b99f4da4304041fe19ab6effa829720adb9775016f9a85",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Grilled Chicken Red Hot Curry"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-curry-massaman-curry-2b971818.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/SOUP/Massaman Curry.jpg",
+      "source_sha256": "4a1c3a8b582ee44b7eefae0b21ac47cd1d6ea52b3871489c795591286fb735e6",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Massaman Curry"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-curry-yellow-curry-90b3043c.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/CURRY/yellow curry.jpg",
+      "source_sha256": "bc6cb796e01d5d3df606e7c50251a2b436d5b74912da2eda889679a5596b2034",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Yellow Curry"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-fried-rice-chicken-donburi-921bcc63.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/RICE/Chicken Donburi.jpg",
+      "source_sha256": "ad1dee4fcc5dd7eedb8b20dd63db963441e834a49efd9d5e6059dd75a268a1a7",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Chicken Donburi"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-fried-rice-grilled-chicken-with-curry-rice-318b2413.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/RICE/Grilled chicken with curry rice.jpg",
+      "source_sha256": "ff6d32f9b9213d68fc1acbf1f38b758571fde2283a7d79ae5ca41472cca942b6",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Grilled chicken with curry rice"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-fried-rice-rice-with-grilled-chicken-satay-sauce-3f9526f7.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/RICE/Rice with Grilled Chicken & Satay Sauce.jpg",
+      "source_sha256": "ac2743ad16d6b1779c41d58cb6269231640926f46dda19e0faf0bde818aeab75",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Rice with Grilled Chicken & Satay Sauce"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-fried-rice-sriracha-fried-rice-c15b028b.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/RICE/Sriracha Fried Rice.jpg",
+      "source_sha256": "02abb03f1c892dca6018ecc8c895b6b1ec6aea0e2c9a38d87319d23002603066",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Sriracha Fried Rice"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-fried-rice-thai-style-fried-rice-0c36ef82.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/RICE/Thai Style fried rice.jpg",
+      "source_sha256": "e761d67dc52d99c57c9c411e0fea894d6808696145cdfd178bd74fb936a1698b",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Thai Style Fried Rice"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-futomaki-salmon-futomaki-11eb978a.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/FUTOMAKI/Copy of futomaki salmon.JPG",
+      "source_sha256": "46185bfbd05ba6ac0338ca8909ab4b16745a8291ce257e1d0f98f2700aef4e70",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -17,8 +139,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/asian-futomaki-tuna-futomaki-09b4635a.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/FUTOMAKI/Copy of futomaki tuna.JPG",
+      "output_path": "assets/food-market/catalogue/asian-futomaki-tuna-futomaki-aeb46b98.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/FUTOMAKI/Copy of futomaki tuna.JPG",
+      "source_sha256": "64c3bdc80315f090b260753d214242fb45d6fa7576e64e281748bc2d1c5ac5e3",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -28,8 +151,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/asian-futomaki-veggie-futomaki-7e4d2105.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/FUTOMAKI/Copy of futomaki veggie.JPG",
+      "output_path": "assets/food-market/catalogue/asian-futomaki-veggie-futomaki-30f9c0ba.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/FUTOMAKI/Copy of futomaki veggie.JPG",
+      "source_sha256": "94cf7059a02c16bc74fa9300dbe565a38bb73e342793abc5eafb4a11cc16855c",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -39,8 +163,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/asian-maki-ebi-maki-757905be.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/MAKI/Copy of shrimp maki.JPG",
+      "output_path": "assets/food-market/catalogue/asian-maki-ebi-maki-ae7748fb.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/MAKI/Copy of shrimp maki.JPG",
+      "source_sha256": "f07ac89974bbd1ad8fbcb379b443bc16aeaf90a05876a3a54bc98a23b8df5e05",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -50,8 +175,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/asian-maki-kappa-maki-5d259973.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/MAKI/Copy of კაპპა მაკი.JPG",
+      "output_path": "assets/food-market/catalogue/asian-maki-kappa-maki-dadcd67a.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/MAKI/Copy of კაპპა მაკი.JPG",
+      "source_sha256": "e7ef38ae1021bc955e4e25e04401301e771a288e57fab37fd634a184b60fad8f",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -61,8 +187,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/asian-maki-shake-maki-a4c6ea2e.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/MAKI/Copy of შაკე მაკი.JPG",
+      "output_path": "assets/food-market/catalogue/asian-maki-shake-maki-9d8c01bd.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/MAKI/Copy of შაკე მაკი.JPG",
+      "source_sha256": "b072afa91a82b8617248b049b4eb3789d38eb9c76feaff78a23e68c0151fad59",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -72,8 +199,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/asian-nigiri-salmon-2102b157.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/NIGIRI/Copy of salmon nigiri.JPG",
+      "output_path": "assets/food-market/catalogue/asian-nigiri-salmon-5d4b1700.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/NIGIRI/Copy of salmon nigiri.JPG",
+      "source_sha256": "c334d6b9315a85bbdc45fd6cfb8e70f67610b89c39bc1738dacde94270a91a7d",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -83,8 +211,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/asian-nigiri-tuna-38cc91c7.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/NIGIRI/Copy of tuna nigiri.JPG",
+      "output_path": "assets/food-market/catalogue/asian-nigiri-tuna-12b59aae.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/NIGIRI/Copy of tuna nigiri.JPG",
+      "source_sha256": "8daa73721b5ae244b95d04ea5cfa573a25fe5d9206cc0462254c2572cbefd839",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -94,8 +223,69 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/asian-sashimi-salmon-75d8714e.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/SASHIMI/Copy of salmon sashimi.JPG",
+      "output_path": "assets/food-market/catalogue/asian-noodles-pad-si-euw-abb9ba89.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/NOODLES/Pad si Eyw.jpg",
+      "source_sha256": "3603733731aed1a66f0fbc33c76cc268827ac259cc7451913d05fc8fc7019b71",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Pad Si Euw"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-noodles-pad-thai-noodles-51db39cd.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/NOODLES/Pad Thai Shrimp Noodles.jpg",
+      "source_sha256": "024fab5cf34d6b0e6fcb660987eb04d338798ad9f668a834687cdd9ff06dc03a",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Pad Thai Noodles"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-noodles-stir-fried-glass-noodles-579bf1e0.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/STIR FRIED/Stir Fried Glass Noodles.jpg",
+      "source_sha256": "617302cae3a46a130cd9c5bde54693ea0a20ba41d09b318eff4073edad67dc35",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Stir fried Glass Noodles"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-salads-crispy-chicken-salad-ec4bad53.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/SALAD/Crispy Chicken Salad.jpg",
+      "source_sha256": "a1328cb0f1ab96e0cfe1f0ee59ba2a6355252e1445c732c123581a2ceaddcd61",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Crispy Chicken Salad"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-salads-grilled-chicken-salad-7e9e6541.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/SALAD/Grilled Chicken Salad.jpg",
+      "source_sha256": "c6e49b851f89b86e8a17f408d6efcde586874b1e1cbb55f91d4557554d8239af",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Grilled Chicken Salad"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-sashimi-salmon-c4df884a.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/SASHIMI/Copy of salmon sashimi.JPG",
+      "source_sha256": "24685d9d6b966464ec95aef7004ee38e6da1bc880d08c0fc1936aebb6d13b7ad",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -105,8 +295,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/asian-sashimi-tuna-97d4da5c.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/SASHIMI/Copy of tuna sashimi.JPG",
+      "output_path": "assets/food-market/catalogue/asian-sashimi-tuna-cb0ac111.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/SASHIMI/Copy of tuna sashimi.JPG",
+      "source_sha256": "20e248bf9b3a8fca4df56172caec366d313a8242e36c0b0d54691e6aa239da92",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -116,8 +307,105 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/asian-uramaki-roll-california-aecaa463.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/URAMAKI ROLL/Copy of california.JPG",
+      "output_path": "assets/food-market/catalogue/asian-soup-pho-with-beef-0227bc69.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/SOUP/Pho With Beef.jpg",
+      "source_sha256": "9111dd8b7ffbf1d3bdff53a2aab2d47ae78f01703ce1df05ddae0cd037cb1b1a",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Pho with Beef"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-soup-thai-noodle-soup-with-chicken-shreded-3e4a168d.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/SOUP/Thai Noodle Soup with Chicken Shreded.jpg",
+      "source_sha256": "0f2aa0ef097e4efeddeade68a33876c85054c795cd303bcc908c0ac8d5974950",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Thai Noodle Soup with Chicken Shreded"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-soup-tom-kha-e7903c0f.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/SOUP/Tom Kha.jpg",
+      "source_sha256": "a0eb43f0e4eef9904ba917d953922ec3a1894a58628da23440ec0a91229b3260",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Tom Kha"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-soup-tom-yum-831de21f.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/SOUP/Tom Yum Shrimp.jpg",
+      "source_sha256": "c6d3ff6386bcf2b8ae51a2244b65dc813e75ed99459c790819bf1a137cf7faf1",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Tom Yum"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-soup-tom-yum-ramen-with-shrimp-fe461bf0.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/SOUP/Tom Yum Ramen with Shrimp.jpg",
+      "source_sha256": "e6a449299c11e6481c62f77de63a795240b3edcd0bc775e5dd98937543b75080",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Tom Yum Ramen with Shrimp"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-soup-tom-yum-seafood-clear-soup-abc1f01d.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/SOUP/Tom Yum Mix Seafood.jpg",
+      "source_sha256": "b3d0c546fdbeb3a4c2963806a1739ed3403970da6b758fa448de36b3e445b010",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Tom Yum Seafood Clear Soup"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-stir-fried-stir-fried-broccoli-with-shrimp-78852514.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/STIR FRIED/Stir Fried Broccoli with Shrimp.jpg",
+      "source_sha256": "b776bfd343ae0c2c43cd2578820cb8299e9c2932ce4b0126e6b0cfbd34b09247",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Stir Fried Broccoli with Shrimp"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-stir-fried-stir-fried-cashewnut-c4f23bd9.webp",
+      "source_path": "/home/gagi/food-market-drive-web/THAI/STIR FRIED/Stir Fried Cashewnut.jpg",
+      "source_sha256": "36def5c95b6e8cb9c9a539a286c28307d6ad5733d797c3403d4b78d625e687e4",
+      "uses": [
+        {
+          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "Stir Fried Cashewnut"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/asian-uramaki-roll-california-abc72fa1.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/URAMAKI ROLL/Copy of california.JPG",
+      "source_sha256": "0c64c01f1dc4ef847f7db87499848d147946340c7e2e26d9aec5ec085deb75cf",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -127,8 +415,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/asian-uramaki-roll-dragon-1952043b.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/URAMAKI ROLL/Copy of dragon roll.JPG",
+      "output_path": "assets/food-market/catalogue/asian-uramaki-roll-dragon-f3d3cdbd.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/URAMAKI ROLL/Copy of dragon roll.JPG",
+      "source_sha256": "10088ca3a551914f0d8d6a55c077d7aaba92ef928c6027a2e0971a832e618ae8",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -138,8 +427,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/asian-uramaki-roll-philadelphia-8947015b.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/URAMAKI ROLL/Copy of philadelphia roll.jpg",
+      "output_path": "assets/food-market/catalogue/asian-uramaki-roll-philadelphia-95728346.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/URAMAKI ROLL/Copy of philadelphia roll.jpg",
+      "source_sha256": "6c0d757de8e1e51d15a6089167480d299d6646e4c49f70310a274706a6167581",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -149,8 +439,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/asian-uramaki-roll-royal-philadelphia-ccfa402f.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/URAMAKI ROLL/სამეფო ფილადელფია.png",
+      "output_path": "assets/food-market/catalogue/asian-uramaki-roll-royal-philadelphia-433ab334.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/URAMAKI ROLL/სამეფო ფილადელფია.png",
+      "source_sha256": "9de9e8ef10257601515b94898054fc9ad02edebcb7bc157d725610f23e6ceea6",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -160,8 +451,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/asian-uramaki-roll-spicy-salmon-14f590ef.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/URAMAKI ROLL/Copy of spicy salmon roll.JPG",
+      "output_path": "assets/food-market/catalogue/asian-uramaki-roll-spicy-salmon-a2638534.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/URAMAKI ROLL/Copy of spicy salmon roll.JPG",
+      "source_sha256": "67ad87a1aeaa632127f0844d4dda66c1442fcde1b75f3317453906a608e7a1c6",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -171,19 +463,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/asian-uramaki-roll-spicy-tuna-9b131c51.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/URAMAKI ROLL/Copy of spicy tuna roll.JPG",
-      "uses": [
-        {
-          "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
-          "source_page": 2,
-          "item": "Spicy Tuna"
-        }
-      ]
-    },
-    {
-      "output_path": "assets/food-market/catalogue/asian-uramaki-roll-tropical-shrimp-e011d09b.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/URAMAKI ROLL/ტროპიკული კრევეტი.png",
+      "output_path": "assets/food-market/catalogue/asian-uramaki-roll-tropical-shrimp-21e2858b.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/URAMAKI ROLL/ტროპიკული კრევეტი.png",
+      "source_sha256": "0133b974fb0d5ef9dffd6a404bac8b60af4e953dd271c2307c85377cfbc3d5a4",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -193,8 +475,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/asian-uramaki-roll-unagi-d83a44b9.webp",
-      "source_path": "/home/gagi/food-market-drive/ASIAN/URAMAKI ROLL/Copy of უნაგი როლი Unagi Roll.jpg",
+      "output_path": "assets/food-market/catalogue/asian-uramaki-roll-unagi-1d173319.webp",
+      "source_path": "/home/gagi/food-market-drive-web/ASIAN/URAMAKI ROLL/Copy of უნაგი როლი Unagi Roll.jpg",
+      "source_sha256": "6ad66e210c964adf4a1cb481282222274f78260d99817b80bf21956846f25b2b",
       "uses": [
         {
           "source_pdf": "FM ASIAN 2026 MAY 31x46cm.pdf",
@@ -204,8 +487,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-red-dry-classic-asuretuli-marbano-e9014015.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/Asuretuli, Marbano.jpg",
+      "output_path": "assets/food-market/catalogue/drinks-red-dry-classic-asuretuli-marbano-86566d29.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Asuretuli, Marbano.jpg",
+      "source_sha256": "1e05c487f6486e17f8f63b03eb2effb8ba801b2e3455f75d9d82f5f83ad5b69e",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -215,8 +499,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-red-dry-classic-lui-cabernet-sauvignon-veneto-2018-pasqua-italy-73b50510.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/Lui’, Cabernet Sauvignon Veneto 2018, Pasqua Italy.jpg",
+      "output_path": "assets/food-market/catalogue/drinks-red-dry-classic-lui-cabernet-sauvignon-veneto-2018-pasqua-italy-c143271c.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Lui’, Cabernet Sauvignon Veneto 2018, Pasqua Italy.jpg",
+      "source_sha256": "6ddaa2b1a93a66159683f1df369698d1ac888f35c741f30ca5c3c200066b18a3",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -226,8 +511,81 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-red-dry-qvevri-asuretuli-zedashe-36fda36e.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/Asuretuli, Zedashe.heic",
+      "output_path": "assets/food-market/catalogue/drinks-red-dry-classic-otskhanuri-sapere-gulodrava-2770acdb.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Otskhanuri Sapere, Gulodrava.png",
+      "source_sha256": "cf94176539a706f96387dcfc0c40323d18caa6df5ea8315e8f321856dc552ea3",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Otskhanuri Sapere, Gulodrava"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-red-dry-classic-rosso-veneto-igt-2021-pasqua-italy-7acd829b.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Rosso Veneto IGT 2021, Pasqua Italy.png",
+      "source_sha256": "3b355d1bf9e65ed7c3f0d494655aa0018b0d6889c4fcee3958fb733bf4ee14dc",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Rosso Veneto IGT 2021, Pasqua Italy"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-red-dry-classic-saint-emilion-reserve-bordeaux-2020-mouton-cadet-france-63c85df4.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Saint-Emilion, Reserve Bordeaux 2020, Mouton Cadet France.png",
+      "source_sha256": "705eba33a02633182a70244ce9eefabaa7e319f7767854fe72231a75bd259282",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Saint-Emilion, Reserve Bordeaux 2020, Mouton Cadet France"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-red-dry-classic-saperavi-dzelshavi-royal-khvanchkara-78ec5af0.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Saperavi Dzelshavi, Royal Khvanchkara.png",
+      "source_sha256": "3bbe2e3bee677e8bfb9a7fbcbfe23a03ac6ca7eca8e08be2481194804c7a1aae",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Saperavi Dzelshavi, Royal Khvanchkara"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-red-dry-classic-saperavi-esabi-eclipse-d9a0fe79.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Saperavi Esabi, Eclipse.png",
+      "source_sha256": "e75fbccbe2de0c85afcba8e8e43a2970a5932f2bbb655cbaa172cbc7d9113e01",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Saperavi Esabi, Eclipse"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-red-dry-classic-saperavi-gulodrava-03a0ed47.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Saperavi, Gulodrava.png",
+      "source_sha256": "330074ac32f3877ed6c6f687b6d6995856ab6064e166285048150c9c5c0244fa",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Saperavi, Gulodrava"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-red-dry-qvevri-asuretuli-zedashe-d112ca86.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Asuretuli, Zedashe.heic",
+      "source_sha256": "f66d1ee809b9c148180eabb25c11b41a8c65eec098f2775373452b138e431707",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -237,8 +595,45 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-red-semi-sweet-khvanchkara-royal-khvanchkara-d46dd3ce.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/Khvanchkara, Royal Khvanchkara.jpg",
+      "output_path": "assets/food-market/catalogue/drinks-red-dry-qvevri-saperavi-anemo-d8e5da1a.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Saperavi, Anemo.jpg",
+      "source_sha256": "a3f52b6f8f6ed2a2fc2be00163fc1f4d3222e6587a3f7131a7cc627e0a907227",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Saperavi, Anemo"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-red-dry-qvevri-saperavi-shakriani-estate-97ad5aa8.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Saperavi, Shakriani Estate kvevri.png",
+      "source_sha256": "4bb928d10978fd37d55cd23bdd8766d08a7789bd469939161403a769aa349e92",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Saperavi, Shakriani Estate"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-red-dry-qvevri-shavkapito-zedashe-328197f7.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Shavkapito, Zedashe.heic",
+      "source_sha256": "e8425b09ef93217c9f2047bee7620f0c5dc16bbc47ed8153ef4e4f1ca597373a",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Shavkapito, Zedashe"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-red-semi-sweet-khvanchkara-royal-khvanchkara-4c981895.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Khvanchkara, Royal Khvanchkara.jpg",
+      "source_sha256": "4d232479932672444e83699c80760183f88c0cac1425174fa4faaa71fedf4841",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -248,8 +643,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-red-semi-sweet-kindzmarauli-rtvelisi-61ef3100.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/Kindzmarauli, Rtvelisi.png",
+      "output_path": "assets/food-market/catalogue/drinks-red-semi-sweet-kindzmarauli-rtvelisi-bbfe7615.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Kindzmarauli, Rtvelisi.png",
+      "source_sha256": "7d3133c909c672a88e7df1eae0705e9e892a51541694b3caba16b89047851504",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -259,8 +655,21 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-rose-11-minutes-rose-trevenezie-2023-pasqua-italy-14102dd4.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/11 Minutes, Rose Trevenezie 2023, Pasqua Italy.jpg",
+      "output_path": "assets/food-market/catalogue/drinks-red-semi-sweet-usakhelauri-royal-racha-25901b52.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Usakhelauri, Royal Racha.png",
+      "source_sha256": "9027941f071c34594dfaf4d034cb7a9ead9357ed465640707234a98f95ca33d2",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Usakhelauri, Royal Racha"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-rose-11-minutes-rose-trevenezie-2023-pasqua-italy-80984c98.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/11 Minutes, Rose Trevenezie 2023, Pasqua Italy.jpg",
+      "source_sha256": "182a026116340fecfb15d16f96639a065c30626257858a7414e6f3715ef95853",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -270,8 +679,45 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-white-classic-atenuri-gulodrava-d1edd923.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/Atenuri, Gulodrava.jpg",
+      "output_path": "assets/food-market/catalogue/drinks-rose-saperavi-rose-chelti-84a37f82.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Saperavi Rose, Chelti.jpg",
+      "source_sha256": "5ef3ff8c45576bab1b7057d9a130196f2507486b530a7fa20c45d933b9795983",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Saperavi Rose, Chelti"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-rose-shavkapito-rose-amosa-9a40490c.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Shavkapito Rose, Amosa.png",
+      "source_sha256": "16e6a5def1006fd2941bbd352bcbace2c9a6569a1722fd3bc017f14935df7475",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Shavkapito Rose, Amosa"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-rose-usakhelauri-rose-naberauli-25bdae92.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Usakhelauri Rose, Naberauli.png",
+      "source_sha256": "2d39a5b5923cc50333bfce3722f35867f5a518f039defab6e1090a0ac5a5921e",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Usakhelauri Rose, Naberauli"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-white-classic-atenuri-gulodrava-b77b1ca0.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Atenuri, Gulodrava.jpg",
+      "source_sha256": "008402c836f35545c6e3225f7b141e1e3b24d2bb8d3605ff562d70114718251d",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -281,8 +727,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-white-classic-chinuri-goruli-mtsvane-gulodrava-573d989d.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/Chinuri-Goruli Mtsvane, Gulodrava.jpg",
+      "output_path": "assets/food-market/catalogue/drinks-white-classic-chinuri-goruli-mtsvane-gulodrava-c11e6efc.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Chinuri-Goruli Mtsvane, Gulodrava.jpg",
+      "source_sha256": "4b060dc582e65a28b2ce30e37d1e8fe53f0865db213a70205d15899c66e51541",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -292,8 +739,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-white-classic-graves-blanc-reserve-bordeaux-2022-mouton-cadet-france-97dd6ac2.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/Graves Blanc, Reserve, Bordeaux 2022, Mouton Cadet France.jpg",
+      "output_path": "assets/food-market/catalogue/drinks-white-classic-graves-blanc-reserve-bordeaux-2022-mouton-cadet-france-30d4c529.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Graves Blanc, Reserve, Bordeaux 2022, Mouton Cadet France.jpg",
+      "source_sha256": "c2ade4572af9e913ce85568dad0a237b3cfe118b641b8012defc09c4f44b0136",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -303,8 +751,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-white-classic-hey-french-bianco-veneto-multivintage-pasqua-italy-fc171a6c.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/Hey French Bianco Veneto, Multivintage Pasqua Italy.png",
+      "output_path": "assets/food-market/catalogue/drinks-white-classic-hey-french-bianco-veneto-multivintage-pasqua-italy-917eee9b.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Hey French Bianco Veneto, Multivintage Pasqua Italy.png",
+      "source_sha256": "383111f51966cb97b80758b86d4cf6403ccc879cef6c98eaa9395961aa09176f",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -314,8 +763,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-white-classic-mtsvane-kardanakhi-1888-65192427.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/Mtsvane, Kardanakhi 1888.png",
+      "output_path": "assets/food-market/catalogue/drinks-white-classic-mtsvane-kardanakhi-1888-b57233a7.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Mtsvane, Kardanakhi 1888.png",
+      "source_sha256": "f27d5dbac1ca34634da1f0ef13858d6b2b622f4415e01f29730cd00862bc9281",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -325,8 +775,57 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-white-dry-qvevri-goruli-mtsvane-zedashe-d3cbfc96.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/Goruli Mtsvane, Zedashe.jpg",
+      "output_path": "assets/food-market/catalogue/drinks-white-classic-mtsvane-shakriani-estate-84d9452a.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Mtsvane, Shakriani Estate.png",
+      "source_sha256": "3e9e9a11d478ac9b46a46d45925022c4d9484799c21acda6597cca551ee7c622",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Mtsvane, Shakriani Estate"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-white-classic-riesling-vom-roten-schiefer-2021-germany-56c77f33.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Riesling “vom Roten Schiefer” 2021, Germany.jpg",
+      "source_sha256": "c5c335101ba037b05620cbee4087010a0976d1968ead28a8cb927dcfaffc9166",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Riesling “vom Roten Schiefer” 2021, Germany"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-white-classic-tsinandali-naberauli-7870c78b.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Tsinandali, Naberauli.png",
+      "source_sha256": "e59f0f8228a98ff98fd3c66295dc84a802d1f6c5614720db1c09ace20077ee68",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Tsinandali, Naberauli"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-white-classic-tsiskari-eclipse-tkatsiteli-2021-bd56bbd6.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Tsiskari, Eclipse, Tkatsiteli 2021.png",
+      "source_sha256": "b4f202d4be58c2e8687275b0642cd12500fca169df24264c692d88b3febbf364",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Tsiskari, Eclipse, Tkatsiteli 2021"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-white-dry-qvevri-goruli-mtsvane-zedashe-11d8b041.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Goruli Mtsvane, Zedashe.jpg",
+      "source_sha256": "8bacbb73e96be158733e7c11f5063326cb793580d37bb72315f0782cd985bc69",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -336,8 +835,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-white-dry-qvevri-khikhvi-pirveli-winery-e9ed587e.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/Khikhvi, Pirveli Winery.png",
+      "output_path": "assets/food-market/catalogue/drinks-white-dry-qvevri-khikhvi-pirveli-winery-23e642f3.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Khikhvi, Pirveli Winery.png",
+      "source_sha256": "c10110f33127c857321e65e3f35c5668a57f7c1b532d6c2222074fbb9dc18a12",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -347,8 +847,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-white-dry-qvevri-kisi-shakriani-estate-64352086.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/Kisi, Shakriani Estate.png",
+      "output_path": "assets/food-market/catalogue/drinks-white-dry-qvevri-kisi-shakriani-estate-2b6afe3b.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Kisi, Shakriani Estate.png",
+      "source_sha256": "b75423d80193135c3f2ae0009da693b9050227173ce1a109c0959c7efdd8648d",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -358,8 +859,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-white-dry-qvevri-mtsvane-rtvelisi-6c23f455.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/Mtsvane, Rtvelisi.png",
+      "output_path": "assets/food-market/catalogue/drinks-white-dry-qvevri-mtsvane-rtvelisi-4e99f40a.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Mtsvane, Rtvelisi.png",
+      "source_sha256": "494c62ce292a5d845c6dcbf5d82984c7b87f07e271ca387698f337efdbff7040",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -369,8 +871,33 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-white-semi-sweet-gviani-mosavali-barbale-bc3782e4.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/Gviani Mosavali, Barbale.jpg",
+      "output_path": "assets/food-market/catalogue/drinks-white-dry-qvevri-rkatsiteli-vardiashvili-9466a7c1.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Rkatsiteli, Vardiashvili.png",
+      "source_sha256": "23c2423bdb7d6d044204f492891350373afc3050685a2b2a90a3d8ea38d5c848",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Rkatsiteli, Vardiashvili"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-white-dry-qvevri-tsolikauri-anemo-4b2d206d.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Tsolikauri, Anemo.png",
+      "source_sha256": "557831631ae07e2d3748f8f6a028c410576f3e4a6e12f6e052cae282a073e4ec",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Tsolikauri, Anemo"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-white-semi-sweet-gviani-mosavali-barbale-77df6f4c.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Gviani Mosavali, Barbale.jpg",
+      "source_sha256": "893d3396cf36b7ddb89a27dec80c89ec943d5543faf3c63b6adfabe719c26851",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -380,8 +907,21 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-wine-by-the-glass-eya-verdejo-2023-bodegas-carchelo-01265ed9.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/EYA Verdejo.heic",
+      "output_path": "assets/food-market/catalogue/drinks-white-semi-sweet-tvishi-naberauli-862391d6.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Tvishi, Naberauli.png",
+      "source_sha256": "b7e189b1d38c22ed9540eb0d5d968cbfc4c5d969689a02062152273154010066",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Tvishi, Naberauli"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-wine-by-the-glass-eya-verdejo-2023-bodegas-carchelo-3e1759e2.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/EYA Verdejo.heic",
+      "source_sha256": "972c18f41eab6a12d870926f61bdb6f736432a5c948ddc1be0f524524ad00bbc",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -391,8 +931,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/drinks-wine-by-the-glass-monastrell-2021-bodegas-carchelo-0a81c591.webp",
-      "source_path": "/home/gagi/food-market-drive/DRINKS/wine/Monastrell 2021, Bodegas Carchelo Red Dry, Spain.jpg",
+      "output_path": "assets/food-market/catalogue/drinks-wine-by-the-glass-monastrell-2021-bodegas-carchelo-da23ff9c.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Monastrell 2021, Bodegas Carchelo Red Dry, Spain.jpg",
+      "source_sha256": "d68c58400aab60ff04a32fff3284b559772c5a6c7cb380151cb63f270659a2e7",
       "uses": [
         {
           "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
@@ -402,8 +943,45 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/georgian-appetizer-dip-mixes-98a7b175.webp",
-      "source_path": "/home/gagi/food-market-drive/INTERNATIONAL/APPETIZER/DIP MIXES.png",
+      "output_path": "assets/food-market/catalogue/drinks-wine-by-the-glass-tsinandali-chelti-2665ea36.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Tsinandali, Chelti.jpg",
+      "source_sha256": "4f40d64c980170856e71d7c2c9ef2d40f7e8191c03f2ed03c64525cb049f3935",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Tsinandali, Chelti"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-wine-by-the-glass-tsolikauri-kisi-rtvelisi-282d2b4f.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Tsolikauri Kisi, Rtvelisi.png",
+      "source_sha256": "a69f227cd68e8ebcb0b23f3ab6976305e56fc7488d79d494adce94b2cb100932",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Tsolikauri Kisi, Rtvelisi"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/drinks-wine-by-the-glass-tvishi-rtvelisi-1f5994c4.webp",
+      "source_path": "/home/gagi/food-market-drive-web/DRINKS/wine/Tvishi, Rtvelisi.png",
+      "source_sha256": "286ebec0b0cb1040ffd4aeda5d976dd6da1551c12edab547d126e95ce8225ce7",
+      "uses": [
+        {
+          "source_pdf": "FM  DRINKS 2026 MAY 31x44cm.pdf",
+          "source_page": 1,
+          "item": "Tvishi, Rtvelisi"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-appetizer-dip-mixes-3dc84e38.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/APPETIZER/DIP MIXES.png",
+      "source_sha256": "d1c8a68ef749040ef5531e448b09bb401e1b9f6bf870cc20f0de6fd457e25307",
       "uses": [
         {
           "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
@@ -413,8 +991,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/georgian-appetizer-french-fries-522e1f87.webp",
-      "source_path": "/home/gagi/food-market-drive/INTERNATIONAL/APPETIZER/Copy of french fries.png",
+      "output_path": "assets/food-market/catalogue/georgian-appetizer-french-fries-e51c291a.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/APPETIZER/Copy of french fries.png",
+      "source_sha256": "7bffe3cfebe1f87dab6fc30cc021d5aeb199ac308424cbe33ddde4703520b7a9",
       "uses": [
         {
           "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
@@ -424,8 +1003,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/georgian-appetizer-hummus-with-green-salad-and-pita-9f260f56.webp",
-      "source_path": "/home/gagi/food-market-drive/INTERNATIONAL/APPETIZER/HUMMUS GREEN SALAD.jpg",
+      "output_path": "assets/food-market/catalogue/georgian-appetizer-hummus-with-green-salad-and-pita-09899e43.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/APPETIZER/HUMMUS GREEN SALAD",
+      "source_sha256": "6dc37174ee7612562c786679641ad1ba1a8f20b832ced8b712dd9f2b9ac42f2b",
       "uses": [
         {
           "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
@@ -435,8 +1015,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/georgian-appetizer-pulled-bbq-pork-taco-2288c30e.webp",
-      "source_path": "/home/gagi/food-market-drive/INTERNATIONAL/APPETIZER/TACOS PORK.jpg",
+      "output_path": "assets/food-market/catalogue/georgian-appetizer-pulled-bbq-pork-taco-40ac841b.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/APPETIZER/TACOS PORK",
+      "source_sha256": "9558874e2b428ae20dbe8b806980d55cc9487b10bd4131c57827409d50058739",
       "uses": [
         {
           "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
@@ -446,8 +1027,9 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/georgian-appetizer-pulled-beef-taco-ba94bfb6.webp",
-      "source_path": "/home/gagi/food-market-drive/INTERNATIONAL/APPETIZER/TACOS BEEF.jpg",
+      "output_path": "assets/food-market/catalogue/georgian-appetizer-pulled-beef-taco-ea5b3809.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/APPETIZER/TACOS BEEF",
+      "source_sha256": "6fd1199fdd41ce99954683101f52666974cad9927057ff5ffbaf229c5097e968",
       "uses": [
         {
           "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
@@ -457,13 +1039,362 @@
       ]
     },
     {
-      "output_path": "assets/food-market/catalogue/georgian-burger-chicken-burger-6a9e4fa4.webp",
-      "source_path": "/home/gagi/food-market-drive/INTERNATIONAL/BURGER/CHICKEN BURGER.png",
+      "output_path": "assets/food-market/catalogue/georgian-burger-chef-burger-38541c00.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/BURGER/Copy of შეფ ბურგერი.jpg",
+      "source_sha256": "d30600afaedf642ab6c161677e3d00a7d8dfc77aa712f5a2632c8d03712fcfbe",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "CHEF BURGER"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-burger-chicken-burger-7876e33f.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/BURGER/CHICKEN BURGER",
+      "source_sha256": "dd6f4fbcf8ccb422da59c140fce943bef8130f996dccd03b97ce8eaf3717b563",
       "uses": [
         {
           "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
           "source_page": 1,
           "item": "CHICKEN BURGER"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-burger-smashed-burger-ebd145b4.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/BURGER/Copy of სმეშ ბურგერი.jpg",
+      "source_sha256": "b77df152408e769d824d6e83e65180b530580c665e68698c0669511b80507b22",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "SMASHED BURGER"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-burger-steak-sandwich-5b19c603.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/BURGER/Copy of სტეიკ სენდვიჩი.jpg",
+      "source_sha256": "907b8ff9b23722e911e580fd83090f5ee2e85fc922be5cfbf118992ff31684aa",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "STEAK SANDWICH"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-croquettes-cheese-sticks-in-tomato-sauce-2236666f.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/CROQUETTES/Copy of sulguni in tomato.jpg",
+      "source_sha256": "f0daf1a8fbe2c56ba44a0106de91a3b09031e4f390a1e25b82157f498d76e42b",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 2,
+          "item": "CHEESE STICKS IN TOMATO SAUCE"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-croquettes-elarji-balls-with-kupati-in-bajhe-sauce-19004b06.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/CROQUETTES/Copy of elarji balls.JPG",
+      "source_sha256": "063f585076d9e29935328e7c618b4ec8e06b2b63d5bfb3e7c378f6743077bc12",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 2,
+          "item": "ELARJI BALLS WITH KUPATI IN BAJHE SAUCE"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-croquettes-lobio-balls-with-ham-in-jonjoli-sauce-f3a95e7f.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/CROQUETTES/Copy of lobio balls.JPG",
+      "source_sha256": "3a35e0c1ff7d686971f653f7d145f7bc64988e315f04d53c5edbb70d3c633544",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 2,
+          "item": "LOBIO BALLS WITH HAM IN JONJOLI SAUCE"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-dough-adjarian-khachapuri-ce148d4c.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/DOUGH/Copy of აჭარული ხაჭაპური.jpg",
+      "source_sha256": "b0bdffa3f1a71859f80355095347249a02133fe3b8c5a437c760b92197b2bd90",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 2,
+          "item": "ADJARIAN KHACHAPURI"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-dough-imeretian-khachapuri-d9a7147a.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/DOUGH/Copy of იმრეული ხაჭაპური.jpg",
+      "source_sha256": "4ba18f1c4d1d3dbe3c5895c67fe3a09c6520d7da6dbf1650e5de47dfd7375a15",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 2,
+          "item": "IMERETIAN KHACHAPURI"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-dough-megrelian-khachapuri-807f1cac.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/DOUGH/Copy of მეგრული ხაჭაპური.jpeg",
+      "source_sha256": "074c70b9f91dce79eb62ab2cfc16a19e8f1083ccdfc217a7aa59eb10140c4be2",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 2,
+          "item": "MEGRELIAN KHACHAPURI"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-main-grilled-lemon-chicken-parmesan-sun-dried-tomato-64932864.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/MAIN/Copy of გრილზე შემწვარი ქათმის ფილე.jpg",
+      "source_sha256": "462b332149385389539e6bc3881ce256e4fdf634644d9ba7307acffcd4531aff",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 2,
+          "item": "GRILLED LEMON CHICKEN, PARMESAN, SUN DRIED TOMATO"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-pasta-mushroom-truffle-fusilloni-6846af91.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/PASTA/Copy of სოკოს და ტრუფელის პასტა.jpg",
+      "source_sha256": "5fd3bb2f2f340769e61401bfe1775411e268aad2fe059da2dee390e61107c91b",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "MUSHROOM & TRUFFLE FUSILLONI"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-pasta-penne-arrabiata-a4fe893f.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/PASTA/Copy of პენე არაბიატა.jpg",
+      "source_sha256": "e4fbe30c60961300699ad11c59c94f12178d28265109f46794ff1a85e4722e66",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "PENNE ARRABIATA"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-pasta-penne-bolognese-b2f25680.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/PASTA/Copy of პენე ბოლონეზე.jpg",
+      "source_sha256": "c434a0286ec04f95c5e9e34cb77a080984ff727a4d1a60ca14f24cb96238cf49",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "PENNE BOLOGNESE"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-pasta-salmon-pasta-f9c1979a.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/PASTA/Copy of salmon pasta.jpg",
+      "source_sha256": "a265977507f93a2158fcf04a2ec8e5cc3ae9aac227fe3348ae1ef29f8ff643db",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "SALMON PASTA"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-pasta-spaghetti-carbonara-ea8790a9.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/PASTA/Copy of სპაგეტი კარბონარა.jpg",
+      "source_sha256": "abfad564c7498530bcdb8fdfc7b27bdf6f402d7069cc8db5a242efeda9bbd24b",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "SPAGHETTI CARBONARA"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-pizza-4-cheese-36db3ff4.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/PIZZA/Copy of 4 ყველი.jpg",
+      "source_sha256": "05fe2e2c0080c10ab585d1040fc4a2f9304cf7239e68b26785e0b2c79dc2f911",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "4 CHEESE"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-pizza-black-truffle-pizza-c33f8865.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/PIZZA/Copy of შავი ტრუფელის პიცა.jpg",
+      "source_sha256": "5d9eeb89bdc5aae88f0f1a831255522eb207afd05822a192933c3d7607fff100",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "BLACK TRUFFLE PIZZA"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-pizza-chef-s-pizza-79e31a3c.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/PIZZA/Copy of პიცა შეფი.jpg",
+      "source_sha256": "fbb90b4a56501570e043a7154f14876e05810068c7eb5b60e34df1178cbe946d",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "CHEF’S PIZZA"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-pizza-margherita-be994ec3.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/PIZZA/Copy of მარგარიტა.jpg",
+      "source_sha256": "d640befd95e0201e0cb507609e2352398ff5bf45d91bc879ab66fbd6d2d711de",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "MARGHERITA"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-pizza-pepperoni-8d5dbf53.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/PIZZA/Copy of პეპერონი.jpg",
+      "source_sha256": "99350bb9a8fd7c612e28587763ec458b458221df24be91d6dcedc90343138262",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "PEPPERONI"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-pizza-prosciutto-a9bd932a.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/PIZZA/Copy of პროშუტო.jpg",
+      "source_sha256": "521711ff15733e459c3c1fc113bc13cdcde095cb3906a882c4919565a5522a52",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "PROSCIUTTO"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-pizza-vegetarian-c4a788ef.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/PIZZA/Copy of ვეგეტარიანული.jpg",
+      "source_sha256": "45714aa125c2325a33e6946f9e94ac518ed288d6de4e07c658e7af761c92e7f4",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 1,
+          "item": "VEGETARIAN"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-salads-caesar-salad-with-chicken-83c5e750.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/SALAD/Copy of ცეზარის სალათი ქათმით.jpg",
+      "source_sha256": "4c5dc242d4efe84ee19a93beed11c5ae8566ad9602865a7d560c1012150b65f5",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 2,
+          "item": "CAESAR SALAD with CHICKEN"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-salads-kakhetian-cucumber-tomato-salad-88a72917.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/SALAD/Copy of kakhetian salad.JPG",
+      "source_sha256": "5fddf90ce681ea7fc80dd309fd2c147bb6fc7a52f755380d7a80ce414a53f500",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 2,
+          "item": "Kakhetian Cucumber & Tomato salad"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-salads-shrimp-salad-e95e835a.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/SALAD/SHRIMP SALAD",
+      "source_sha256": "e5723be05a470013e4325f82eb7654f2b2287ddbc12cfe7d98439bd4288b4949",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 2,
+          "item": "SHRIMP SALAD"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-soups-3-mushrooms-cream-soup-36a0b582.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/SOUP/Copy of 3-soko.jpg",
+      "source_sha256": "3585500562f2358c657f463acbf3a59a2cca8532683179272fbafdaa596ecd7b",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 2,
+          "item": "3 MUSHROOMS CREAM SOUP"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-soups-beef-soup-rice-noodles-3467d582.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/SOUP/Copy of საქონლის ხორცის წვნიანი ბრინჯის ნუდლსით.jpg",
+      "source_sha256": "1a2be4f110386ee0ab1e654b510bac4bde341473f21a86ecaa5dd8ad5af92925",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 2,
+          "item": "BEEF SOUP, RICE NOODLES"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-soups-chikhirtma-with-smoked-sulguni-5bcc338d.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/SOUP/Copy of ჩიხირთმა.jpeg",
+      "source_sha256": "f9e9d3d47cf1f3ea3878b95942b249bbaa46362ef6812ac4604790bc3b877107",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 2,
+          "item": "CHIKHIRTMA WITH SMOKED SULGUNI"
+        }
+      ]
+    },
+    {
+      "output_path": "assets/food-market/catalogue/georgian-soups-pumpkin-cream-soup-crostini-f811cc9d.webp",
+      "source_path": "/home/gagi/food-market-drive-web/INTERNATIONAL/SOUP/Copy of Pumpkin-cream-soup-1.JPG",
+      "source_sha256": "ea243742f6daf3ea7fdd15e8065092b725511042a19282d2dc2718090c67cfce",
+      "uses": [
+        {
+          "source_pdf": "FM GEORGIAN 2026 MAY 31x46cm.pdf",
+          "source_page": 2,
+          "item": "PUMPKIN CREAM SOUP, CROSTINI"
         }
       ]
     }

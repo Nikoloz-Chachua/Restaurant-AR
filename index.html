@@ -551,6 +551,15 @@
             display: block;
             cursor: pointer;
         }
+        html[data-tenant="food-market-main"][data-brand-slug="food-market"] .menu-item.food-market-drink .thumb-wrap {
+            background: #f7f3eb;
+        }
+        html[data-tenant="food-market-main"][data-brand-slug="food-market"] .menu-item.food-market-drink .thumb-img {
+            object-fit: contain;
+        }
+        html[data-tenant="food-market-main"][data-brand-slug="food-market"] .menu-item.food-market-drink .thumb-vignette {
+            display: none;
+        }
         .thumb-wrap.thumb-model-ready .thumb-img {
             visibility: hidden;
         }
@@ -9864,7 +9873,10 @@
         }
         function _isFoodMarketTenant() {
             const tenant = window.__tenant || _tenant || {};
-            return (tenant.restaurant_slug || _tenantSlugFromHost()) === 'food-market-main';
+            const brand = Array.isArray(tenant.brand) ? tenant.brand[0] : tenant.brand;
+            const brandSlug = brand?.slug || document.documentElement.dataset.brandSlug || '';
+            return (tenant.restaurant_slug || _tenantSlugFromHost()) === 'food-market-main'
+                && brandSlug === 'food-market';
         }
         function _foodMarketVisibleCategory(name) {
             if (!_isFoodMarketTenant()) return _cleanText(name);
@@ -13045,6 +13057,9 @@
                 const priceWasHtml = (!_hasVariants && item.price_old)
                     ? `<span class="price-was">${_escapeHtml(item.price_old)}</span>` : '';
                 if (noImage) card.classList.add('no-image');
+                if (!noImage && _isFoodMarketTenant() && _groupOf(item.category || item.categories?.name_en) === 'drinks') {
+                    card.classList.add('food-market-drink');
+                }
                 // Text-only dishes are the majority of a drinks-heavy menu, so they get the
                 // same cart button and variant/add-on pills as photo cards — only the media
                 // stage and AR button are dropped. Variants and add-ons sit in a full-width

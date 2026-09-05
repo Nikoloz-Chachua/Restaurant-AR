@@ -1,0 +1,908 @@
+{
+  "drive_root": "/home/gagi/food-market-drive-web",
+  "total": 179,
+  "counts": {
+    "matched": 116,
+    "current_item_preserved_3d_media": 1,
+    "ambiguous": 6,
+    "unmatched_or_obsolete": 56
+  },
+  "files": [
+    {
+      "source": "ASIAN/COMBO/Copy of chef combo.jpeg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "ASIAN/COMBO/Copy of dapa combo nigiri.JPG",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "ASIAN/COMBO/Copy of hosomaki combo.JPG",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "ASIAN/COMBO/Copy of salmon combo.JPG",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "ASIAN/FUTOMAKI/Copy of futomaki salmon.JPG",
+      "status": "matched",
+      "item": "asian:Futomaki:Salmon Futomaki"
+    },
+    {
+      "source": "ASIAN/FUTOMAKI/Copy of futomaki tuna.JPG",
+      "status": "matched",
+      "item": "asian:Futomaki:Tuna Futomaki"
+    },
+    {
+      "source": "ASIAN/FUTOMAKI/Copy of futomaki veggie.JPG",
+      "status": "matched",
+      "item": "asian:Futomaki:Veggie Futomaki"
+    },
+    {
+      "source": "ASIAN/MAKI/Copy of shrimp maki.JPG",
+      "status": "matched",
+      "item": "asian:Maki:Ebi Maki"
+    },
+    {
+      "source": "ASIAN/MAKI/Copy of unagi maki.JPG",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "ASIAN/MAKI/Copy of კაპპა მაკი.JPG",
+      "status": "matched",
+      "item": "asian:Maki:Kappa Maki"
+    },
+    {
+      "source": "ASIAN/MAKI/Copy of შაკე მაკი.JPG",
+      "status": "matched",
+      "item": "asian:Maki:Shake Maki"
+    },
+    {
+      "source": "ASIAN/NIGIRI/Copy of salmon nigiri.JPG",
+      "status": "matched",
+      "item": "asian:Nigiri:Salmon"
+    },
+    {
+      "source": "ASIAN/NIGIRI/Copy of tuna nigiri.JPG",
+      "status": "matched",
+      "item": "asian:Nigiri:Tuna"
+    },
+    {
+      "source": "ASIAN/NIGIRI/Copy of unagi nigiri.JPG",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "ASIAN/SASHIMI/Copy of salmon sashimi.JPG",
+      "status": "matched",
+      "item": "asian:Sashimi:Salmon"
+    },
+    {
+      "source": "ASIAN/SASHIMI/Copy of tuna sashimi.JPG",
+      "status": "matched",
+      "item": "asian:Sashimi:Tuna"
+    },
+    {
+      "source": "ASIAN/SASHIMI/Copy of unagi sashimi.JPG",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "ASIAN/URAMAKI ROLL/Copy of california.JPG",
+      "status": "matched",
+      "item": "asian:Uramaki Roll:California"
+    },
+    {
+      "source": "ASIAN/URAMAKI ROLL/Copy of dragon roll.JPG",
+      "status": "matched",
+      "item": "asian:Uramaki Roll:Dragon"
+    },
+    {
+      "source": "ASIAN/URAMAKI ROLL/Copy of philadelphia roll.jpg",
+      "status": "matched",
+      "item": "asian:Uramaki Roll:Philadelphia"
+    },
+    {
+      "source": "ASIAN/URAMAKI ROLL/Copy of spicy salmon roll.JPG",
+      "status": "matched",
+      "item": "asian:Uramaki Roll:Spicy Salmon"
+    },
+    {
+      "source": "ASIAN/URAMAKI ROLL/Copy of spicy tuna roll.JPG",
+      "status": "ambiguous",
+      "reason": "byte-identical to the selected Spicy Salmon photo"
+    },
+    {
+      "source": "ASIAN/URAMAKI ROLL/Copy of უნაგი როლი Unagi Roll.jpg",
+      "status": "matched",
+      "item": "asian:Uramaki Roll:Unagi"
+    },
+    {
+      "source": "ASIAN/URAMAKI ROLL/Copy of შრიმპ იკურა როლი Shrimp ikura roll.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "ASIAN/URAMAKI ROLL/სამეფო ფილადელფია.png",
+      "status": "matched",
+      "item": "asian:Uramaki Roll:Royal Philadelphia"
+    },
+    {
+      "source": "ASIAN/URAMAKI ROLL/ტროპიკული კრევეტი.png",
+      "status": "matched",
+      "item": "asian:Uramaki Roll:Tropical Shrimp"
+    },
+    {
+      "source": "DRINKS/wine/11 Minutes, Rose Trevenezie 2023, Pasqua Italy.jpg",
+      "status": "matched",
+      "item": "drinks:Rose:11 Minutes, Rose Trevenezie 2023, Pasqua Italy"
+    },
+    {
+      "source": "DRINKS/wine/Asuretuli, Marbano.jpg",
+      "status": "matched",
+      "item": "drinks:Red Dry Classic:Asuretuli, Marbano"
+    },
+    {
+      "source": "DRINKS/wine/Asuretuli, Zedashe.heic",
+      "status": "matched",
+      "item": "drinks:Red Dry Qvevri:Asuretuli, Zedashe"
+    },
+    {
+      "source": "DRINKS/wine/Atenuri, Gulodrava.jpg",
+      "status": "matched",
+      "item": "drinks:White Classic:Atenuri, Gulodrava"
+    },
+    {
+      "source": "DRINKS/wine/Bianco Veneto IGT 2022, Pasqua Italy.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "DRINKS/wine/Cava Brut.png",
+      "status": "ambiguous",
+      "reason": "generic bottle has no proven producer"
+    },
+    {
+      "source": "DRINKS/wine/Chenin Blanc 2023, Simonsing South Africa.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "DRINKS/wine/Chinuri-Goruli Mtsvane, Gulodrava.jpg",
+      "status": "matched",
+      "item": "drinks:White Classic:Chinuri-Goruli Mtsvane, Gulodrava"
+    },
+    {
+      "source": "DRINKS/wine/EYA Verdejo.heic",
+      "status": "matched",
+      "item": "drinks:Wine by the Glass:EYA Verdejo 2023, Bodegas Carchelo"
+    },
+    {
+      "source": "DRINKS/wine/Goruli Mtsvane, Zedashe.jpg",
+      "status": "matched",
+      "item": "drinks:White Dry Qvevri:Goruli Mtsvane, Zedashe"
+    },
+    {
+      "source": "DRINKS/wine/Graves Blanc, Reserve, Bordeaux 2022, Mouton Cadet France.jpg",
+      "status": "matched",
+      "item": "drinks:White Classic:Graves Blanc, Reserve, Bordeaux 2022, Mouton Cadet France"
+    },
+    {
+      "source": "DRINKS/wine/Gviani Mosavali, Barbale.jpg",
+      "status": "matched",
+      "item": "drinks:White Semi Sweet:Gviani Mosavali, Barbale"
+    },
+    {
+      "source": "DRINKS/wine/Hey French Bianco Veneto, Multivintage Pasqua Italy.png",
+      "status": "matched",
+      "item": "drinks:White Classic:Hey French Bianco Veneto, Multivintage Pasqua Italy"
+    },
+    {
+      "source": "DRINKS/wine/Khikhvi, Pirveli Winery.png",
+      "status": "matched",
+      "item": "drinks:White Dry Qvevri:Khikhvi, Pirveli Winery"
+    },
+    {
+      "source": "DRINKS/wine/Khvanchkara, Royal Khvanchkara.jpg",
+      "status": "matched",
+      "item": "drinks:Red Semi Sweet:Khvanchkara, Royal Khvanchkara"
+    },
+    {
+      "source": "DRINKS/wine/Kindzmarauli, Rtvelisi.png",
+      "status": "matched",
+      "item": "drinks:Red Semi Sweet:Kindzmarauli, Rtvelisi"
+    },
+    {
+      "source": "DRINKS/wine/Kisi, Shakriani Estate.png",
+      "status": "matched",
+      "item": "drinks:White Dry Qvevri:Kisi, Shakriani Estate"
+    },
+    {
+      "source": "DRINKS/wine/Lui’, Cabernet Sauvignon Veneto 2018, Pasqua Italy.jpg",
+      "status": "matched",
+      "item": "drinks:Red Dry Classic:Lui’, Cabernet Sauvignon Veneto 2018, Pasqua Italy"
+    },
+    {
+      "source": "DRINKS/wine/Malvasia di Puglia 2023, Pasqua Italy.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "DRINKS/wine/Monastrell 2021, Bodegas Carchelo Red Dry, Spain.jpg",
+      "status": "matched",
+      "item": "drinks:Wine by the Glass:Monastrell 2021, Bodegas Carchelo"
+    },
+    {
+      "source": "DRINKS/wine/Mtsvane, Kardanakhi 1888.png",
+      "status": "matched",
+      "item": "drinks:White Classic:Mtsvane, Kardanakhi 1888"
+    },
+    {
+      "source": "DRINKS/wine/Mtsvane, Rtvelisi.png",
+      "status": "matched",
+      "item": "drinks:White Dry Qvevri:Mtsvane, Rtvelisi"
+    },
+    {
+      "source": "DRINKS/wine/Mtsvane, Shakriani Estate.png",
+      "status": "matched",
+      "item": "drinks:White Classic:Mtsvane, Shakriani Estate"
+    },
+    {
+      "source": "DRINKS/wine/Nero D’Avola DOC Sicilia 2021, Pasqua Italy.webp",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "DRINKS/wine/Otskhanuri Sapere, Gulodrava.png",
+      "status": "matched",
+      "item": "drinks:Red Dry Classic:Otskhanuri Sapere, Gulodrava"
+    },
+    {
+      "source": "DRINKS/wine/Pinot Grigio delle Venezie DOC 2023, Pasqua Italy.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "DRINKS/wine/Primitivo di Puglia 2023, Pasqua Italy.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "DRINKS/wine/Riesling “vom Roten Schiefer” 2021, Germany.jpg",
+      "status": "matched",
+      "item": "drinks:White Classic:Riesling “vom Roten Schiefer” 2021, Germany"
+    },
+    {
+      "source": "DRINKS/wine/Rioja Rosado 2022, Vivanco Spain.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "DRINKS/wine/Rkatsiteli, Siame.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "DRINKS/wine/Rkatsiteli, Vardiashvili.png",
+      "status": "matched",
+      "item": "drinks:White Dry Qvevri:Rkatsiteli, Vardiashvili"
+    },
+    {
+      "source": "DRINKS/wine/Rosso Veneto IGT 2021, Pasqua Italy.png",
+      "status": "matched",
+      "item": "drinks:Red Dry Classic:Rosso Veneto IGT 2021, Pasqua Italy"
+    },
+    {
+      "source": "DRINKS/wine/Saint-Emilion, Reserve Bordeaux 2020, Mouton Cadet France.png",
+      "status": "matched",
+      "item": "drinks:Red Dry Classic:Saint-Emilion, Reserve Bordeaux 2020, Mouton Cadet France"
+    },
+    {
+      "source": "DRINKS/wine/Saperavi Dzelshavi, Royal Khvanchkara.png",
+      "status": "matched",
+      "item": "drinks:Red Dry Classic:Saperavi Dzelshavi, Royal Khvanchkara"
+    },
+    {
+      "source": "DRINKS/wine/Saperavi Esabi, Eclipse.png",
+      "status": "matched",
+      "item": "drinks:Red Dry Classic:Saperavi Esabi, Eclipse"
+    },
+    {
+      "source": "DRINKS/wine/Saperavi Rose, Chelti.jpg",
+      "status": "matched",
+      "item": "drinks:Rose:Saperavi Rose, Chelti"
+    },
+    {
+      "source": "DRINKS/wine/Saperavi, Anemo.jpg",
+      "status": "matched",
+      "item": "drinks:Red Dry Qvevri:Saperavi, Anemo"
+    },
+    {
+      "source": "DRINKS/wine/Saperavi, Gulodrava.png",
+      "status": "matched",
+      "item": "drinks:Red Dry Classic:Saperavi, Gulodrava"
+    },
+    {
+      "source": "DRINKS/wine/Saperavi, Shakriani Estate kvevri.png",
+      "status": "matched",
+      "item": "drinks:Red Dry Qvevri:Saperavi, Shakriani Estate"
+    },
+    {
+      "source": "DRINKS/wine/Saperavi, Shakriani Estate.png",
+      "status": "ambiguous",
+      "reason": "byte-identical to the selected explicitly named qvevri file"
+    },
+    {
+      "source": "DRINKS/wine/Saperavi, Siame.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "DRINKS/wine/Saperavi, Zedashe.heic",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "DRINKS/wine/Shavkapito Rose, Amosa.png",
+      "status": "matched",
+      "item": "drinks:Rose:Shavkapito Rose, Amosa"
+    },
+    {
+      "source": "DRINKS/wine/Shavkapito, Zedashe.heic",
+      "status": "matched",
+      "item": "drinks:Red Dry Qvevri:Shavkapito, Zedashe"
+    },
+    {
+      "source": "DRINKS/wine/Soave DOC 2023, Pasqua Italy.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "DRINKS/wine/Tsinandali, Chelti.jpg",
+      "status": "matched",
+      "item": "drinks:Wine by the Glass:Tsinandali, Chelti"
+    },
+    {
+      "source": "DRINKS/wine/Tsinandali, Naberauli.png",
+      "status": "matched",
+      "item": "drinks:White Classic:Tsinandali, Naberauli"
+    },
+    {
+      "source": "DRINKS/wine/Tsiskari, Eclipse, Tkatsiteli 2021.png",
+      "status": "matched",
+      "item": "drinks:White Classic:Tsiskari, Eclipse, Tkatsiteli 2021"
+    },
+    {
+      "source": "DRINKS/wine/Tsolikauri Kisi, Rtvelisi.png",
+      "status": "matched",
+      "item": "drinks:Wine by the Glass:Tsolikauri Kisi, Rtvelisi"
+    },
+    {
+      "source": "DRINKS/wine/Tsolikauri, Anemo.png",
+      "status": "matched",
+      "item": "drinks:White Dry Qvevri:Tsolikauri, Anemo"
+    },
+    {
+      "source": "DRINKS/wine/Tvishi, Naberauli.png",
+      "status": "matched",
+      "item": "drinks:White Semi Sweet:Tvishi, Naberauli"
+    },
+    {
+      "source": "DRINKS/wine/Tvishi, Rtvelisi.png",
+      "status": "matched",
+      "item": "drinks:Wine by the Glass:Tvishi, Rtvelisi"
+    },
+    {
+      "source": "DRINKS/wine/Usakhelauri Rose, Naberauli.png",
+      "status": "matched",
+      "item": "drinks:Rose:Usakhelauri Rose, Naberauli"
+    },
+    {
+      "source": "DRINKS/wine/Usakhelauri, Royal Racha.png",
+      "status": "matched",
+      "item": "drinks:Red Semi Sweet:Usakhelauri, Royal Racha"
+    },
+    {
+      "source": "DRINKS/wine/Valpolicella DOC 2023, Pasqua Italy.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Apple-Pie.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Basque-Cheesecake.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Brownie.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Bryiani.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Butter-Chicken.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Chicken-Curry.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Dahi-Puri.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Fish-Curry.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Green-Moong-Salad.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Pakora.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Panacota-Strawberry.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Panacota.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Samosa.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Shrimp-Curry.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Spring-Onion-Spinach-Soup.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Squid-ink-Spaghetti-with-Prawns.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Sweet-Corn-Soup.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INDIAN + DESSERT/Veggie-Curry.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INTERNATIONAL/APPETIZER/Copy of Ajafsandali.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INTERNATIONAL/APPETIZER/Copy of french fries.png",
+      "status": "matched",
+      "item": "georgian:Appetizer:FRENCH FRIES"
+    },
+    {
+      "source": "INTERNATIONAL/APPETIZER/Copy of sokos-chipsi.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INTERNATIONAL/APPETIZER/DIP MIXES.png",
+      "status": "matched",
+      "item": "georgian:Appetizer:DIP MIXES"
+    },
+    {
+      "source": "INTERNATIONAL/APPETIZER/HUMMUS GREEN SALAD",
+      "status": "matched",
+      "item": "georgian:Appetizer:HUMMUS WITH GREEN SALAD AND PITA"
+    },
+    {
+      "source": "INTERNATIONAL/APPETIZER/TACOS BEEF",
+      "status": "matched",
+      "item": "georgian:Appetizer:PULLED BEEF TACO"
+    },
+    {
+      "source": "INTERNATIONAL/APPETIZER/TACOS PORK",
+      "status": "matched",
+      "item": "georgian:Appetizer:PULLED BBQ PORK TACO"
+    },
+    {
+      "source": "INTERNATIONAL/BURGER/CHICKEN BURGER",
+      "status": "matched",
+      "item": "georgian:Burger:CHICKEN BURGER"
+    },
+    {
+      "source": "INTERNATIONAL/BURGER/Copy of falaffel.png",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INTERNATIONAL/BURGER/Copy of სმეშ ბურგერი.jpg",
+      "status": "matched",
+      "item": "georgian:Burger:SMASHED BURGER"
+    },
+    {
+      "source": "INTERNATIONAL/BURGER/Copy of სტეიკ სენდვიჩი.jpg",
+      "status": "matched",
+      "item": "georgian:Burger:STEAK SANDWICH"
+    },
+    {
+      "source": "INTERNATIONAL/BURGER/Copy of შეფ ბურგერი.jpg",
+      "status": "matched",
+      "item": "georgian:Burger:CHEF BURGER"
+    },
+    {
+      "source": "INTERNATIONAL/CROQUETTES/Copy of chicken balls.JPG",
+      "status": "current_item_preserved_3d_media",
+      "item": "georgian:Croquettes:CHICKEN BALLS IN SHKMERULI SAUCE",
+      "reason": "exact match for CHICKEN BALLS IN SHKMERULI SAUCE; preserved 3D row 1385 retains its established thumbnail"
+    },
+    {
+      "source": "INTERNATIONAL/CROQUETTES/Copy of elarji balls.JPG",
+      "status": "matched",
+      "item": "georgian:Croquettes:ELARJI BALLS WITH KUPATI IN BAJHE SAUCE"
+    },
+    {
+      "source": "INTERNATIONAL/CROQUETTES/Copy of lobio balls.JPG",
+      "status": "matched",
+      "item": "georgian:Croquettes:LOBIO BALLS WITH HAM IN JONJOLI SAUCE"
+    },
+    {
+      "source": "INTERNATIONAL/CROQUETTES/Copy of sulguni in tomato.jpg",
+      "status": "matched",
+      "item": "georgian:Croquettes:CHEESE STICKS IN TOMATO SAUCE"
+    },
+    {
+      "source": "INTERNATIONAL/DOUGH/Copy of აჭარული ხაჭაპური.jpg",
+      "status": "matched",
+      "item": "georgian:Dough:ADJARIAN KHACHAPURI"
+    },
+    {
+      "source": "INTERNATIONAL/DOUGH/Copy of იმრეული ხაჭაპური.jpg",
+      "status": "matched",
+      "item": "georgian:Dough:IMERETIAN KHACHAPURI"
+    },
+    {
+      "source": "INTERNATIONAL/DOUGH/Copy of მეგრული ხაჭაპური.jpeg",
+      "status": "matched",
+      "item": "georgian:Dough:MEGRELIAN KHACHAPURI"
+    },
+    {
+      "source": "INTERNATIONAL/MAIN/Copy of გრილზე შემწვარი ქათმის ფილე.jpg",
+      "status": "matched",
+      "item": "georgian:Main:GRILLED LEMON CHICKEN, PARMESAN, SUN DRIED TOMATO"
+    },
+    {
+      "source": "INTERNATIONAL/MAIN/Copy of ორაგულის სტეიკი იოგურტის სოუსით.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INTERNATIONAL/PASTA/Copy of salmon pasta.jpg",
+      "status": "matched",
+      "item": "georgian:Pasta:SALMON PASTA"
+    },
+    {
+      "source": "INTERNATIONAL/PASTA/Copy of პენე არაბიატა.jpg",
+      "status": "matched",
+      "item": "georgian:Pasta:PENNE ARRABIATA"
+    },
+    {
+      "source": "INTERNATIONAL/PASTA/Copy of პენე ბოლონეზე.jpg",
+      "status": "matched",
+      "item": "georgian:Pasta:PENNE BOLOGNESE"
+    },
+    {
+      "source": "INTERNATIONAL/PASTA/Copy of სოკოს და ტრუფელის პასტა.jpg",
+      "status": "matched",
+      "item": "georgian:Pasta:MUSHROOM & TRUFFLE FUSILLONI"
+    },
+    {
+      "source": "INTERNATIONAL/PASTA/Copy of სპაგეტი კარბონარა.jpg",
+      "status": "matched",
+      "item": "georgian:Pasta:SPAGHETTI CARBONARA"
+    },
+    {
+      "source": "INTERNATIONAL/PIZZA/Copy of 4 ყველი.jpg",
+      "status": "matched",
+      "item": "georgian:Pizza:4 CHEESE"
+    },
+    {
+      "source": "INTERNATIONAL/PIZZA/Copy of ვეგეტარიანული.jpg",
+      "status": "matched",
+      "item": "georgian:Pizza:VEGETARIAN"
+    },
+    {
+      "source": "INTERNATIONAL/PIZZA/Copy of მარგარიტა.jpg",
+      "status": "matched",
+      "item": "georgian:Pizza:MARGHERITA"
+    },
+    {
+      "source": "INTERNATIONAL/PIZZA/Copy of პეპერონი.jpg",
+      "status": "matched",
+      "item": "georgian:Pizza:PEPPERONI"
+    },
+    {
+      "source": "INTERNATIONAL/PIZZA/Copy of პიცა შეფი.jpg",
+      "status": "matched",
+      "item": "georgian:Pizza:CHEF’S PIZZA"
+    },
+    {
+      "source": "INTERNATIONAL/PIZZA/Copy of პროშუტო.jpg",
+      "status": "matched",
+      "item": "georgian:Pizza:PROSCIUTTO"
+    },
+    {
+      "source": "INTERNATIONAL/PIZZA/Copy of შავი ტრუფელის პიცა.jpg",
+      "status": "matched",
+      "item": "georgian:Pizza:BLACK TRUFFLE PIZZA"
+    },
+    {
+      "source": "INTERNATIONAL/SALAD/Copy of Cherry salad.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "INTERNATIONAL/SALAD/Copy of Walnut salad.jpg",
+      "status": "ambiguous",
+      "reason": "byte-identical to the selected Kakhetian salad photo"
+    },
+    {
+      "source": "INTERNATIONAL/SALAD/Copy of kakhetian salad.JPG",
+      "status": "matched",
+      "item": "georgian:Salads:Kakhetian Cucumber & Tomato salad"
+    },
+    {
+      "source": "INTERNATIONAL/SALAD/Copy of ცეზარის სალათი ქათმით.jpg",
+      "status": "matched",
+      "item": "georgian:Salads:CAESAR SALAD with CHICKEN"
+    },
+    {
+      "source": "INTERNATIONAL/SALAD/SHRIMP SALAD",
+      "status": "matched",
+      "item": "georgian:Salads:SHRIMP SALAD"
+    },
+    {
+      "source": "INTERNATIONAL/SOUP/Copy of 3-soko.jpg",
+      "status": "matched",
+      "item": "georgian:Soups:3 MUSHROOMS CREAM SOUP"
+    },
+    {
+      "source": "INTERNATIONAL/SOUP/Copy of Pumpkin-cream-soup-1.JPG",
+      "status": "matched",
+      "item": "georgian:Soups:PUMPKIN CREAM SOUP, CROSTINI"
+    },
+    {
+      "source": "INTERNATIONAL/SOUP/Copy of საქონლის ხორცის წვნიანი ბრინჯის ნუდლსით.jpg",
+      "status": "matched",
+      "item": "georgian:Soups:BEEF SOUP, RICE NOODLES"
+    },
+    {
+      "source": "INTERNATIONAL/SOUP/Copy of ჩიხირთმა.jpeg",
+      "status": "matched",
+      "item": "georgian:Soups:CHIKHIRTMA WITH SMOKED SULGUNI"
+    },
+    {
+      "source": "THAI/APPETIZER/Copy of shrimp donut.JPG",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "THAI/APPETIZER/Copy of ხრაშუნა კრევეტი თამარინდ სოუსით crispy shrimp with tamarind souce.jpg",
+      "status": "matched",
+      "item": "asian:Appetizer:Crispy Shrimp with Tamarind Sauce"
+    },
+    {
+      "source": "THAI/APPETIZER/Kimchi.jpg",
+      "status": "matched",
+      "item": "asian:Appetizer:Kimchi"
+    },
+    {
+      "source": "THAI/APPETIZER/Shrimp Spring Roll.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "THAI/CURRY/Grilled Chicken Red Hot Curry.jpg",
+      "status": "matched",
+      "item": "asian:Curry:Grilled Chicken Red Hot Curry"
+    },
+    {
+      "source": "THAI/CURRY/Sri Lanka curry.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "THAI/CURRY/yellow curry.jpg",
+      "status": "matched",
+      "item": "asian:Curry:Yellow Curry"
+    },
+    {
+      "source": "THAI/NOODLES/Pad Thai Noodles with chicken.jpg",
+      "status": "ambiguous",
+      "reason": "alternate Pad Thai variant; shrimp is the selected representative"
+    },
+    {
+      "source": "THAI/NOODLES/Pad Thai Shrimp Noodles.jpg",
+      "status": "matched",
+      "item": "asian:Noodles:Pad Thai Noodles"
+    },
+    {
+      "source": "THAI/NOODLES/Pad si Eyw.jpg",
+      "status": "matched",
+      "item": "asian:Noodles:Pad Si Euw"
+    },
+    {
+      "source": "THAI/RICE/Chicken Donburi.jpg",
+      "status": "matched",
+      "item": "asian:Fried Rice:Chicken Donburi"
+    },
+    {
+      "source": "THAI/RICE/Grilled chicken with curry rice.jpg",
+      "status": "matched",
+      "item": "asian:Fried Rice:Grilled chicken with curry rice"
+    },
+    {
+      "source": "THAI/RICE/Kimchi Fried rice with Bacon.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "THAI/RICE/Rice with Grilled Chicken & Satay Sauce.jpg",
+      "status": "matched",
+      "item": "asian:Fried Rice:Rice with Grilled Chicken & Satay Sauce"
+    },
+    {
+      "source": "THAI/RICE/Sriracha Fried Rice.jpg",
+      "status": "matched",
+      "item": "asian:Fried Rice:Sriracha Fried Rice"
+    },
+    {
+      "source": "THAI/RICE/Thai Style fried rice.jpg",
+      "status": "matched",
+      "item": "asian:Fried Rice:Thai Style Fried Rice"
+    },
+    {
+      "source": "THAI/SALAD/Copy of midiebis-salaTa.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "THAI/SALAD/Crab Stick Salad.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "THAI/SALAD/Crispy Chicken Salad.jpg",
+      "status": "matched",
+      "item": "asian:Salads:Crispy Chicken Salad"
+    },
+    {
+      "source": "THAI/SALAD/Grilled Chicken Salad.jpg",
+      "status": "matched",
+      "item": "asian:Salads:Grilled Chicken Salad"
+    },
+    {
+      "source": "THAI/SOUP/Kimchi Soup with Bacon.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "THAI/SOUP/Massaman Curry.jpg",
+      "status": "matched",
+      "item": "asian:Curry:Massaman Curry"
+    },
+    {
+      "source": "THAI/SOUP/Pho With Beef.jpg",
+      "status": "matched",
+      "item": "asian:Soup:Pho with Beef"
+    },
+    {
+      "source": "THAI/SOUP/Thai Noodle Soup with Chicken Shreded.jpg",
+      "status": "matched",
+      "item": "asian:Soup:Thai Noodle Soup with Chicken Shreded"
+    },
+    {
+      "source": "THAI/SOUP/Tom Kha.jpg",
+      "status": "matched",
+      "item": "asian:Soup:Tom Kha"
+    },
+    {
+      "source": "THAI/SOUP/Tom Yam  Veggie Chicken.jpg",
+      "status": "ambiguous",
+      "reason": "alternate Tom Yum variant; shrimp is the selected representative"
+    },
+    {
+      "source": "THAI/SOUP/Tom Yum Mix Seafood.jpg",
+      "status": "matched",
+      "item": "asian:Soup:Tom Yum Seafood Clear Soup"
+    },
+    {
+      "source": "THAI/SOUP/Tom Yum Ramen with Shrimp.jpg",
+      "status": "matched",
+      "item": "asian:Soup:Tom Yum Ramen with Shrimp"
+    },
+    {
+      "source": "THAI/SOUP/Tom Yum Shrimp.jpg",
+      "status": "matched",
+      "item": "asian:Soup:Tom Yum"
+    },
+    {
+      "source": "THAI/SOUP/Wakame Black Soup with Shrimp.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "THAI/STIR FRIED/Stir Fried Black Pepper Sauce.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "THAI/STIR FRIED/Stir Fried Broccoli with Shrimp.jpg",
+      "status": "matched",
+      "item": "asian:Stir Fried:Stir Fried Broccoli with Shrimp"
+    },
+    {
+      "source": "THAI/STIR FRIED/Stir Fried Cashewnut.jpg",
+      "status": "matched",
+      "item": "asian:Stir Fried:Stir Fried Cashewnut"
+    },
+    {
+      "source": "THAI/STIR FRIED/Stir Fried Chicken with Garlic.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "THAI/STIR FRIED/Stir Fried Glass Noodles.jpg",
+      "status": "matched",
+      "item": "asian:Noodles:Stir fried Glass Noodles"
+    },
+    {
+      "source": "THAI/STIR FRIED/Stir Fried Green Gurry.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "THAI/STIR FRIED/Stir fried Noodles Tom yum.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    },
+    {
+      "source": "THAI/STIR FRIED/Stir fried noodles Green curry.jpg",
+      "status": "unmatched_or_obsolete",
+      "reason": "no exact item in the official 228-row catalogue"
+    }
+  ]
+}
