@@ -1915,11 +1915,9 @@
             --thumb-bg:    #f0f0f2;
             --modal-bg:    #ffffff;
             --modal-rgb:   255,255,255;
-            --bg-image:
-                url('./img/food-market/doodles/bg-tile.png'),
-                radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1.6px);
-            --bg-size:     480px 587px, 26px 26px;
-            --bg-repeat:   repeat, repeat;
+            --bg-image:    radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1.6px);
+            --bg-size:     26px 26px;
+            --bg-repeat:   repeat;
             --card-bg:          linear-gradient(158deg, var(--card) 0%, var(--card2) 100%);
             --item-shadow:      0 0 0 rgba(0,0,0,0);
             --item-hover-shadow:0 6px 16px rgba(0,0,0,0.10);
@@ -1937,9 +1935,25 @@
                 radial-gradient(70% 48% at 50% 36%, var(--glow) 0%, transparent 62%),
                 radial-gradient(130% 100% at 50% 50%, var(--bg2) 0%, var(--modal-bg) 72%);
         }
+        /* Georgian & More and Asian each get a background watermark built
+           from that print menu's own decorative icons (petroglyphs vs. the
+           Thai doodles + origami crane). Drinks intentionally keeps the
+           plain dot-grid — its design is left as-is. */
+        [data-tenant="food-market-main"][data-theme="day"][data-fm-group="georgian"] {
+            --bg-image:
+                url('./img/food-market/doodles/tile-georgian.png'),
+                radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1.6px);
+            --bg-size:   450px 600px, 26px 26px;
+            --bg-repeat: repeat, repeat;
+        }
         [data-tenant="food-market-main"][data-theme="day"][data-fm-group="asian"] {
             --accent:  #8f4f9f;
             --accent2: #6c3a7a;
+            --bg-image:
+                url('./img/food-market/doodles/tile-asian.png'),
+                radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1.6px);
+            --bg-size:   410px 501px, 26px 26px;
+            --bg-repeat: repeat, repeat;
         }
         [data-tenant="food-market-main"][data-theme="day"][data-fm-group="drinks"] {
             --accent:  #7a2340;
@@ -2002,6 +2016,10 @@
         [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="th-flower"]::after      { background-image: url('./img/food-market/doodles/th-flower.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="th-star"]::after        { background-image: url('./img/food-market/doodles/th-star.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="th-chili"]::after       { background-image: url('./img/food-market/doodles/th-chili.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="pg-wrestler"]::after     { background-image: url('./img/food-market/doodles/pg-wrestler.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="pg-duel"]::after         { background-image: url('./img/food-market/doodles/pg-duel.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="pg-raised-hands"]::after { background-image: url('./img/food-market/doodles/pg-raised-hands.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="pg-river"]::after        { background-image: url('./img/food-market/doodles/pg-river.png'); }
         /* Japanese sub-categories: the actual kanji word from the print
            menu's "Origami" page, instead of a doodle. */
         [data-tenant="food-market-main"][data-theme="day"] .category-header[data-kanji]::after {
@@ -2049,6 +2067,11 @@
         [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="th-flower"]::after      { background-image: url('./img/food-market/doodles/th-flower-dark.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="th-star"]::after        { background-image: url('./img/food-market/doodles/th-star-dark.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="th-chili"]::after       { background-image: url('./img/food-market/doodles/th-chili-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="jp-crane"]::after       { background-image: url('./img/food-market/doodles/jp-crane-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="pg-wrestler"]::after     { background-image: url('./img/food-market/doodles/pg-wrestler-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="pg-duel"]::after         { background-image: url('./img/food-market/doodles/pg-duel-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="pg-raised-hands"]::after { background-image: url('./img/food-market/doodles/pg-raised-hands-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="pg-river"]::after        { background-image: url('./img/food-market/doodles/pg-river-dark.png'); }
 
         /* Sticky category bar — after you scroll past the hero it stays pinned to
            the top so diners can switch categories at any point. Scoped to the
@@ -9917,8 +9940,12 @@
         // same string data-cat-name already carries) so the pick never shifts
         // on re-render/language toggle. Drinks and Poke Bowl have no print
         // reference, so they get nothing rather than an invented icon.
-        const _FM_GEORGIAN_DOODLES = ['pg-shaman', 'pg-eye-legs', 'pg-diver', 'pg-totem', 'pg-deer-star', 'pg-deer-running', 'pg-sun', 'pg-hunter'];
+        const _FM_GEORGIAN_DOODLES = ['pg-shaman', 'pg-eye-legs', 'pg-diver', 'pg-totem', 'pg-deer-star', 'pg-deer-running', 'pg-sun', 'pg-hunter', 'pg-wrestler', 'pg-duel', 'pg-raised-hands', 'pg-river'];
         const _FM_THAI_DOODLES = ['th-sun-burst', 'th-flower', 'th-star', 'th-chili'];
+        // Card-corner accents for the whole Asian (Thai + Japanese) group: the
+        // Thai doodles plus the origami crane lifted from the Japanese
+        // "Origami" page, so Japanese dishes get a symbol too.
+        const _FM_ASIAN_CARD_DOODLES = [..._FM_THAI_DOODLES, 'jp-crane'];
         const _FM_JAPANESE_KANJI = {
             'Japanese — Sashimi': '刺身',
             'Japanese — Nigiri': '握り寿司',
@@ -9940,17 +9967,26 @@
             for (let i = 0; i < clean.length; i++) hash = (hash * 31 + clean.charCodeAt(i)) >>> 0;
             return { doodle: icons[hash % icons.length] };
         }
-        // Same doodle set, stamped faintly in a corner of roughly one in three
-        // dish cards so the white cards pick up the print menu's hand-drawn
-        // feel instead of sitting empty. Hashed from globalIdx (stable across
-        // language toggles, unlike the translated name) with a multiplicative
-        // hash so the "every third card" selection doesn't look mechanically
-        // periodic on screen.
-        const _FM_ALL_DOODLES = [..._FM_GEORGIAN_DOODLES, ..._FM_THAI_DOODLES];
+        // Same doodle set, stamped faintly in a corner of most dish cards so
+        // the white cards pick up the print menu's hand-drawn feel instead of
+        // sitting empty. Picked from whichever group's tab is on screen
+        // (Georgian & More vs. Asian), so a Georgian dish never shows a Thai
+        // doodle or vice versa; Drinks keeps its design untouched, so it gets
+        // none. Hashed from globalIdx (stable across language toggles, unlike
+        // the translated name) with a multiplicative hash so the selection
+        // doesn't look mechanically periodic on screen.
         function _foodMarketCardDoodle(globalIdx) {
+            const group = document.documentElement.dataset.fmGroup;
+            const pool = group === 'georgian' ? _FM_GEORGIAN_DOODLES
+                       : group === 'asian'    ? _FM_ASIAN_CARD_DOODLES
+                       : null;
+            if (!pool) return null;
             const hash = (Math.imul(globalIdx + 1, 2654435761) >>> 0);
-            if (hash % 3 !== 0) return null;
-            return _FM_ALL_DOODLES[Math.floor(hash / 3) % _FM_ALL_DOODLES.length];
+            if (hash % 5 >= 3) return null; // ~3 in 5 cards
+            return pool[Math.floor(hash / 5) % pool.length];
+        }
+        function _isFoodMarketDrinksActive() {
+            return _isFoodMarketTenant() && document.documentElement.dataset.fmGroup === 'drinks';
         }
         function _isMingleyardTenant() {
             return document.documentElement.dataset.tenant === 'social-dining'
@@ -13075,7 +13111,10 @@
                 const thumbSrc = selectedVariantImage || _safeAssetUrl(item.thumbnail_url);
                 // A non-3D item (is_3d === false) or an item with no model renders as a
                 // plain photo card: no 3D badge, no live-3D thumbnail upgrade, no AR button.
-                const has3d = _isAREnabledMenuItem(item);
+                // On the Drinks tab, 3D is suppressed entirely regardless of the item's
+                // own is_3d flag — nobody wants a rotating burger model while browsing
+                // drinks, so those cards fall back to a plain photo card.
+                const has3d = _isAREnabledMenuItem(item) && !_isFoodMarketDrinksActive();
                 const modelSrc = has3d ? _safeAssetUrl(item.model) : '';
                 const noImage = item.text_only === true || (!thumbSrc && !has3d);
                 // thumb_3d (admin checkbox "also load 3D model in thumbnail") controls ONLY
@@ -13278,6 +13317,11 @@
             const AR_CAT = '__ar3d';
 
             function _arEntriesForActiveGroup() {
+                // Drinks is the one Food & Market view where nobody wants the global
+                // 3D showcase — searching for a wine shouldn't surface a rotating
+                // burger. Scoped to this one group only; Georgian & More and Asian
+                // keep the showcase exactly as before.
+                if (_isFoodMarketTenant() && _activeGroup === 'drinks') return [];
                 let arEntries = items
                     .map((item, globalIdx) => ({ item, globalIdx }))
                     .filter(({ item }) => _isAREnabledMenuItem(item));
