@@ -1874,6 +1874,103 @@
             box-shadow: 0 4px 12px -4px var(--shadow, rgba(0,0,0,0.4));
         }
 
+        /* Food & Market — white/day theme reskin, matching the printed menus
+           (FM-GEORGIAN / FM-ASIAN, May 2026): plain white page, near-black
+           "Georgian & More" identity, purple "Thai" identity, and a red
+           underline for the "Japanese" sub-section — instead of the shared
+           warm-beige default. Scoped to data-theme="day" only; the night
+           theme is untouched.
+
+           This tenant already has an admin-configured theme_config (a
+           generic olive/sage palette from the `minimal_sushi` template),
+           injected at runtime as a <style id="remote-theme"> block that is
+           appended to <head> AFTER this stylesheet. Its rules are plain
+           [data-theme="day"]/[data-theme="night"], so it beats the
+           original lower-specificity theme purely on source order for any
+           derived variable (--hero-color, --cta-bg, --pill-active-bg, …)
+           it sets directly. Every such derived variable is therefore
+           re-declared explicitly below so this block's higher specificity
+           — two/three attribute selectors on <html> vs. the remote
+           block's one — wins regardless of what admin colours are on
+           file. --accent/--accent2 are the only per-group knobs; every
+           other derived variable is a var(--accent)-based formula copied
+           from the base day theme so it re-tints automatically. The
+           active group is read from a data-fm-group attribute kept on
+           <html> (not <body>) specifically so this var() chaining
+           resolves against the same element that declares it. */
+        [data-tenant="food-market-main"][data-theme="day"] {
+            --bg:          #ffffff;
+            --bg2:         #f5f5f7;
+            --glow:        rgba(0,0,0,0.05);
+            --glow2:       rgba(0,0,0,0.035);
+            --shadow:      rgba(0,0,0,0.16);
+            --card:        #ffffff;
+            --card2:       #f6f6f8;
+            --border:      rgba(0,0,0,0.12);
+            --text:        #1a1a1a;
+            --dim:         #5c5c5c;
+            --accent:      #171717;
+            --accent2:     #000000;
+            --accent-text: #ffffff;
+            --thumb-bg:    #f0f0f2;
+            --modal-bg:    #ffffff;
+            --modal-rgb:   255,255,255;
+            --bg-image:    radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1.6px);
+            --bg-size:     26px 26px;
+            --bg-repeat:   repeat;
+            --card-bg:          linear-gradient(158deg, var(--card) 0%, var(--card2) 100%);
+            --item-shadow:      0 3px 10px var(--shadow);
+            --item-hover-shadow:0 10px 22px var(--shadow);
+            --accent-edge:      linear-gradient(180deg, var(--accent), var(--accent2));
+            --stage-bg:         var(--thumb-bg);
+            --thumb-vignette:   radial-gradient(ellipse at center, transparent 32%, var(--card) 100%);
+            --pill-bg:          var(--card);
+            --pill-active-bg:   linear-gradient(120deg, var(--accent), var(--accent2));
+            --cta-bg:           linear-gradient(120deg, var(--accent), var(--accent2));
+            --cta-shadow:       0 4px 14px var(--glow);
+            --hero-color:       var(--accent);
+            --hero-shadow:      0 2px 16px var(--glow);
+            --divider-bg:       linear-gradient(90deg, transparent, var(--accent2), transparent);
+            --modal-bg-image:
+                radial-gradient(70% 48% at 50% 36%, var(--glow) 0%, transparent 62%),
+                radial-gradient(130% 100% at 50% 50%, var(--bg2) 0%, var(--modal-bg) 72%);
+        }
+        [data-tenant="food-market-main"][data-theme="day"][data-fm-group="asian"] {
+            --accent:  #8f4f9f;
+            --accent2: #6c3a7a;
+        }
+        [data-tenant="food-market-main"][data-theme="day"][data-fm-group="drinks"] {
+            --accent:  #7a2340;
+            --accent2: #5a1930;
+        }
+        /* Category headers become solid brand-colour banners (like the print
+           menu's colour blocks) instead of plain underlined text. Default
+           (Georgian, Drinks) is near-black; data-cat-name carries the
+           untranslated English category name regardless of UI language, so
+           the prefix match works in Georgian/English/Russian alike. */
+        [data-tenant="food-market-main"][data-theme="day"] .category-header {
+            color: #fff;
+            background: #171717;
+            border-bottom: none;
+            border-radius: 8px;
+            padding: 9px 16px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-cat-name^="Thai"] {
+            background: #8f4f9f;
+        }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-cat-name^="Drinks"] {
+            background: #7a2340;
+        }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-cat-name^="Japanese"] {
+            background: transparent;
+            color: #e51b22;
+            border-bottom: 2px solid #e51b22;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 9px 4px 8px;
+        }
+
         /* Sticky category bar — after you scroll past the hero it stays pinned to
            the top so diners can switch categories at any point. Scoped to the
            monday_greens skin so other templates are unchanged. */
@@ -13299,6 +13396,7 @@
                     const url = new URL(location.href);
                     url.searchParams.set('menu', g);
                     history.replaceState(history.state, '', url);
+                    document.documentElement.dataset.fmGroup = g;
                 }
                 document.querySelectorAll('.group-btn').forEach(b => b.classList.toggle('active', b.dataset.group === g));
                 _updateGroupPillVisibility();
@@ -13325,6 +13423,7 @@
                 _activeGroup = _isFoodMarketTenant()
                     ? _fmGroupFromQuery()
                     : ((window.__menuGroup === 'drink') ? 'drink' : 'food');
+                if (_isFoodMarketTenant()) document.documentElement.dataset.fmGroup = _activeGroup;
                 _renderGroupToggle();
                 groupsDiv.hidden = false;
                 _updateGroupPillVisibility();
