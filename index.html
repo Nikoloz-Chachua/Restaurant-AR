@@ -12350,11 +12350,13 @@
                 _applyMugsyCopy();
                 const logoUrl = _safeAssetUrl(cfg.logo_url);
                 const logo = document.getElementById('tenant-logo');
-                if (logo && logoUrl) {
+                if (logo && logoUrl && !_isFoodMarketTenant()) {
                     logo.src = logoUrl;
                     logo.alt = _isBaomaTenant() ? _localizedBrandTitle() : (cfg.site_name || tenant.restaurant_name || 'Restaurant logo');
                     logo.style.display = 'block';
-                    logo.onerror = () => { logo.style.display = 'none'; };
+                    logo.onerror = () => { logo.style.display = 'none'; }
+                } else if (logo && _isFoodMarketTenant()) {
+                    logo.style.display = 'none';
                 }
                 const baomaLogo = document.getElementById('baoma-topbar-logo');
                 if (baomaLogo && logoUrl) {
