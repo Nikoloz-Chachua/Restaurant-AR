@@ -107,6 +107,13 @@ test('an explicit unresolved tenant never leaks the shared fallback menu', () =>
   )
 })
 
+test('Food & Market Drinks never exposes the global 3D collection', () => {
+  const entriesBlock = html.match(/function _arEntriesForActiveGroup\(\) \{([\s\S]*?)\n            \}/)
+  assert.ok(entriesBlock, 'Missing AR entries filter')
+  assert.match(entriesBlock[1], /_isFoodMarketTenant\(\) && _activeGroup === 'drink'/)
+  assert.match(entriesBlock[1], /return \[\];/)
+})
+
 test('pictured choices drive the card image and pictureless first choices fall through to the first pictured choice', () => {
   assert.match(html, /function _variantIndex\(item, globalIdx\) \{[\s\S]*?findIndex\(v => _safeAssetUrl\(v\?\.image_url\)\)/)
   assert.match(html, /function _selectedVariantImage\(item, globalIdx\) \{[\s\S]*?_safeAssetUrl\(item\.variants\[_variantIndex\(item, globalIdx\)\]\?\.image_url\)/)

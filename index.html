@@ -13237,12 +13237,13 @@
             const AR_CAT = '__ar3d';
 
             function _arEntriesForActiveGroup() {
+                // Food & Market keeps its Drinks view catalogue-only: no cross-listed 3D dishes.
+                if (_isFoodMarketTenant() && _activeGroup === 'drink') return [];
                 let arEntries = items
                     .map((item, globalIdx) => ({ item, globalIdx }))
                     .filter(({ item }) => _isAREnabledMenuItem(item));
-                // Food & Market has separate Georgian/Asian/Drinks catalogue views, but
-                // 3D is a global showcase: every model-backed dish belongs at the top of
-                // each view, even when its source category lives in another menu group.
+                // Food & Market's food views keep the global 3D showcase; other tenants only
+                // show 3D dishes from their currently active menu group.
                 if (_groupingOn() && !_isFoodMarketTenant()) {
                     arEntries = arEntries.filter(({ item }) => _groupOf(item.category) === _activeGroup);
                 }
