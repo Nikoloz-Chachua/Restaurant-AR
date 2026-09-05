@@ -55,3 +55,9 @@ test('an explicit unresolved tenant never leaks the shared fallback menu', () =>
     'Explicit tenant failures must stay empty instead of loading foods/menu.json',
   )
 })
+
+test('the Drinks menu never exposes the virtual AR / 3D featured collection', () => {
+  const entriesBlock = html.match(/function _arEntriesForActiveGroup\(\) \{([\s\S]*?)\n            \}/)
+  assert.ok(entriesBlock, 'Missing AR entries filter')
+  assert.match(entriesBlock[1], /if \(_activeGroup === 'drink'\) return \[\];/)
+})
