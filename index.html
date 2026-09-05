@@ -2030,6 +2030,13 @@
             color: #e51b22;
             opacity: 0.8;
         }
+        /* Spicy / veggie call-outs, matching the print menu's own pepper and
+           leaf icons next to specific dish names (see _foodMarketDietBadges). */
+        [data-tenant="food-market-main"] .item-name .fm-diet-badge {
+            margin-left: 5px;
+            font-size: 0.85em;
+            font-style: normal;
+        }
         /* Same doodle set, faint and dark, stamped in a corner of roughly one
            in three dishes (picked deterministically in JS — see
            _foodMarketCardDoodle) so the white cards pick up the print menu's
@@ -9988,6 +9995,37 @@
         function _isFoodMarketDrinksActive() {
             return _isFoodMarketTenant() && document.documentElement.dataset.fmGroup === 'drinks';
         }
+        // Dietary call-outs, matching the little pepper / veggie icons printed
+        // next to these exact dishes on the FM-GEORGIAN and FM-ASIAN menus.
+        // Keyed by the English dish name (item.name at runtime, before
+        // per-language translation) since that's what the print menu itself
+        // marked — a Georgian/Russian rename would not add or remove the
+        // PDF's own icon. "Veggie alternative available" (Tom Yum, Tom Kha)
+        // is not the same as the dish itself being vegetarian, so those are
+        // spicy-only.
+        const _FM_SPICY_ITEMS = new Set([
+            'Stir Fried Cashewnut', 'Sriracha Fried Rice', 'Rice with Grilled Chicken & Satay Sauce',
+            'Grilled Chicken Salad', 'Crispy Chicken Salad', 'Kimchi', 'Panang Curry', 'Massaman Curry',
+            'Grilled Chicken Red Hot Curry', 'Green Curry', 'Yellow Curry', 'Stir fried Noodles Sriracha Sauce',
+            'Pad Thai Noodles', 'Tom Yum Seafood Clear Soup', 'Tom Yum', 'Tom Kha', 'Tom Yum Ramen with Shrimp',
+            'Salmon Poke Bowl',
+            // Named "Spicy ___" on the Origami roll page rather than icon-marked —
+            // just as unambiguous as the icon.
+            'Spicy Salmon', 'Spicy Tuna', 'Spicy Philadelphia',
+        ]);
+        const _FM_VEGGIE_ITEMS = new Set([
+            'MARGHERITA', 'VEGETARIAN', 'PENNE ARRABIATA', 'MUSHROOM & TRUFFLE FUSILLONI',
+            'Thai Style Fried Rice', 'Stir fried Glass Noodles', 'Pad Si Euw', 'Pad Thai Noodles',
+            'Veggie Futomaki',
+        ]);
+        function _foodMarketDietBadges(item) {
+            if (!_isFoodMarketTenant()) return '';
+            const name = item.name;
+            let badges = '';
+            if (_FM_SPICY_ITEMS.has(name))  badges += '<span class="fm-diet-badge" title="Spicy" aria-label="Spicy">🌶️</span>';
+            if (_FM_VEGGIE_ITEMS.has(name)) badges += '<span class="fm-diet-badge" title="Vegetarian" aria-label="Vegetarian">🌱</span>';
+            return badges;
+        }
         function _isMingleyardTenant() {
             return document.documentElement.dataset.tenant === 'social-dining'
                 && document.documentElement.dataset.template === 'social_dining';
@@ -13143,7 +13181,7 @@
                     ? _variantsHtml(item, globalIdx) + _addonsHtml(item, globalIdx)
                     : '';
                 card.innerHTML = `
-                    <p class="item-name" data-field="name" data-idx="${globalIdx}">${itemNameHtml}</p>
+                    <p class="item-name" data-field="name" data-idx="${globalIdx}">${itemNameHtml}${_foodMarketDietBadges(item)}</p>
                     ${noImage ? '' : `<div class="item-left">
                         <div class="thumb-wrap">
                             <img class="thumb-img"${thumbSrc ? ` src="${thumbSrc}"` : ''} data-model="${thumbModelSrc}" alt="${itemNameHtml}" loading="lazy">
