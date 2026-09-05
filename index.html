@@ -12940,7 +12940,9 @@
                         if (entries.length) list.appendChild(renderCategorySection(selected, entries, true));
                     }
                 } else {
-                    if (!_isFoodMarketTenant()) renderARFeaturedBlock(list);
+                    // The Food & Market catalogue is split into menu groups, but its 3D
+                    // dishes are deliberately cross-listed first as the AR showcase.
+                    renderARFeaturedBlock(list);
                     renderMostOrderedBlock(list);
                     // Every category keeps ALL its items (3D ones included), in menu order —
                     // a 3D dish appears both in the virtual 3D block above and here. When
