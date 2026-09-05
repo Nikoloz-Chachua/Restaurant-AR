@@ -1915,12 +1915,14 @@
             --thumb-bg:    #f0f0f2;
             --modal-bg:    #ffffff;
             --modal-rgb:   255,255,255;
-            --bg-image:    radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1.6px);
-            --bg-size:     26px 26px;
-            --bg-repeat:   repeat;
+            --bg-image:
+                url('./img/food-market/doodles/bg-tile.png'),
+                radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1.6px);
+            --bg-size:     480px 587px, 26px 26px;
+            --bg-repeat:   repeat, repeat;
             --card-bg:          linear-gradient(158deg, var(--card) 0%, var(--card2) 100%);
-            --item-shadow:      0 3px 10px var(--shadow);
-            --item-hover-shadow:0 10px 22px var(--shadow);
+            --item-shadow:      0 0 0 rgba(0,0,0,0);
+            --item-hover-shadow:0 6px 16px rgba(0,0,0,0.10);
             --accent-edge:      linear-gradient(180deg, var(--accent), var(--accent2));
             --stage-bg:         var(--thumb-bg);
             --thumb-vignette:   radial-gradient(ellipse at center, transparent 32%, var(--card) 100%);
@@ -2010,6 +2012,43 @@
             color: #e51b22;
             opacity: 0.8;
         }
+        /* Same doodle set, faint and dark, stamped in a corner of roughly one
+           in three dishes (picked deterministically in JS — see
+           _foodMarketCardDoodle) so the white cards pick up the print menu's
+           hand-drawn feel instead of sitting empty. Purely decorative: kept
+           behind the card's own content and out of the way of price/cart. */
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle]::after {
+            content: '';
+            position: absolute;
+            right: 10px;
+            bottom: 8px;
+            width: 46px;
+            height: 46px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.16;
+            pointer-events: none;
+            z-index: 0;
+        }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item.no-image[data-bg-doodle]::after {
+            right: 14px;
+            bottom: 10px;
+            width: 38px;
+            height: 38px;
+        }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="pg-shaman"]::after      { background-image: url('./img/food-market/doodles/pg-shaman-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="pg-eye-legs"]::after    { background-image: url('./img/food-market/doodles/pg-eye-legs-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="pg-diver"]::after       { background-image: url('./img/food-market/doodles/pg-diver-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="pg-totem"]::after       { background-image: url('./img/food-market/doodles/pg-totem-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="pg-deer-star"]::after   { background-image: url('./img/food-market/doodles/pg-deer-star-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="pg-deer-running"]::after{ background-image: url('./img/food-market/doodles/pg-deer-running-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="pg-sun"]::after         { background-image: url('./img/food-market/doodles/pg-sun-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="pg-hunter"]::after      { background-image: url('./img/food-market/doodles/pg-hunter-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="th-sun-burst"]::after   { background-image: url('./img/food-market/doodles/th-sun-burst-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="th-flower"]::after      { background-image: url('./img/food-market/doodles/th-flower-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="th-star"]::after        { background-image: url('./img/food-market/doodles/th-star-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="th-chili"]::after       { background-image: url('./img/food-market/doodles/th-chili-dark.png'); }
 
         /* Sticky category bar — after you scroll past the hero it stays pinned to
            the top so diners can switch categories at any point. Scoped to the
@@ -9901,6 +9940,18 @@
             for (let i = 0; i < clean.length; i++) hash = (hash * 31 + clean.charCodeAt(i)) >>> 0;
             return { doodle: icons[hash % icons.length] };
         }
+        // Same doodle set, stamped faintly in a corner of roughly one in three
+        // dish cards so the white cards pick up the print menu's hand-drawn
+        // feel instead of sitting empty. Hashed from globalIdx (stable across
+        // language toggles, unlike the translated name) with a multiplicative
+        // hash so the "every third card" selection doesn't look mechanically
+        // periodic on screen.
+        const _FM_ALL_DOODLES = [..._FM_GEORGIAN_DOODLES, ..._FM_THAI_DOODLES];
+        function _foodMarketCardDoodle(globalIdx) {
+            const hash = (Math.imul(globalIdx + 1, 2654435761) >>> 0);
+            if (hash % 3 !== 0) return null;
+            return _FM_ALL_DOODLES[Math.floor(hash / 3) % _FM_ALL_DOODLES.length];
+        }
         function _isMingleyardTenant() {
             return document.documentElement.dataset.tenant === 'social-dining'
                 && document.documentElement.dataset.template === 'social_dining';
@@ -13191,6 +13242,11 @@
                         }
                     });
                 });
+
+                if (_isFoodMarketTenant()) {
+                    const bgDoodle = _foodMarketCardDoodle(globalIdx);
+                    if (bgDoodle) card.dataset.bgDoodle = bgDoodle;
+                }
 
                 return card;
             }
