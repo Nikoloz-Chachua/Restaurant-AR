@@ -417,17 +417,16 @@
             word-break: break-word;
         }
 
-        /* ── Monday Greens template — mobile card layout ──
-           Name becomes the full-width top row; image bottom-left, description
-           bottom-right. Long Georgian names wrap to the next line instead of
-           being clipped in the old narrow (108px) name column. Scoped to this
-           template only so other tenants' cards are unchanged. */
-        [data-template="monday_greens"] .menu-item {
+        /* Full-width names keep long Food & Market and Monday Greens dishes readable
+           above the image/details row instead of constraining them to the 108px column. */
+        [data-template="monday_greens"] .menu-item,
+        [data-template="minimal_sushi"] .menu-item {
             grid-template-columns: 108px minmax(0, 1fr);
             grid-template-areas: "name  name" "left  right";
             min-width: 0;
         }
-        [data-template="monday_greens"] .item-name {
+        [data-template="monday_greens"] .item-name,
+        [data-template="minimal_sushi"] .item-name {
             overflow-wrap: anywhere;
             word-break: normal;
             white-space: normal;
