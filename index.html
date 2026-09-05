@@ -4844,6 +4844,9 @@
             const AR_CAT = '__ar3d';
 
             function _arEntriesForActiveGroup() {
+                // The Drinks view is intentionally a clean catalogue: never show the
+                // virtual AR/3D feature block or its 3D filter there.
+                if (_activeGroup === 'drink') return [];
                 let arEntries = items
                     .map((item, globalIdx) => ({ item, globalIdx }))
                     .filter(({ item }) => _isAREnabledMenuItem(item));

@@ -45,3 +45,9 @@ test('3D thumbnail frame clips media without stretching on phone and wider layou
   assert.match(html, /\[data-phone-layout="twin"\] \.thumb-wrap \{[\s\S]*?aspect-ratio:\s*1 \/ 1;/)
   assert.match(html, /\[data-phone-layout="twin"\] \.thumb-wrap \.thumb-img,\s*\n\s*\[data-phone-layout="twin"\] \.thumb-wrap model-viewer \{[\s\S]*?height:\s*100%;/)
 })
+
+test('the Drinks menu never exposes the virtual AR / 3D featured collection', () => {
+  const entriesBlock = html.match(/function _arEntriesForActiveGroup\(\) \{([\s\S]*?)\n            \}/)
+  assert.ok(entriesBlock, 'Missing AR entries filter')
+  assert.match(entriesBlock[1], /if \(_activeGroup === 'drink'\) return \[];/)
+})
