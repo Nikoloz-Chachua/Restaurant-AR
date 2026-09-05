@@ -1826,14 +1826,48 @@
             letter-spacing: 0.3px;
             font-size: 0.9rem;
         }
-        [data-tenant="food-market-main"] .menu-groups { max-width: 450px; }
+        /* Food & Market: the logo repeats the title, so its menu artwork leads the
+           three primary catalogue buttons instead. */
+        [data-tenant="food-market-main"] #tenant-logo { display: none; }
+        [data-tenant="food-market-main"] .menu-groups {
+            max-width: 450px;
+            gap: 8px;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+        }
         [data-tenant="food-market-main"] .group-btn {
             min-width: 0;
-            padding: 9px 5px;
-            font-size: 0.78rem;
+            min-height: 82px;
+            padding: 8px 6px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background-color: var(--pill-bg);
+            color: var(--text);
+            font-size: 0.76rem;
             letter-spacing: 0.2px;
             text-transform: none;
             line-height: 1.15;
+        }
+        [data-tenant="food-market-main"] .group-btn[data-group="georgian"],
+        [data-tenant="food-market-main"] .group-btn[data-group="drinks"] {
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.85);
+        }
+        [data-tenant="food-market-main"] .group-btn[data-group="georgian"] {
+            background-image: linear-gradient(rgba(0,0,0,0.22), rgba(0,0,0,0.52)), url('./img/food-market-georgian-more.png');
+        }
+        [data-tenant="food-market-main"] .group-btn[data-group="drinks"] {
+            background-image: linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.46)), url('./img/food-market-drinks.png');
+        }
+        [data-tenant="food-market-main"] .group-btn.active {
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+            box-shadow: 0 4px 12px -4px var(--shadow, rgba(0,0,0,0.4));
         }
 
         /* Sticky category bar — after you scroll past the hero it stays pinned to
