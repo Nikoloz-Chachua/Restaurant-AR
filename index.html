@@ -1949,6 +1949,10 @@
            untranslated English category name regardless of UI language, so
            the prefix match works in Georgian/English/Russian alike. */
         [data-tenant="food-market-main"][data-theme="day"] .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
             color: #fff;
             background: #171717;
             border-bottom: none;
@@ -1969,6 +1973,42 @@
             border-radius: 0;
             box-shadow: none;
             padding: 9px 4px 8px;
+        }
+        /* Hand-drawn doodle lifted from the print menu, one per Georgian/Thai
+           category (picked deterministically in JS — see
+           _foodMarketCategoryDecoration). White silhouette so it reads on
+           every banner colour. */
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle]::after {
+            content: '';
+            flex: none;
+            width: 24px;
+            height: 24px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.92;
+        }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="pg-shaman"]::after      { background-image: url('./img/food-market/doodles/pg-shaman.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="pg-eye-legs"]::after    { background-image: url('./img/food-market/doodles/pg-eye-legs.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="pg-diver"]::after       { background-image: url('./img/food-market/doodles/pg-diver.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="pg-totem"]::after       { background-image: url('./img/food-market/doodles/pg-totem.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="pg-deer-star"]::after   { background-image: url('./img/food-market/doodles/pg-deer-star.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="pg-deer-running"]::after{ background-image: url('./img/food-market/doodles/pg-deer-running.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="pg-sun"]::after         { background-image: url('./img/food-market/doodles/pg-sun.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="pg-hunter"]::after      { background-image: url('./img/food-market/doodles/pg-hunter.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="th-sun-burst"]::after   { background-image: url('./img/food-market/doodles/th-sun-burst.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="th-flower"]::after      { background-image: url('./img/food-market/doodles/th-flower.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="th-star"]::after        { background-image: url('./img/food-market/doodles/th-star.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="th-chili"]::after       { background-image: url('./img/food-market/doodles/th-chili.png'); }
+        /* Japanese sub-categories: the actual kanji word from the print
+           menu's "Origami" page, instead of a doodle. */
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-kanji]::after {
+            content: attr(data-kanji);
+            flex: none;
+            font-size: 1.05rem;
+            font-weight: 400;
+            color: #e51b22;
+            opacity: 0.8;
         }
 
         /* Sticky category bar — after you scroll past the hero it stays pinned to
@@ -9830,6 +9870,37 @@
             if (!_isFoodMarketTenant()) return _cleanText(name);
             return _cleanText(name).replace(/^(?:Georgian|Thai|Japanese|Drinks|ქართული|ტაილანდური|იაპონური|სასმელები)\s+—\s+/, '');
         }
+        // Small hand-drawn accents lifted from the printed menus (FM-GEORGIAN /
+        // FM-ASIAN, May 2026): Georgian & More gets the print's petroglyph
+        // doodles, Thai gets its sun/star/chili doodles, Japanese gets the
+        // actual kanji word for that dish style (as printed on the "Origami"
+        // page). Deterministic per category (hashed from the English name, the
+        // same string data-cat-name already carries) so the pick never shifts
+        // on re-render/language toggle. Drinks and Poke Bowl have no print
+        // reference, so they get nothing rather than an invented icon.
+        const _FM_GEORGIAN_DOODLES = ['pg-shaman', 'pg-eye-legs', 'pg-diver', 'pg-totem', 'pg-deer-star', 'pg-deer-running', 'pg-sun', 'pg-hunter'];
+        const _FM_THAI_DOODLES = ['th-sun-burst', 'th-flower', 'th-star', 'th-chili'];
+        const _FM_JAPANESE_KANJI = {
+            'Japanese — Sashimi': '刺身',
+            'Japanese — Nigiri': '握り寿司',
+            'Japanese — Onigiri': 'お握り',
+            'Japanese — Maki': '巻き',
+            'Japanese — Uramaki Roll': '裏巻き',
+            'Japanese — Futomaki': '太巻き',
+        };
+        function _foodMarketCategoryDecoration(name) {
+            const clean = String(name || '');
+            const prefix = clean.split('—')[0].trim();
+            if (prefix === 'Japanese') {
+                const kanji = _FM_JAPANESE_KANJI[clean];
+                return kanji ? { kanji } : {};
+            }
+            const icons = prefix === 'Georgian' ? _FM_GEORGIAN_DOODLES : prefix === 'Thai' ? _FM_THAI_DOODLES : null;
+            if (!icons) return {};
+            let hash = 0;
+            for (let i = 0; i < clean.length; i++) hash = (hash * 31 + clean.charCodeAt(i)) >>> 0;
+            return { doodle: icons[hash % icons.length] };
+        }
         function _isMingleyardTenant() {
             return document.documentElement.dataset.tenant === 'social-dining'
                 && document.documentElement.dataset.template === 'social_dining';
@@ -12938,6 +13009,11 @@
                 header.dataset.catName   = cat.name;
                 header.dataset.catNameKa = cat.name_ka;
                 header.textContent = _foodMarketVisibleCategory(_byLang(cat.name, cat.name_ka, cat.name_ru));
+                if (_isFoodMarketTenant()) {
+                    const deco = _foodMarketCategoryDecoration(cat.name);
+                    if (deco.doodle) header.dataset.doodle = deco.doodle;
+                    if (deco.kanji) header.dataset.kanji = deco.kanji;
+                }
                 return header;
             }
 
