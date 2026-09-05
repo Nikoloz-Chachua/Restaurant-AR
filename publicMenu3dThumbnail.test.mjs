@@ -48,9 +48,53 @@ test('3D thumbnail frame clips media without stretching on phone and wider layou
 
 test('a configured hero image is available to every shared-template tenant', () => {
   assert.match(html, /html\[data-generic-hero="true"\] \.mg-hero \{[\s\S]*?display:\s*flex;/)
-  assert.match(html, /document\.documentElement\.dataset\.heroImage = heroShots\.length \? 'true' : 'false';/)
-  assert.match(html, /document\.documentElement\.dataset\.genericHero = heroShots\.length && !HERO_NATIVE_SHELL_TEMPLATES\.has\(templateKey\) \? 'true' : 'false';/)
+  assert.match(html, /document\.documentElement\.dataset\.heroImage = heroStill \? 'true' : 'false';/)
+  assert.match(html, /document\.documentElement\.dataset\.genericHero = Boolean\(heroStill \|\| heroClip\) && !HERO_NATIVE_SHELL_TEMPLATES\.has\(templateKey\) \? 'true' : 'false';/)
   assert.match(html, /\.mg-hero-photo \{[\s\S]*?background-image:\s*var\(--hero-image, none\)/)
+})
+
+test('a hero video never costs the first paint, and always leaves a still behind', () => {
+  // Ships without a src: whatever the clip costs, it is spent after the band has
+  // already painted from the poster.
+  const tag = html.match(/<video id="mg-hero-video"[\s\S]*?>/)
+  assert.ok(tag, 'Missing hero video element')
+  assert.ok(!/\ssrc=/.test(tag[0]), 'Hero video must not carry a src in the markup')
+  assert.match(tag[0], /preload="none"/)
+  // Autoplay on a phone is muted + inline or it is nothing.
+  assert.match(tag[0], /\bmuted\b/)
+  assert.match(tag[0], /\bplaysinline\b/)
+  assert.match(tag[0], /\bloop\b/)
+
+  // The poster survives every path that skips the clip.
+  assert.match(html, /const heroStill = \(heroClip \? heroPoster : ''\) \|\| heroShots\[0\] \|\| heroPoster \|\| '';/)
+  assert.match(html, /function _heroVideoWanted\(\) \{[\s\S]*?prefers-reduced-motion: reduce[\s\S]*?return false;/)
+  assert.match(html, /function _heroVideoWanted\(\) \{[\s\S]*?c\.saveData[\s\S]*?return false;/)
+  assert.match(html, /function _heroVideoWanted\(\) \{[\s\S]*?2g[\s\S]*?return false;/)
+
+  // Only revealed once frames exist, so the fade never crosses a black frame.
+  assert.match(html, /vid\.addEventListener\('loadeddata'[\s\S]*?dataset\.heroVideo = 'true'/)
+  assert.match(html, /vid\.addEventListener\('error'[\s\S]*?dataset\.heroVideo = 'failed'/)
+
+  // A clip and a photo rotation on the same band is a flicker, not a feature.
+  assert.match(html, /if \(!heroVideoOn && HERO_GALLERY_TEMPLATES\.has\(templateKey\) && heroShots\.length > 1\) _startHeroGallery\(heroShots\);/)
+
+  const videoRule = cssRule('.mg-hero-video')
+  assert.match(videoRule, /object-fit:\s*cover\b/)
+  assert.match(videoRule, /position:\s*absolute\b/)
+  assert.match(videoRule, /opacity:\s*0\b/)
+})
+
+test('the service worker keeps video off the Cache API', () => {
+  // A ranged request answered with a full 200 will not play in Safari, and a 206
+  // cannot be cached at all — so these must never reach the cache-first handler.
+  const sw = readFileSync(new URL('./sw.js', import.meta.url), 'utf8')
+  const bypass = sw.indexOf("e.request.headers.has('range')")
+  // lastIndexOf on purpose: the navigate branch above also calls caches.match,
+  // and it is the final cache-first handler this must sit in front of.
+  const cacheFirst = sw.lastIndexOf('caches.match(e.request)')
+  assert.ok(bypass > -1, 'Missing video/range bypass in the service worker')
+  assert.ok(bypass < cacheFirst, 'The video bypass must come before the cache-first handler')
+  assert.match(sw, /\\\.\(mp4\|webm\|mov\|m4v\)/)
 })
 
 test('an explicit unresolved tenant never leaks the shared fallback menu', () => {

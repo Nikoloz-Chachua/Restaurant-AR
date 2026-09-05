@@ -95,11 +95,28 @@ a super-admin/owner override the highlighted ones per tenant.
 - **Hero image** → a `theme_config` key (`hero_image_url`, optionally
   `hero_image_url_day`/`_night`). The template uses it as the hero/background art;
   fall back to the token-driven gradient background if empty.
-- Both are uploaded to **R2** through `/api/r2-presign` (WebP for images) and stored as
-  their public R2 URL. The presign route auto-prefixes the tenant slug.
+- **Hero video** → `hero_video_url` (wide 16:9 cut), optionally
+  `hero_video_mobile_url` (a squarer cut used below 640px, where `cover` throws away
+  most of a wide frame) and `hero_video_poster_url` (the still; defaults to the first
+  `hero_images` photo). A muted, looping clip layered over the poster inside the same
+  `.mg-hero` band, so **no per-template CSS is needed** — a template that art-directs
+  the photo hero gets the video for free.
+- All are uploaded to **R2** through `/api/r2-presign` (WebP for images, MP4 for video)
+  and stored as their public R2 URL. The presign route auto-prefixes the tenant slug.
+  Video, like GLB/USDZ, is **super-admin only**: a photo the browser re-encodes to WebP
+  can only get smaller, but nothing in the browser trims a clip straight off a phone.
 
 A template **must** degrade gracefully when logo/hero are unset (new tenants start
 empty) — show the gradient background and the text site name.
+
+The hero video is deliberately never on the critical path, and a new template gets
+that behaviour without doing anything: the band paints from the poster on the first
+frame, and the clip is attached on idle afterwards. It is skipped entirely — poster
+kept, nothing fetched — on Data Saver, on 2G, and under `prefers-reduced-motion`.
+A configured clip also suppresses the `hero_images` crossfade, since two fades on one
+band is a flicker. Budget: roughly 10 s, no audio, ~1 MB. `sw.js` deliberately lets
+video bypass the Cache API — a byte-range request answered with a full 200 will not
+play in Safari, and a 206 cannot be cached at all.
 
 ---
 

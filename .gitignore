@@ -18,3 +18,8 @@ Userstemotmap3d/
 # Private survey data — never commit (contains respondent contact info)
 survey stats not for github/
 *.csv
+
+# Hero-video smoke fixtures. Encoded clips staged locally so
+# scripts/smoke-hero-video-local.spec.mjs can exercise the hero before anything
+# is uploaded to R2 — heavy assets live in R2, not in the repo.
+.hero-video-smoke/

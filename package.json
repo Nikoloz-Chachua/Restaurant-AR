@@ -8,6 +8,7 @@
     "smoke:baoma": "playwright test scripts/smoke-baoma-local.spec.mjs",
     "smoke:mugsy": "playwright test scripts/smoke-mugsy-local.spec.mjs",
     "smoke:pipes": "playwright test scripts/smoke-pipes-local.spec.mjs",
+    "smoke:hero-video": "playwright test scripts/smoke-hero-video-local.spec.mjs",
     "preview": "npx --yes serve -p 3000 .",
     "compress": "npx --yes gltf-pipeline -i food.glb -o food.glb --draco.compressionLevel 10 && npx gltf-pipeline -i Druidi.glb -o Druidi.glb --draco.compressionLevel 10"
   },

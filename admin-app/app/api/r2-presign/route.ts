@@ -23,24 +23,36 @@ export async function POST(req: NextRequest) {
   const isGlb  = lower.endsWith('.glb')
   const isUsdz = lower.endsWith('.usdz')
   const isWebp = lower.endsWith('.webp')
-  if (!filename || (!isGlb && !isUsdz && !isWebp)) {
-    return NextResponse.json({ error: 'Only .glb, .usdz, or .webp files allowed' }, { status: 400 })
+  const isMp4  = lower.endsWith('.mp4')
+  if (!filename || (!isGlb && !isUsdz && !isWebp && !isMp4)) {
+    return NextResponse.json({ error: 'Only .glb, .usdz, .webp, or .mp4 files allowed' }, { status: 400 })
   }
 
   // Model files (GLB/USDZ) are BetaReal-only. Clients (brand_owner / branch_staff)
   // may upload item photo thumbnails (WebP) but never 3D models — those are produced
   // and uploaded by us via the super-admin panel. Enforced server-side so the rule
   // holds even if the client UI is bypassed.
-  if (isGlb || isUsdz) {
+  //
+  // Hero videos sit on the same side of that line. A photo the browser re-encodes
+  // to WebP before upload cannot be much larger than the hero it replaces; a video
+  // straight off a phone is tens of megabytes at the top of the page, and nothing
+  // in the browser trims it. These are graded and encoded by us.
+  if (isGlb || isUsdz || isMp4) {
     const { data: isSuperAdmin, error: roleError } = await supabase.rpc('is_super_admin')
     if (roleError || !isSuperAdmin) {
-      return NextResponse.json({ error: 'Only BetaReal admins can upload 3D models' }, { status: 403 })
+      return NextResponse.json(
+        { error: isMp4 ? 'Only BetaReal admins can upload hero videos' : 'Only BetaReal admins can upload 3D models' },
+        { status: 403 },
+      )
     }
   }
 
   // Content-Type must match what the browser sends on the PUT, or R2 rejects the
   // presigned request. .usdz is Apple Quick Look's format (a zipped USD bundle).
-  const contentType = isUsdz ? 'model/vnd.usdz+zip' : isWebp ? 'image/webp' : 'model/gltf-binary'
+  const contentType = isUsdz ? 'model/vnd.usdz+zip'
+    : isWebp ? 'image/webp'
+    : isMp4 ? 'video/mp4'
+    : 'model/gltf-binary'
 
   const restaurantIdNumber = Number(restaurantId)
   if (!Number.isInteger(restaurantIdNumber)) {

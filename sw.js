@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bl-v199';
+const CACHE_NAME = 'bl-v200';
 
 const SUPABASE_URL  = 'https://lwdpegloznhpcecivhfy.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_65dKKpb-lxOr8JTjdj7yxw_LZzcJp5h';
@@ -74,6 +74,13 @@ self.addEventListener('fetch', e => {
         );
         return;
     }
+
+    // Video: straight to the network, never through the Cache API. A <video>
+    // fetches by byte range, and the cache-first handler below would answer a
+    // ranged request with a full 200 — which Safari refuses to play — while a
+    // 206 cannot be put in a Cache at all. Letting these through means the
+    // browser's own HTTP cache handles them, which is what it is for.
+    if (e.request.headers.has('range') || /\.(mp4|webm|mov|m4v)(\?|$)/i.test(e.request.url)) return;
 
     // Supabase REST / auth: always network — never serve stale menu or session data.
     // Storage GLBs (stable by URL) are allowed through to cache-first below.

@@ -46,8 +46,16 @@ const MUGSY_CONFIG_FIELDS = [
 
 const CONTENT_KEYS = [...CONTENT_FIELDS.map(f => f.key), 'info_image_url', ...MUGSY_CONFIG_FIELDS.map(f => f.key)]
 
+// The hero clip is footage of this restaurant's food, so it belongs to the tenant
+// the same way the hero photos do and survives a template switch with them.
+const HERO_VIDEO_KEYS = ['hero_video_url', 'hero_video_mobile_url', 'hero_video_poster_url'] as const
+
+// A hero clip that clears this is already an encoding mistake, not a slow upload.
+// The real budget is ~1 MB; this is the wall, not the target.
+const HERO_VIDEO_MAX_MB = 6
+
 // Content survives a template switch — it describes the restaurant, not the look.
-const BRANDING_KEYS = ['site_name', 'site_name_ka', 'logo_url', 'hero_logo_url', 'hero_image_url', 'hero_images', ...CONTENT_KEYS]
+const BRANDING_KEYS = ['site_name', 'site_name_ka', 'logo_url', 'hero_logo_url', 'hero_image_url', 'hero_images', ...HERO_VIDEO_KEYS, ...CONTENT_KEYS]
 
 // The hero gallery is stored in theme_config.hero_images as a JSON array of URLs.
 // Older rows may hold a comma/newline list, so accept that shape too.
@@ -414,6 +422,36 @@ export default function ThemePage() {
     writeHeroImages(heroImages.filter((_, n) => n !== index))
   }
 
+  // ── Hero video ─────────────────────────────────────────────────────────────
+  // Uploaded as-is: unlike photos, there is no browser-side re-encode that could
+  // rescue an oversized file, so an unencoded one is refused rather than pushed
+  // to R2 and hung on the top of a guest's first screen.
+  async function uploadHeroVideo(key: string, file: File) {
+    if (!/\.mp4$/i.test(file.name)) { setMsg(T.onlyMp4Files); return }
+    const mb = file.size / (1024 * 1024)
+    if (mb > HERO_VIDEO_MAX_MB) {
+      setMsg(text(T.heroVideoTooBig, { mb: mb.toFixed(1), limit: HERO_VIDEO_MAX_MB }))
+      return
+    }
+    setUploadingKey(key)
+    try {
+      const res = await fetch('/api/r2-presign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, restaurantId: plan.restaurantId, restaurantSlug: plan.restaurantSlug }),
+      })
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `Server error ${res.status}`)
+      const { uploadUrl, publicUrl } = await res.json()
+      const up = await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': 'video/mp4' }, body: file })
+      if (!up.ok) throw new Error(`R2 upload failed: ${up.status}`)
+      set(key, publicUrl)
+      setMsg(T.heroVideoUploaded)
+    } catch (e) {
+      setMsg(text(T.uploadFailed, { message: e instanceof Error ? e.message : String(e) }))
+    }
+    setUploadingKey('')
+  }
+
   function moveHeroImage(index: number, dir: -1 | 1) {
     const to = index + dir
     if (to < 0 || to >= heroImages.length) return
@@ -683,6 +721,38 @@ export default function ThemePage() {
                               upLabel={T.heroMoveUp} downLabel={T.heroMoveDown}
                               emptyLabel={T.heroEmpty} previewAlt={T.imagePreviewAlt}
                               onPick={uploadHeroImages} onRemove={removeHeroImage} onMove={moveHeroImage} />
+              {/* BetaReal-only, matching the 3D model rule and enforced again in
+                  /api/r2-presign. A photo the browser re-encodes to WebP can only
+                  get smaller; a clip straight off a phone is tens of megabytes
+                  sitting on top of the guest's first screen, and nothing in the
+                  browser trims it. We grade and encode these. */}
+              {plan.canUploadModels && (
+                <>
+                  <div className="pt-2">
+                    <div className="text-sm font-semibold" style={{ color: 'var(--gold)' }}>{T.heroVideoHeading}</div>
+                    <div className="text-xs mt-1" style={{ color: 'var(--dim)' }}>{T.heroVideoHint}</div>
+                  </div>
+                  <VideoUploadRow label={T.heroVideoWide} hint={T.heroVideoWideHint}
+                                  value={config.hero_video_url ?? ''}
+                                  uploading={uploadingKey === 'hero_video_url'}
+                                  uploadLabel={T.uploadThumb} clearLabel={T.clearThumb}
+                                  onPick={f => uploadHeroVideo('hero_video_url', f)}
+                                  onClear={() => set('hero_video_url', '')} />
+                  <VideoUploadRow label={T.heroVideoMobile} hint={T.heroVideoMobileHint}
+                                  value={config.hero_video_mobile_url ?? ''}
+                                  uploading={uploadingKey === 'hero_video_mobile_url'}
+                                  uploadLabel={T.uploadThumb} clearLabel={T.clearThumb}
+                                  onPick={f => uploadHeroVideo('hero_video_mobile_url', f)}
+                                  onClear={() => set('hero_video_mobile_url', '')} />
+                  <ImageUploadRow label={T.heroVideoPoster} hint={T.heroVideoPosterHint}
+                                  value={config.hero_video_poster_url ?? ''}
+                                  uploading={uploadingKey === 'hero_video_poster_url'}
+                                  uploadLabel={T.uploadThumb} clearLabel={T.clearThumb}
+                                  previewAlt={T.imagePreviewAlt}
+                                  onPick={f => uploadImage('hero_video_poster_url', f)}
+                                  onClear={() => set('hero_video_poster_url', '')} />
+                </>
+              )}
               {/* Templates that render editorial copy of their own expose it here, so a
                   tenant's wording, address and links are data the owner controls rather
                   than strings baked into the customer app. Only shown for templates that
@@ -906,6 +976,39 @@ function ImageUploadRow({ label, hint, value, uploading, uploadLabel, clearLabel
             </button>
             <img src={value} alt={previewAlt}
                  style={{ height: 40, maxWidth: 120, objectFit: 'contain', borderRadius: 6, border: '1px solid var(--border)' }} />
+          </>
+        )}
+      </div>
+      <p className="text-xs mt-2" style={{ color: 'var(--dim)' }}>{hint}</p>
+    </div>
+  )
+}
+
+// Same shape as ImageUploadRow, but the preview has to be a <video>: an <img>
+// pointed at an MP4 is just a broken icon, which reads as a failed upload.
+// Muted + loop + playsInline so the preview behaves like the live hero does.
+function VideoUploadRow({ label, hint, value, uploading, uploadLabel, clearLabel, onPick, onClear }: {
+  label: string; hint: string; value: string; uploading: boolean; uploadLabel: string; clearLabel: string
+  onPick: (f: File) => void; onClear: () => void
+}) {
+  return (
+    <div className="p-3 rounded-xl" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+      <div className="text-xs mb-2 uppercase tracking-widest" style={{ color: 'var(--dim)' }}>{label}</div>
+      <div className="flex items-center gap-3 flex-wrap">
+        <label className="px-3 py-1.5 rounded text-xs font-medium cursor-pointer"
+               style={{ background: 'var(--card2)', color: 'var(--gold)', border: '1px solid var(--border)', opacity: uploading ? 0.5 : 1 }}>
+          {uploading ? '…' : uploadLabel}
+          <input type="file" accept="video/mp4,.mp4" style={{ display: 'none' }} disabled={uploading}
+                 onChange={e => { const f = e.target.files?.[0]; if (f) onPick(f); e.target.value = '' }} />
+        </label>
+        {value && (
+          <>
+            <button type="button" onClick={onClear} className="px-3 py-1.5 rounded text-xs font-medium"
+                    style={{ background: 'rgba(224,82,82,0.1)', color: 'var(--danger)', border: '1px solid rgba(224,82,82,0.25)' }}>
+              {clearLabel}
+            </button>
+            <video src={value} muted loop playsInline autoPlay preload="metadata"
+                   style={{ height: 56, maxWidth: 140, objectFit: 'cover', borderRadius: 6, border: '1px solid var(--border)' }} />
           </>
         )}
       </div>

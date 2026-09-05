@@ -2180,6 +2180,34 @@
         html[data-generic-hero="true"] .mg-hero-brand { color: #fff; font-size: clamp(2.25rem, 9vw, 4.5rem); text-shadow: 0 3px 18px rgba(0,0,0,0.62); }
         html[data-generic-hero="true"] .mg-hero-tagline { color: rgba(255,255,255,0.9); max-width: min(88vw, 560px); }
         html[data-generic-hero="true"] .mg-hero-scroll { position: absolute; z-index: 2; bottom: 22px; color: #fff; }
+
+        /* ── Hero video ──────────────────────────────────────────────────────
+           Sits in the same stacking slot as .mg-hero-photo, so every template
+           that art-directs the photo hero (height, veil, breakout width) gets
+           the video for free — no per-template rules needed. It stays out of
+           the layout until a clip is actually attached and decoding, and fades
+           in over the poster photo rather than cutting to it, so a slow clip
+           just means the band stays a still photo a moment longer. */
+        .mg-hero-video {
+            display: none;
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            opacity: 0;
+            transition: opacity 600ms ease-in-out;
+            pointer-events: none;
+            background: transparent;
+        }
+        html[data-hero-video="loading"] .mg-hero-video,
+        html[data-hero-video="true"] .mg-hero-video { display: block; }
+        html[data-hero-video="true"] .mg-hero-video { opacity: 1; }
+        @media (prefers-reduced-motion: reduce) {
+            .mg-hero-video { transition: none; }
+        }
         /* ── Monday Greens template: full-bleed hero photo + logo ── */
         [data-template="monday_greens"] .mg-hero {
             position: relative;
@@ -8240,6 +8268,12 @@
     <section class="mg-hero" aria-hidden="true">
         <div class="mg-hero-photo"></div>
         <div class="mg-hero-next"></div>
+        <!-- Hero video. Ships with no src on purpose: _startHeroVideo() attaches one
+             on idle, after the poster photo has already painted the band, so the
+             clip can never compete with the menu for the first screenful. -->
+        <video id="mg-hero-video" class="mg-hero-video" preload="none"
+               muted loop playsinline autoplay disablepictureinpicture
+               tabindex="-1" aria-hidden="true"></video>
         <div class="mg-hero-veil"></div>
         <div class="my-editorial-copy" data-editorial="mingleyard">
             <span class="my-sticker my-sticker-one" data-mingleyard="stickerOne">Yard no. 11</span>
@@ -12218,6 +12252,96 @@
             play();
         }
 
+        /* ── Hero video ─────────────────────────────────────────────────────────
+           theme_config.hero_video_url turns the shared hero band into a muted,
+           looping clip. It is layered over the hero poster rather than replacing
+           it, which is what keeps this cheap: the band paints from the still on
+           the very first frame, exactly as it did before, and the video is only
+           attached on idle afterwards. Nothing about the first screenful changes
+           if the clip is slow, blocked, or never arrives.
+
+           A tenant may also set hero_video_mobile_url — a squarer cut for phones,
+           where a 16:9 clip loses most of its width to `cover`. Chose the source
+           in JS rather than <source media>, which browsers only evaluate at first
+           load and Chrome has dropped and re-added more than once. */
+        const HERO_VIDEO_MOBILE_MQ = '(max-width: 639px)';
+
+        function _heroVideoSrc(cfg) {
+            const wide   = _safeAssetUrl(cfg.hero_video_url);
+            const mobile = _safeAssetUrl(cfg.hero_video_mobile_url);
+            if (!wide && !mobile) return '';
+            const phone = window.matchMedia(HERO_VIDEO_MOBILE_MQ).matches;
+            return (phone && mobile) || wide || mobile;
+        }
+
+        // The clip is a megabyte the guest did not ask for, sitting on top of a
+        // poster that already carries the hero on its own. Anything suggesting
+        // they are paying for bytes or want less movement keeps the still photo,
+        // and they lose nothing by it.
+        function _heroVideoWanted() {
+            try {
+                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+                const c = navigator.connection;
+                if (c && c.saveData) return false;
+                if (c && /2g/i.test(String(c.effectiveType || ''))) return false;
+            } catch (_) {}
+            return true;
+        }
+
+        // Returns true when a clip is configured — including when it is
+        // deliberately not being played — so the caller knows the band belongs to
+        // the video and leaves the photo rotation alone.
+        function _startHeroVideo(cfg) {
+            const src = _heroVideoSrc(cfg);
+            if (!src) return false;
+            const vid = document.getElementById('mg-hero-video');
+            if (!vid || !vid.canPlayType || !vid.canPlayType('video/mp4')) return false;
+            if (!_heroVideoWanted()) return true;
+
+            const kick = () => { const p = vid.play(); if (p && p.catch) p.catch(() => {}); };
+
+            const mount = () => {
+                if (vid.dataset.mounted) return;
+                vid.dataset.mounted = '1';
+                // Set as a property too: some Safari builds ignore autoplay unless
+                // muted is true on the element, not merely present in the markup.
+                vid.muted = true;
+                document.documentElement.dataset.heroVideo = 'loading';
+                // Reveal only once there are decoded frames, so the fade never
+                // crosses a black or half-painted first frame.
+                vid.addEventListener('loadeddata', () => {
+                    document.documentElement.dataset.heroVideo = 'true';
+                }, { once: true });
+                // A clip that will not decode leaves the poster exactly as it was.
+                vid.addEventListener('error', () => {
+                    document.documentElement.dataset.heroVideo = 'failed';
+                }, { once: true });
+                vid.preload = 'auto';
+                vid.src = src;
+                vid.load();
+                kick();
+
+                // Decoding a looping video the guest cannot see is pure battery.
+                if ('IntersectionObserver' in window) {
+                    new IntersectionObserver(entries => {
+                        entries.forEach(e => {
+                            vid.dataset.onscreen = e.isIntersecting ? '1' : '0';
+                            if (e.isIntersecting && !document.hidden) kick(); else vid.pause();
+                        });
+                    }, { threshold: 0.01 }).observe(vid);
+                }
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) vid.pause(); else if (vid.dataset.onscreen !== '0') kick();
+                });
+            };
+
+            // Same idiom the 3D thumbnail upgrades use: hand the clip to an idle
+            // slot so it queues behind the menu's own first paint.
+            const idle = window.requestIdleCallback || (cb => setTimeout(cb, 1));
+            idle(mount, { timeout: 2500 });
+            return true;
+        }
+
         // Fetch theme config from Supabase and apply as CSS overrides
         async function applyRemoteTheme() {
             // MINGLEYARD's editorial hero has a complete local fallback. Reveal and
@@ -12375,10 +12499,18 @@
                 const heroGallery = _parseHeroImages(cfg.hero_images);
                 const heroSingle = _safeAssetUrl(cfg.hero_image_url);
                 const heroShots = heroGallery.length ? heroGallery : (heroSingle ? [heroSingle] : []);
-                document.documentElement.dataset.heroImage = heroShots.length ? 'true' : 'false';
-                document.documentElement.dataset.genericHero = heroShots.length && !HERO_NATIVE_SHELL_TEMPLATES.has(templateKey) ? 'true' : 'false';
-                if (heroShots.length) {
-                    document.documentElement.style.setProperty('--hero-image', `url("${heroShots[0]}")`);
+                // A video hero still needs a still. It is what the band paints while the
+                // clip downloads, and what it keeps for good for anyone metered, on 2G,
+                // or asking for reduced motion. The poster only outranks the gallery
+                // when there is actually a clip for it to stand in for — otherwise it is
+                // a leftover from a removed video and the photos win.
+                const heroPoster = _safeAssetUrl(cfg.hero_video_poster_url);
+                const heroClip = _heroVideoSrc(cfg);
+                const heroStill = (heroClip ? heroPoster : '') || heroShots[0] || heroPoster || '';
+                document.documentElement.dataset.heroImage = heroStill ? 'true' : 'false';
+                document.documentElement.dataset.genericHero = Boolean(heroStill || heroClip) && !HERO_NATIVE_SHELL_TEMPLATES.has(templateKey) ? 'true' : 'false';
+                if (heroStill) {
+                    document.documentElement.style.setProperty('--hero-image', `url("${heroStill}")`);
                 }
                 // Showcase heroes ship aria-hidden and are revealed here. The rest of
                 // what surrounded this on cloudflare was the 2026-07-27 workaround for
@@ -12415,7 +12547,11 @@
                     const baomaHeroImg = document.querySelector('.baoma-hero-img');
                     if (baomaHeroImg) baomaHeroImg.src = heroShots[0];
                 }
-                if (HERO_GALLERY_TEMPLATES.has(templateKey) && heroShots.length > 1) _startHeroGallery(heroShots);
+                // A configured clip takes the band over. The photos stay on as its poster
+                // and its fallback, but they do not also rotate underneath it — two
+                // crossfades running at once on the same element is just a flicker.
+                const heroVideoOn = !HERO_NATIVE_SHELL_TEMPLATES.has(templateKey) && _startHeroVideo(cfg);
+                if (!heroVideoOn && HERO_GALLERY_TEMPLATES.has(templateKey) && heroShots.length > 1) _startHeroGallery(heroShots);
                 // Optional per-tenant hero height (e.g. "56.25vw" for a full 16:9 banner).
                 if (cfg.hero_min_h) {
                     document.documentElement.style.setProperty('--mg-hero-h', cfg.hero_min_h);
