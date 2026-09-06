@@ -1826,9 +1826,11 @@
             letter-spacing: 0.3px;
             font-size: 0.9rem;
         }
-        /* Food & Market: the logo repeats the title, so its menu artwork leads the
-           three primary catalogue buttons instead. */
-        [data-tenant="food-market-main"] #tenant-logo { display: none; }
+        /* Food & Market: show the real wordmark logo once a kitchen is chosen (the
+           kitchen-picker landing page carries its own art and doesn't need it) and
+           drop the plain text title in favour of it, matching the burger_bar/
+           gochit_monster convention below. */
+        [data-tenant="food-market-main"] #tenant-logo[src] ~ #brand-title { display: none; }
         [data-tenant="food-market-main"] .menu-groups {
             max-width: 450px;
             gap: 8px;
@@ -12994,12 +12996,12 @@
                 _applyMugsyCopy();
                 const logoUrl = _safeAssetUrl(cfg.logo_url);
                 const logo = document.getElementById('tenant-logo');
-                if (logo && logoUrl && !_isFoodMarketTenant()) {
+                if (logo && logoUrl) {
                     logo.src = logoUrl;
                     logo.alt = _isBaomaTenant() ? _localizedBrandTitle() : (cfg.site_name || tenant.restaurant_name || 'Restaurant logo');
                     logo.style.display = 'block';
                     logo.onerror = () => { logo.style.display = 'none'; }
-                } else if (logo && _isFoodMarketTenant()) {
+                } else if (logo) {
                     logo.style.display = 'none';
                 }
                 const baomaLogo = document.getElementById('baoma-topbar-logo');
