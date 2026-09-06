@@ -2013,10 +2013,10 @@
         }
         .fm-kitchen-tiles {
             display: grid;
-            grid-template-columns: repeat(2, minmax(140px, 220px));
-            gap: 16px;
+            grid-template-columns: repeat(2, minmax(160px, 320px));
+            gap: 22px;
             width: 100%;
-            max-width: 480px;
+            max-width: 700px;
             margin: auto;
         }
         .fm-kitchen-tile {
@@ -2056,40 +2056,43 @@
         }
         .fm-jp-sun {
             position: absolute;
-            top: 12%;
-            right: 14%;
-            width: 34%;
+            top: 10%;
+            right: 12%;
+            width: 40%;
             aspect-ratio: 1;
             border-radius: 50%;
             background: #e51b22;
             opacity: 0.92;
         }
         .fm-jp-crane {
-            width: 46%;
-            max-width: 100px;
+            width: 58%;
+            max-width: 160px;
             opacity: 0.92;
             filter: invert(9%) sepia(78%) saturate(6000%) hue-rotate(350deg) brightness(0.9);
         }
         .fm-jp-kanji {
-            font-size: 1.9rem;
+            font-size: 2.8rem;
             font-weight: 400;
             color: #111;
             line-height: 1;
         }
         .fm-jp-title {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.15rem;
+            font-size: 1.7rem;
             letter-spacing: 2px;
             color: #111;
         }
         .fm-jp-sub {
-            font-size: 0.62rem;
+            font-size: 0.85rem;
             font-weight: 800;
             letter-spacing: 1.5px;
             color: #e51b22;
         }
-        @media (min-width: 520px) {
-            .fm-kitchen-tiles { grid-template-columns: repeat(4, minmax(120px, 200px)); }
+        /* Kept two-by-two at every width per direct request -- wider screens make the
+           tiles themselves bigger (via the minmax upper bound above) rather than adding
+           a third/fourth column. */
+        @media (min-width: 640px) {
+            .fm-kitchen-tiles { grid-template-columns: repeat(2, minmax(220px, 340px)); gap: 28px; }
         }
         /* Back-to-kitchens pill, shown once inside any kitchen so a diner can
            return to the picker without relying on the browser back button. */
