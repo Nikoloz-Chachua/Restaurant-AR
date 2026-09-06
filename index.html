@@ -2246,6 +2246,10 @@
         [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="th-star"]::after        { background-image: url('./img/food-market/doodles/th-star-dark.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="th-chili"]::after       { background-image: url('./img/food-market/doodles/th-chili-dark.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="jp-crane"]::after       { background-image: url('./img/food-market/doodles/jp-crane-dark.png'); }
+        /* The crane's thin origami fold-lines read far fainter than the bold
+           Georgian/Thai icons at the shared 0.16 opacity above, so it needs its own
+           boost to actually be visible on the card. */
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="jp-crane"]::after       { opacity: 0.4; }
         [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="dr-citrus"]::after      { background-image: url('./img/food-market/doodles/dr-citrus-dark.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="dr-flower"]::after      { background-image: url('./img/food-market/doodles/dr-flower-dark.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="dr-spiral"]::after      { background-image: url('./img/food-market/doodles/dr-spiral-dark.png'); }
