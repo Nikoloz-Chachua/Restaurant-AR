@@ -1998,7 +1998,11 @@
             position: fixed;
             inset: 0;
             z-index: 999;
-            background: #0a0a0a;
+            /* The real storefront, darkened so the four kitchen tiles stay legible on
+               top of it -- same photo, same signage as the physical shop. */
+            background:
+                linear-gradient(rgba(6,6,6,0.62), rgba(6,6,6,0.8)),
+                url('./img/food-market/hero-storefront.webp') center / cover no-repeat;
             align-items: center;
             justify-content: center;
             padding: 24px 16px;
