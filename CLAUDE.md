@@ -50,6 +50,8 @@ All new heavy assets are served from Cloudflare R2. AR sessions show no name/pri
 
 The carousel shows **all menu items** (full `menuItems` list), not category-scoped. Users can cycle through every item in AR.
 
+**Exception — Food & Market (`food-market-main`):** this tenant is split into independent "kitchens" (Georgian & More / Thai / Japanese / Drinks), each with its own landing tile and theme. For this tenant only, `_fmActiveKitchenItems()`/`_scopedCatItems()` restrict the 3D modal and AR carousel to the active kitchen's items, so a Japanese sushi roll's 3D model can never surface while browsing the Georgian kitchen. See `_groupOf`, `_arEntriesForActiveGroup`, and `_mostOrderedEntries` in `index.html` for the same per-kitchen scoping applied to the "3D showcase" and "Most ordered" blocks.
+
 ## Deployment rule — MUST follow every time
 
 **Whenever any of these files change, bump `CACHE_NAME` in `sw.js` in the same commit:**

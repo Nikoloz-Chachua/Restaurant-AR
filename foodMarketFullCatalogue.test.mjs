@@ -49,7 +49,7 @@ test('page grouping is prefix-based and visible labels are stripped only for Foo
   assert.deepEqual(prefixCounts, { Georgian: 9, Thai: 7, Japanese: 7, Drinks: 21 });
   assert.match(html, /function _foodMarketVisibleCategory\(name\)/);
   assert.match(html, /if \(!_isFoodMarketTenant\(\)\) return _cleanText\(name\)/);
-  assert.match(html, /\['georgian', 'asian', 'drinks'\]/);
+  assert.match(html, /_FM_KITCHEN_KEYS = \['georgian', 'thai', 'japanese', 'drinks'\]/);
   assert.match(html, /history\.replaceState\(history\.state, '', url\)/);
 });
 

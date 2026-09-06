@@ -92,7 +92,7 @@ test('MINGLEYARD editorial copy localizes and its fallback hero remains accessib
   assert.match(html, /function _ensureMingleyardTemplateForExactTenant\(\)/);
   assert.match(html, /dataset\.tenant === 'social-dining' && !root\.dataset\.template/);
   assert.match(html, /root\.dataset\.template = 'social_dining'/);
-  assert.match(html, /dataset\.tenant = _tenant\.restaurant_slug \|\| '';[\s\S]*?_ensureMingleyardTemplateForExactTenant\(\)/);
+  assert.match(html, /dataset\.tenant = _dataTenantSlug\(_tenant\.restaurant_slug \|\| ''\);[\s\S]*?_ensureMingleyardTemplateForExactTenant\(\)/);
   assert.match(html, /document\.documentElement\.dataset\.template = templateKey;[\s\S]*?_applyMingleyardCopy\(\)/);
   assert.match(html, /_applyMingleyardCopy\(\);[\s\S]*document\.getElementById\('lang-toggle'\)/);
   assert.match(html, /_applyMingleyardCopy\(\);[\s\S]*try \{[\s\S]*const tenant = await _resolveTenant\(\)/);

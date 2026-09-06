@@ -1851,7 +1851,7 @@
             line-height: 1.15;
         }
         [data-tenant="food-market-main"] .group-btn[data-group="georgian"],
-        [data-tenant="food-market-main"] .group-btn[data-group="asian"],
+        [data-tenant="food-market-main"] .group-btn[data-group="thai"],
         [data-tenant="food-market-main"] .group-btn[data-group="drinks"] {
             background-repeat: no-repeat;
             background-size: cover;
@@ -1862,11 +1862,30 @@
         [data-tenant="food-market-main"] .group-btn[data-group="georgian"] {
             background-image: linear-gradient(rgba(0,0,0,0.22), rgba(0,0,0,0.52)), url('./img/food-market-georgian-more.png');
         }
-        [data-tenant="food-market-main"] .group-btn[data-group="asian"] {
+        [data-tenant="food-market-main"] .group-btn[data-group="thai"] {
             background-image: linear-gradient(rgba(0,0,0,0.22), rgba(0,0,0,0.52)), url('./img/food-market-asian.png');
         }
         [data-tenant="food-market-main"] .group-btn[data-group="drinks"] {
             background-image: linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.46)), url('./img/food-market-drinks.png');
+        }
+        /* Japanese tab: the "Origami" page is white/red, not a photo tile, so it gets
+           its own look instead of the cover-photo treatment used by the other three. */
+        [data-tenant="food-market-main"] .group-btn[data-group="japanese"] {
+            background: #fff;
+            border: 2px solid #e51b22;
+            color: #e51b22;
+            text-shadow: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+        [data-tenant="food-market-main"] .group-btn[data-group="japanese"] .fm-tab-crane {
+            width: 22px;
+            height: 16px;
+            background: url('./img/food-market/doodles/jp-crane-dark.png') center/contain no-repeat;
+            opacity: 0.9;
         }
         [data-tenant="food-market-main"] .group-btn.active {
             outline: 2px solid var(--accent);
@@ -1946,7 +1965,7 @@
             --bg-size:   450px 600px, 26px 26px;
             --bg-repeat: repeat, repeat;
         }
-        [data-tenant="food-market-main"][data-theme="day"][data-fm-group="asian"] {
+        [data-tenant="food-market-main"][data-theme="day"][data-fm-group="thai"] {
             --accent:  #8f4f9f;
             --accent2: #6c3a7a;
             --bg-image:
@@ -1955,9 +1974,133 @@
             --bg-size:   410px 501px, 26px 26px;
             --bg-repeat: repeat, repeat;
         }
+        /* Japanese ("Origami" page) is its own kitchen now, not folded into Thai.
+           The real print page is plain white with a red accent — no scattered
+           watermark — so it keeps the base dot-grid untouched, just re-tinted red. */
+        [data-tenant="food-market-main"][data-theme="day"][data-fm-group="japanese"] {
+            --accent:  #e51b22;
+            --accent2: #b3141a;
+        }
         [data-tenant="food-market-main"][data-theme="day"][data-fm-group="drinks"] {
             --accent:  #7a2340;
             --accent2: #5a1930;
+        }
+
+        /* ── Kitchen-picker landing gate ──────────────────────────────────
+           Shown before the diner picks a kitchen (Georgian & More / Thai /
+           Japanese / Drinks); hidden the instant a kitchen is chosen or a
+           direct ?menu=<kitchen> link is opened (e.g. a table-specific QR
+           code). Toggled by data-fm-landing="1"/"0" on <html> — see
+           _fmSyncLanding(). Hidden for every tenant except food-market-main. */
+        #fm-kitchen-landing { display: none; }
+        [data-tenant="food-market-main"][data-fm-landing="1"] #fm-kitchen-landing {
+            display: flex;
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            background: #0a0a0a;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            overflow-y: auto;
+        }
+        [data-tenant="food-market-main"][data-fm-landing="1"] body > *:not(#fm-kitchen-landing) {
+            display: none !important;
+        }
+        .fm-kitchen-tiles {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(140px, 220px));
+            gap: 16px;
+            width: 100%;
+            max-width: 480px;
+            margin: auto;
+        }
+        .fm-kitchen-tile {
+            position: relative;
+            aspect-ratio: 3 / 4;
+            border: none;
+            border-radius: 14px;
+            padding: 0;
+            cursor: pointer;
+            overflow: hidden;
+            background: #111;
+            box-shadow: 0 10px 26px -10px rgba(0,0,0,0.6);
+            transition: transform 0.15s ease;
+        }
+        .fm-kitchen-tile:active { transform: scale(0.97); }
+        .fm-kitchen-tile img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .fm-kitchen-tile-japanese {
+            background: #fff;
+            border: 3px solid #e51b22;
+        }
+        .fm-jp-tile-art {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-align: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .fm-jp-sun {
+            position: absolute;
+            top: 12%;
+            right: 14%;
+            width: 34%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: #e51b22;
+            opacity: 0.92;
+        }
+        .fm-jp-crane {
+            width: 46%;
+            max-width: 100px;
+            opacity: 0.92;
+            filter: invert(9%) sepia(78%) saturate(6000%) hue-rotate(350deg) brightness(0.9);
+        }
+        .fm-jp-kanji {
+            font-size: 1.9rem;
+            font-weight: 400;
+            color: #111;
+            line-height: 1;
+        }
+        .fm-jp-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.15rem;
+            letter-spacing: 2px;
+            color: #111;
+        }
+        .fm-jp-sub {
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #e51b22;
+        }
+        @media (min-width: 520px) {
+            .fm-kitchen-tiles { grid-template-columns: repeat(4, minmax(120px, 200px)); }
+        }
+        /* Back-to-kitchens pill, shown once inside any kitchen so a diner can
+           return to the picker without relying on the browser back button. */
+        #fm-back-to-kitchens {
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.78rem;
+            letter-spacing: 0.3px;
+            color: var(--text);
+            background: var(--pill-bg);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 7px 14px;
+            margin-bottom: 8px;
+            cursor: pointer;
         }
         /* Category headers become solid brand-colour banners (like the print
            menu's colour blocks) instead of plain underlined text. Default
@@ -8402,6 +8545,32 @@
     <noscript><style>#br-splash{display:none!important}</style></noscript>
 </head>
 <body>
+    <!-- Food & Market only: kitchen picker shown before the diner enters a
+         specific kitchen's menu. See _fmSyncLanding()/_setGroup() in the main
+         script and the [data-fm-landing] rules above. Inert markup for every
+         other tenant (kept display:none by the unscoped base rule). -->
+    <div id="fm-kitchen-landing">
+        <div class="fm-kitchen-tiles">
+            <button type="button" class="fm-kitchen-tile fm-kitchen-tile-georgian" data-kitchen="georgian">
+                <img src="./img/food-market-georgian-more.png" alt="Food &amp; Market — Georgian &amp; More Kitchen" loading="eager">
+            </button>
+            <button type="button" class="fm-kitchen-tile fm-kitchen-tile-thai" data-kitchen="thai">
+                <img src="./img/food-market-asian.png" alt="Food &amp; Market — Thai Kitchen" loading="eager">
+            </button>
+            <button type="button" class="fm-kitchen-tile fm-kitchen-tile-japanese" data-kitchen="japanese">
+                <div class="fm-jp-tile-art">
+                    <span class="fm-jp-sun" aria-hidden="true"></span>
+                    <img class="fm-jp-crane" src="./img/food-market/doodles/jp-crane-dark.png" alt="" aria-hidden="true">
+                    <span class="fm-jp-kanji" lang="ja">折り紙</span>
+                    <span class="fm-jp-title">ORIGAMI</span>
+                    <span class="fm-jp-sub">JAPANESE KITCHEN</span>
+                </div>
+            </button>
+            <button type="button" class="fm-kitchen-tile fm-kitchen-tile-drinks" data-kitchen="drinks">
+                <img src="./img/food-market-drinks.png" alt="Food &amp; Market — Drinks" loading="eager">
+            </button>
+        </div>
+    </div>
     <div id="br-splash" aria-hidden="true"><div class="br-spin"></div></div>
     <script>
     (function() {
@@ -8601,6 +8770,7 @@
             <a class="bp-delivery-btn bp-delivery-glovo" href="https://glovoapp.com/ka/ge/tbilisi/stores/ghost-burger-tbi" target="_blank" rel="noopener">Glovo</a>
             <a class="bp-delivery-btn bp-delivery-bolt" href="https://food.bolt.eu/en/15-tbilisi/p/187522-burger-planet/" target="_blank" rel="noopener">Bolt</a>
         </div>
+        <button type="button" id="fm-back-to-kitchens" hidden>&larr; Kitchens</button>
         <div id="menu-groups" class="menu-groups" hidden></div>
         <div class="cat-scroll">
             <button type="button" class="cat-nav cat-nav-l" aria-label="Scroll categories left" hidden>&#8249;</button>
@@ -9931,9 +10101,20 @@
             const brandSlug = brand?.slug || document.documentElement.dataset.brandSlug || '';
             return restaurant_slug === _PIPES_RESTAURANT_SLUG && brandSlug === _PIPES_BRAND_SLUG;
         }
+        // 'food-and-market-test2-main' is a duplicate tenant created via the admin
+        // panel to preview the kitchen-split redesign live, side by side with the
+        // real food-market-main tenant, before rolling the redesign onto it.
+        const _FOOD_MARKET_TENANT_SLUGS = ['food-market-main', 'food-and-market-test2-main'];
         function _isFoodMarketTenant() {
             const tenant = window.__tenant || _tenant || {};
-            return (tenant.restaurant_slug || _tenantSlugFromHost()) === 'food-market-main';
+            return _FOOD_MARKET_TENANT_SLUGS.includes(tenant.restaurant_slug || _tenantSlugFromHost());
+        }
+        // The whole Food & Market redesign is keyed off [data-tenant="food-market-main"]
+        // CSS selectors. Rather than duplicate every one of those selectors for the
+        // admin-created preview tenant, alias its resolved slug to the same
+        // data-tenant value so it picks up the identical styling.
+        function _dataTenantSlug(slug) {
+            return _FOOD_MARKET_TENANT_SLUGS.includes(slug) ? 'food-market-main' : (slug || '');
         }
         function _foodMarketVisibleCategory(name) {
             if (!_isFoodMarketTenant()) return _cleanText(name);
@@ -9949,10 +10130,10 @@
         // reference, so they get nothing rather than an invented icon.
         const _FM_GEORGIAN_DOODLES = ['pg-shaman', 'pg-eye-legs', 'pg-diver', 'pg-totem', 'pg-deer-star', 'pg-deer-running', 'pg-sun', 'pg-hunter', 'pg-wrestler', 'pg-duel', 'pg-raised-hands', 'pg-river'];
         const _FM_THAI_DOODLES = ['th-sun-burst', 'th-flower', 'th-star', 'th-chili'];
-        // Card-corner accents for the whole Asian (Thai + Japanese) group: the
-        // Thai doodles plus the origami crane lifted from the Japanese
-        // "Origami" page, so Japanese dishes get a symbol too.
-        const _FM_ASIAN_CARD_DOODLES = [..._FM_THAI_DOODLES, 'jp-crane'];
+        // Japanese card-corner accent: just the origami crane lifted from the
+        // "Origami" print page — Thai and Japanese are independent kitchens now,
+        // so a Japanese dish never picks up a Thai doodle or vice versa.
+        const _FM_JAPANESE_CARD_DOODLES = ['jp-crane'];
         const _FM_JAPANESE_KANJI = {
             'Japanese — Sashimi': '刺身',
             'Japanese — Nigiri': '握り寿司',
@@ -9976,16 +10157,17 @@
         }
         // Same doodle set, stamped faintly in a corner of most dish cards so
         // the white cards pick up the print menu's hand-drawn feel instead of
-        // sitting empty. Picked from whichever group's tab is on screen
-        // (Georgian & More vs. Asian), so a Georgian dish never shows a Thai
-        // doodle or vice versa; Drinks keeps its design untouched, so it gets
-        // none. Hashed from globalIdx (stable across language toggles, unlike
-        // the translated name) with a multiplicative hash so the selection
-        // doesn't look mechanically periodic on screen.
+        // sitting empty. Picked from whichever kitchen is on screen, so a
+        // Georgian dish never shows a Thai doodle, and a Thai dish never shows
+        // the Japanese crane or vice versa; Drinks keeps its design untouched,
+        // so it gets none. Hashed from globalIdx (stable across language
+        // toggles, unlike the translated name) with a multiplicative hash so
+        // the selection doesn't look mechanically periodic on screen.
         function _foodMarketCardDoodle(globalIdx) {
             const group = document.documentElement.dataset.fmGroup;
             const pool = group === 'georgian' ? _FM_GEORGIAN_DOODLES
-                       : group === 'asian'    ? _FM_ASIAN_CARD_DOODLES
+                       : group === 'thai'      ? _FM_THAI_DOODLES
+                       : group === 'japanese'  ? _FM_JAPANESE_CARD_DOODLES
                        : null;
             if (!pool) return null;
             const hash = (Math.imul(globalIdx + 1, 2654435761) >>> 0);
@@ -10459,6 +10641,7 @@
             'monday-greens': ['ka', 'en'],
             'chero-main': ['ka', 'en'],
             'food-market-main': ['ka', 'en'],
+            'food-and-market-test2-main': ['ka', 'en'],
             'burger-planet-main': ['ka', 'en'],
             'corner-by-eleven-main': ['ka', 'en']
         };
@@ -10466,6 +10649,7 @@
             'monday-greens': 'ka',
             'chero-main': 'ka',
             'food-market-main': 'ka',
+            'food-and-market-test2-main': 'ka',
             'burger-planet-main': 'ka',
             'corner-by-eleven-main': 'ka'
         };
@@ -10620,7 +10804,7 @@
                 };
                 window.__tenant = _tenant;
                 _normalizeLanguageForTenant(_tenant);
-                document.documentElement.dataset.tenant = _tenant.restaurant_slug || '';
+                document.documentElement.dataset.tenant = _dataTenantSlug(_tenant.restaurant_slug || '');
                 _ensureMingleyardTemplateForExactTenant();
                 document.documentElement.dataset.brandSlug = brand?.slug || '';
                 _applyTenantFavicon(_tenant);
@@ -10664,7 +10848,7 @@
             // Per-restaurant styling hook. data-template cannot do this job: every
             // tenant currently resolves to template_key "monday_greens", so
             // [data-template="monday_greens"] matches the whole estate.
-            document.documentElement.dataset.tenant = _tenant.restaurant_slug || '';
+            document.documentElement.dataset.tenant = _dataTenantSlug(_tenant.restaurant_slug || '');
             _ensureMingleyardTemplateForExactTenant();
             document.documentElement.dataset.brandSlug = brand?.slug || '';
             _applyTenantFavicon(_tenant);
@@ -13074,9 +13258,10 @@
             // Active only when the tenant configured drink_categories. When on, the
             // menu is split into two top-level groups; a category is "drink" if its
             // English name is in the configured set, otherwise "food".
+            const _FM_KITCHEN_KEYS = ['georgian', 'thai', 'japanese', 'drinks'];
             const _fmGroupFromQuery = () => {
                 const value = new URLSearchParams(location.search).get('menu');
-                return ['georgian', 'asian', 'drinks'].includes(value) ? value : 'georgian';
+                return _FM_KITCHEN_KEYS.includes(value) ? value : 'georgian';
             };
             let _activeGroup = _isFoodMarketTenant() ? _fmGroupFromQuery() : ((window.__menuGroup === 'drink') ? 'drink' : 'food');
             const _groupingOn = () => _isFoodMarketTenant() || !!(window.__drinkCats && window.__drinkCats.size);
@@ -13084,11 +13269,29 @@
                 if (_isFoodMarketTenant()) {
                     const prefix = String(catName || '').split('—')[0].trim();
                     if (prefix === 'Drinks') return 'drinks';
-                    if (prefix === 'Thai' || prefix === 'Japanese') return 'asian';
+                    if (prefix === 'Thai') return 'thai';
+                    if (prefix === 'Japanese') return 'japanese';
                     return 'georgian';
                 }
                 return (window.__drinkCats && window.__drinkCats.has(String(catName || '').toLowerCase())) ? 'drink' : 'food';
             };
+            // For Food & Market: the items belonging to whichever kitchen is on
+            // screen right now. Used to scope the 3D modal / AR carousel so a
+            // diner browsing Georgian dishes can never swipe into a Japanese
+            // sushi roll or a Thai curry — see openModal/openAR call sites below.
+            function _fmActiveKitchenItems() {
+                if (!_isFoodMarketTenant()) return menuItems;
+                return menuItems.filter(it => _groupOf(it.category) === _activeGroup);
+            }
+            // Resolves a card's 3D-modal / AR-carousel scope: the active kitchen's
+            // items for Food & Market (so the carousel/modal next-prev never crosses
+            // into another kitchen's dishes), otherwise the full menuItems list
+            // unchanged — matching the existing behaviour for every other tenant.
+            function _scopedCatItems(item) {
+                const scoped = _fmActiveKitchenItems();
+                const idx = scoped.indexOf(item);
+                return { scoped, idx: idx >= 0 ? idx : 0 };
+            }
 
             function _arFeaturedText() {
                 return window.__lang === 'ka'
@@ -13154,7 +13357,9 @@
                 // drinks, so those cards fall back to a plain photo card.
                 const has3d = _isAREnabledMenuItem(item) && !_isFoodMarketDrinksActive();
                 const modelSrc = has3d ? _safeAssetUrl(item.model) : '';
-                const noImage = item.text_only === true || (!thumbSrc && !has3d);
+                // Drinks are written out like the printed wine/spirits list: name + price,
+                // no photo at all, even if an item happens to carry a thumbnail_url.
+                const noImage = item.text_only === true || (!thumbSrc && !has3d) || _isFoodMarketDrinksActive();
                 // thumb_3d (admin checkbox "also load 3D model in thumbnail") controls ONLY
                 // the card thumbnail: off = keep the photo (saves bandwidth), on = upgrade to
                 // live 3D. Text-only/no-image dishes stay compact and never get media/AR UI.
@@ -13219,7 +13424,7 @@
                         card.querySelector('.item-left')?.remove();
                     }, { once: true });
                     if (has3d) {
-                        thumbImg.addEventListener('click', () => openModal(globalIdx, menuItems));
+                        thumbImg.addEventListener('click', () => { const { scoped, idx } = _scopedCatItems(item); openModal(idx, scoped); });
                     } else if (thumbSrc) {
                         // Photo-only item: tap the image to expand it. In twin phone
                         // layout and Burger Planet it opens the rich popup (name + photo +
@@ -13245,9 +13450,9 @@
                 // still open the rich photo/text detail sheet; basket controls below
                 // keep their own click handling.
                 if (has3d && !noImage) {
-                    card.querySelector('.item-right').addEventListener('click', () => openModal(globalIdx, menuItems));
-                    card.querySelector('.item-name').addEventListener('click', () => openModal(globalIdx, menuItems));
-                    card.querySelector('.ar-btn')?.addEventListener('click', e => { e.stopPropagation(); openAR(globalIdx, menuItems); });
+                    card.querySelector('.item-right').addEventListener('click', () => { const { scoped, idx } = _scopedCatItems(item); openModal(idx, scoped); });
+                    card.querySelector('.item-name').addEventListener('click', () => { const { scoped, idx } = _scopedCatItems(item); openModal(idx, scoped); });
+                    card.querySelector('.ar-btn')?.addEventListener('click', e => { e.stopPropagation(); const { scoped, idx } = _scopedCatItems(item); openAR(idx, scoped); });
                 } else if (_isBaomaTenant() || _isMugsyTenant() || _isPipesTenant()) {
                     card.addEventListener('click', e => {
                         if (e.target.closest('.qty-ctrl, .variant, .addon, .ar-btn')) return;
@@ -13355,18 +13560,19 @@
             const AR_CAT = '__ar3d';
 
             function _arEntriesForActiveGroup() {
-                // Drinks is the one Food & Market view where nobody wants the global
-                // 3D showcase — searching for a wine shouldn't surface a rotating
-                // burger. Scoped to this one group only; Georgian & More and Asian
-                // keep the showcase exactly as before.
+                // Drinks never gets the 3D showcase — searching for a wine shouldn't
+                // surface a rotating burger.
                 if (_isFoodMarketTenant() && _activeGroup === 'drinks') return [];
                 let arEntries = items
                     .map((item, globalIdx) => ({ item, globalIdx }))
                     .filter(({ item }) => _isAREnabledMenuItem(item));
-                // Food & Market has separate Georgian/Asian/Drinks catalogue views, but
-                // 3D is a global showcase: every model-backed dish belongs at the top of
-                // each view, even when its source category lives in another menu group.
-                if (_groupingOn() && !_isFoodMarketTenant()) {
+                // Each kitchen's 3D showcase is scoped to that kitchen only — a diner
+                // browsing Georgian & More should never see a Japanese sushi roll or a
+                // Thai curry surface at the top of their menu just because it happens
+                // to have a 3D model. (Food & Market used to exempt itself from this
+                // filter deliberately; that's exactly what caused 3D dishes to bleed
+                // across kitchens, so the exemption is gone.)
+                if (_groupingOn()) {
                     arEntries = arEntries.filter(({ item }) => _groupOf(item.category) === _activeGroup);
                 }
                 return arEntries;
@@ -13388,10 +13594,18 @@
             const FEATURED_CAT = '__most_ordered';
 
             function _mostOrderedEntries() {
-                return _mostOrderedIds
+                let entries = _mostOrderedIds
                     .map(id => items.findIndex(it => it.id === id))
                     .filter(globalIdx => globalIdx !== -1)
                     .map(globalIdx => ({ item: items[globalIdx], globalIdx }));
+                // Same kitchen-independence rule as the AR showcase, scoped to Food &
+                // Market specifically (other drink_categories tenants never filtered
+                // "most ordered" by group and shouldn't start now): a pin from one
+                // kitchen shouldn't surface while browsing another.
+                if (_isFoodMarketTenant()) {
+                    entries = entries.filter(({ item }) => _groupOf(item.category) === _activeGroup);
+                }
+                return entries;
             }
 
             function renderMostOrderedBlock(parent) {
@@ -13562,11 +13776,11 @@
 
             // ── Food / Drinks group switch ──────────────────────────────
             const groupsDiv = document.getElementById('menu-groups');
-            const _groupKeys = () => _isFoodMarketTenant() ? ['georgian', 'asian', 'drinks'] : ['food', 'drink'];
+            const _groupKeys = () => _isFoodMarketTenant() ? _FM_KITCHEN_KEYS : ['food', 'drink'];
             const _groupLabels = (lang) => {
                 if (_isFoodMarketTenant()) return lang === 'ka'
-                    ? { georgian: 'ქართული და სხვა', asian: 'აზიური (ტაილანდური + იაპონური)', drinks: 'სასმელები' }
-                    : { georgian: 'Georgian & More', asian: 'Asian (Thai + Japanese)', drinks: 'Drinks' };
+                    ? { georgian: 'ქართული და სხვა', thai: 'ტაილანდური', japanese: 'იაპონური', drinks: 'სასმელები' }
+                    : { georgian: 'Georgian & More', thai: 'Thai', japanese: 'Japanese', drinks: 'Drinks' };
                 return lang === 'ka'
                     ? { food: 'საკვები', drink: 'სასმელები' }
                     : lang === 'ru'
@@ -13581,7 +13795,13 @@
                     const b = document.createElement('button');
                     b.className = 'group-btn' + (g === _activeGroup ? ' active' : '');
                     b.dataset.group = g;
-                    b.textContent = lab[g];
+                    // The Japanese tab is a white/red card, not a photo tile — give it a
+                    // small crane glyph alongside the label to match its landing tile.
+                    if (g === 'japanese') {
+                        b.innerHTML = `<span class="fm-tab-crane" aria-hidden="true"></span><span>${_escapeHtml(lab[g])}</span>`;
+                    } else {
+                        b.textContent = lab[g];
+                    }
                     groupsDiv.appendChild(b);
                 });
             }
@@ -13623,9 +13843,38 @@
                 if (b) { track('menu_group', null, { group: b.dataset.group }); _setGroup(b.dataset.group); }
             });
 
+            // ── Kitchen-picker landing gate (Food & Market only) ─────────────────
+            // Shows #fm-kitchen-landing whenever the URL has no `menu` param yet;
+            // a direct ?menu=<kitchen> link (e.g. a table-specific QR code) skips
+            // straight past it. See the [data-fm-landing] CSS rules.
+            function _fmSyncLanding() {
+                if (!_isFoodMarketTenant()) return;
+                const hasMenuParam = new URLSearchParams(location.search).has('menu');
+                document.documentElement.dataset.fmLanding = hasMenuParam ? '0' : '1';
+            }
+            document.querySelectorAll('#fm-kitchen-landing .fm-kitchen-tile').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const g = btn.dataset.kitchen;
+                    const url = new URL(location.href);
+                    url.searchParams.set('menu', g);
+                    history.replaceState(history.state, '', url);
+                    document.documentElement.dataset.fmLanding = '0';
+                    track('menu_group', null, { group: g, source: 'landing' });
+                    _setGroup(g);
+                    document.documentElement.dataset.fmGroup = g; // covers the g === _activeGroup no-op case
+                });
+            });
+            document.getElementById('fm-back-to-kitchens')?.addEventListener('click', () => {
+                const url = new URL(location.href);
+                url.searchParams.delete('menu');
+                history.replaceState(history.state, '', url);
+                document.documentElement.dataset.fmLanding = '1';
+            });
+
             // Called by applyRemoteTheme once drink_categories is known (and once here
             // in case the theme already resolved). Idempotent.
             window._applyMenuGroups = function () {
+                _fmSyncLanding();
                 if (!_groupingOn()) {
                     groupsDiv.hidden = true;
                     document.querySelectorAll('.cat-pill').forEach(p => {
@@ -13637,7 +13886,11 @@
                 _activeGroup = _isFoodMarketTenant()
                     ? _fmGroupFromQuery()
                     : ((window.__menuGroup === 'drink') ? 'drink' : 'food');
-                if (_isFoodMarketTenant()) document.documentElement.dataset.fmGroup = _activeGroup;
+                if (_isFoodMarketTenant()) {
+                    document.documentElement.dataset.fmGroup = _activeGroup;
+                    const backBtn = document.getElementById('fm-back-to-kitchens');
+                    if (backBtn) backBtn.hidden = false;
+                }
                 _renderGroupToggle();
                 groupsDiv.hidden = false;
                 _updateGroupPillVisibility();
@@ -13654,7 +13907,14 @@
             window._updateGroupLabels = function (lang) {
                 if (groupsDiv.hidden) return;
                 const lab = _groupLabels(lang);
-                groupsDiv.querySelectorAll('.group-btn').forEach(b => { b.textContent = lab[b.dataset.group]; });
+                groupsDiv.querySelectorAll('.group-btn').forEach(b => {
+                    if (b.dataset.group === 'japanese') {
+                        const span = b.querySelector('span:last-child');
+                        if (span) span.textContent = lab[b.dataset.group];
+                    } else {
+                        b.textContent = lab[b.dataset.group];
+                    }
+                });
             };
 
             // ── Category pills: desktop horizontal-scroll affordances ───
