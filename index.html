@@ -1975,15 +1975,28 @@
             --bg-repeat: repeat, repeat;
         }
         /* Japanese ("Origami" page) is its own kitchen now, not folded into Thai.
-           The real print page is plain white with a red accent — no scattered
-           watermark — so it keeps the base dot-grid untouched, just re-tinted red. */
+           Watermark built from the same crane lifted from the print page's own
+           cover art, scattered faintly (see img/food-market/doodles/tile-japanese.png). */
         [data-tenant="food-market-main"][data-theme="day"][data-fm-group="japanese"] {
             --accent:  #e51b22;
             --accent2: #b3141a;
+            --bg-image:
+                url('./img/food-market/doodles/tile-japanese.png'),
+                radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1.6px);
+            --bg-size:   410px 501px, 26px 26px;
+            --bg-repeat: repeat, repeat;
         }
+        /* Drinks watermark built from the print menu's own cover doodles (citrus
+           slice, sunburst, spiral, cocktail-stirrer swirl), cropped straight out of
+           the real FM-DRINKS cover art — see img/food-market/doodles/tile-drinks.png. */
         [data-tenant="food-market-main"][data-theme="day"][data-fm-group="drinks"] {
             --accent:  #7a2340;
             --accent2: #5a1930;
+            --bg-image:
+                url('./img/food-market/doodles/tile-drinks.png'),
+                radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1.6px);
+            --bg-size:   410px 501px, 26px 26px;
+            --bg-repeat: repeat, repeat;
         }
 
         /* ── Kitchen-picker landing gate ──────────────────────────────────
@@ -2166,6 +2179,10 @@
         [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="th-flower"]::after      { background-image: url('./img/food-market/doodles/th-flower.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="th-star"]::after        { background-image: url('./img/food-market/doodles/th-star.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="th-chili"]::after       { background-image: url('./img/food-market/doodles/th-chili.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="dr-citrus"]::after      { background-image: url('./img/food-market/doodles/dr-citrus.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="dr-flower"]::after      { background-image: url('./img/food-market/doodles/dr-flower.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="dr-spiral"]::after      { background-image: url('./img/food-market/doodles/dr-spiral.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="dr-swirl"]::after       { background-image: url('./img/food-market/doodles/dr-swirl.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="pg-wrestler"]::after     { background-image: url('./img/food-market/doodles/pg-wrestler.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="pg-duel"]::after         { background-image: url('./img/food-market/doodles/pg-duel.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .category-header[data-doodle="pg-raised-hands"]::after { background-image: url('./img/food-market/doodles/pg-raised-hands.png'); }
@@ -2225,6 +2242,10 @@
         [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="th-star"]::after        { background-image: url('./img/food-market/doodles/th-star-dark.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="th-chili"]::after       { background-image: url('./img/food-market/doodles/th-chili-dark.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="jp-crane"]::after       { background-image: url('./img/food-market/doodles/jp-crane-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="dr-citrus"]::after      { background-image: url('./img/food-market/doodles/dr-citrus-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="dr-flower"]::after      { background-image: url('./img/food-market/doodles/dr-flower-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="dr-spiral"]::after      { background-image: url('./img/food-market/doodles/dr-spiral-dark.png'); }
+        [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="dr-swirl"]::after       { background-image: url('./img/food-market/doodles/dr-swirl-dark.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="pg-wrestler"]::after     { background-image: url('./img/food-market/doodles/pg-wrestler-dark.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="pg-duel"]::after         { background-image: url('./img/food-market/doodles/pg-duel-dark.png'); }
         [data-tenant="food-market-main"][data-theme="day"] .menu-item[data-bg-doodle="pg-raised-hands"]::after { background-image: url('./img/food-market/doodles/pg-raised-hands-dark.png'); }
@@ -10133,14 +10154,19 @@
         // actual kanji word for that dish style (as printed on the "Origami"
         // page). Deterministic per category (hashed from the English name, the
         // same string data-cat-name already carries) so the pick never shifts
-        // on re-render/language toggle. Drinks and Poke Bowl have no print
-        // reference, so they get nothing rather than an invented icon.
+        // on re-render/language toggle. Poke Bowl has no print reference (no
+        // matching kanji on the Origami page), so it gets nothing rather than
+        // an invented icon.
         const _FM_GEORGIAN_DOODLES = ['pg-shaman', 'pg-eye-legs', 'pg-diver', 'pg-totem', 'pg-deer-star', 'pg-deer-running', 'pg-sun', 'pg-hunter', 'pg-wrestler', 'pg-duel', 'pg-raised-hands', 'pg-river'];
         const _FM_THAI_DOODLES = ['th-sun-burst', 'th-flower', 'th-star', 'th-chili'];
         // Japanese card-corner accent: just the origami crane lifted from the
         // "Origami" print page — Thai and Japanese are independent kitchens now,
         // so a Japanese dish never picks up a Thai doodle or vice versa.
         const _FM_JAPANESE_CARD_DOODLES = ['jp-crane'];
+        // Drinks doodles: cropped directly out of the real FM-DRINKS cover art
+        // (citrus slice, sunburst, spiral, cocktail-stirrer swirl) — same "lifted
+        // from the print menu" treatment as the other three kitchens, not invented.
+        const _FM_DRINKS_DOODLES = ['dr-citrus', 'dr-flower', 'dr-spiral', 'dr-swirl'];
         const _FM_JAPANESE_KANJI = {
             'Japanese — Sashimi': '刺身',
             'Japanese — Nigiri': '握り寿司',
@@ -10156,7 +10182,10 @@
                 const kanji = _FM_JAPANESE_KANJI[clean];
                 return kanji ? { kanji } : {};
             }
-            const icons = prefix === 'Georgian' ? _FM_GEORGIAN_DOODLES : prefix === 'Thai' ? _FM_THAI_DOODLES : null;
+            const icons = prefix === 'Georgian' ? _FM_GEORGIAN_DOODLES
+                        : prefix === 'Thai'      ? _FM_THAI_DOODLES
+                        : prefix === 'Drinks'    ? _FM_DRINKS_DOODLES
+                        : null;
             if (!icons) return {};
             let hash = 0;
             for (let i = 0; i < clean.length; i++) hash = (hash * 31 + clean.charCodeAt(i)) >>> 0;
@@ -10165,16 +10194,17 @@
         // Same doodle set, stamped faintly in a corner of most dish cards so
         // the white cards pick up the print menu's hand-drawn feel instead of
         // sitting empty. Picked from whichever kitchen is on screen, so a
-        // Georgian dish never shows a Thai doodle, and a Thai dish never shows
-        // the Japanese crane or vice versa; Drinks keeps its design untouched,
-        // so it gets none. Hashed from globalIdx (stable across language
-        // toggles, unlike the translated name) with a multiplicative hash so
-        // the selection doesn't look mechanically periodic on screen.
+        // Georgian dish never shows a Thai doodle, a Thai dish never shows the
+        // Japanese crane, and a Drinks row never shows a Georgian petroglyph.
+        // Hashed from globalIdx (stable across language toggles, unlike the
+        // translated name) with a multiplicative hash so the selection doesn't
+        // look mechanically periodic on screen.
         function _foodMarketCardDoodle(globalIdx) {
             const group = document.documentElement.dataset.fmGroup;
             const pool = group === 'georgian' ? _FM_GEORGIAN_DOODLES
                        : group === 'thai'      ? _FM_THAI_DOODLES
                        : group === 'japanese'  ? _FM_JAPANESE_CARD_DOODLES
+                       : group === 'drinks'    ? _FM_DRINKS_DOODLES
                        : null;
             if (!pool) return null;
             const hash = (Math.imul(globalIdx + 1, 2654435761) >>> 0);
