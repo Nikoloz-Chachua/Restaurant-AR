@@ -1839,7 +1839,14 @@
             border-radius: 0;
             background: transparent;
         }
-        [data-tenant="food-market-main"] .group-btn {
+        /* `html` prefix matches html[lang="ka"] .group-btn's specificity (both are
+           1 tag + 1 attribute + 1 class) so this wins the font-size/letter-spacing/
+           text-transform tie by source order -- without it, the ka-lang rule further
+           down would silently win and push the font back up, which is exactly what
+           was causing "ტაილანდური"/"სასმელები" to overflow the tile. Flex-centered
+           (all four kitchens, not just Japanese) so every label sits at the same
+           vertical position regardless of how many lines it wraps to. */
+        html[data-tenant="food-market-main"] .group-btn {
             min-width: 0;
             min-height: 94px;
             padding: 8px 6px;
@@ -1847,10 +1854,16 @@
             border: 1px solid var(--border);
             background-color: var(--pill-bg);
             color: var(--text);
-            font-size: 0.76rem;
-            letter-spacing: 0.2px;
+            font-size: 0.66rem;
+            letter-spacing: 0.1px;
             text-transform: none;
-            line-height: 1.15;
+            line-height: 1.2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 2px;
         }
         [data-tenant="food-market-main"] .group-btn[data-group="georgian"],
         [data-tenant="food-market-main"] .group-btn[data-group="thai"],
@@ -1871,17 +1884,14 @@
             background-image: linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.46)), url('./img/food-market-drinks.png');
         }
         /* Japanese tab: the "Origami" page is white/red, not a photo tile, so it gets
-           its own look instead of the cover-photo treatment used by the other three. */
+           its own look instead of the cover-photo treatment used by the other three.
+           Centering/gap now come from the shared base rule above, so this tab sits
+           at the exact same vertical position as the other three. */
         [data-tenant="food-market-main"] .group-btn[data-group="japanese"] {
             background: #fff;
             border: 2px solid #e51b22;
             color: #e51b22;
             text-shadow: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
         }
         [data-tenant="food-market-main"] .group-btn[data-group="japanese"] .fm-tab-crane {
             width: 22px;
