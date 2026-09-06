@@ -1942,7 +1942,9 @@
             --item-hover-shadow:0 6px 16px rgba(0,0,0,0.10);
             --accent-edge:      linear-gradient(180deg, var(--accent), var(--accent2));
             --stage-bg:         var(--thumb-bg);
-            --thumb-vignette:   radial-gradient(ellipse at center, transparent 32%, var(--card) 100%);
+            /* Direct feedback: the radial white fade at the photo corners read as an
+               unwanted glow/blur. Dish photos should show as-is, no overlay. */
+            --thumb-vignette:   none;
             --pill-bg:          var(--card);
             --pill-active-bg:   linear-gradient(120deg, var(--accent), var(--accent2));
             --cta-bg:           linear-gradient(120deg, var(--accent), var(--accent2));
