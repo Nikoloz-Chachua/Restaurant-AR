@@ -4734,17 +4734,17 @@
                     if (has3d) {
                         thumbImg.addEventListener('click', () => openModal(globalIdx, menuItems));
                     } else if (thumbSrc) {
-                        // Photo-only item: tap the image to expand it. In twin phone
-                        // layout it opens the rich popup (name + photo + description +
-                        // price + add-to-cart); Monday Greens keeps the plain image.
-                        // Checked at click time, after the remote theme has set the
-                        // data-template / data-phone-layout attributes.
+                        // Photo-only item: tap the image to expand it, on every
+                        // template. Twin phone layout opens the rich popup (name +
+                        // photo + description + price + add-to-cart); every other
+                        // template gets the plain fullscreen image, same as Monday
+                        // Greens. Checked at click time, after the remote theme has
+                        // set the data-phone-layout attribute.
                         thumbImg.addEventListener('click', e => {
+                            e.stopPropagation();
                             if (document.documentElement.dataset.phoneLayout === 'twin') {
-                                e.stopPropagation();
                                 openLightbox(thumbSrc, itemName, item, globalIdx);
-                            } else if (document.documentElement.dataset.template === 'monday_greens') {
-                                e.stopPropagation();
+                            } else {
                                 openLightbox(thumbSrc, itemName);
                             }
                         });
