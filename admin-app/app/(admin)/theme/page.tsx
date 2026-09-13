@@ -108,12 +108,15 @@ export default function ThemePage() {
   const [tab, setTab]         = useState<ThemeTab>('night')
   const [loadedTemplateKey, setLoadedTemplateKey] = useState<string | undefined>()
   const showTemplateControls = canManageThemeTemplates(plan.role)
-  // Announcement (event/promo banner) is scoped to this one tenant for now --
-  // it's a bespoke feature built for Corner at Tabidze's recurring jazz
-  // nights, not yet offered platform-wide. Gate on the tenant slug the same
-  // way the Monday Greens-only approved reset does, so other tenants' theme
-  // editors are completely unaffected.
-  const showAnnouncementTab = plan.restaurantSlug === 'corner-by-eleven-main'
+  // Announcement (event/promo banner) is scoped to Corner at Tabidze for now
+  // -- it's a bespoke feature built for their recurring jazz nights, not yet
+  // offered platform-wide. Visible to Corner's own tenant login (matched by
+  // slug) and, unconditionally, to super_admin -- the same pattern this file
+  // already uses for e.g. canUploadModels, since a super_admin isn't relying
+  // on the ?tenant= URL param resolving in time the way a scoped tenant
+  // slug check would be. Every other brand_owner/branch_* login still gets
+  // nothing here.
+  const showAnnouncementTab = plan.restaurantSlug === 'corner-by-eleven-main' || plan.role === 'super_admin'
 
   const load = useCallback(async () => {
     if (plan.loading || !plan.canUseTheme || !plan.restaurantId) {
