@@ -8,17 +8,19 @@ import {
   filterMenuItems,
   menuFiltersAreActive,
 } from '@/lib/menuFilters'
+import { supportsAdditionalInfo } from '@/lib/additionalInfo'
 
 type Category = { id: number; name_en: string; name_ka: string; sort_order: number }
 type MenuItem = {
   id: number; name_en: string; name_ka: string
   description_en: string; description_ka: string
+  additional_info_en: string; additional_info_ka: string
   price: string; category_id: number | null; model: string; model_usdz: string
   sort_order: number; visible: boolean; ar_scale: number; thumbnail_url: string; thumb_3d: boolean; is_3d: boolean
 }
 type MenuItemPayload = Partial<Omit<MenuItem, 'id'>> & Pick<
   Omit<MenuItem, 'id'>,
-  'name_en' | 'name_ka' | 'description_en' | 'description_ka' | 'price' | 'category_id' | 'sort_order' | 'visible' | 'thumbnail_url'
+  'name_en' | 'name_ka' | 'description_en' | 'description_ka' | 'additional_info_en' | 'additional_info_ka' | 'price' | 'category_id' | 'sort_order' | 'visible' | 'thumbnail_url'
 >
 type MenuFilters = {
   query: string
@@ -28,7 +30,7 @@ type MenuFilters = {
   quality: 'all' | 'missing-en' | 'missing-ka' | 'missing-price'
 }
 const EMPTY_ITEM: Omit<MenuItem, 'id'> = {
-  name_en: '', name_ka: '', description_en: '', description_ka: '',
+  name_en: '', name_ka: '', description_en: '', description_ka: '', additional_info_en: '', additional_info_ka: '',
   price: '', category_id: null, model: '', model_usdz: '', sort_order: 0, visible: true, ar_scale: 1.0, thumbnail_url: '', thumb_3d: false, is_3d: true,
 }
 
@@ -113,6 +115,7 @@ export default function MenuPage() {
   function flash(m: string) { setMsg(m); setTimeout(() => setMsg(''), 3000) }
 
   const activeArItemCount = items.filter(isActiveArItem).length
+  const showAdditionalInfo = supportsAdditionalInfo(plan.restaurantId, plan.restaurantSlug)
   const itemLimitLabel = plan.itemLimit === null ? 'Unlimited' : String(plan.itemLimit)
   const planLimitReached = plan.itemLimit !== null && activeArItemCount >= plan.itemLimit
 
@@ -136,6 +139,8 @@ export default function MenuPage() {
       name_ka: base.name_ka,
       description_en: base.description_en,
       description_ka: base.description_ka,
+      additional_info_en: base.additional_info_en,
+      additional_info_ka: base.additional_info_ka,
       price: base.price,
       category_id: base.category_id,
       sort_order: base.sort_order,
@@ -172,6 +177,7 @@ export default function MenuPage() {
     setSortOrderTouched(true)
     setItemForm({ name_en: item.name_en, name_ka: item.name_ka,
       description_en: item.description_en, description_ka: item.description_ka,
+      additional_info_en: item.additional_info_en ?? '', additional_info_ka: item.additional_info_ka ?? '',
       price: item.price, category_id: item.category_id, model: item.model, model_usdz: item.model_usdz ?? '',
       sort_order: item.sort_order, visible: item.visible, ar_scale: item.ar_scale ?? 1.0,
       thumbnail_url: item.thumbnail_url ?? '', thumb_3d: item.thumb_3d ?? false, is_3d: item.is_3d ?? true })
@@ -665,6 +671,20 @@ export default function MenuPage() {
               <textarea rows={2} value={itemForm.description_ka}
                         onChange={e => setItemForm(f => ({ ...f, description_ka: e.target.value }))} />
             </Field>
+            {showAdditionalInfo && (
+              <>
+                <Field label="Additional information (English)" className="col-span-2">
+                  <textarea rows={2} value={itemForm.additional_info_en}
+                            placeholder="Example: Contains peanuts. May trigger an allergic reaction."
+                            onChange={e => setItemForm(f => ({ ...f, additional_info_en: e.target.value }))} />
+                </Field>
+                <Field label="Additional information (Georgian)" className="col-span-2">
+                  <textarea rows={2} value={itemForm.additional_info_ka}
+                            placeholder="მაგალითი: შეიცავს მიწის თხილს. შესაძლოა გამოიწვიოს ალერგიული რეაქცია."
+                            onChange={e => setItemForm(f => ({ ...f, additional_info_ka: e.target.value }))} />
+                </Field>
+              </>
+            )}
             <Field label={T.priceLabel}>
               <input value={itemForm.price} onChange={e => setItemForm(f => ({ ...f, price: e.target.value }))} />
             </Field>
