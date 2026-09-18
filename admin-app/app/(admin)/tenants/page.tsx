@@ -823,17 +823,25 @@ function AccountLog({
   onReset: (email: string) => void
   onRemove: (account: AccountLogEntry) => void
 }) {
+  const [expanded, setExpanded] = useState(false)
+
   return (
     <section className="mb-8">
-      <div className="flex flex-wrap items-end justify-between gap-3 mb-3">
-        <div>
-          <h2 className="text-base font-semibold" style={{ color: 'var(--text)' }}>Account Log</h2>
-          <p className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
-            Temporary password visibility shows stored initial passwords only; old Supabase Auth passwords remain unrecoverable.
-          </p>
-        </div>
-      </div>
-      <div className="table-scroll rounded-xl" style={{ border: '1px solid var(--border)' }}>
+      <button
+        type="button"
+        onClick={() => setExpanded(current => !current)}
+        className="w-full flex items-center justify-between gap-3 p-3 rounded-xl text-left"
+        style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
+        aria-expanded={expanded}
+      >
+        <span>
+          <span className="block text-base font-semibold" style={{ color: 'var(--text)' }}>Account Log</span>
+          <span className="block text-xs mt-1" style={{ color: 'var(--dim)' }}>Account history and login actions</span>
+        </span>
+        <span aria-hidden="true" className="text-lg" style={{ color: 'var(--dim)' }}>{expanded ? '⌃' : '⌄'}</span>
+      </button>
+      {expanded && (
+      <div className="table-scroll rounded-xl mt-3" style={{ border: '1px solid var(--border)' }}>
         <table className="w-full text-xs" style={{ minWidth: '1240px' }}>
           <thead>
             <tr style={{ background: 'var(--card2)', borderBottom: '1px solid var(--border)' }}>
@@ -919,6 +927,7 @@ function AccountLog({
           </tbody>
         </table>
       </div>
+      )}
     </section>
   )
 }
