@@ -44,6 +44,7 @@ export default function MenuPage() {
   const [items, setItems]           = useState<MenuItem[]>([])
   const [loading, setLoading]       = useState(true)
   const [tab, setTab]               = useState<'items' | 'categories'>('items')
+  const [search, setSearch]         = useState('')
 
   const [itemModal, setItemModal]   = useState(false)
   const [editItem, setEditItem]     = useState<MenuItem | null>(null)
@@ -102,6 +103,10 @@ export default function MenuPage() {
   const activeArItemCount = items.filter(isActiveArItem).length
   const itemLimitLabel = plan.itemLimit === null ? 'Unlimited' : String(plan.itemLimit)
   const planLimitReached = plan.itemLimit !== null && activeArItemCount >= plan.itemLimit
+  const filteredItems = items.filter(item => {
+    const query = search.trim().toLowerCase()
+    return !query || [item.name_en, item.name_ka, item.description_en, item.description_ka].some(value => value.toLowerCase().includes(query))
+  })
 
   function activeCountWithForm() {
     const existingItems = editItem ? items.filter(item => item.id !== editItem.id) : items
@@ -409,6 +414,13 @@ export default function MenuPage() {
                   style={{ background: 'var(--card)', color: 'var(--dim)', border: '1px solid var(--border)' }}>
               Active AR items: <span style={{ color: 'var(--text)' }}>{activeArItemCount} / {itemLimitLabel}</span>
             </span>
+            <input
+              value={search}
+              onChange={event => setSearch(event.target.value)}
+              placeholder="Search menu items…"
+              aria-label="Search menu items"
+              className="min-w-56 flex-1"
+            />
           </div>
           {planLimitReached && plan.itemLimit !== null && (
             <div className="mb-4 rounded-xl p-3 text-sm"
@@ -428,7 +440,7 @@ export default function MenuPage() {
                 </tr>
               </thead>
               <tbody>
-                {items.map((item, i) => (
+                {filteredItems.map((item, i) => (
                   <tr key={item.id}
                       style={{ background: i % 2 ? 'var(--card)' : 'transparent',
                                borderBottom: '1px solid var(--border)' }}>
