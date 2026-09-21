@@ -11691,7 +11691,7 @@
             photoEl.hidden = !photoUrl;
             if (photoUrl) photoEl.style.backgroundImage = `url("${photoUrl}")`;
 
-            const date = _cleanText(cfg.announcement_date);
+            const date = _cleanText(pick('announcement_date'));
             const time = _cleanText(cfg.announcement_time);
             const when = [date, time].filter(Boolean).join(' · ');
             const whenEl = document.querySelector('[data-announcement-when]');

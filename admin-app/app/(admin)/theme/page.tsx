@@ -58,7 +58,7 @@ const HERO_VIDEO_MAX_MB = 6
 // _applyAnnouncement). Rendered generically for any tenant that sets these keys,
 // but the editor below is only shown for Corner at Tabidze for now — see
 // ANNOUNCEMENT_TENANT_SLUG.
-const ANNOUNCEMENT_KEYS = ['announcement_enabled', 'announcement_date', 'announcement_time', 'announcement_text', 'announcement_text_ka', 'announcement_photo_url'] as const
+const ANNOUNCEMENT_KEYS = ['announcement_enabled', 'announcement_date', 'announcement_date_ka', 'announcement_time', 'announcement_text', 'announcement_text_ka', 'announcement_photo_url'] as const
 const ANNOUNCEMENT_TENANT_SLUG = 'corner-by-eleven-main'
 
 // Content survives a template switch — it describes the restaurant, not the look.
@@ -817,6 +817,8 @@ export default function ThemePage() {
                          onChange={v => set('announcement_enabled', v ? 'true' : 'false')} />
               <BrandRow label={T.announcementDate} value={config.announcement_date ?? ''}
                         onChange={v => set('announcement_date', v)} />
+              <BrandRow label={T.announcementDateKa} value={config.announcement_date_ka ?? ''}
+                        onChange={v => set('announcement_date_ka', v)} />
               <BrandRow label={T.announcementTime} value={config.announcement_time ?? ''}
                         onChange={v => set('announcement_time', v)} />
               <BrandRow label={T.announcementTextEn} value={config.announcement_text ?? ''}
