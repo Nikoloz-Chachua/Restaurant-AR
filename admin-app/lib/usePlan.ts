@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { canCreateBranchesForRole } from '@/lib/branchPermissions'
 
@@ -79,11 +80,20 @@ function planIdFromPlatform(platformPlan: PlatformPlanId, role: RoleId): PlanId 
   return 'basic300'
 }
 
+function normalizeRequestedSlug(raw: string) {
+  return raw.trim().toLowerCase().replace(/[^a-z0-9-]/g, '')
+}
+
+// Reads directly from window.location.search as a fallback for the very first
+// render (before Next's reactive searchParams are available) or for any
+// non-hook caller. usePlan() itself uses the reactive value below instead, so
+// it re-resolves when the tenant query param changes on a persisted layout
+// (e.g. the Sidebar) instead of keeping the first tenant it ever loaded.
 function requestedRestaurantSlug() {
   if (typeof window === 'undefined') return ''
   const params = new URLSearchParams(window.location.search)
   const requested = params.get('tenant') || params.get('restaurant') || params.get('restaurantSlug') || params.get('slug')
-  return requested?.trim().toLowerCase().replace(/[^a-z0-9-]/g, '') ?? ''
+  return normalizeRequestedSlug(requested ?? '')
 }
 
 function accessFor(
@@ -127,6 +137,17 @@ function accessFor(
 
 export function usePlan(): PlanAccess {
   const [access, setAccess] = useState<PlanAccess>(() => accessFor('brand_owner', 'basic300', true))
+  // Reactive to the URL: unlike reading window.location.search once inside an
+  // effect with an empty dependency array, this updates on every client-side
+  // navigation. A component that stays mounted across tenants — the Sidebar,
+  // via the admin layout — was otherwise stuck on whichever tenant it first
+  // resolved, so its "View Menu" link (and anything else derived from
+  // plan.restaurantSlug/restaurantDomain) kept pointing at that first tenant
+  // even after switching to a different one's Menu Editor.
+  const searchParams = useSearchParams()
+  const requestedSlugFromUrl = normalizeRequestedSlug(
+    searchParams.get('tenant') || searchParams.get('restaurant') || searchParams.get('restaurantSlug') || searchParams.get('slug') || ''
+  )
 
   useEffect(() => {
     const supabase = createClient()
@@ -144,7 +165,7 @@ export function usePlan(): PlanAccess {
       let tenant: Partial<Pick<PlanAccess, 'brandId' | 'restaurantId' | 'restaurantSlug' | 'restaurantName' | 'restaurantDomain' | 'canCreateBranchesEntitlement'>> = {}
 
       if (userId) {
-        const requestedSlug = requestedRestaurantSlug()
+        const requestedSlug = requestedSlugFromUrl || requestedRestaurantSlug()
         const [{ data: brandUsers }, { data: restaurantUsers }] = await Promise.all([
           supabase.from('brand_users').select('brand_id, role, brands(plan)').eq('user_id', userId),
           supabase.from('restaurant_users').select('restaurant_id, role, restaurants(id, slug, name, brand_id, custom_domain, brands(plan))').eq('user_id', userId),
@@ -229,7 +250,7 @@ export function usePlan(): PlanAccess {
       mounted = false
       listener.subscription.unsubscribe()
     }
-  }, [])
+  }, [requestedSlugFromUrl])
 
   return access
 }
