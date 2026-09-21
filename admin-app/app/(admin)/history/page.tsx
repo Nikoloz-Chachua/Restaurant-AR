@@ -14,6 +14,7 @@ type Change = {
   old_value: string | null
   new_value: string | null
   changed_at: string
+  changed_by: string | null
 }
 
 const PAGE_SIZE = 60
@@ -65,7 +66,7 @@ export default function HistoryPage() {
     if (plan.loading || !plan.restaurantId) { setLoading(plan.loading); return }
     const { data, error } = await supabase
       .from('change_history')
-      .select('id,source,record_id,label,field,old_value,new_value,changed_at')
+      .select('id,source,record_id,label,field,old_value,new_value,changed_at,changed_by')
       .eq('restaurant_id', plan.restaurantId)
       .order('changed_at', { ascending: false })
       .limit(PAGE_SIZE)
@@ -200,6 +201,7 @@ export default function HistoryPage() {
 
                   <div className="text-xs mt-1" style={{ color: 'var(--dim)' }}>
                     {timeAgo(r.changed_at, T)}
+                    {r.changed_by ? ` · ${r.changed_by}` : ''}
                   </div>
                 </div>
               </label>
