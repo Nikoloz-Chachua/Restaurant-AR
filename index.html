@@ -9373,10 +9373,17 @@
         };
         // Returns target opacity for a role based on current view mode
         const _roleOp = role => _xrSingleItem ? (role === 'center' ? 1.0 : 0) : CFG[role].opacity;
-        // Tenants whose dishes are too wide for the sliding carousel: neighbours
-        // would overlap the centre plate mid-swap. They get one dish at a time,
-        // swapped in place (shrink out, grow in) — see _swapInPlace().
-        const _noCarousel = () => document.documentElement.dataset.tenant === 'food-market-main';
+        // Food & Market AR: dishes are too wide for the sliding carousel (neighbours
+        // overlap the centre plate mid-swap), so it shows one dish at a time,
+        // swapped in place — see _swapInPlace(). It also gets the premium effects:
+        // plate-sized placement guide, drop-in with ripple, contact shadow, steam.
+        const _fmAR = () => document.documentElement.dataset.tenant === 'food-market-main';
+        // Per-slot model footprint (radius on the table, height), set in setSlotModel
+        const _dims = [null, null, null, null];
+        let _plateGuide = null, _guideShownAt = 0;
+        let _shadow = null, _ripple = null, _rippleAt = -1, _steam = null, _steamLevel = 0;
+        let _dropAt = -1;
+        const DROP_H = 0.14, DROP_FALL = 380, DROP_BOUNCE = 220, BOUNCE_H = 0.012;
 
         const INIT_ROLES    = ['left', 'center', 'right', 'farRight'];
         const DUR           = 350;
@@ -9621,6 +9628,10 @@
                 // Seat the model: bottom of bounding box sits at y=0
                 const seated = new THREE.Box3().setFromObject(obj);
                 if (isFinite(seated.min.y)) obj.position.y = -seated.min.y;
+                if (!seated.isEmpty()) {
+                    const sz = seated.getSize(new THREE.Vector3());
+                    _dims[slotIdx] = { r: Math.min(Math.max(sz.x, sz.z) / 2, 0.3), h: sz.y };
+                }
                 slotGroups[slotIdx].add(obj);
                 meshObjs[slotIdx] = obj;
             }
@@ -9636,8 +9647,8 @@
                 slotGroups[i].position.z = CFG[role].z;
                 slotGroups[i].scale.setScalar(CFG[role].s);
                 slotGroups[i].rotation.set(0, 0, 0);
-                slotGroups[i].visible = !_noCarousel() || role === 'center';
-                setOpacity(i, _noCarousel() ? 1.0 : opacities[i]);
+                slotGroups[i].visible = !_fmAR() || role === 'center';
+                setOpacity(i, _fmAR() ? 1.0 : opacities[i]);
             });
             _syncXRAddBtn();
         }
@@ -9687,6 +9698,154 @@
             })(performance.now());
         }
 
+        // ── Food & Market AR effects ──────────────────────────────────
+        const _easeOut = t => 1 - (1 - t) * (1 - t);
+        const _easeIn  = t => t * t;
+
+        function _radialTexture(stops) {
+            const c = document.createElement('canvas');
+            c.width = c.height = 128;
+            const ctx = c.getContext('2d');
+            const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+            stops.forEach(([o, col]) => g.addColorStop(o, col));
+            ctx.fillStyle = g; ctx.fillRect(0, 0, 128, 128);
+            return new THREE.CanvasTexture(c);
+        }
+
+        // Flat unit-radius shapes; callers scale them to the dish footprint.
+        function _flatRing(inner, opacity) {
+            const geo = new THREE.RingGeometry(inner, 1, 64).rotateX(-Math.PI / 2);
+            return new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+                color: 0xffffff, transparent: true, opacity, depthWrite: false, side: THREE.DoubleSide
+            }));
+        }
+
+        function _buildPlateGuide() {
+            const g = new THREE.Group();
+            const rim  = _flatRing(0.965, 0.9);
+            const fill = new THREE.Mesh(
+                new THREE.CircleGeometry(0.965, 64).rotateX(-Math.PI / 2),
+                new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.12, depthWrite: false, side: THREE.DoubleSide })
+            );
+            g.add(fill, rim);
+            g.userData = { rim, fill };
+            return g;
+        }
+
+        function _buildPlacedFX() {
+            _shadow = new THREE.Mesh(
+                new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2),
+                new THREE.MeshBasicMaterial({
+                    map: _radialTexture([[0, 'rgba(0,0,0,0.55)'], [0.45, 'rgba(0,0,0,0.3)'], [1, 'rgba(0,0,0,0)']]),
+                    transparent: true, depthWrite: false
+                })
+            );
+            _shadow.position.y = 0.001;
+            _shadow.renderOrder = -1;
+            carouselRoot.add(_shadow);
+
+            _ripple = _flatRing(0.93, 0);
+            _ripple.position.y = 0.002;
+            _ripple.visible = false;
+            carouselRoot.add(_ripple);
+
+            const puff = _radialTexture([[0, 'rgba(255,255,255,1)'], [0.4, 'rgba(255,255,255,0.45)'], [1, 'rgba(255,255,255,0)']]);
+            _steam = new THREE.Group();
+            for (let i = 0; i < 14; i++) {
+                const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: puff, transparent: true, depthWrite: false, opacity: 0 }));
+                sp.userData = { off: i / 14 * 3.1, a: Math.random() * Math.PI * 2, d: Math.sqrt(Math.random()), sway: 0.6 + Math.random() * 0.8 };
+                _steam.add(sp);
+            }
+            slotGroups[slotOf.center].add(_steam);
+        }
+
+        const _isHotDish = item => !!item && !/japanese|drink|salad|dessert/i.test(item.category || '');
+
+        function _fitSteam() {
+            if (!_steam) return;
+            const d = _dims[slotOf.center] || { r: 0.1, h: 0.05 };
+            _steam.userData = { hot: _isHotDish(MENU[currentCenterMenu]), r: d.r, top: d.h };
+        }
+
+        function _endDrop() {
+            if (_dropAt < 0) return;
+            _dropAt = -1; isAnimating = false;
+            if (slotGroups[slotOf.center]) slotGroups[slotOf.center].position.y = 0;
+        }
+
+        function _fxTick(now) {
+            const d = _dims[slotOf.center] || { r: 0.1, h: 0.05 };
+
+            // Placement guide: sized to the dish, pops in when a surface is found, then breathes
+            if (_plateGuide && !placed && reticle.visible) {
+                const k = _easeOut(Math.min((now - _guideShownAt) / 280, 1));
+                const breathe = 1 + 0.03 * Math.sin(now / 420);
+                _plateGuide.scale.setScalar(Math.max(d.r, 0.06) * (1.25 - 0.25 * k) * breathe);
+                _plateGuide.userData.rim.material.opacity  = 0.9 * k;
+                _plateGuide.userData.fill.material.opacity = (0.1 + 0.05 * Math.sin(now / 420)) * k;
+            }
+            if (!placed) return;
+
+            const g = slotGroups[slotOf.center];
+
+            // Drop: gravity fall, impact (ripple + haptic), small bounce
+            if (_dropAt >= 0) {
+                const t = now - _dropAt;
+                if (t < DROP_FALL) {
+                    g.position.y = DROP_H * (1 - _easeIn(t / DROP_FALL));
+                } else {
+                    if (_rippleAt < _dropAt) {
+                        _rippleAt = now;
+                        try { navigator.vibrate?.(18); } catch (e) {}
+                    }
+                    const b = (t - DROP_FALL) / DROP_BOUNCE;
+                    if (b < 1) g.position.y = BOUNCE_H * Math.sin(Math.PI * b);
+                    else _endDrop();
+                }
+            }
+
+            // Ripple spreading out from the landing point
+            if (_ripple) {
+                const rt = (now - _rippleAt) / 650;
+                _ripple.visible = _rippleAt >= 0 && rt < 1;
+                if (_ripple.visible) {
+                    _ripple.scale.setScalar(d.r * (1 + 1.4 * _easeOut(rt)));
+                    _ripple.material.opacity = 0.55 * (1 - rt);
+                }
+            }
+
+            // Contact shadow: tracks the dish's size, lighter and wider while it is in the air
+            if (_shadow) {
+                const lift = Math.min(g.position.y / DROP_H, 1);
+                const s = g.scale.x / CFG.center.s;
+                _shadow.scale.setScalar(d.r * 2.6 * s * (1 + 0.6 * lift));
+                _shadow.material.opacity = s * (1 - 0.75 * lift);
+            }
+
+            // Steam over hot dishes, eased in once the dish has landed
+            if (_steam) {
+                const sd = _steam.userData;
+                const target = (sd.hot && _dropAt < 0) ? 1 : 0;
+                _steamLevel += (target - _steamLevel) * 0.03;
+                _steam.visible = _steamLevel > 0.01;
+                if (_steam.visible) {
+                    const LIFE = 3.1, rise = Math.max(sd.r * 1.2, 0.1);
+                    _steam.children.forEach(sp => {
+                        const u = sp.userData;
+                        const age = ((now / 1000 + u.off) % LIFE) / LIFE;
+                        const rad = sd.r * 0.45 * u.d;
+                        sp.position.set(
+                            Math.cos(u.a) * rad + Math.sin(age * 5 * u.sway + u.a) * 0.012 * age,
+                            sd.top + age * rise,
+                            Math.sin(u.a) * rad
+                        );
+                        sp.scale.setScalar(sd.r * (0.25 + 0.55 * age));
+                        sp.material.opacity = _steamLevel * 0.2 * Math.sin(Math.PI * age);
+                    });
+                }
+            }
+        }
+
         // ── Navigation ────────────────────────────────────────────────
         function _afterNav(direction) {
             if (labelMesh && labelMesh.visible) drawLabel(MENU[currentCenterMenu]);
@@ -9717,6 +9876,7 @@
                 menuOf[cIdx] = next;
                 setSlotModel(cIdx, next);
                 currentCenterMenu = next;
+                _fitSteam();
                 _animScale(g, 0.001, CFG.center.s, 240, () => {
                     isAnimating = false;
                     _afterNav(step > 0 ? 'next' : 'prev');
@@ -9726,7 +9886,7 @@
 
         function goNext() {
             if (isAnimating) return;
-            if (_noCarousel()) return _swapInPlace(1);
+            if (_fmAR()) return _swapInPlace(1);
             isAnimating = true;
             const { left: lIdx, center: cIdx, right: rIdx, hidden: hIdx } = slotOf;
             if (hiddenSide === 'farLeft') snapSlot(hIdx, 'farRight');
@@ -9748,7 +9908,7 @@
 
         function goPrev() {
             if (isAnimating) return;
-            if (_noCarousel()) return _swapInPlace(-1);
+            if (_fmAR()) return _swapInPlace(-1);
             isAnimating = true;
             const { left: lIdx, center: cIdx, right: rIdx, hidden: hIdx } = slotOf;
             if (hiddenSide === 'farRight') snapSlot(hIdx, 'farLeft');
@@ -9818,6 +9978,11 @@
             if (placed || !reticle.visible) return;
             carouselRoot.position.setFromMatrixPosition(reticle.matrix);
             carouselRoot.quaternion.setFromRotationMatrix(reticle.matrix);
+            if (_fmAR()) {
+                slotGroups[slotOf.center].position.y = DROP_H;
+                _dropAt = performance.now(); isAnimating = true;
+                _steamLevel = 0; _fitSteam();
+            }
             carouselRoot.visible = true;
             reticle.visible      = false;
             placed               = true;
@@ -9839,6 +10004,7 @@
         function _resetPlacement() {
             _ignoreNextSelect = true;
             placed = false;
+            _endDrop();
             carouselRoot.scale.setScalar(1);
             _pinchDist0 = null; _pinchScale0 = null;
             if (_scaleHideTimer) { clearTimeout(_scaleHideTimer); _scaleHideTimer = null; }
@@ -9966,6 +10132,11 @@
                 new THREE.RingGeometry(0.04, 0.07, 32),
                 new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })
             );
+            if (_fmAR()) {
+                reticle = new THREE.Group();
+                _plateGuide = _buildPlateGuide();
+                reticle.add(_plateGuide);
+            }
             reticle.rotation.x       = -Math.PI / 2;
             reticle.matrixAutoUpdate = false;
             reticle.visible          = false;
@@ -9978,6 +10149,7 @@
                 const g = new THREE.Group(); carouselRoot.add(g); return g;
             });
             createLabelMesh();
+            if (_fmAR()) _buildPlacedFX();
 
             gestureLayer = document.getElementById('xr-gesture-layer');
             xrOverlay    = document.getElementById('xr-overlay');
@@ -10053,7 +10225,7 @@
             });
 
             renderer.xr.addEventListener('sessionend', () => {
-                hitTestSource = null; placed = false; _reticleWasVisible = false;
+                hitTestSource = null; placed = false; _reticleWasVisible = false; _endDrop();
                 xrSession = null; xrStarting = false;
                 carouselRoot.visible = false; reticle.visible = false;
                 if (labelMesh) labelMesh.visible = false;
@@ -10094,7 +10266,11 @@
                     }
                 }
                 const _rvNow = !placed && reticle.visible;
-                if (_rvNow !== _reticleWasVisible) { _reticleWasVisible = _rvNow; _updateScanHint(_rvNow); }
+                if (_rvNow !== _reticleWasVisible) {
+                    _reticleWasVisible = _rvNow; _updateScanHint(_rvNow);
+                    if (_rvNow && _plateGuide) _guideShownAt = performance.now();
+                }
+                if (_fmAR()) _fxTick(performance.now());
                 if (placed && Math.abs(_rotVelocity) > 0.0001) {
                     slotGroups[slotOf.center].rotation.y += _rotVelocity;
                     _rotVelocity *= INERTIA_DAMP;
