@@ -9779,6 +9779,28 @@
             uOccViewport: { value: null },
         };
         let _occBuf = null;
+        // ?ardebug=1 shows a live occlusion readout inside the AR overlay
+        const _occDiag = { req: '-', err: '', usage: '-', fmt: '-', size: '-', real: '-', dish: '-', on: 0 };
+        const _occDebug = new URLSearchParams(location.search).has('ardebug');
+        let _occDiagEl = null, _occDiagAt = 0;
+        function _occDiagShow(now) {
+            if (!_occDebug || now - _occDiagAt < 250) return;
+            _occDiagAt = now;
+            if (!_occDiagEl) {
+                _occDiagEl = document.createElement('pre');
+                Object.assign(_occDiagEl.style, {
+                    position: 'absolute', left: '18px', bottom: '120px', zIndex: 3, margin: 0,
+                    padding: '8px 10px', background: 'rgba(0,0,0,0.7)', color: '#fff',
+                    font: '11px/1.4 monospace', borderRadius: '8px', pointerEvents: 'none'
+                });
+                xrOverlay.appendChild(_occDiagEl);
+            }
+            const d = _occDiag;
+            _occDiagEl.textContent =
+                `session: ${d.req}${d.err ? ' (' + d.err + ')' : ''}\n` +
+                `depth: ${d.usage} / ${d.fmt}  ${d.size}\n` +
+                `centre real: ${d.real} m\ndish: ${d.dish} m\nocclusion: ${d.on ? 'ON' : 'off'}`;
+        }
 
         function _occPatch(mat) {
             if (!mat || mat.userData.occ) return;
@@ -9817,6 +9839,8 @@ if (uOccOn > 0.5) {
             // depthUsage throws when the depth-sensing feature was not granted
             let usage = null;
             try { usage = session?.depthUsage; } catch (e) {}
+            _occDiag.usage = usage || 'not granted';
+            _occDiagShow(performance.now());
             if (usage !== 'cpu-optimized') return;
             const pose = frame.getViewerPose(renderer.xr.getReferenceSpace());
             const view = pose?.views[0];
@@ -9826,6 +9850,13 @@ if (uOccOn > 0.5) {
             if (!info) return;
             const isFloat = session.depthDataFormat === 'float32';
             const w = info.width, h = info.height;
+            _occDiag.fmt = session.depthDataFormat; _occDiag.size = w + 'x' + h;
+            try { _occDiag.real = info.getDepthInMeters(0.5, 0.5).toFixed(2); } catch (e) { _occDiag.real = 'err'; }
+            if (placed) {
+                const cp = new THREE.Vector3(), dp = new THREE.Vector3();
+                camera.getWorldPosition(cp); carouselRoot.getWorldPosition(dp);
+                _occDiag.dish = cp.distanceTo(dp).toFixed(2);
+            }
             let tex = _occ.uOccDepth.value;
             if (!tex || tex.image.width !== w || tex.image.height !== h) {
                 tex?.dispose();
@@ -9846,9 +9877,11 @@ if (uOccOn > 0.5) {
             _occ.uOccToMeters.value = info.rawValueToMeters;
             _occ.uOccFloat.value = isFloat ? 1 : 0;
             const vp = renderer.xr.getCamera().cameras[0]?.viewport;
-            if (!vp || !vp.z) return;
+            _occDiag.on = 0;
+            if (!vp || !vp.z) { _occDiag.err = 'no viewport'; return; }
             _occ.uOccViewport.value.copy(vp);
             _occ.uOccOn.value = 1;
+            _occDiag.on = 1;
         }
 
         const _isHotDish = item => !!item && !/japanese|drink|salad|dessert/i.test(item.category || '');
@@ -10489,16 +10522,18 @@ if (uOccOn > 0.5) {
                     };
                     _xrReq = !_fmAR()
                         ? navigator.xr.requestSession('immersive-ar', _xrOpts)
-                        : navigator.xr.requestSession('immersive-ar', {
+                        : (_occDiag.req = 'depth requested', navigator.xr.requestSession('immersive-ar', {
                             ..._xrOpts,
                             optionalFeatures: ['dom-overlay', 'depth-sensing'],
                             depthSensing: {
                                 usagePreference: ['cpu-optimized'],
                                 dataFormatPreference: ['luminance-alpha', 'float32']
                             }
-                        }).catch(e => (e.name === 'TypeError' || e.name === 'NotSupportedError')
-                            ? navigator.xr.requestSession('immersive-ar', _xrOpts)
-                            : Promise.reject(e));
+                        }).catch(e => {
+                            if (e.name !== 'TypeError' && e.name !== 'NotSupportedError') return Promise.reject(e);
+                            _occDiag.req = 'fallback, no depth'; _occDiag.err = e.name + ': ' + e.message;
+                            return navigator.xr.requestSession('immersive-ar', _xrOpts);
+                        }));
                     // ARCore needs recovery time after a previous session ends.
                     // requestSession can hang indefinitely — race it against an 8s timeout.
                     const _xrTimeout = new Promise((_, rej) =>
