@@ -12423,6 +12423,10 @@
         function _safeAssetUrl(value) {
             const raw = String(value || '').trim();
             if (!raw) return '';
+            // data:image/... thumbnails (stored inline in menu_items.thumbnail_url rather
+            // than uploaded to R2) are a legitimate asset source too - only image data
+            // URIs qualify, never data:text/html or anything else that could carry markup.
+            if (/^data:image\/[a-z0-9+.-]+;base64,/i.test(raw)) return raw;
             try {
                 const url = new URL(raw, location.href);
                 return /^https?:$/.test(url.protocol) ? url.href : '';
