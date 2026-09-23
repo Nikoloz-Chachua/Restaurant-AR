@@ -2535,11 +2535,9 @@
         /* Food & Market: No Bun Burger (menu_items.id 2484) gets the green frame of
            its block on the printed menu, so it stands out in the Burger list. */
         [data-tenant="food-market-main"] .menu-item[data-item-id="2484"] {
-            border: 2px solid #2f8f3e;
-            box-shadow: 0 0 0 1px rgba(47,143,62,0.35), 0 8px 22px rgba(47,143,62,0.28);
+            border-color: #2f8f3e;
         }
         [data-tenant="food-market-main"] .menu-item[data-item-id="2484"]::before {
-            width: 4px;
             background: #2f8f3e;
         }
         [data-template="monday_greens"] {
@@ -13807,6 +13805,19 @@
             // Start detection in background — don't block menu render on it
             const arCapPromise = detectAR();
 
+            // Choice pills for items whose variants can't be entered in the admin yet
+            // (it has no variant editor). Only used while the DB row has none, so a
+            // future DB value takes over automatically. Keyed by menu_items.id.
+            const CODE_VARIANTS = {
+                // Food & Market — No Bun Burger: sauce choice, same price
+                2484: [
+                    { en: 'Carbonara',    ka: 'კარბონარა',       price: '30.00 ₾' },
+                    { en: 'Champignon',   ka: 'სოკოს სოუსი',     price: '30.00 ₾' },
+                    { en: 'White Sauce',  ka: 'თეთრი სოუსი',     price: '30.00 ₾' },
+                    { en: 'Black Pepper', ka: 'პილპილის სოუსი',  price: '30.00 ₾' },
+                ],
+            };
+
             // Fetch menu from Supabase; fall back to local JSON then hardcoded fallback
             let items = null;
             {
@@ -13852,7 +13863,7 @@
                             is_3d:          r.is_3d !== false,
                             text_only:      r.text_only === true,
                             addons:         Array.isArray(r.addons) ? r.addons : [],
-                            variants:       Array.isArray(r.variants) ? r.variants : [],
+                            variants:       (Array.isArray(r.variants) && r.variants.length) ? r.variants : (CODE_VARIANTS[r.id] || []),
                         }));
                     } else {
                         // A real resolved tenant with no menu items should stay empty.
