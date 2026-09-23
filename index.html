@@ -2544,6 +2544,42 @@
         [data-tenant="food-market-main"] .menu-item[data-item-id="2484"]::before {
             background: #2f8f3e;
         }
+        /* Phone layout for No Bun Burger: its four sauce pills stretched the narrow
+           right column (and the photo with it). Square photo beside name/description,
+           sauces as a 2x2 grid under both, then a full-width 3D button. */
+        @media (max-width: 639px) {
+            [data-tenant="food-market-main"] .menu-item[data-item-id="2484"]:not(.no-image) {
+                grid-template-columns: 132px minmax(0, 1fr);
+                grid-template-rows: auto;
+                grid-template-areas:
+                    "left name"
+                    "left desc"
+                    "left info"
+                    "left actions"
+                    "vars vars"
+                    "ar   ar";
+                align-items: start;
+                row-gap: 6px;
+            }
+            [data-tenant="food-market-main"] .menu-item[data-item-id="2484"] .item-right { display: contents; }
+            [data-tenant="food-market-main"] .menu-item[data-item-id="2484"] .item-name { grid-area: name; }
+            [data-tenant="food-market-main"] .menu-item[data-item-id="2484"] .ingredients { grid-area: desc; }
+            [data-tenant="food-market-main"] .menu-item[data-item-id="2484"] .additional-info { grid-area: info; }
+            [data-tenant="food-market-main"] .menu-item[data-item-id="2484"] .item-actions { grid-area: actions; }
+            [data-tenant="food-market-main"] .menu-item[data-item-id="2484"] .item-left { align-self: start; }
+            [data-tenant="food-market-main"] .menu-item[data-item-id="2484"] .thumb-wrap {
+                width: 132px; height: 132px; min-height: 132px; flex-basis: 132px;
+            }
+            [data-tenant="food-market-main"] .menu-item[data-item-id="2484"] .variants {
+                grid-area: vars;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                margin-top: 6px;
+            }
+            [data-tenant="food-market-main"] .menu-item[data-item-id="2484"] .variant { justify-content: center; }
+            [data-tenant="food-market-main"] .menu-item[data-item-id="2484"] .ar-btn { grid-area: ar; }
+        }
         [data-template="monday_greens"] {
             --bg-image: linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%);
             --bg-size: auto;
