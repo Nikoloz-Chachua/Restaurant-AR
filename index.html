@@ -1748,6 +1748,7 @@
         #xr-place-again      { top: 62px; right: 18px; display: none; }
         #xr-hide-ui          { top: 18px; left: 18px; display: block; transition: opacity 0.25s; }
         #xr-carousel-toggle  { top: 62px; left: 18px; display: none; }
+        [data-tenant="food-market-main"] #xr-carousel-toggle { display: none !important; }
         #xr-label-toggle     { top: 106px; left: 18px; display: none; }
         #xr-hide-ui.ui-hidden { opacity: 0.35; }
         #xr-add-btn {
@@ -9372,6 +9373,10 @@
         };
         // Returns target opacity for a role based on current view mode
         const _roleOp = role => _xrSingleItem ? (role === 'center' ? 1.0 : 0) : CFG[role].opacity;
+        // Tenants whose dishes are too wide for the sliding carousel: neighbours
+        // would overlap the centre plate mid-swap. They get one dish at a time,
+        // swapped in place (shrink out, grow in) — see _swapInPlace().
+        const _noCarousel = () => document.documentElement.dataset.tenant === 'food-market-main';
 
         const INIT_ROLES    = ['left', 'center', 'right', 'farRight'];
         const DUR           = 350;
@@ -9631,7 +9636,8 @@
                 slotGroups[i].position.z = CFG[role].z;
                 slotGroups[i].scale.setScalar(CFG[role].s);
                 slotGroups[i].rotation.set(0, 0, 0);
-                setOpacity(i, opacities[i]);
+                slotGroups[i].visible = !_noCarousel() || role === 'center';
+                setOpacity(i, _noCarousel() ? 1.0 : opacities[i]);
             });
             _syncXRAddBtn();
         }
@@ -9682,8 +9688,45 @@
         }
 
         // ── Navigation ────────────────────────────────────────────────
+        function _afterNav(direction) {
+            if (labelMesh && labelMesh.visible) drawLabel(MENU[currentCenterMenu]);
+            _syncXRAddBtn();
+            const item = MENU[currentCenterMenu];
+            const idx  = (item && window.__menuItems) ? window.__menuItems.indexOf(item) : -1;
+            if (idx >= 0) window._arViewedItems?.add(idx);
+            window.track?.('xr_nav', idx >= 0 ? idx : null, { direction });
+        }
+
+        function _animScale(g, s0, s1, dur, done) {
+            const t0 = performance.now();
+            (function tick(now) {
+                const t = Math.min((now - t0) / dur, 1);
+                const e = t < 0.5 ? 2*t*t : -1 + (4 - 2*t)*t;
+                g.scale.setScalar(s0 + (s1 - s0) * e);
+                if (t < 1) requestAnimationFrame(tick); else done();
+            })(performance.now());
+        }
+
+        // Single-dish swap: the current model fully leaves before the next one
+        // appears, so two models never occupy the plate at the same time.
+        function _swapInPlace(step) {
+            isAnimating = true;
+            const cIdx = slotOf.center, g = slotGroups[cIdx];
+            const next = mod(currentCenterMenu + step);
+            _animScale(g, CFG.center.s, 0.001, 160, () => {
+                menuOf[cIdx] = next;
+                setSlotModel(cIdx, next);
+                currentCenterMenu = next;
+                _animScale(g, 0.001, CFG.center.s, 240, () => {
+                    isAnimating = false;
+                    _afterNav(step > 0 ? 'next' : 'prev');
+                });
+            });
+        }
+
         function goNext() {
             if (isAnimating) return;
+            if (_noCarousel()) return _swapInPlace(1);
             isAnimating = true;
             const { left: lIdx, center: cIdx, right: rIdx, hidden: hIdx } = slotOf;
             if (hiddenSide === 'farLeft') snapSlot(hIdx, 'farRight');
@@ -9699,17 +9742,13 @@
                 slotOf = { left: cIdx, center: rIdx, right: hIdx, hidden: lIdx };
                 hiddenSide = 'farLeft'; currentCenterMenu = mod(currentCenterMenu + 1);
                 isAnimating = false;
-                if (labelMesh && labelMesh.visible) drawLabel(MENU[currentCenterMenu]);
-                _syncXRAddBtn();
-                const _nItem = MENU[currentCenterMenu];
-                const _nIdx  = (_nItem && window.__menuItems) ? window.__menuItems.indexOf(_nItem) : -1;
-                if (_nIdx >= 0) window._arViewedItems?.add(_nIdx);
-                window.track?.('xr_nav', _nIdx >= 0 ? _nIdx : null, { direction: 'next' });
+                _afterNav('next');
             }, DUR + 10);
         }
 
         function goPrev() {
             if (isAnimating) return;
+            if (_noCarousel()) return _swapInPlace(-1);
             isAnimating = true;
             const { left: lIdx, center: cIdx, right: rIdx, hidden: hIdx } = slotOf;
             if (hiddenSide === 'farRight') snapSlot(hIdx, 'farLeft');
@@ -9725,12 +9764,7 @@
                 slotOf = { left: hIdx, center: lIdx, right: cIdx, hidden: rIdx };
                 hiddenSide = 'farRight'; currentCenterMenu = mod(currentCenterMenu - 1);
                 isAnimating = false;
-                if (labelMesh && labelMesh.visible) drawLabel(MENU[currentCenterMenu]);
-                _syncXRAddBtn();
-                const _pItem = MENU[currentCenterMenu];
-                const _pIdx  = (_pItem && window.__menuItems) ? window.__menuItems.indexOf(_pItem) : -1;
-                if (_pIdx >= 0) window._arViewedItems?.add(_pIdx);
-                window.track?.('xr_nav', _pIdx >= 0 ? _pIdx : null, { direction: 'prev' });
+                _afterNav('prev');
             }, DUR + 10);
         }
 
