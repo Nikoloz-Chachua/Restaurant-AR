@@ -1093,6 +1093,14 @@
         [data-tenant="ikigai-sushiroom-main"] .footer-logo-white { display: block; }
         [data-tenant="ikigai-sushiroom-main"] .footer-email,
         [data-tenant="ikigai-sushiroom-main"] .footer-copy { color: #fff; }
+        /* Mamma Italia runs a deep-red theme -- same reasoning as Ikigai/Monday
+           Greens: the dark-variant mark reads poorly against a saturated red, so
+           use the white mark + white text instead. */
+        [data-tenant="mamma-italia-main"] .footer-logo-dark,
+        [data-tenant="mamma-italia-main"] .footer-logo-light { display: none; }
+        [data-tenant="mamma-italia-main"] .footer-logo-white { display: block; }
+        [data-tenant="mamma-italia-main"] .footer-email,
+        [data-tenant="mamma-italia-main"] .footer-copy { color: #fff; }
         .footer-email {
             font-family: 'Nunito', sans-serif;
             font-size: 0.82rem;
@@ -1911,6 +1919,10 @@
            the menu is forced to day theme in JS (see applyTheme's initial call),
            this just hides the now-inert toggle button. */
         [data-tenant="food-market-main"] #theme-toggle { display: none; }
+        /* Mamma Italia: day and night use the identical dark-red palette (no
+           light/white theme for this tenant), so the toggle has nothing to do -
+           hide the now-inert button rather than leave a dead control on screen. */
+        [data-tenant="mamma-italia-main"] #theme-toggle { display: none; }
         /* Food & Market: nothing wanted between the hero photo and the kitchen
            tiles -- the "FOOD & MARKET" title (already redundant with the hero and
            every kitchen tile's own wordmark), its underline, and the "Back to
