@@ -9614,11 +9614,7 @@
             const gltf = modelGLTFs[modelUrl];
             if (!gltf) return null;
             const obj = gltf.scene.clone(true);
-            obj.traverse(n => {
-                if (!n.isMesh || !n.material) return;
-                n.material = Array.isArray(n.material) ? n.material.map(m => m.clone()) : n.material.clone();
-                if (_fmAR()) [].concat(n.material).forEach(_occPatch);
-            });
+            obj.traverse(n => { if (n.isMesh && n.material) n.material = n.material.clone(); });
             return obj;
         }
 
@@ -9746,7 +9742,6 @@
                     transparent: true, depthWrite: false
                 })
             );
-            _occPatch(_shadow.material);
             _shadow.position.y = 0.001;
             _shadow.renderOrder = -1;
             carouselRoot.add(_shadow);
@@ -9764,124 +9759,6 @@
                 _steam.add(sp);
             }
             slotGroups[slotOf.center].add(_steam);
-        }
-
-        // ── Occlusion (real objects in front of the dish hide it) ─────
-        // ARCore's depth map is uploaded each frame; patched materials discard
-        // fragments where the real world is closer than the dish. Edges are
-        // feathered with a screen-space dither so no transparency sorting is needed.
-        const _occ = {
-            uOccOn:       { value: 0 },
-            uOccDepth:    { value: null },
-            uOccFloat:    { value: 0 },
-            uOccUv:       { value: null },
-            uOccToMeters: { value: 0.001 },
-            uOccViewport: { value: null },
-        };
-        let _occBuf = null;
-        // ?ardebug=1 shows a live occlusion readout inside the AR overlay
-        const _occDiag = { req: '-', err: '', usage: '-', fmt: '-', size: '-', real: '-', dish: '-', on: 0 };
-        const _occDebug = new URLSearchParams(location.search).has('ardebug');
-        let _occDiagEl = null, _occDiagAt = 0;
-        function _occDiagShow(now) {
-            if (!_occDebug || now - _occDiagAt < 250) return;
-            _occDiagAt = now;
-            if (!_occDiagEl) {
-                _occDiagEl = document.createElement('pre');
-                Object.assign(_occDiagEl.style, {
-                    position: 'absolute', left: '18px', bottom: '120px', zIndex: 3, margin: 0,
-                    padding: '8px 10px', background: 'rgba(0,0,0,0.7)', color: '#fff',
-                    font: '11px/1.4 monospace', borderRadius: '8px', pointerEvents: 'none'
-                });
-                xrOverlay.appendChild(_occDiagEl);
-            }
-            const d = _occDiag;
-            _occDiagEl.textContent =
-                `session: ${d.req}${d.err ? ' (' + d.err + ')' : ''}\n` +
-                `depth: ${d.usage} / ${d.fmt}  ${d.size}\n` +
-                `centre real: ${d.real} m\ndish: ${d.dish} m\nocclusion: ${d.on ? 'ON' : 'off'}`;
-        }
-
-        function _occPatch(mat) {
-            if (!mat || mat.userData.occ) return;
-            mat.userData.occ = true;
-            mat.onBeforeCompile = sh => {
-                Object.assign(sh.uniforms, _occ);
-                sh.vertexShader = sh.vertexShader
-                    .replace('#include <common>', '#include <common>\nvarying float vOccZ;')
-                    .replace('#include <project_vertex>', '#include <project_vertex>\nvOccZ = -mvPosition.z;');
-                sh.fragmentShader = sh.fragmentShader
-                    .replace('#include <common>', `#include <common>
-varying float vOccZ;
-uniform float uOccOn, uOccFloat, uOccToMeters;
-uniform sampler2D uOccDepth;
-uniform mat4 uOccUv;
-uniform vec4 uOccViewport;`)
-                    .replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
-if (uOccOn > 0.5) {
-    vec2 vUv = (gl_FragCoord.xy - uOccViewport.xy) / uOccViewport.zw;
-    vec2 dUv = (uOccUv * vec4(vUv.x, 1.0 - vUv.y, 0.0, 1.0)).xy;
-    vec4 t = texture2D(uOccDepth, dUv);
-    float real = (uOccFloat > 0.5 ? t.r : (t.r + t.a * 256.0) * 255.0) * uOccToMeters;
-    if (real > 0.0) {
-        float vis = smoothstep(-0.015, 0.025, real - vOccZ);
-        if (vis < fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))))) discard;
-    }
-}`);
-            };
-            mat.customProgramCacheKey = () => 'occ';
-            mat.needsUpdate = true;
-        }
-
-        function _occUpdate(frame) {
-            _occ.uOccOn.value = 0;
-            const session = frame?.session;
-            // depthUsage throws when the depth-sensing feature was not granted
-            let usage = null;
-            try { usage = session?.depthUsage; } catch (e) {}
-            _occDiag.usage = usage || 'not granted';
-            _occDiagShow(performance.now());
-            if (usage !== 'cpu-optimized') return;
-            const pose = frame.getViewerPose(renderer.xr.getReferenceSpace());
-            const view = pose?.views[0];
-            if (!view) return;
-            let info;
-            try { info = frame.getDepthInformation(view); } catch (e) { return; }
-            if (!info) return;
-            const isFloat = session.depthDataFormat === 'float32';
-            const w = info.width, h = info.height;
-            _occDiag.fmt = session.depthDataFormat; _occDiag.size = w + 'x' + h;
-            try { _occDiag.real = info.getDepthInMeters(0.5, 0.5).toFixed(2); } catch (e) { _occDiag.real = 'err'; }
-            if (placed) {
-                const cp = new THREE.Vector3(), dp = new THREE.Vector3();
-                camera.getWorldPosition(cp); carouselRoot.getWorldPosition(dp);
-                _occDiag.dish = cp.distanceTo(dp).toFixed(2);
-            }
-            let tex = _occ.uOccDepth.value;
-            if (!tex || tex.image.width !== w || tex.image.height !== h) {
-                tex?.dispose();
-                _occBuf = isFloat ? new Float32Array(w * h) : new Uint8Array(w * h * 2);
-                tex = new THREE.DataTexture(_occBuf, w, h,
-                    isFloat ? THREE.RedFormat : THREE.LuminanceAlphaFormat,
-                    isFloat ? THREE.FloatType : THREE.UnsignedByteType);
-                tex.magFilter = tex.minFilter = THREE.NearestFilter;
-                tex.generateMipmaps = false;
-                tex.unpackAlignment = 1;
-                _occ.uOccDepth.value = tex;
-                _occ.uOccUv.value = new THREE.Matrix4();
-                _occ.uOccViewport.value = new THREE.Vector4();
-            }
-            _occBuf.set(isFloat ? new Float32Array(info.data) : new Uint8Array(info.data));
-            tex.needsUpdate = true;
-            _occ.uOccUv.value.fromArray(info.normDepthBufferFromNormView.matrix);
-            _occ.uOccToMeters.value = info.rawValueToMeters;
-            _occ.uOccFloat.value = isFloat ? 1 : 0;
-            const vp = renderer.xr.getCamera().cameras[0]?.viewport;
-            _occDiag.on = 0;
-            if (!vp || !vp.z) { _occDiag.err = 'no viewport'; return; }
-            _occ.uOccViewport.value.copy(vp);
-            _occ.uOccOn.value = 1;
-            _occDiag.on = 1;
         }
 
         const _isHotDish = item => !!item && !/japanese|drink|salad|dessert/i.test(item.category || '');
@@ -10395,7 +10272,7 @@ if (uOccOn > 0.5) {
                     _reticleWasVisible = _rvNow; _updateScanHint(_rvNow);
                     if (_rvNow && _plateGuide) _guideShownAt = performance.now();
                 }
-                if (_fmAR()) { _fxTick(performance.now()); _occUpdate(frame); }
+                if (_fmAR()) _fxTick(performance.now());
                 if (placed && Math.abs(_rotVelocity) > 0.0001) {
                     slotGroups[slotOf.center].rotation.y += _rotVelocity;
                     _rotVelocity *= INERTIA_DAMP;
@@ -10515,25 +10392,11 @@ if (uOccOn > 0.5) {
 
                 let _xrReq;
                 try {
-                    const _xrOpts = {
+                    _xrReq = navigator.xr.requestSession('immersive-ar', {
                         requiredFeatures: ['hit-test'],
                         optionalFeatures: ['dom-overlay'],
                         domOverlay: { root: xrOverlay }
-                    };
-                    _xrReq = !_fmAR()
-                        ? navigator.xr.requestSession('immersive-ar', _xrOpts)
-                        : (_occDiag.req = 'depth requested', navigator.xr.requestSession('immersive-ar', {
-                            ..._xrOpts,
-                            optionalFeatures: ['dom-overlay', 'depth-sensing'],
-                            depthSensing: {
-                                usagePreference: ['cpu-optimized'],
-                                dataFormatPreference: ['luminance-alpha', 'float32']
-                            }
-                        }).catch(e => {
-                            if (e.name !== 'TypeError' && e.name !== 'NotSupportedError') return Promise.reject(e);
-                            _occDiag.req = 'fallback, no depth'; _occDiag.err = e.name + ': ' + e.message;
-                            return navigator.xr.requestSession('immersive-ar', _xrOpts);
-                        }));
+                    });
                     // ARCore needs recovery time after a previous session ends.
                     // requestSession can hang indefinitely — race it against an 8s timeout.
                     const _xrTimeout = new Promise((_, rej) =>
