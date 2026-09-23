@@ -2536,6 +2536,13 @@
            its block on the printed menu, so it stands out in the Burger list. */
         [data-tenant="food-market-main"] .menu-item[data-item-id="2484"] {
             border-color: #2f8f3e;
+            /* Buttons go green the way the Thai tab turns them purple; price stays as is */
+            --pill-active-bg: linear-gradient(120deg, #2f8f3e, #22702f);
+            --cta-bg:         linear-gradient(120deg, #2f8f3e, #22702f);
+            --add-btn-color:  #2f8f3e;
+        }
+        [data-tenant="food-market-main"] .menu-item[data-item-id="2484"] .variant:not(.selected) .variant-price {
+            color: #2f8f3e;
         }
         [data-tenant="food-market-main"] .menu-item[data-item-id="2484"]::before {
             background: #2f8f3e;
