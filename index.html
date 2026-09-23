@@ -2532,6 +2532,16 @@
         [data-template="minimal_sushi"] .menu-item::before {
             width: 2px;
         }
+        /* Food & Market: No Bun Burger (menu_items.id 2484) gets the green frame of
+           its block on the printed menu, so it stands out in the Burger list. */
+        [data-tenant="food-market-main"] .menu-item[data-item-id="2484"] {
+            border: 2px solid #2f8f3e;
+            box-shadow: 0 0 0 1px rgba(47,143,62,0.35), 0 8px 22px rgba(47,143,62,0.28);
+        }
+        [data-tenant="food-market-main"] .menu-item[data-item-id="2484"]::before {
+            width: 4px;
+            background: #2f8f3e;
+        }
         [data-template="monday_greens"] {
             --bg-image: linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%);
             --bg-size: auto;
@@ -14109,6 +14119,7 @@
             function renderMenuCard(item, globalIdx, promoted = false) {
                 const card = document.createElement('div');
                 card.className = promoted ? 'menu-item ar-featured' : 'menu-item';
+                if (item.id != null) card.dataset.itemId = item.id;
                 const selectedVariantImage = _selectedVariantImage(item, globalIdx);
                 const thumbSrc = selectedVariantImage || _safeAssetUrl(item.thumbnail_url);
                 // A non-3D item (is_3d === false) or an item with no model renders as a
