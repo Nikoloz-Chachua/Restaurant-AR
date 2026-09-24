@@ -9455,6 +9455,135 @@
             }, delay);
         }
 
+        // ── Food & Market AR polish (restaurant 73 only) ─────────────
+        // Breathing reticle, drop-in placement with a ripple and haptic tick, a soft
+        // contact shadow, one showcase turn after landing, a hop on dish swap and a
+        // fading label. Everything is gated on _fxOn so other tenants are untouched.
+        let _fxOn = false, dishRoot = null, _fxRipple = null, _fxShadowTex = null;
+        let _fxPlaceT0 = -1, _fxSpin = null, _fxLabelT0 = -1, _fxScaleM = null;
+        const _fxShadows = [null, null, null, null], _fxShadowOp = [0, 0, 0, 0];
+        const FX_DROP_H = 0.09, FX_DROP_MS = 650, FX_RIPPLE_MS = 900, FX_SPIN_MS = 2200, FX_LABEL_MS = 300;
+        const _fxEaseBounce = t => {
+            const n = 7.5625, d = 2.75;
+            if (t < 1 / d) return n * t * t;
+            if (t < 2 / d) return n * (t -= 1.5 / d) * t + 0.75;
+            if (t < 2.5 / d) return n * (t -= 2.25 / d) * t + 0.9375;
+            return n * (t -= 2.625 / d) * t + 0.984375;
+        };
+        const _fxEaseBack   = t => 1 + 2.2 * Math.pow(t - 1, 3) + 1.2 * Math.pow(t - 1, 2);
+        const _fxEaseInOut  = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        const _fxEaseOut    = t => 1 - Math.pow(1 - t, 3);
+        const _fxReducedMotion = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+        function _fxSetup() {
+            _fxOn = typeof _tenantSlugFromHost === 'function' && _tenantSlugFromHost() === 'food-market-main';
+            if (!_fxOn) return;
+            _fxScaleM = new THREE.Matrix4();
+            // Hit-test poses put the surface normal on +Y; lay the ring flat on the table.
+            reticle.geometry.rotateX(-Math.PI / 2);
+
+            const c = document.createElement('canvas');
+            c.width = c.height = 128;
+            const g = c.getContext('2d');
+            const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+            grad.addColorStop(0,    'rgba(0,0,0,0.55)');
+            grad.addColorStop(0.55, 'rgba(0,0,0,0.28)');
+            grad.addColorStop(1,    'rgba(0,0,0,0)');
+            g.fillStyle = grad; g.fillRect(0, 0, 128, 128);
+            _fxShadowTex = new THREE.CanvasTexture(c);
+            for (let i = 0; i < 4; i++) {
+                const m = new THREE.Mesh(
+                    new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2),
+                    new THREE.MeshBasicMaterial({ map: _fxShadowTex, transparent: true, depthWrite: false, opacity: 0 })
+                );
+                m.position.y = 0.001; m.renderOrder = -1; m.visible = false;
+                carouselRoot.add(m);
+                _fxShadows[i] = m;
+            }
+
+            _fxRipple = new THREE.Mesh(
+                new THREE.RingGeometry(0.07, 0.08, 64).rotateX(-Math.PI / 2),
+                new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, depthWrite: false, opacity: 0 })
+            );
+            _fxRipple.position.y = 0.002; _fxRipple.visible = false;
+            carouselRoot.add(_fxRipple);
+        }
+
+        // Circle sized to the dish footprint (box measured before it's parented).
+        function _fxSizeShadow(slotIdx, box) {
+            const sh = _fxShadows[slotIdx];
+            if (!sh) return;
+            if (!box || !isFinite(box.min.x)) { sh.visible = false; return; }
+            const d = Math.max(box.max.x - box.min.x, box.max.z - box.min.z) * 1.3;
+            sh.userData.d = d;
+            sh.visible = true;
+        }
+
+        function _fxPulseReticle(now) {
+            if (!_fxOn) return;
+            const s = 1 + 0.14 * Math.sin(now / 240);
+            reticle.matrix.multiply(_fxScaleM.makeScale(s, s, s));
+        }
+
+        function _fxStartPlacement() {
+            if (!_fxOn) return;
+            try { navigator.vibrate?.(18); } catch (_) {}
+            if (_fxReducedMotion()) return;
+            _fxPlaceT0 = performance.now();
+            dishRoot.position.y = FX_DROP_H;
+            _fxRipple.visible = true;
+        }
+
+        function _fxReset() {
+            _fxPlaceT0 = -1; _fxSpin = null; _fxLabelT0 = -1;
+            if (dishRoot) { dishRoot.position.y = 0; dishRoot.scale.setScalar(1); }
+            if (_fxRipple) _fxRipple.visible = false;
+            if (labelMesh) labelMesh.material.opacity = 1;
+        }
+
+        function _fxTick(now) {
+            if (!_fxOn) return;
+            let land = 1;
+            if (_fxPlaceT0 >= 0) {
+                const t = Math.min((now - _fxPlaceT0) / FX_DROP_MS, 1);
+                land = _fxEaseBounce(t);
+                dishRoot.position.y = FX_DROP_H * (1 - land);
+                dishRoot.scale.setScalar(0.9 + 0.1 * _fxEaseBack(t));
+                const r = Math.min((now - _fxPlaceT0) / FX_RIPPLE_MS, 1);
+                _fxRipple.scale.setScalar(0.5 + 2.2 * _fxEaseOut(r));
+                _fxRipple.material.opacity = 0.55 * (1 - r);
+                if (r >= 1) {
+                    _fxRipple.visible = false;
+                    _fxPlaceT0 = -1;
+                    dishRoot.position.y = 0; dishRoot.scale.setScalar(1);
+                    const g = slotGroups[slotOf.center];
+                    if (!activeTouches.size) _fxSpin = { g, t0: now, base: g.rotation.y };
+                }
+            }
+            if (_fxSpin) {
+                const t = Math.min((now - _fxSpin.t0) / FX_SPIN_MS, 1);
+                _fxSpin.g.rotation.y = _fxSpin.base + Math.PI * 2 * _fxEaseInOut(t);
+                if (t >= 1) _fxSpin = null;
+            }
+            // Shadows stay on the table while the dish drops and hops above them.
+            for (let i = 0; i < 4; i++) {
+                const sh = _fxShadows[i];
+                if (!sh || !sh.visible) continue;
+                const g = slotGroups[i];
+                const hop = Math.max(0, g.position.y) / 0.03;
+                sh.position.x = g.position.x; sh.position.z = g.position.z;
+                sh.scale.setScalar((sh.userData.d || 0.2) * g.scale.x * (0.6 + 0.4 * land) * (1 - 0.2 * hop));
+                sh.material.opacity = _fxShadowOp[i] * land * (1 - 0.35 * hop);
+            }
+            if (labelMesh && _fxLabelT0 >= 0) {
+                const t = Math.min((now - _fxLabelT0) / FX_LABEL_MS, 1);
+                const e = _fxEaseOut(t);
+                labelMesh.material.opacity = e;
+                if (labelMode === 'float') labelMesh.position.y -= 0.02 * (1 - e);
+                if (t >= 1) _fxLabelT0 = -1;
+            }
+        }
+
         // ── AR label (museum card) ────────────────────────────────────
         function _rrPath(ctx, x, y, w, h, r) {
             ctx.beginPath();
@@ -9601,6 +9730,7 @@
             ctx.fillText(_priceDisplay(item.price), 28, H - 20);
 
             if (labelTexture) labelTexture.needsUpdate = true;
+            if (_fxOn && !_fxReducedMotion()) { _fxLabelT0 = performance.now(); labelMesh && (labelMesh.material.opacity = 0); }
         }
 
         function createLabelMesh() {
@@ -9669,6 +9799,10 @@
                 if (isFinite(seated.min.y)) obj.position.y = -seated.min.y;
                 slotGroups[slotIdx].add(obj);
                 meshObjs[slotIdx] = obj;
+                _fxSizeShadow(slotIdx, seated);
+            } else {
+                meshObjs[slotIdx] = null;
+                _fxSizeShadow(slotIdx, null);
             }
         }
 
@@ -9689,6 +9823,7 @@
 
         // ── Opacity ───────────────────────────────────────────────────
         function setOpacity(idx, opacity) {
+            _fxShadowOp[idx] = Math.max(0, Math.min(1, opacity));
             const obj = meshObjs[idx];
             if (!obj) return;
             obj.traverse(n => {
@@ -9728,6 +9863,7 @@
                 slotGroups[idx].position.x = x0 + (x1 - x0) * e;
                 slotGroups[idx].position.z = z0 + (z1 - z0) * e;
                 slotGroups[idx].scale.setScalar(s0 + (s1 - s0) * e);
+                if (_fxOn && role === 'center' && !_fxReducedMotion()) slotGroups[idx].position.y = 0.018 * Math.sin(Math.PI * t);
                 if (t < 1) requestAnimationFrame(tick);
             })(performance.now());
         }
@@ -9736,6 +9872,7 @@
         function goNext() {
             if (isAnimating) return;
             isAnimating = true;
+            _fxSpin = null;
             const { left: lIdx, center: cIdx, right: rIdx, hidden: hIdx } = slotOf;
             if (hiddenSide === 'farLeft') snapSlot(hIdx, 'farRight');
             menuOf[hIdx] = mod(menuOf[rIdx] + 1);
@@ -9762,6 +9899,7 @@
         function goPrev() {
             if (isAnimating) return;
             isAnimating = true;
+            _fxSpin = null;
             const { left: lIdx, center: cIdx, right: rIdx, hidden: hIdx } = slotOf;
             if (hiddenSide === 'farRight') snapSlot(hIdx, 'farLeft');
             menuOf[hIdx] = mod(menuOf[lIdx] - 1);
@@ -9838,6 +9976,7 @@
             carouselRoot.visible = true;
             reticle.visible      = false;
             placed               = true;
+            _fxStartPlacement();
             const _plItem = MENU[currentCenterMenu];
             const _plIdx  = (_plItem && window.__menuItems) ? window.__menuItems.indexOf(_plItem) : -1;
             window.track?.('ar_placed', _plIdx >= 0 ? _plIdx : null);
@@ -9856,6 +9995,7 @@
         function _resetPlacement() {
             _ignoreNextSelect = true;
             placed = false;
+            _fxReset();
             carouselRoot.scale.setScalar(1);
             _pinchDist0 = null; _pinchScale0 = null;
             if (_scaleHideTimer) { clearTimeout(_scaleHideTimer); _scaleHideTimer = null; }
@@ -9991,10 +10131,15 @@
             carouselRoot = new THREE.Group();
             scene.add(carouselRoot);
             carouselRoot.visible = false;
+            // dishRoot lets the placement drop move the dishes without touching the
+            // label or the user's pinch scale on carouselRoot. Identity for other tenants.
+            dishRoot = new THREE.Group();
+            carouselRoot.add(dishRoot);
             slotGroups = Array.from({ length: 4 }, () => {
-                const g = new THREE.Group(); carouselRoot.add(g); return g;
+                const g = new THREE.Group(); dishRoot.add(g); return g;
             });
             createLabelMesh();
+            _fxSetup();
 
             gestureLayer = document.getElementById('xr-gesture-layer');
             xrOverlay    = document.getElementById('xr-overlay');
@@ -10004,6 +10149,7 @@
             // dom-overlay elements receive normal HTML touch events instead.
             gestureLayer.addEventListener('touchstart', e => {
                 _rotVelocity = 0;
+                _fxSpin = null;
                 for (const t of e.changedTouches)
                     activeTouches.set(t.identifier, { x: t.clientX, y: t.clientY, prevX: t.clientX, prevY: t.clientY });
                 if (activeTouches.size === 1) {
@@ -10072,6 +10218,7 @@
             renderer.xr.addEventListener('sessionend', () => {
                 hitTestSource = null; placed = false; _reticleWasVisible = false;
                 xrSession = null; xrStarting = false;
+                _fxReset();
                 carouselRoot.visible = false; reticle.visible = false;
                 if (labelMesh) labelMesh.visible = false;
                 xrCanvas.style.display       = 'none';
@@ -10106,7 +10253,7 @@
                         const results = frame.getHitTestResults(hitTestSource);
                         if (results.length > 0) {
                             const pose = results[0].getPose(refSpace);
-                            if (pose) { reticle.visible = true; reticle.matrix.fromArray(pose.transform.matrix); }
+                            if (pose) { reticle.visible = true; reticle.matrix.fromArray(pose.transform.matrix); _fxPulseReticle(performance.now()); }
                         } else { reticle.visible = false; }
                     }
                 }
@@ -10156,6 +10303,7 @@
                         labelMesh.quaternion.multiplyQuaternions(_pQ.clone().invert(), _wQ);
                     }
                 }
+                _fxTick(performance.now());
                 renderer.render(scene, camera);
             });
 
