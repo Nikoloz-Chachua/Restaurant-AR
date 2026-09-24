@@ -8868,15 +8868,15 @@
                 background: var(--cta-bg, #2f6b3a); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
             }
 
-            html[data-fm-motion][data-theme="day"] .category-header[data-doodle]::after,
-            html[data-fm-motion][data-theme="day"] .category-header[data-kanji]::after {
+            html[data-fm-motion-lab][data-theme="day"] .category-header[data-doodle]::after,
+            html[data-fm-motion-lab][data-theme="day"] .category-header[data-kanji]::after {
                 animation: fmm-wobble 5s ease-in-out infinite alternate;
             }
-            html[data-fm-motion][data-theme="day"] .menu-item[data-bg-doodle]::after {
+            html[data-fm-motion-lab][data-theme="day"] .menu-item[data-bg-doodle]::after {
                 animation: fmm-drift 9s ease-in-out infinite alternate;
             }
-            html[data-fm-motion] .menu-item:nth-child(2n)::after { animation-delay: -3s; }
-            html[data-fm-motion] .menu-item:nth-child(3n)::after { animation-delay: -6s; animation-duration: 11s; }
+            html[data-fm-motion-lab] .menu-item:nth-child(2n)::after { animation-delay: -3s; }
+            html[data-fm-motion-lab] .menu-item:nth-child(3n)::after { animation-delay: -6s; animation-duration: 11s; }
             @keyframes fmm-wobble { 0% { rotate: -8deg; } 100% { rotate: 8deg; } }
             @keyframes fmm-drift  { 0% { translate: 0 0; rotate: -6deg; } 50% { translate: -4px -6px; } 100% { translate: 3px -2px; rotate: 7deg; } }
 
@@ -11352,8 +11352,10 @@
                 window.__tenant = _tenant;
                 _normalizeLanguageForTenant(_tenant);
                 document.documentElement.dataset.tenant = _dataTenantSlug(_tenant.restaurant_slug || '');
-            // Motion test bed: only the Food & Market 2 test copy gets the extra UI motion.
-            document.documentElement.toggleAttribute('data-fm-motion', _tenant.restaurant_slug === 'food-and-market-test2-main');
+            // UI motion runs on both Food & Market sites; the test copy also gets the
+            // lab extras (haptic buzz, drifting doodles) that main doesn't ship.
+            document.documentElement.toggleAttribute('data-fm-motion', _FOOD_MARKET_TENANT_SLUGS.includes(_tenant.restaurant_slug));
+            document.documentElement.toggleAttribute('data-fm-motion-lab', _tenant.restaurant_slug === 'food-and-market-test2-main');
                 _ensureMingleyardTemplateForExactTenant();
                 document.documentElement.dataset.brandSlug = brand?.slug || '';
                 _applyTenantFavicon(_tenant);
@@ -11398,8 +11400,10 @@
             // tenant currently resolves to template_key "monday_greens", so
             // [data-template="monday_greens"] matches the whole estate.
             document.documentElement.dataset.tenant = _dataTenantSlug(_tenant.restaurant_slug || '');
-            // Motion test bed: only the Food & Market 2 test copy gets the extra UI motion.
-            document.documentElement.toggleAttribute('data-fm-motion', _tenant.restaurant_slug === 'food-and-market-test2-main');
+            // UI motion runs on both Food & Market sites; the test copy also gets the
+            // lab extras (haptic buzz, drifting doodles) that main doesn't ship.
+            document.documentElement.toggleAttribute('data-fm-motion', _FOOD_MARKET_TENANT_SLUGS.includes(_tenant.restaurant_slug));
+            document.documentElement.toggleAttribute('data-fm-motion-lab', _tenant.restaurant_slug === 'food-and-market-test2-main');
             _ensureMingleyardTemplateForExactTenant();
             document.documentElement.dataset.brandSlug = brand?.slug || '';
             _applyTenantFavicon(_tenant);
@@ -15334,7 +15338,8 @@ document.getElementById('basket-items').addEventListener('click', e => {
     </script>
     <!-- ── Food & Market test copy: UI motion ───────────────────────── -->
     <script>
-    // Only runs while <html data-fm-motion> is set (Food & Market 2 test tenant).
+    // Only runs while <html data-fm-motion> is set (both Food & Market sites).
+    // Buzz and doodle drift need data-fm-motion-lab too (test copy only).
     // Cards reveal on scroll, a kitchen switch slides sideways, the basket bar bumps
     // with a dish flying into it, haptic ticks, photos zoom out of their thumbnail.
     // Doodle drift is CSS only. Reduced-motion users get none of it.
@@ -15342,7 +15347,10 @@ document.getElementById('basket-items').addEventListener('click', e => {
         const root = document.documentElement;
         const on = () => root.hasAttribute('data-fm-motion')
             && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const buzz = ms => { try { navigator.vibrate?.(ms); } catch (_) {} };
+        const buzz = ms => {
+            if (!root.hasAttribute('data-fm-motion-lab')) return;
+            try { navigator.vibrate?.(ms); } catch (_) {}
+        };
 
         // Cards reveal as they scroll in; a kitchen switch sets the slide direction.
         const list = document.getElementById('menu-list');
