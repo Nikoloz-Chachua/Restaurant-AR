@@ -15396,14 +15396,16 @@ document.getElementById('basket-items').addEventListener('click', e => {
         const bar = document.getElementById('basket-bar');
         let lastCount = 0;
         const replay = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
-        function fly(tap) {
+        function fly(tap, barHidden) {
             const b = bar.getBoundingClientRect();
+            // A hidden bar is still parked below the screen; aim where it slides up to.
+            const by = barHidden ? innerHeight - b.height / 2 : b.top + b.height / 2;
             const el = document.createElement(tap.src ? 'img' : 'div');
             el.className = 'fmm-fly';
             if (tap.src) { el.src = tap.src; el.alt = ''; }
             el.style.left = tap.x + 'px'; el.style.top = tap.y + 'px';
             document.body.appendChild(el);
-            const dx = b.left + b.width / 2 - tap.x, dy = b.top + b.height / 2 - tap.y;
+            const dx = b.left + b.width / 2 - tap.x, dy = by - tap.y;
             const anim = el.animate([
                 { transform: 'translate(0,0) scale(0.6)', opacity: 0.95 },
                 { transform: `translate(${dx * 0.45}px, ${dy * 0.45 - 70}px) scale(1)`, opacity: 1, offset: 0.45 },
@@ -15422,8 +15424,7 @@ document.getElementById('basket-items').addEventListener('click', e => {
                     const tap = lastTap && performance.now() - lastTap.t < 800 ? lastTap : null;
                     lastTap = null;
                     const bump = () => { replay(bar, 'fmm-bump'); replay(countEl, 'fmm-tick'); };
-                    // The very first add slides the bar up from off-screen, so only fly once it's showing.
-                    if (tap && prev > 0) fly(tap).finished.then(bump, bump); else bump();
+                    if (tap) fly(tap, prev === 0).finished.then(bump, bump); else bump();
                 } else {
                     buzz(6);
                     replay(countEl, 'fmm-tick-down');
