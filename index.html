@@ -9964,7 +9964,11 @@
             slotGroups[slotOf.center].add(_steam);
         }
 
-        const _isHotDish = item => !!item && !/japanese|drink|salad|dessert/i.test(item.category || '');
+        // No steam on cold categories, or on dishes served warm but not steaming
+        // (burrata, tacos, burgers incl. No Bun Burger).
+        const _isHotDish = item => !!item
+            && !/japanese|drink|salad|dessert|cold/i.test(item.category || '')
+            && !/burrata|taco|burger/i.test(item.name || '');
 
         function _fitSteam() {
             if (!_steam) return;
