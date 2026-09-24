@@ -18,6 +18,7 @@ const PRECACHE = [
     './img/monday-greens-favicon.svg',
     './img/food-and-market-favicon.png',
     './img/corner-at-tabidze-favicon.png',
+    './img/kado-favicon.png',
     './img/baoma/interior-hero-maps.webp',
     './img/baoma/interior-terrace.jpg',
     './assets/mugsy/logo.svg',
