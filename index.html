@@ -8842,6 +8842,50 @@
             border:3px solid rgba(231,177,90,.25);border-top-color:var(--accent,#e7b15a);
             animation:br-spin .8s linear infinite;}
         @keyframes br-spin{to{transform:rotate(360deg)}}
+        /* ── Food & Market test copy: UI motion (see fm-motion script) ── */
+        @media (prefers-reduced-motion: no-preference) {
+            html[data-fm-motion] .menu-item.fmm-pending {
+                opacity: 0;
+                translate: var(--fmm-dx, 0px) 18px;
+            }
+            html[data-fm-motion] .menu-item.fmm-in {
+                transition: opacity 0.45s ease, translate 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                            transform 0.2s ease, box-shadow 0.2s ease, border-color var(--t);
+                transition-delay: var(--fmm-delay, 0ms);
+            }
+            html[data-fm-motion] .group-btn.active { animation: fmm-tab-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+            @keyframes fmm-tab-pop { 0% { scale: 0.94; } 100% { scale: 1; } }
+
+            html[data-fm-motion] #basket-bar.fmm-bump { animation: fmm-bump 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+            @keyframes fmm-bump { 0% { scale: 1; } 35% { scale: 1.035 1.12; } 100% { scale: 1; } }
+            html[data-fm-motion] #basket-bar-count.fmm-tick { display: inline-block; animation: fmm-tick 0.35s ease; }
+            @keyframes fmm-tick { 0% { translate: 0 60%; opacity: 0; } 100% { translate: 0 0; opacity: 1; } }
+            html[data-fm-motion] #basket-bar-count.fmm-tick-down { display: inline-block; animation: fmm-tick-down 0.35s ease; }
+            @keyframes fmm-tick-down { 0% { translate: 0 -60%; opacity: 0; } 100% { translate: 0 0; opacity: 1; } }
+            .fmm-fly {
+                position: fixed; z-index: 6000; width: 46px; height: 46px; margin: -23px 0 0 -23px;
+                border-radius: 50%; object-fit: cover; pointer-events: none;
+                background: var(--cta-bg, #2f6b3a); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+            }
+
+            html[data-fm-motion][data-theme="day"] .category-header[data-doodle]::after,
+            html[data-fm-motion][data-theme="day"] .category-header[data-kanji]::after {
+                animation: fmm-wobble 5s ease-in-out infinite alternate;
+            }
+            html[data-fm-motion][data-theme="day"] .menu-item[data-bg-doodle]::after {
+                animation: fmm-drift 9s ease-in-out infinite alternate;
+            }
+            html[data-fm-motion] .menu-item:nth-child(2n)::after { animation-delay: -3s; }
+            html[data-fm-motion] .menu-item:nth-child(3n)::after { animation-delay: -6s; animation-duration: 11s; }
+            @keyframes fmm-wobble { 0% { rotate: -8deg; } 100% { rotate: 8deg; } }
+            @keyframes fmm-drift  { 0% { translate: 0 0; rotate: -6deg; } 50% { translate: -4px -6px; } 100% { translate: 3px -2px; rotate: 7deg; } }
+
+            html[data-fm-motion][data-fm-landing="1"] .fm-kitchen-tile { animation: fmm-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+            html[data-fm-motion] .fm-kitchen-tile:nth-child(2) { animation-delay: 0.08s; }
+            html[data-fm-motion] .fm-kitchen-tile:nth-child(3) { animation-delay: 0.16s; }
+            html[data-fm-motion] .fm-kitchen-tile:nth-child(4) { animation-delay: 0.24s; }
+            @keyframes fmm-rise { 0% { opacity: 0; translate: 0 24px; } 100% { opacity: 1; translate: 0 0; } }
+        }
     </style>
     <noscript><style>#br-splash{display:none!important}</style></noscript>
 </head>
@@ -11308,6 +11352,8 @@
                 window.__tenant = _tenant;
                 _normalizeLanguageForTenant(_tenant);
                 document.documentElement.dataset.tenant = _dataTenantSlug(_tenant.restaurant_slug || '');
+            // Motion test bed: only the Food & Market 2 test copy gets the extra UI motion.
+            document.documentElement.toggleAttribute('data-fm-motion', _tenant.restaurant_slug === 'food-and-market-test2-main');
                 _ensureMingleyardTemplateForExactTenant();
                 document.documentElement.dataset.brandSlug = brand?.slug || '';
                 _applyTenantFavicon(_tenant);
@@ -11352,6 +11398,8 @@
             // tenant currently resolves to template_key "monday_greens", so
             // [data-template="monday_greens"] matches the whole estate.
             document.documentElement.dataset.tenant = _dataTenantSlug(_tenant.restaurant_slug || '');
+            // Motion test bed: only the Food & Market 2 test copy gets the extra UI motion.
+            document.documentElement.toggleAttribute('data-fm-motion', _tenant.restaurant_slug === 'food-and-market-test2-main');
             _ensureMingleyardTemplateForExactTenant();
             document.documentElement.dataset.brandSlug = brand?.slug || '';
             _applyTenantFavicon(_tenant);
@@ -15283,6 +15331,134 @@ document.getElementById('basket-items').addEventListener('click', e => {
                 }).catch(() => {});
             });
         }
+    </script>
+    <!-- ── Food & Market test copy: UI motion ───────────────────────── -->
+    <script>
+    // Only runs while <html data-fm-motion> is set (Food & Market 2 test tenant).
+    // Cards reveal on scroll, a kitchen switch slides sideways, the basket bar bumps
+    // with a dish flying into it, haptic ticks, photos zoom out of their thumbnail.
+    // Doodle drift is CSS only. Reduced-motion users get none of it.
+    (function () {
+        const root = document.documentElement;
+        const on = () => root.hasAttribute('data-fm-motion')
+            && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const buzz = ms => { try { navigator.vibrate?.(ms); } catch (_) {} };
+
+        // Cards reveal as they scroll in; a kitchen switch sets the slide direction.
+        const list = document.getElementById('menu-list');
+        if (list && 'IntersectionObserver' in window) {
+            let batch = 0, batchTimer = null;
+            const io = new IntersectionObserver(entries => {
+                entries.forEach(en => {
+                    if (!en.isIntersecting) return;
+                    io.unobserve(en.target);
+                    en.target.style.setProperty('--fmm-delay', Math.min(batch++ * 55, 275) + 'ms');
+                    en.target.classList.add('fmm-in');
+                    requestAnimationFrame(() => en.target.classList.remove('fmm-pending'));
+                });
+                clearTimeout(batchTimer);
+                batchTimer = setTimeout(() => { batch = 0; }, 120);
+            }, { rootMargin: '0px 0px -8% 0px' });
+            const prime = () => {
+                if (!on()) return;
+                list.querySelectorAll('.menu-item:not(.fmm-in):not(.fmm-pending)').forEach(card => {
+                    card.classList.add('fmm-pending');
+                    io.observe(card);
+                });
+            };
+            new MutationObserver(prime).observe(list, { childList: true, subtree: true });
+            new MutationObserver(prime).observe(root, { attributes: true, attributeFilter: ['data-fm-motion'] });
+        }
+        let lastGroup = root.dataset.fmGroup, dxTimer = null;
+        new MutationObserver(() => {
+            const g = root.dataset.fmGroup;
+            if (g === lastGroup) return;
+            const keys = [...document.querySelectorAll('.group-btn')].map(b => b.dataset.group);
+            const dir = keys.indexOf(g) >= keys.indexOf(lastGroup) ? 1 : -1;
+            lastGroup = g;
+            if (!on()) return;
+            root.style.setProperty('--fmm-dx', (dir * 36) + 'px');
+            clearTimeout(dxTimer);
+            dxTimer = setTimeout(() => root.style.removeProperty('--fmm-dx'), 900);
+            buzz(8);
+        }).observe(root, { attributes: true, attributeFilter: ['data-fm-group'] });
+
+        // Basket: bar bump, count tick, the dish photo flying into the bar, haptics.
+        let lastTap = null;
+        document.addEventListener('pointerdown', e => {
+            const btn = e.target.closest('.qty-add-btn, .qty-inc, .qty-btn[data-delta="1"]');
+            if (!btn) return;
+            const r = btn.getBoundingClientRect();
+            const img = btn.closest('.menu-item')?.querySelector('img');
+            lastTap = { x: r.left + r.width / 2, y: r.top + r.height / 2, src: img?.currentSrc || img?.src || '', t: performance.now() };
+        }, true);
+        const countEl = document.getElementById('basket-bar-count');
+        const bar = document.getElementById('basket-bar');
+        let lastCount = 0;
+        const replay = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
+        function fly(tap) {
+            const b = bar.getBoundingClientRect();
+            const el = document.createElement(tap.src ? 'img' : 'div');
+            el.className = 'fmm-fly';
+            if (tap.src) { el.src = tap.src; el.alt = ''; }
+            el.style.left = tap.x + 'px'; el.style.top = tap.y + 'px';
+            document.body.appendChild(el);
+            const dx = b.left + b.width / 2 - tap.x, dy = b.top + b.height / 2 - tap.y;
+            const anim = el.animate([
+                { transform: 'translate(0,0) scale(0.6)', opacity: 0.95 },
+                { transform: `translate(${dx * 0.45}px, ${dy * 0.45 - 70}px) scale(1)`, opacity: 1, offset: 0.45 },
+                { transform: `translate(${dx}px, ${dy}px) scale(0.3)`, opacity: 0.4 }
+            ], { duration: 600, easing: 'cubic-bezier(0.45, 0, 0.55, 1)' });
+            anim.onfinish = anim.oncancel = () => el.remove();
+            return anim;
+        }
+        if (countEl && bar) {
+            new MutationObserver(() => {
+                const n = parseInt(countEl.textContent, 10) || 0;
+                const prev = lastCount; lastCount = n;
+                if (!on() || n === prev) return;
+                if (n > prev) {
+                    buzz(12);
+                    const tap = lastTap && performance.now() - lastTap.t < 800 ? lastTap : null;
+                    lastTap = null;
+                    const bump = () => { replay(bar, 'fmm-bump'); replay(countEl, 'fmm-tick'); };
+                    // The very first add slides the bar up from off-screen, so only fly once it's showing.
+                    if (tap && prev > 0) fly(tap).finished.then(bump, bump); else bump();
+                } else {
+                    buzz(6);
+                    replay(countEl, 'fmm-tick-down');
+                }
+            }).observe(countEl, { childList: true, characterData: true, subtree: true });
+        }
+
+        // Photo-only dishes: the fullscreen photo zooms out of the tapped thumbnail.
+        const lb = document.getElementById('img-lightbox'), lbImg = document.getElementById('lightbox-img');
+        let fromRect = null;
+        document.addEventListener('click', e => {
+            const img = e.target.closest('.menu-item img');
+            fromRect = img ? img.getBoundingClientRect() : null;
+        }, true);
+        const zoomIn = () => {
+            const to = lbImg.getBoundingClientRect();
+            if (!fromRect || !to.width) return;
+            const sx = fromRect.width / to.width, sy = fromRect.height / to.height;
+            const dx = fromRect.left + fromRect.width / 2 - (to.left + to.width / 2);
+            const dy = fromRect.top + fromRect.height / 2 - (to.top + to.height / 2);
+            lbImg.animate([
+                { transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})` },
+                { transform: 'none' }
+            ], { duration: 380, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+            fromRect = null;
+        };
+        if (lb && lbImg) {
+            new MutationObserver(() => {
+                if (!on() || !lb.classList.contains('open') || lb.classList.contains('has-panel')) return;
+                buzz(6);
+                if (lbImg.complete && lbImg.naturalWidth) zoomIn();
+                else lbImg.addEventListener('load', zoomIn, { once: true });
+            }).observe(lb, { attributes: true, attributeFilter: ['class'] });
+        }
+    })();
     </script>
 </body>
 </html>
