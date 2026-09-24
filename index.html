@@ -1705,6 +1705,28 @@
             pointer-events: none;
         }
         html[data-fm-motion-lab] #xr-scan-guide.show { display: block; }
+        #xr-scan-guide .sg-tap, #xr-scan-guide[data-step="tap"] .sg-scan { display: none; }
+        #xr-scan-guide[data-step="tap"] .sg-tap { display: block; }
+        #xr-scan-guide .sg-finger, #xr-scan-guide .sg-ripple {
+            transform-box: view-box;
+            transform-origin: 100px 58px;
+        }
+        #xr-scan-guide .sg-finger { animation: sg-finger 1.6s ease-in-out infinite; }
+        #xr-scan-guide .sg-ripple { animation: sg-ripple 1.6s ease-out infinite; }
+        @keyframes sg-finger {
+            0%   { translate: 22px -18px; opacity: 0; }
+            15%  { opacity: 1; }
+            45%  { translate: 0 0; scale: 1; }
+            55%  { translate: 0 2px; scale: 0.92; }
+            65%  { translate: 0 0; scale: 1; }
+            88%  { translate: 22px -18px; opacity: 1; }
+            100% { translate: 22px -18px; opacity: 0; }
+        }
+        @keyframes sg-ripple {
+            0%, 52% { scale: 0.5; opacity: 0; }
+            56%     { scale: 0.6; opacity: 0.9; }
+            100%    { scale: 1.6; opacity: 0; }
+        }
         #xr-scan-guide svg { display: block; width: 100%; height: auto; overflow: visible; }
         #xr-scan-guide .sg-arm {
             transform-box: view-box;
@@ -1733,7 +1755,8 @@
             100%     { fill: rgba(255,255,255,0.25); }
         }
         @media (prefers-reduced-motion: reduce) {
-            #xr-scan-guide .sg-arm, #xr-scan-guide .sg-cone, #xr-scan-guide .sg-plate { animation: none; }
+            #xr-scan-guide .sg-arm, #xr-scan-guide .sg-cone, #xr-scan-guide .sg-plate,
+            #xr-scan-guide .sg-finger, #xr-scan-guide .sg-ripple { animation: none; }
             #xr-scan-guide .sg-arm { rotate: -30deg; }
         }
         #xr-nav-row {
@@ -9385,7 +9408,20 @@
     <div id="xr-overlay">
         <div id="xr-gesture-layer"></div>
         <div id="xr-scan-guide" aria-hidden="true">
-            <svg viewBox="0 0 200 140">
+            <svg class="sg-tap" viewBox="0 0 200 140">
+                <ellipse cx="100" cy="58" rx="46" ry="14" fill="rgba(255,255,255,0.12)" stroke="#fff" stroke-width="3"/>
+                <ellipse class="sg-ripple" cx="100" cy="58" rx="30" ry="9" fill="none" stroke="#fff" stroke-width="2.5"/>
+                <g class="sg-finger">
+                    <g transform="rotate(-24 100 58)" fill="#fff" stroke="rgba(0,0,0,0.35)" stroke-width="1.5">
+                        <rect x="92" y="56" width="16" height="44" rx="8"/>
+                        <rect x="104" y="80" width="14" height="30" rx="7"/>
+                        <rect x="114" y="84" width="13" height="27" rx="6.5"/>
+                        <rect x="84" y="86" width="44" height="40" rx="14"/>
+                        <rect x="76" y="88" width="13" height="26" rx="6.5" transform="rotate(-30 82 100)"/>
+                    </g>
+                </g>
+            </svg>
+            <svg class="sg-scan" viewBox="0 0 200 140">
                 <path d="M100 22 A86 86 0 0 0 34.1 52.7" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2" stroke-dasharray="4 5"/>
                 <path d="M35.4 43.4 L34.1 52.7 L43 49.8" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
                 <line x1="30" y1="112" x2="170" y2="112" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
@@ -10258,11 +10294,16 @@
             stepEl.textContent = found ? u.hintStep2 : u.hintStep1;
             mainEl.textContent = found ? u.hintTap   : u.hintScan;
             const guide = document.getElementById('xr-scan-guide');
+            // Scan step (arc) until a surface is found, tap step once the circle shows,
+            // gone once the dish is placed (placed also reports found = false).
             if (guide && document.documentElement.hasAttribute('data-fm-motion-lab')) {
-                guide.classList.toggle('show', !found);
-                if (!found) mainEl.textContent = window.__lang === 'ka'
-                    ? 'დაიჭირე ტელეფონი მაგიდის თავზე, შემდეგ ნელა გადმოხარე შენკენ'
-                    : 'Hold your phone above the table, then slowly tilt it toward you';
+                const ka = window.__lang === 'ka';
+                guide.classList.toggle('show', !placed);
+                guide.dataset.step = found ? 'tap' : 'scan';
+                mainEl.textContent = found
+                    ? (ka ? 'ყოჩაღ! ახლა დააჭირე წრეს' : 'Good job! Now tap the circle')
+                    : (ka ? 'დაიჭირე ტელეფონი მაგიდის თავზე, შემდეგ ნელა გადმოხარე შენკენ'
+                          : 'Hold your phone above the table, then slowly tilt it toward you');
             }
         }
 
