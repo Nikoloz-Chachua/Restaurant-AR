@@ -1690,6 +1690,52 @@
     width: 80%;
     max-width: 320px;
 }
+        /* Food & Market test copy: animated "above the table, then tilt toward you" guide
+           shown while ARCore is still looking for a surface (see _updateScanHint). */
+        #xr-scan-guide {
+            display: none;
+            position: absolute;
+            bottom: 196px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            padding: 10px 10px 4px;
+            border-radius: 20px;
+            background: rgba(0,0,0,0.55);
+            pointer-events: none;
+        }
+        html[data-fm-motion-lab] #xr-scan-guide.show { display: block; }
+        #xr-scan-guide svg { display: block; width: 100%; height: auto; overflow: visible; }
+        #xr-scan-guide .sg-arm {
+            transform-box: view-box;
+            transform-origin: 100px 108px;
+            animation: sg-arc 3.6s ease-in-out infinite;
+        }
+        #xr-scan-guide .sg-cone { animation: sg-cone 3.6s ease-in-out infinite; }
+        #xr-scan-guide .sg-plate { animation: sg-plate 3.6s ease-in-out infinite; }
+        @keyframes sg-arc {
+            0%   { rotate: 0deg;   opacity: 0; }
+            6%   { rotate: 0deg;   opacity: 1; }
+            16%  { rotate: 0deg; }
+            68%  { rotate: -50deg; }
+            88%  { rotate: -50deg; opacity: 1; }
+            100% { rotate: -50deg; opacity: 0; }
+        }
+        @keyframes sg-cone {
+            0%, 16%  { opacity: 0.18; }
+            40%      { opacity: 0.32; }
+            68%, 88% { opacity: 0.45; }
+            100%     { opacity: 0; }
+        }
+        @keyframes sg-plate {
+            0%, 64%  { fill: rgba(255,255,255,0.25); }
+            72%, 90% { fill: rgba(255,255,255,0.95); }
+            100%     { fill: rgba(255,255,255,0.25); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #xr-scan-guide .sg-arm, #xr-scan-guide .sg-cone, #xr-scan-guide .sg-plate { animation: none; }
+            #xr-scan-guide .sg-arm { rotate: -30deg; }
+        }
         #xr-nav-row {
             display: none;
             position: absolute;
@@ -9338,6 +9384,24 @@
 
     <div id="xr-overlay">
         <div id="xr-gesture-layer"></div>
+        <div id="xr-scan-guide" aria-hidden="true">
+            <svg viewBox="0 0 200 140">
+                <path d="M100 22 A86 86 0 0 0 34.1 52.7" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2" stroke-dasharray="4 5"/>
+                <path d="M35.4 43.4 L34.1 52.7 L43 49.8" fill="none" stroke="rgba(255,255,255,0.75)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="30" y1="112" x2="170" y2="112" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                <line x1="46" y1="112" x2="46" y2="136" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+                <line x1="154" y1="112" x2="154" y2="136" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+                <ellipse class="sg-plate" cx="100" cy="107" rx="18" ry="3.5" fill="rgba(255,255,255,0.25)"/>
+                <clipPath id="sg-above-table"><rect x="0" y="0" width="200" height="109"/></clipPath>
+                <g clip-path="url(#sg-above-table)">
+                    <g class="sg-arm"><polygon class="sg-cone" points="100,32 72,128 128,128" fill="#fff" opacity="0.2"/></g>
+                </g>
+                <g class="sg-arm">
+                    <rect x="80" y="24" width="40" height="8" rx="3" fill="#fff"/>
+                    <circle cx="100" cy="32" r="1.8" fill="#222"/>
+                </g>
+            </svg>
+        </div>
         <div id="xr-place-hint">
             <div id="xr-hint-step"></div>
             <div id="xr-hint-main"></div>
@@ -10193,6 +10257,13 @@
             const u = UI[window.__lang || 'en'];
             stepEl.textContent = found ? u.hintStep2 : u.hintStep1;
             mainEl.textContent = found ? u.hintTap   : u.hintScan;
+            const guide = document.getElementById('xr-scan-guide');
+            if (guide && document.documentElement.hasAttribute('data-fm-motion-lab')) {
+                guide.classList.toggle('show', !found);
+                if (!found) mainEl.textContent = window.__lang === 'ka'
+                    ? 'დაიჭირე ტელეფონი მაგიდის თავზე, შემდეგ ნელა გადმოხარე შენკენ'
+                    : 'Hold your phone above the table, then slowly tilt it toward you';
+            }
         }
 
         // ── Add-btn basket state sync ─────────────────────────────────
