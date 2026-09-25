@@ -2840,7 +2840,10 @@
             background-size: cover;
             background-repeat: no-repeat;
         }
-        html[data-generic-hero="true"] .mg-hero-next { opacity: 0; pointer-events: none; }
+        html[data-generic-hero="true"] .mg-hero-next {
+            opacity: 0; pointer-events: none;
+            transition: opacity var(--mg-hero-fade, 1200ms) ease-in-out;
+        }
         html[data-generic-hero="true"] .mg-hero-veil {
             position: absolute; inset: 0; z-index: 1;
             background: linear-gradient(180deg, rgba(0,0,0,0.16), rgba(0,0,0,0.62));
@@ -2852,6 +2855,21 @@
         html[data-generic-hero="true"] .mg-hero-brand { color: #fff; font-size: clamp(2.25rem, 9vw, 4.5rem); text-shadow: 0 3px 18px rgba(0,0,0,0.62); }
         html[data-generic-hero="true"] .mg-hero-tagline { color: rgba(255,255,255,0.9); max-width: min(88vw, 560px); }
         html[data-generic-hero="true"] .mg-hero-scroll { position: absolute; z-index: 2; bottom: 22px; color: #fff; }
+        /* Ikigai: the hero already carries the logo, so the logo + name header under
+           it is dropped instead of repeating the brand a screen apart. The title
+           stays in the page for screen readers and search. */
+        html[data-tenant="ikigai-sushiroom-main"][data-generic-hero="true"] #tenant-logo { display: none !important; }
+        html[data-tenant="ikigai-sushiroom-main"][data-generic-hero="true"] .header {
+            position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+        }
+        html[data-tenant="ikigai-sushiroom-main"][data-generic-hero="true"] #cat-bar { margin-top: 22px; }
+        html[data-tenant="ikigai-sushiroom-main"][data-generic-hero="true"] .mg-hero-scroll {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            text-decoration: none; font-size: 0.72rem; font-weight: 600;
+            letter-spacing: 0.22em; text-transform: uppercase;
+        }
+        html[data-tenant="ikigai-sushiroom-main"][data-generic-hero="true"] .mg-hero-scroll svg { width: 22px; height: 22px; }
 
         /* ── Hero video ──────────────────────────────────────────────────────
            Sits in the same stacking slot as .mg-hero-photo, so every template
@@ -10680,7 +10698,8 @@
             'food-market-main': './img/food-and-market-favicon.png',
             'corner-by-eleven-main': './img/corner-at-tabidze-favicon.png',
             'kado-main': './img/kado-favicon.png',
-            'mugsy-main': './assets/mugsy/logo.svg'
+            'mugsy-main': './assets/mugsy/logo.svg',
+            'ikigai-sushiroom-main': './img/ikigai-favicon.png'
         };
         const _DEFAULT_FAVICON = './img/betareal-favicon.svg';
         const _BAOMA_TEMPLATE_KEY = 'baoma';
@@ -13578,6 +13597,28 @@
             play();
         }
 
+        /* ── Hero photos by orientation ─────────────────────────────────────────
+           For the tenants listed here, the hero gallery may mix tall (phone) and
+           wide (desktop) photos. Phones get the tall ones and larger screens the
+           wide ones; a tall shot covering a desktop band is cropped to a sliver
+           and looks stretched. Orientation is read from the images themselves, so
+           the admin needs no extra field — upload both kinds into the one gallery.
+           If a device's set would be empty, it keeps the whole list. */
+        const HERO_ORIENTATION_TENANTS = new Set(['ikigai-sushiroom-main']);
+
+        function _heroShotsForDevice(urls) {
+            const phone = window.matchMedia(HERO_VIDEO_MOBILE_MQ).matches;
+            return Promise.all(urls.map(u => new Promise(res => {
+                const img = new Image();
+                img.onload = () => res({ u, tall: img.naturalHeight > img.naturalWidth });
+                img.onerror = () => res(null);
+                img.src = u;
+            }))).then(shots => {
+                const pick = shots.filter(x => x && x.tall === phone).map(x => x.u);
+                return pick.length ? pick : urls;
+            });
+        }
+
         /* ── Hero video ─────────────────────────────────────────────────────────
            theme_config.hero_video_url turns the shared hero band into a muted,
            looping clip. It is layered over the hero poster rather than replacing
@@ -14002,7 +14043,12 @@
                         ? _startHeroVideoGallerySequence(cfg, heroShots)
                         : _startHeroVideo(cfg)
                 );
-                if (!heroVideoOn && wantHeroGallery) _startHeroGallery(heroShots);
+                if (!heroVideoOn && HERO_ORIENTATION_TENANTS.has(document.documentElement.dataset.tenant) && heroShots.length > 1) {
+                    _heroShotsForDevice(heroShots).then(shots => {
+                        document.documentElement.style.setProperty('--hero-image', `url("${shots[0]}")`);
+                        _startHeroGallery(shots);
+                    });
+                } else if (!heroVideoOn && wantHeroGallery) _startHeroGallery(heroShots);
                 // Optional per-tenant hero height (e.g. "56.25vw" for a full 16:9 banner).
                 if (cfg.hero_min_h) {
                     document.documentElement.style.setProperty('--mg-hero-h', cfg.hero_min_h);

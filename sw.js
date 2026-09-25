@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bl-v237';
+const CACHE_NAME = 'bl-v239';
 
 const SUPABASE_URL  = 'https://lwdpegloznhpcecivhfy.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_65dKKpb-lxOr8JTjdj7yxw_LZzcJp5h';
@@ -19,6 +19,7 @@ const PRECACHE = [
     './img/food-and-market-favicon.png',
     './img/corner-at-tabidze-favicon.png',
     './img/kado-favicon.png',
+    './img/ikigai-favicon.png',
     './img/baoma/interior-hero-maps.webp',
     './img/baoma/interior-terrace.jpg',
     './assets/mugsy/logo.svg',
